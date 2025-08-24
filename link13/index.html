@@ -3,14 +3,15 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>World of PDFs • Remove Color • Made by ANABRATA</title>
+<title>World of PDFs • Color Replace (Lossless) • Made by ANABRATA</title>
 <meta name="color-scheme" content="light dark" />
 <style>
   :root{
     --green:#10b981; --blue:#3b82f6; --yellow:#fde047; --pink:#f9a8d4;
     --card:#ffffffee; --text:#0b1020; --muted:#4b5563; --ring:rgba(0,0,0,.12);
-    --grad:linear-gradient(135deg,var(--green),var(--blue),var(--yellow));
+    --grad: linear-gradient(135deg, var(--green), var(--blue), var(--yellow));
   }
+  /* Soft animated background */
   body{
     margin:0; font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif; color:var(--text);
     background:
@@ -20,7 +21,8 @@
       linear-gradient(120deg, #e8fdf6, #eef4ff 40%, #fffbe6 80%, #ffffff);
     background-size:140% 140%; animation:bgShift 18s ease-in-out infinite alternate;
   }
-  @keyframes bgShift{0%{background-position:0% 0%,100% 0%,50% 100%,0% 0%}100%{background-position:50% 30%,50% 20%,60% 70%,100% 100%}}
+  @keyframes bgShift{0%{background-position:0% 0%, 100% 0%, 50% 100%, 0% 0%}100%{background-position:50% 30%, 50% 20%, 60% 70%, 100% 100%}}
+
   .wrap{ width:min(980px,94%); margin:0 auto }
   header.hero{ min-height:24vh; display:grid; place-items:center; text-align:center; padding: clamp(1.2rem,5vw,2.2rem) 0 1rem; }
   .welcome{
@@ -42,11 +44,14 @@
         box-shadow:0 8px 22px rgba(16,185,129,.22), 0 4px 14px rgba(59,130,246,.14); font-size:1.02rem }
   .btn.ghost{ background:linear-gradient(135deg, rgba(16,185,129,.12), rgba(59,130,246,.12)); color:#0b1020; border:1px solid var(--ring) }
   .field{ display:flex; align-items:center; gap:.55rem; background:#f8fafc; border:1px solid #e5e7eb; border-radius:.9rem; padding:.55rem .75rem }
+  .field input, .field label{ font:inherit }
   .muted{ color:#4b5563 }
   progress{ width:100% }
   .tags{ display:flex; flex-wrap:wrap; gap:.35rem; justify-content:center; margin-top:.4rem }
   .tag{ padding:.25rem .55rem; border-radius:.7rem; background:#fff; border:1px solid #e5e7eb; font-size:.9rem }
   .info{ text-align:center; color:#111827; opacity:.9; margin:1.2rem 0 2.2rem }
+  .swatch{ width:28px; height:28px; border-radius:6px; border:1px solid #d1d5db }
+  .hex{ width:100px }
 </style>
 </head>
 <body>
@@ -59,19 +64,35 @@
 
   <main class="wrap">
     <section class="panel">
-      <div style="font-weight:900; font-size:1.15rem">Remove a specific color (lossless stream edit)</div>
-      <div class="muted" style="margin-top:.15rem">No rasterization. Pages remain vector/text. Rewrites only color‑set commands that match your target color.</div>
+      <div style="font-weight:900; font-size:1.15rem">Replace one color with another (lossless)</div>
+      <div class="muted" style="margin-top:.15rem">No rasterization. We rewrite only color-set commands. Pages stay vector/text.</div>
 
       <div class="row" style="margin-top:.8rem">
         <button class="btn" id="pick">Choose PDF</button>
-        <button class="btn ghost" id="run" disabled>Remove color → Download</button>
-        <a id="download" class="btn ghost" download="color_removed.pdf" href="#" aria-disabled="true">Download</a>
+        <button class="btn ghost" id="run" disabled>Replace color → Download</button>
+        <a id="download" class="btn ghost" download="color_replaced.pdf" href="#" aria-disabled="true">Download</a>
       </div>
 
       <div class="row" style="margin-top:.8rem">
-        <div class="field"><label>Target color</label><input id="hex" type="text" value="#e6e6e6"></div>
-        <div class="field"><label>Tolerance (0–255)</label><input id="tol" type="number" min="0" max="40" step="1" value="8"></div>
-        <div class="muted">Tip: start with tolerance 8–12. Higher = match more near shades.</div>
+        <div class="field">
+          <label>From</label>
+          <input id="fromPicker" type="color" value="#e6e6e6" class="swatch">
+          <input id="fromHex" class="hex" type="text" value="#e6e6e6">
+        </div>
+        <div class="field">
+          <label>To</label>
+          <input id="toPicker" type="color" value="#ffffff" class="swatch">
+          <input id="toHex" class="hex" type="text" value="#ffffff">
+        </div>
+        <div class="field">
+          <label>Tolerance (0–255)</label>
+          <input id="tol" type="number" min="0" max="60" step="1" value="12">
+        </div>
+        <div class="field">
+          <label><input id="fills" type="checkbox" checked> Fills</label>
+          <label><input id="strokes" type="checkbox" checked> Strokes</label>
+          <label><input id="scOps" type="checkbox" checked> sc/SC</label>
+        </div>
       </div>
 
       <div class="panel">
@@ -82,17 +103,20 @@
     </section>
 
     <section class="panel">
-      <div style="font-weight:800; margin-bottom:.4rem">What’s changed</div>
+      <div style="font-weight:800; margin-bottom:.4rem">What gets changed</div>
       <div class="muted">
-        - Matches and rewrites these operators when they are near your color:<br>
-        RGB: “rg / RG”, Gray: “g / G”, CMYK: “k / K”, Generic: “sc / SC” (3‑component).<br>
-        - Rewritten to pure white (RGB 1 1 1, Gray 1, CMYK 0 0 0 0). Everything else remains untouched.
+        - RGB: “r g b rg” (fill) and “R G B RG” (stroke)<br>
+        - Gray: “g” (fill) and “G” (stroke)<br>
+        - CMYK: “c m y k k” (fill) and “K” (stroke)<br>
+        - sc / SC with 1, 3, or 4 operands (Gray / RGB / CMYK)<br>
+        We match near your “From” color by tolerance and rewrite to the “To” color in the same family.
       </div>
     </section>
 
     <div class="info">© <span id="year"></span> Made by ANABRATA</div>
   </main>
 
+  <!-- pdf-lib and pako (inflate/deflate) -->
   <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
 
@@ -102,17 +126,30 @@ document.getElementById('year').textContent = new Date().getFullYear();
 const pickBtn = document.getElementById('pick');
 const runBtn = document.getElementById('run');
 const downloadA = document.getElementById('download');
-const hexInput = document.getElementById('hex');
-const tolInput = document.getElementById('tol');
 const note = document.getElementById('note');
 const prog = document.getElementById('prog');
 const tags = document.getElementById('tags');
+
+const fromPicker = document.getElementById('fromPicker');
+const fromHex = document.getElementById('fromHex');
+const toPicker = document.getElementById('toPicker');
+const toHex = document.getElementById('toHex');
+const tolInput = document.getElementById('tol');
+const fillsChk = document.getElementById('fills');
+const strokesChk = document.getElementById('strokes');
+const scOpsChk = document.getElementById('scOps');
 
 const fileIn = document.createElement('input');
 fileIn.type = 'file';
 fileIn.accept = 'application/pdf';
 
 let pdfBytes = null;
+
+// Sync color inputs
+fromPicker.addEventListener('input', ()=> fromHex.value = fromPicker.value);
+fromHex.addEventListener('input', ()=> { if (validHex(fromHex.value)) fromPicker.value = normHex(fromHex.value); });
+toPicker.addEventListener('input', ()=> toHex.value = toPicker.value);
+toHex.addEventListener('input', ()=> { if (validHex(toHex.value)) toPicker.value = normHex(toHex.value); });
 
 pickBtn.onclick = () => fileIn.click();
 fileIn.onchange = async () => {
@@ -126,25 +163,29 @@ fileIn.onchange = async () => {
 
 runBtn.onclick = async () => {
   if (!pdfBytes){ note.textContent = "Choose a PDF first."; return; }
-  try{
-    const hex = (hexInput.value || '#e6e6e6').trim();
-    const RGB = hexToRgb(hex);
-    if (!RGB) { note.textContent = "Invalid hex color. Example: #e6e6e6"; return; }
-    const tol = Math.max(0, Math.min(255, parseInt(tolInput.value||'8',10)));
-    const target = { r: RGB.r/255, g: RGB.g/255, b: RGB.b/255, gray: (RGB.r+RGB.g+RGB.b)/(3*255) };
-    const tolF = tol/255;
 
+  const from = parseHex(fromHex.value);
+  const to = parseHex(toHex.value);
+  if (!from || !to){ note.textContent = "Enter valid hex like #e6e6e6"; return; }
+
+  const tol = Math.max(0, Math.min(255, parseInt(tolInput.value||'12',10)));
+  const src = { r: from.r/255, g: from.g/255, b: from.b/255, gray: rgbToGray(from) };
+  const dst = { r: to.r/255, g: to.g/255, b: to.b/255, gray: rgbToGray(to) };
+  const tolF = tol/255;
+
+  try{
     prog.hidden = false; prog.value = 8; note.textContent = "Loading PDF…";
 
     const { PDFDocument, PDFName, PDFArray, PDFDict, PDFRawStream } = PDFLib;
     const doc = await PDFDocument.load(pdfBytes, { updateMetadata:false, ignoreEncryption:false });
     const ctx = doc.context;
 
-    let totalStreams=0, editedStreams=0, rgbHits=0, grayHits=0, cmykHits=0, scHits=0;
+    let totalStreams=0, editedStreams=0, hits = { rgb:0, gray:0, cmyk:0, sc1:0, sc3:0, sc4:0, RG:0, rg:0, G:0, g:0, K:0, k:0, SC:0, sc:0 };
 
     for (const page of doc.getPages()){
       const cRef = page.node.get(PDFName.of('Contents'));
       if (!cRef) continue;
+
       const arr = (cRef instanceof PDFArray) ? cRef : (()=>{const a=PDFArray.withContext(ctx); a.push(cRef); return a;})();
       const outArr = PDFArray.withContext(ctx);
 
@@ -153,22 +194,32 @@ runBtn.onclick = async () => {
         const sref = arr.get(i);
         const stream = ctx.lookup(sref, PDFRawStream);
         const filter = stream.dict.get(PDFName.of('Filter'));
-        const fName = String(filter||'');
-        const bytes = (fName === '/FlateDecode') ? pako.inflate(stream.getContents()) : stream.getContents();
-        let src = new TextDecoder('latin1').decode(bytes);
+        const hadFlate = hasFlate(filter);
+        const raw = stream.getContents();
+        const infl = hadFlate ? pako.inflate(raw) : raw;
 
-        const before = src;
-        const res = rewriteColors(src, target, tolF);
-        src = res.text;
-        rgbHits += res.rgb; grayHits += res.gray; cmykHits += res.cmyk; scHits += res.sc;
+        let srcStr = new TextDecoder('latin1').decode(infl);
+        const before = srcStr;
 
-        if (src !== before) editedStreams++;
+        const res = replaceColorsInStream(srcStr, src, dst, tolF, {
+          fills: fillsChk.checked,
+          strokes: strokesChk.checked,
+          scOps: scOpsChk.checked
+        });
 
-        let outBytes = new TextEncoder().encode(src);
+        srcStr = res.text;
+        Object.keys(hits).forEach(k => hits[k]+= (res.hits[k]||0));
+
+        if (srcStr !== before) editedStreams++;
+
+        let outBytes = new TextEncoder().encode(srcStr);
         let outFilter = filter;
-        if (fName === '/FlateDecode'){
+        if (hadFlate){
           outBytes = pako.deflate(outBytes);
-          outFilter = PDFName.of('FlateDecode');
+          outFilter = ensureFlate(filter);
+        } else {
+          // keep whatever filter (usually none)
+          outFilter = filter;
         }
 
         const newDict = stream.dict.clone(ctx);
@@ -187,14 +238,14 @@ runBtn.onclick = async () => {
     downloadA.setAttribute('aria-disabled','false');
 
     tags.innerHTML = '';
-    addTag(`streams ${editedStreams}/${totalStreams} edited`);
-    addTag(`RGB hits: ${rgbHits}`);
-    addTag(`Gray hits: ${grayHits}`);
-    addTag(`CMYK hits: ${cmykHits}`);
-    addTag(`SC hits: ${scHits}`);
+    addTag(`Streams edited: ${editedStreams}/${totalStreams}`);
+    addTag(`RGB (rg/RG): ${hits.rgb}`);
+    addTag(`Gray (g/G): ${hits.gray}`);
+    addTag(`CMYK (k/K): ${hits.cmyk}`);
+    addTag(`sc(1): ${hits.sc1} • sc(3): ${hits.sc3} • sc(4): ${hits.sc4}`);
 
     prog.value = 100; setTimeout(()=>prog.hidden=true, 300);
-    note.textContent = "Done. Download your color‑cleaned PDF.";
+    note.textContent = "Done. Download your color‑replaced PDF.";
   } catch(e){
     console.error(e);
     prog.hidden = true;
@@ -202,65 +253,156 @@ runBtn.onclick = async () => {
   }
 };
 
-/* ---------- Color rewrite logic ---------- */
+/* ---------- Replace logic ---------- */
 const NUM = '([+\\-]?(?:\\d*\\.\\d+|\\d+)(?:[Ee][+\\-]?\\d+)?)';
 const WS  = '\\s+';
 
-function rewriteColors(text, tgt, tol){
-  let rgb=0, gray=0, cmyk=0, sc=0;
+function replaceColorsInStream(text, src, dst, tol, opts){
+  const hits = { rgb:0, gray:0, cmyk:0, sc1:0, sc3:0, sc4:0, RG:0, rg:0, G:0, g:0, K:0, k:0, SC:0, sc:0 };
+  const dec = n => Math.max(0, Math.min(1, +n));
+  const fmt = v => (Math.round(v*1000)/1000).toString();  // up to 3 decimals
 
-  // RGB: r g b (rg|RG)
-  const reRGB = new RegExp(`${NUM}${WS}${NUM}${WS}${NUM}${WS}(rg|RG)\\b`, 'g');
-  text = text.replace(reRGB, (m, r,g,b, op) => {
-    const R = parseFloat(r), G = parseFloat(g), B = parseFloat(b);
-    if (isCloseRGB(R,G,B,tgt, tol)) { rgb++; return `1 1 1 ${op}`; }
-    return m;
-  });
+  // RGB rg (fill) and RG (stroke)
+  if (opts.fills){
+    const re_rg = new RegExp(`${NUM}${WS}${NUM}${WS}${NUM}${WS}(rg)\\b`, 'g');
+    text = text.replace(re_rg, (m, r,g,b,op) => {
+      const R=dec(r), G=dec(g), B=dec(b);
+      if (isCloseRGB(R,G,B, src, tol)){ hits.rgb++; hits.rg++; return `${fmt(dst.r)} ${fmt(dst.g)} ${fmt(dst.b)} ${op}`; }
+      return m;
+    });
+  }
+  if (opts.strokes){
+    const re_RG = new RegExp(`${NUM}${WS}${NUM}${WS}${NUM}${WS}(RG)\\b`, 'g');
+    text = text.replace(re_RG, (m, r,g,b,op) => {
+      const R=dec(r), G=dec(g), B=dec(b);
+      if (isCloseRGB(R,G,B, src, tol)){ hits.rgb++; hits.RG++; return `${fmt(dst.r)} ${fmt(dst.g)} ${fmt(dst.b)} ${op}`; }
+      return m;
+    });
+  }
 
-  // Gray: g|G (single)
-  const reGray = new RegExp(`${NUM}${WS}(g|G)\\b`, 'g');
-  text = text.replace(reGray, (m, v, op) => {
-    const V = parseFloat(v);
-    if (Math.abs(V - tgt.gray) <= tol) { gray++; return `1 ${op}`; }
-    return m;
-  });
+  // Gray g/G (single operand 0..1) — match src gray, set to dst gray
+  if (opts.fills){
+    const re_g = new RegExp(`${NUM}${WS}(g)\\b`, 'g');
+    text = text.replace(re_g, (m, val, op) => {
+      const V = dec(val);
+      if (Math.abs(V - src.gray) <= tol){ hits.gray++; hits.g++; return `${fmt(dst.gray)} ${op}`; }
+      return m;
+    });
+  }
+  if (opts.strokes){
+    const re_G = new RegExp(`${NUM}${WS}(G)\\b`, 'g');
+    text = text.replace(re_G, (m, val, op) => {
+      const V = dec(val);
+      if (Math.abs(V - src.gray) <= tol){ hits.gray++; hits.G++; return `${fmt(dst.gray)} ${op}`; }
+      return m;
+    });
+  }
 
-  // CMYK: c m y k (k|K) — convert to RGB and compare
-  const reCMYK = new RegExp(`${NUM}${WS}${NUM}${WS}${NUM}${WS}${NUM}${WS}(k|K)\\b`, 'g');
-  text = text.replace(reCMYK, (m, c,mv,y,k, op) => {
-    const C=parseFloat(c), M=parseFloat(mv), Y=parseFloat(y), K=parseFloat(k);
-    const R = (1 - Math.min(1, C + K));
-    const G = (1 - Math.min(1, M + K));
-    const B = (1 - Math.min(1, Y + K));
-    if (isCloseRGB(R,G,B,tgt, tol)) { cmyk++; return `0 0 0 0 ${op}`; }
-    return m;
-  });
+  // CMYK k/K (four operands 0..1) — compare to src RGB via conversion; set to dst CMYK
+  const dstCMYK = rgbToCmyk(dst.r, dst.g, dst.b);
+  if (opts.fills){
+    const re_k = new RegExp(`${NUM}${WS}${NUM}${WS}${NUM}${WS}${NUM}${WS}(k)\\b`, 'g');
+    text = text.replace(re_k, (m, c,mv,y,k,op) => {
+      const C=dec(c), M=dec(mv), Y=dec(y), K=dec(k);
+      const rgb = cmykToRgb(C,M,Y,K);
+      if (isCloseRGB(rgb.r,rgb.g,rgb.b, src, tol)){ hits.cmyk++; hits.k++; return `${fmt(dstCMYK.c)} ${fmt(dstCMYK.m)} ${fmt(dstCMYK.y)} ${fmt(dstCMYK.k)} ${op}`; }
+      return m;
+    });
+  }
+  if (opts.strokes){
+    const re_K = new RegExp(`${NUM}${WS}${NUM}${WS}${NUM}${WS}${NUM}${WS}(K)\\b`, 'g');
+    text = text.replace(re_K, (m, c,mv,y,k,op) => {
+      const C=dec(c), M=dec(mv), Y=dec(y), K=dec(k);
+      const rgb = cmykToRgb(C,M,Y,K);
+      if (isCloseRGB(rgb.r,rgb.g,rgb.b, src, tol)){ hits.cmyk++; hits.K++; return `${fmt(dstCMYK.c)} ${fmt(dstCMYK.m)} ${fmt(dstCMYK.y)} ${fmt(dstCMYK.k)} ${op}`; }
+      return m;
+    });
+  }
 
-  // Generic DeviceRGB-like sc/SC (3 operands)
-  const reSC = new RegExp(`${NUM}${WS}${NUM}${WS}${NUM}${WS}(sc|SC)\\b`, 'g');
-  text = text.replace(reSC, (m, r,g,b, op) => {
-    const R = parseFloat(r), G = parseFloat(g), B = parseFloat(b);
-    if (isCloseRGB(R,G,B,tgt, tol)) { sc++; return `1 1 1 ${op}`; }
-    return m;
-  });
+  // sc/SC — handle 1, 3, or 4 operand variants
+  if (opts.scOps){
+    // 3-operand (RGB-like)
+    const re_sc3 = new RegExp(`${NUM}${WS}${NUM}${WS}${NUM}${WS}(sc|SC)\\b`, 'g');
+    text = text.replace(re_sc3, (m, r,g,b,op) => {
+      const R=dec(r), G=dec(g), B=dec(b);
+      if (isCloseRGB(R,G,B, src, tol)){ hits.sc3++; hits[(op==='SC'?'SC':'sc')] = (hits[(op==='SC'?'SC':'sc')]||0)+1; return `${fmt(dst.r)} ${fmt(dst.g)} ${fmt(dst.b)} ${op}`; }
+      return m;
+    });
+    // 1-operand (Gray)
+    const re_sc1 = new RegExp(`${NUM}${WS}(sc|SC)\\b`, 'g');
+    text = text.replace(re_sc1, (m, v,op) => {
+      const V=dec(v);
+      if (Math.abs(V - src.gray) <= tol){ hits.sc1++; hits[(op==='SC'?'SC':'sc')] = (hits[(op==='SC'?'SC':'sc')]||0)+1; return `${fmt(dst.gray)} ${op}`; }
+      return m;
+    });
+    // 4-operand (CMYK)
+    const re_sc4 = new RegExp(`${NUM}${WS}${NUM}${WS}${NUM}${WS}${NUM}${WS}(sc|SC)\\b`, 'g');
+    text = text.replace(re_sc4, (m, c,mv,y,k,op) => {
+      const C=dec(c), M=dec(mv), Y=dec(y), K=dec(k);
+      const rgb = cmykToRgb(C,M,Y,K);
+      if (isCloseRGB(rgb.r,rgb.g,rgb.b, src, tol)){ hits.sc4++; hits[(op==='SC'?'SC':'sc')] = (hits[(op==='SC'?'SC':'sc')]||0)+1; return `${fmt(dstCMYK.c)} ${fmt(dstCMYK.m)} ${fmt(dstCMYK.y)} ${fmt(dstCMYK.k)} ${op}`; }
+      return m;
+    });
+  }
 
-  return { text, rgb, gray, cmyk, sc };
+  return { text, hits };
 }
 
-function isCloseRGB(R,G,B, tgt, tol){
-  // R,G,B,tgt.* are 0..1; compare Euclidean distance
-  const dr=R-tgt.r, dg=G-tgt.g, db=B-tgt.b;
+function isCloseRGB(R,G,B, src, tol){
+  const dr=R - src.r, dg=G - src.g, db=B - src.b;
   const dist = Math.sqrt(dr*dr + dg*dg + db*db);
-  return dist <= Math.sqrt(3)*tol; // scale tol across 3 channels
+  return dist <= Math.sqrt(3)*tol;
 }
 
-/* ---------- Utils ---------- */
-function hexToRgb(hex){
-  const m = /^#?([a-f0-9]{6})$/i.exec(hex);
+/* ---------- Filters handling ---------- */
+function hasFlate(filter){
+  if (!filter) return false;
+  const s = String(filter);
+  if (s === '/FlateDecode') return true;
+  if (filter instanceof PDFLib.PDFArray){
+    for (let i=0;i<filter.size();i++){
+      const f = filter.get(i);
+      if (String(f) === '/FlateDecode') return true;
+    }
+  }
+  return false;
+}
+function ensureFlate(filter){
+  // Keep original Filter object; if it already was FlateDecode (or included), return as-is.
+  // Otherwise, set to /FlateDecode to reflect compression we apply.
+  if (!filter) return PDFLib.PDFName.of('FlateDecode');
+  if (hasFlate(filter)) return filter;
+  return PDFLib.PDFName.of('FlateDecode');
+}
+
+/* ---------- Color helpers ---------- */
+function validHex(h){ return /^#?[0-9a-f]{6}$/i.test(h.trim()); }
+function normHex(h){ const s=h.trim().replace(/^#/,''); return '#'+s.toLowerCase(); }
+function parseHex(h){
+  const m = /^#?([0-9a-f]{6})$/i.exec(h.trim());
   if (!m) return null;
   const n = parseInt(m[1],16);
   return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 };
 }
+function rgbToGray(rgb){ return (0.2126*rgb.r + 0.7152*rgb.g + 0.0722*rgb.b)/255; }
+function rgbToCmyk(r,g,b){
+  // r,g,b in 0..1
+  const K = 1 - Math.max(r,g,b);
+  if (K>=0.999) return { c:0, m:0, y:0, k:1 };
+  const C = (1 - r - K)/(1 - K);
+  const M = (1 - g - K)/(1 - K);
+  const Y = (1 - b - K)/(1 - K);
+  return { c:clamp01(C), m:clamp01(M), y:clamp01(Y), k:clamp01(K) };
+}
+function cmykToRgb(C,M,Y,K){
+  const r = 1 - Math.min(1, C + K);
+  const g = 1 - Math.min(1, M + K);
+  const b = 1 - Math.min(1, Y + K);
+  return { r, g, b };
+}
+function clamp01(v){ return v<0?0:(v>1?1:v); }
+
+/* ---------- UI helpers ---------- */
 function addTag(text){ const s=document.createElement('span'); s.className='tag'; s.textContent=text; tags.appendChild(s); }
 </script>
 </body>
