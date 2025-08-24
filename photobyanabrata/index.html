@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>A4 Photo Sheet (4×3 cm) • Made by ANABRATA</title>
+<title>A4 Photo Sheet (3×4 cm) • Made by ANABRATA</title>
 <meta name="color-scheme" content="light dark" />
 <style>
   :root{
@@ -79,7 +79,7 @@
   .dz-actions{ margin-top:.7rem; display:flex; gap:.6rem; justify-content:center; flex-wrap:wrap }
   #file{ display:none } /* hidden; Choose button opens it */
   .thumb{ margin-top:.7rem; display:flex; gap:.6rem; align-items:center; justify-content:center }
-  .thumb img{ width:84px; height:63px; object-fit:cover; border-radius:.5rem; border:1px solid #e5e7eb; background:#fff }
+  .thumb img{ width:63px; height:84px; object-fit:cover; border-radius:.5rem; border:1px solid #e5e7eb; background:#fff } /* 3×4 portrait preview */
 
   /* Layout */
   .grid{ display:grid; gap:1rem; grid-template-columns:1.2fr .8fr; align-items:start; margin:1rem 0 2rem }
@@ -103,7 +103,7 @@
       <div class="row" style="justify-content:space-between">
         <div class="row">
           <span class="pill">A4 portrait: 210 × 297 mm</span>
-          <span class="pill">Tile: 40 × 30 mm (width × height)</span>
+          <span class="pill">Tile: 30 × 40 mm (width × height)</span>
           <span class="pill">Centered grid • Multi‑page</span>
         </div>
       </div>
@@ -113,11 +113,11 @@
         <div class="dropzone" id="dropzone">
           <div>
             <div class="dz-title">Choose one photo</div>
-            <div class="dz-sub">We’ll duplicate it into a 4 × 3 cm grid on A4.</div>
+            <div class="dz-sub">We’ll duplicate it into 3 × 4 cm tiles on A4.</div>
             <div class="dz-actions">
               <button class="btn" id="chooseBtn" type="button">Choose photo</button>
               <button class="btn ghost" id="arrange" type="button">Arrange → PDF</button>
-              <a id="downloadPdf" class="btn ghost" download="photos_a4_4x3cm.pdf" href="#" aria-disabled="true">Download PDF</a>
+              <a id="downloadPdf" class="btn ghost" download="photos_a4_3x4cm.pdf" href="#" aria-disabled="true">Download PDF</a>
             </div>
             <div class="thumb" id="thumb" style="display:none">
               <img id="thumbImg" alt="Selected photo preview" />
@@ -147,14 +147,14 @@
         <!-- A4 portrait preview -->
         <canvas id="preview" width="840" height="1188" aria-label="Preview canvas"></canvas>
         <p class="muted" style="margin:.5rem 0 0">
-          Print the PDF at 100% scale (no “Fit to page”). Each tile will be exactly 40 × 30 mm.
+          Print the PDF at 100% scale (no “Fit to page”). Each tile will be exactly 30 × 40 mm (3 × 4 cm).
         </p>
       </div>
       <div class="card">
         <h3 style="margin:.2rem 0 .8rem">How it works</h3>
         <ul class="muted" style="margin:.2rem 0 0; padding-left:1rem; list-style:disc">
           <li>Select one photo; choose how many copies to place.</li>
-          <li>Each tile is 40 mm × 30 mm; images are center‑cropped to fit.</li>
+          <li>Each tile is 30 mm × 40 mm (width × height); images are center‑cropped to fit.</li>
           <li>Rows/columns are calculated from margins and gap. Extra photos spill to more A4 pages.</li>
         </ul>
       </div>
@@ -173,7 +173,7 @@
   // Page & tile constants (A4 portrait)
   const PAGE_W_MM = 210, PAGE_H_MM = 297;   // width × height
   const MARGIN_MM = 20;                     // 2 cm margins
-  const TILE_W_MM = 40, TILE_H_MM = 30;     // 4 × 3 cm (width × height)
+  const TILE_W_MM = 30, TILE_H_MM = 40;     // 3 × 4 cm (width × height)
 
   // Elements
   const $ = id => document.getElementById(id);
@@ -297,7 +297,6 @@
     const doc = new jsPDF({ unit:'mm', format:[PAGE_W_MM, PAGE_H_MM] }); // portrait
 
     const { cols, rows, gridW, gridH } = computeGrid(gapMM);
-    const capacity = cols * rows;
     const ox = centerGrid ? Math.max(0, (PAGE_W_MM - gridW) / 2) : MARGIN_MM;
     const oy = centerGrid ? Math.max(0, (PAGE_H_MM - gridH) / 2) : MARGIN_MM;
 
@@ -342,9 +341,9 @@
       }
       const img = await blobToImage(fileEl.files[0]);
 
-      const copies = Math.max(1, parseInt(copiesInput.value || '1', 10));
-      const gapMM  = Math.max(0, parseFloat(gapInput.value || '0'));
-      const centerGrid = !!centerGridInput.checked;
+      const copies = Math.max(1, parseInt(document.getElementById('copies').value || '1', 10));
+      const gapMM  = Math.max(0, parseFloat(document.getElementById('gap').value || '0'));
+      const centerGrid = !!document.getElementById('centerGrid').checked;
 
       prog.value = 35; note.textContent = "Arranging preview…";
       await previewLayout(img, copies, gapMM, centerGrid);
@@ -356,7 +355,7 @@
       downloadPdf.href = url;
       downloadPdf.setAttribute('aria-disabled','false');
 
-      prog.value = 100; note.textContent = "PDF ready. Download and print at 100% scale.";
+      prog.value = 100; note.textContent = "PDF ready. Download and print at 100% scale (no fit).";
       setTimeout(() => prog.hidden = true, 400);
     } catch(e){
       console.error(e);
