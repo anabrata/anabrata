@@ -11,7 +11,6 @@
     --card:#ffffffee; --text:#0b1020; --muted:#4b5563; --ring:rgba(0,0,0,.12);
     --grad: linear-gradient(135deg, var(--green), var(--blue), var(--yellow));
   }
-  /* Soft animated background + floral sides */
   body{
     margin:0; font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif; color:var(--text);
     background:
@@ -104,7 +103,7 @@
   <main class="wrap">
     <section class="shiny">
       <div style="font-weight:900; font-size:1.15rem">PDF → Word (exact same look)</div>
-      <div class="muted" style="margin-top:.15rem">Conversion is 100% in your browser. For perfect fidelity, each PDF page becomes an image inside the .docx.</div>
+      <div class="muted" style="margin-top:.15rem">Each PDF page is rendered to a high‑resolution image and placed into a .docx page sized to match.</div>
       <div class="row" style="margin-top:.8rem">
         <button class="btn" id="pick">Choose PDF</button>
         <button class="btn ghost" id="convert" disabled>Convert → DOCX</button>
@@ -118,7 +117,7 @@
             <option value="200">Extra (200 DPI)</option>
           </select>
         </div>
-        <div class="muted">Tip: higher DPI → larger file, sharper pages.</div>
+        <div class="muted">Higher DPI = larger .docx but sharper pages.</div>
       </div>
       <input id="file" type="file" accept="application/pdf" hidden>
       <div style="margin-top:.8rem" class="panel">
@@ -128,19 +127,22 @@
     </section>
 
     <section class="panel" style="margin-top:1rem">
-      <div style="font-weight:800; margin-bottom:.4rem">Why this looks exact</div>
+      <div style="font-weight:800; margin-bottom:.4rem">About the “exact look” method</div>
       <div class="muted">
-        Word and PDF draw text and graphics differently. To preserve layout perfectly without a server, we render each PDF page to a high‑resolution image and place it onto a Word page sized to match. The result displays identically across devices.
+        This guarantees visual identity in Word across devices. If editable text is required, a server converter (LibreOffice/Office/Adobe) is needed and won’t be 100% identical.
       </div>
     </section>
 
     <div class="info">© <span id="year"></span> Made by ANABRATA</div>
   </main>
 
-  <!-- pdf.js (render PDF pages in browser) -->
+  <!-- pdf.js (UMD) -->
   <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
-  <script>pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";</script>
-  <!-- docx (build .docx in browser) -->
+  <script>
+    // Important: set worker to the same version on the same CDN
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
+  </script>
+  <!-- docx (UMD) -->
   <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
 
 <script>
@@ -169,20 +171,42 @@ fileIn.onchange = () => {
 const PT_PER_IN = 72;
 const TWIPS_PER_IN = 1440;
 const MM_PER_IN = 25.4;
-const TWIPS_PER_MM = TWIPS_PER_IN / MM_PER_IN; // ≈ 56.7
+const TWIPS_PER_MM = TWIPS_PER_IN / MM_PER_IN;
 
-function ptToTwips(pt){ return Math.round(pt * 20); }     // 1 point = 20 twips
 function mmToTwips(mm){ return Math.round(mm * TWIPS_PER_MM); }
 function inchesToPx(inches, dpi){ return Math.round(inches * dpi); }
 
+function canvasToJPEGArrayBuffer(canvas, quality=0.92){
+  // Convert canvas to ArrayBuffer (what docx.Media.addImage expects)
+  return new Promise((resolve, reject) => {
+    if (canvas.toBlob){
+      canvas.toBlob(async (blob) => {
+        if (!blob) return reject(new Error("Canvas toBlob failed"));
+        try{
+          const buf = await blob.arrayBuffer();
+          resolve(buf);
+        } catch(e){ reject(e); }
+      }, 'image/jpeg', quality);
+    } else {
+      // Fallback via dataURL
+      const dataURL = canvas.toDataURL('image/jpeg', quality);
+      const byteString = atob(dataURL.split(',')[1]);
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i=0; i<byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+      resolve(ab);
+    }
+  });
+}
+
 async function canvasFromPdfPage(page, dpi){
-  // Get page size in points (PDF units)
   const [x0, y0, x1, y1] = page.view; // points
   const widthInches  = (x1 - x0) / PT_PER_IN;
   const heightInches = (y1 - y0) / PT_PER_IN;
 
-  const scale = dpi / 96; // pdf.js uses 96 CSS px per inch as base
-  const viewport = page.getViewport({ scale: scale });
+  // pdf.js uses 96 CSS px/inch baseline
+  const scale = dpi / 96;
+  const viewport = page.getViewport({ scale });
 
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d', { willReadFrequently: false });
@@ -195,9 +219,8 @@ async function canvasFromPdfPage(page, dpi){
   return { canvas, widthInches, heightInches };
 }
 
-// Build DOCX with each PDF page as a full-page image
 async function buildDocxFromCanvases(pages, marginsMM){
-  const { Document, Packer, Paragraph, AlignmentType, Media } = docx;
+  const { Document, Packer, Paragraph, AlignmentType, Media } = window.docx;
 
   const doc = new Document({ sections: [] });
   const marginTw = mmToTwips(marginsMM);
@@ -205,25 +228,24 @@ async function buildDocxFromCanvases(pages, marginsMM){
   for (let i=0; i<pages.length; i++){
     const { canvas, widthInches, heightInches } = pages[i];
 
-    // Page size in twips (match original PDF size)
     const pageWtw = Math.round(widthInches  * TWIPS_PER_IN);
     const pageHtw = Math.round(heightInches * TWIPS_PER_IN);
 
-    // Content area size (twips) and in pixels at 96 dpi for docx sizing
+    // Content area (page minus margins)
     const contentWtw = Math.max(0, pageWtw - 2*marginTw);
     const contentHtw = Math.max(0, pageHtw - 2*marginTw);
     const contentWin  = contentWtw / TWIPS_PER_IN;
     const contentHin  = contentHtw / TWIPS_PER_IN;
+
+    // Scale canvas to fit inside content area (Word measures images at 96 dpi)
     const targetPxW = Math.floor(contentWin * 96);
     const targetPxH = Math.floor(contentHin * 96);
-
-    // Scale canvas image to fit content area while keeping aspect
     const scale = Math.min(targetPxW / canvas.width, targetPxH / canvas.height);
-    const drawW = Math.floor(canvas.width * scale);
-    const drawH = Math.floor(canvas.height * scale);
+    const drawW = Math.max(1, Math.floor(canvas.width * scale));
+    const drawH = Math.max(1, Math.floor(canvas.height * scale));
 
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.92));
-    const imgRun = await Media.addImage(doc, blob, drawW, drawH);
+    const imgBuf = await canvasToJPEGArrayBuffer(canvas, 0.92);
+    const imgRun = await Media.addImage(doc, imgBuf, drawW, drawH);
 
     doc.addSection({
       properties: {
@@ -241,16 +263,23 @@ async function buildDocxFromCanvases(pages, marginsMM){
 }
 
 convertBtn.onclick = async () => {
+  const pdfjsLib = window.pdfjsLib;
+  if (!pdfjsLib || !window.docx){
+    note.textContent = "Libraries failed to load. Check your internet and refresh.";
+    return;
+  }
+
   try{
     if (!pdfFile){ note.textContent = "Please choose a PDF first."; return; }
-    convertBtn.disabled = true; downloadA.setAttribute('aria-disabled','true'); downloadA.removeAttribute('href');
-    note.textContent = "Loading PDF…"; prog.hidden = false; prog.value = 5;
+    convertBtn.disabled = true;
+    downloadA.setAttribute('aria-disabled','true'); downloadA.removeAttribute('href');
+    prog.hidden = false; prog.value = 5; note.textContent = "Loading PDF…";
 
     const arrayBuf = await pdfFile.arrayBuffer();
     const loadingTask = pdfjsLib.getDocument({ data: arrayBuf });
     const pdf = await loadingTask.promise;
 
-    const dpi = parseInt(dpiSel.value, 10);   // 120/150/200
+    const dpi = parseInt(dpiSel.value, 10);
     const pages = [];
     const total = pdf.numPages;
 
@@ -260,14 +289,14 @@ convertBtn.onclick = async () => {
       const page = await pdf.getPage(p);
       const rendered = await canvasFromPdfPage(page, dpi);
       pages.push(rendered);
+      // free pdf.js page resources earlier
+      page._destroy();
     }
 
     note.textContent = "Building Word file…";
     prog.value = 90;
 
-    const marginsMM = 10; // small safe margins inside Word
-    const docxBlob = await buildDocxFromCanvases(pages, marginsMM);
-
+    const docxBlob = await buildDocxFromCanvases(pages, 10); // 10 mm margins
     const url = URL.createObjectURL(docxBlob);
     downloadA.href = url;
     downloadA.setAttribute('aria-disabled','false');
@@ -275,7 +304,15 @@ convertBtn.onclick = async () => {
     prog.value = 100; note.textContent = "Done. Click Download DOCX. Open in Word at 100% zoom.";
   } catch(err){
     console.error(err);
-    note.textContent = "Conversion failed: " + (err?.message || err);
+    // Friendly messages for common issues
+    const msg = (err && err.message) ? err.message : String(err);
+    if (/Password required|Unsupported encryption/i.test(msg)){
+      note.textContent = "This PDF is encrypted/password‑protected. Please unlock it before converting.";
+    } else if (/NetworkError|Failed to fetch/i.test(msg)){
+      note.textContent = "Could not fetch library or file. Check your connection and try again.";
+    } else {
+      note.textContent = "Conversion failed: " + msg;
+    }
   } finally {
     prog.hidden = true;
     convertBtn.disabled = false;
