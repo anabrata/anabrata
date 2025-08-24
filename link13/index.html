@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>QR A4 Arranger → Google Drive</title>
+<title>QR A4 Arranger (2 cm margins, no login)</title>
 <meta name="color-scheme" content="light dark" />
 <style>
   :root{
@@ -22,7 +22,6 @@
   .btn.ghost{ background:transparent; border:1px solid var(--ring); color:var(--text) }
   label,input,button{ font:inherit }
   input[type="number"]{ width:6.5rem }
-  textarea, input[type="text"]{ width:100%; padding:.6rem .7rem; border-radius:.5rem; border:1px solid var(--ring); background:transparent; color:var(--text) }
   .muted{ color:var(--muted) }
   .grid{ display:grid; gap:1rem; grid-template-columns:1fr 1fr }
   @media (max-width: 860px){ .grid{ grid-template-columns:1fr } }
@@ -30,29 +29,27 @@
   .out{ word-break:break-all; padding:.6rem .7rem; border-radius:.5rem; border:1px dashed var(--ring); background:transparent; color:var(--text) }
   .pill{ display:inline-block; padding:.25rem .5rem; border:1px solid var(--ring); border-radius:999px; font-size:.85rem; color:var(--muted) }
   canvas{ width:100%; background:#fff; border-radius:8px }
+  ul.flat { list-style: disc; padding-left: 1.2rem; margin: .4rem 0 0 }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>QR code arranger → Drive URL</h1>
-  <p class="muted">Upload a ZIP (or images), auto‑arrange on A4, generate PDF, upload to Google Drive, and get a shareable link.</p>
+  <h1>QR code arranger (A4 • 2 cm margins • no login)</h1>
+  <p class="muted">Upload a ZIP (or images), arrange inside 20 mm margins, auto‑fit to one page, and download a print‑ready PDF.</p>
 
   <div class="card" style="margin-bottom:1rem">
     <div class="row" style="justify-content:space-between">
       <div class="row">
         <span class="pill">Max per page: 200</span>
-        <span class="pill">Units: millimeters (A4 = 210 × 297 mm)</span>
-      </div>
-      <div class="row">
-        <button id="signin" class="btn ghost" type="button">Sign in to Google</button>
-        <button id="signout" class="btn ghost" type="button">Sign out</button>
+        <span class="pill">A4: 210 × 297 mm</span>
+        <span class="pill">Margins: 20 mm on all sides</span>
       </div>
     </div>
 
     <div class="row" style="margin-top:.6rem">
       <input id="files" type="file" accept=".zip,image/*" multiple />
       <button id="arrange" class="btn" type="button">Arrange → PDF</button>
-      <button id="upload" class="btn" type="button" disabled>Upload to Drive</button>
+      <a id="downloadPdf" class="btn ghost" download="qr_a4.pdf" href="#" aria-disabled="true">Download PDF</a>
     </div>
 
     <div class="row" style="margin-top:.6rem">
@@ -65,32 +62,25 @@
       <progress id="prog" value="0" max="100" hidden></progress>
       <div id="note" class="muted" style="margin-top:.4rem"></div>
     </div>
-
-    <div style="margin-top:.8rem">
-      <div id="driveUrl" class="out" hidden></div>
-    </div>
   </div>
 
   <div class="grid">
     <div class="card">
       <h3>Preview (scaled)</h3>
       <canvas id="preview" width="794" height="1123" aria-label="Preview canvas"></canvas>
-      <p class="muted">Print tip: Use the PDF. In print dialog set Scale 100% and disable headers/footers.</p>
-      <div class="row">
-        <a id="downloadPdf" class="btn ghost" download="qr_a4.pdf" href="#" aria-disabled="true">Download PDF</a>
-      </div>
+      <ul class="muted flat">
+        <li>Print the generated PDF at 100% scale. Do not “fit to page”.</li>
+        <li>With 15 mm QR + 5 mm gap and 20 mm margins, about 104 fit; Auto‑fit shrinks to fit up to 200.</li>
+      </ul>
     </div>
     <div class="card">
       <h3>What it does</h3>
-      <ul class="muted">
-        - Unzips images in browser
-        - Lays out up to 200 QR images on one A4 page
-        - Keeps requested size and gap; shrinks if needed when Auto‑fit is on
-        - Creates a single‑page A4 PDF (millimeter accurate)
-        - Uploads PDF to Drive and shows a shareable link
+      <ul class="muted flat">
+        <li>Reads images from ZIP or file picker (max 200)</li>
+        <li>Arranges inside a 20 mm margin on all sides</li>
+        <li>Keeps requested size/gap; shrinks if needed to fit on one page</li>
+        <li>Outputs a single‑page, millimeter‑accurate A4 PDF</li>
       </ul>
-      <p class="muted">Note: 15 mm QR + 5 mm gap fits 150 per A4 (10 × 15). Auto‑fit reduces QR size to fit 200 if needed.</p>
-      <p class="muted">Contact: abheroism01@gmai.com</p>
     </div>
   </div>
 </div>
@@ -99,32 +89,17 @@
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <!-- jsPDF for generating A4 PDF -->
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-<!-- Google APIs (Drive) + Google Identity Services -->
-<script src="https://apis.google.com/js/api.js"></script>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <script>
-// =========================
-// Config: update these
-// =========================
-const CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID"; // paste your OAuth Web Client ID (not an email)
-const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
+// ===== Settings (fixed 20 mm margins) =====
+const MARGIN_MM = 20;  // 2 cm from each side
+const MAX_IMAGES = 200;
 
-// If true, make file public (anyone with link). If false, share only with SHARE_WITH_EMAIL.
-const PUBLIC_LINK = false;
-const SHARE_WITH_EMAIL = "abheroism01@gmai.com"; // as provided
-
-// =========================
-// State and elements
-// =========================
-let accessToken = null;
-let tokenClient = null;
-let outputBlob = null;
-
-const $ = (id) => document.getElementById(id);
+// ===== Elements =====
+const $ = id => document.getElementById(id);
 const filesEl = $('files');
 const arrangeBtn = $('arrange');
-const uploadBtn = $('upload');
+const downloadPdf = $('downloadPdf');
 const note = $('note');
 const prog = $('prog');
 const canvas = $('preview');
@@ -132,65 +107,6 @@ const ctx = canvas.getContext('2d');
 const qrSizeInput = $('qrSize');
 const gapInput = $('gap');
 const autoFitInput = $('autoFit');
-const downloadPdf = $('downloadPdf');
-const driveUrl = $('driveUrl');
-
-// =========================
-// Google OAuth
-// =========================
-window.onload = () => {
-  tokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: CLIENT_ID,
-    scope: DRIVE_SCOPE,
-    callback: (resp) => {
-      if (resp && resp.access_token){
-        accessToken = resp.access_token;
-        note.textContent = "Google Drive ready.";
-        uploadBtn.disabled = !outputBlob;
-      }
-    }
-  });
-};
-
-$('signin').onclick = () => {
-  tokenClient.requestAccessToken({ prompt: 'consent' });
-};
-$('signout').onclick = () => {
-  accessToken = null;
-  note.textContent = "Signed out.";
-  uploadBtn.disabled = true;
-};
-
-// =========================
-/* File loading */
-// =========================
-async function readAllImagesFromInput(fileList){
-  const imgs = [];
-  const files = Array.from(fileList || []);
-  const zips = files.filter(f => f.name.toLowerCase().endsWith('.zip'));
-  const singles = files.filter(f => !f.name.toLowerCase().endsWith('.zip'));
-
-  // From ZIPs
-  for (const zf of zips){
-    const zip = await JSZip.loadAsync(zf);
-    const entries = Object.values(zip.files).filter(f => !f.dir && /\.(png|jpe?g|webp|bmp|gif|svg)$/i.test(f.name));
-    for (const entry of entries){
-      const blob = await entry.async("blob");
-      const img = await blobToImage(blob);
-      imgs.push(img);
-      if (imgs.length >= 200) break;
-    }
-    if (imgs.length >= 200) break;
-  }
-
-  // Singles
-  for (const f of singles){
-    const img = await blobToImage(f);
-    imgs.push(img);
-    if (imgs.length >= 200) break;
-  }
-  return imgs.slice(0,200);
-}
 
 function blobToImage(blob){
   return new Promise((res, rej) => {
@@ -202,86 +118,83 @@ function blobToImage(blob){
   });
 }
 
-// =========================
-/* Layout + Preview */
-// =========================
-function imagesToCanvasLayout(imgs, qrMM, gapMM){
-  const pageWpx = canvas.width;   // ~ A4 width at ~96dpi (794 px)
-  const pageHpx = canvas.height;  // ~ A4 height at ~96dpi (1123 px)
-  const pxPerMM = pageWpx / 210;  // scale off width to ensure mm proportions
+async function readAllImagesFromInput(fileList){
+  const imgs = [];
+  const files = Array.from(fileList || []);
+  const zips = files.filter(f => f.name.toLowerCase().endsWith('.zip'));
+  const singles = files.filter(f => !f.name.toLowerCase().endsWith('.zip'));
 
+  for (const zf of zips){
+    const zip = await JSZip.loadAsync(zf);
+    const entries = Object.values(zip.files).filter(f => !f.dir && /\.(png|jpe?g|webp|bmp|gif|svg)$/i.test(f.name));
+    for (const entry of entries){
+      const blob = await entry.async("blob");
+      const img = await blobToImage(blob);
+      imgs.push(img);
+      if (imgs.length >= MAX_IMAGES) break;
+    }
+    if (imgs.length >= MAX_IMAGES) break;
+  }
+
+  for (const f of singles){
+    const img = await blobToImage(f);
+    imgs.push(img);
+    if (imgs.length >= MAX_IMAGES) break;
+  }
+
+  return imgs.slice(0, MAX_IMAGES);
+}
+
+// Preview layout on canvas (scaled to width)
+function previewLayout(imgs, qrMM, gapMM){
+  const pageWmm = 210, pageHmm = 297;
+  const pxPerMM = canvas.width / pageWmm;
+
+  const pageWpx = Math.round(pageWmm * pxPerMM);
+  const pageHpx = Math.round(pageHmm * pxPerMM);
+  const marginPx = Math.round(MARGIN_MM * pxPerMM);
   let qrPx = Math.max(1, Math.round(qrMM * pxPerMM));
   let gapPx = Math.max(0, Math.round(gapMM * pxPerMM));
 
-  function fit(qr, gap){
-    const cols = Math.max(1, Math.floor((pageWpx + gap) / (qr + gap)));
-    const rows = Math.max(1, Math.floor((pageHpx + gap) / (qr + gap)));
-    return { cols, rows, capacity: cols * rows };
+  // Available drawing area within margins
+  const availW = pageWpx - 2*marginPx;
+  const availH = pageHpx - 2*marginPx;
+
+  function fit(q, g){
+    const cols = Math.max(1, Math.floor( (availW + g) / (q + g) ));
+    const rows = Math.max(1, Math.floor( (availH + g) / (q + g) ));
+    return { cols, rows, capacity: cols*rows };
   }
 
   let { cols, rows, capacity } = fit(qrPx, gapPx);
 
   if (capacity < imgs.length && autoFitInput.checked){
-    // shrink QR until fits or floor
     while (capacity < imgs.length && qrPx > 3){
-      qrPx -= 1;
+      qrPx -= 1; // shrink 1 px at a time
       ({ cols, rows, capacity } = fit(qrPx, gapPx));
     }
   }
 
-  // Paint white background
+  // White page
   ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0,0,pageWpx,pageHpx);
+  ctx.fillRect(0, 0, pageWpx, pageHpx);
 
-  // Draw images
+  // Draw margin guide (optional faint border)
+  ctx.strokeStyle = '#d0d0d0';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(marginPx + 0.5, marginPx + 0.5, availW - 1, availH - 1);
+
+  // Draw images inside margin
   let i = 0;
   for (let r=0; r<rows && i<imgs.length; r++){
     for (let c=0; c<cols && i<imgs.length; c++){
-      const x = c * (qrPx + gapPx);
-      const y = r * (qrPx + gapPx);
+      const x = marginPx + c * (qrPx + gapPx);
+      const y = marginPx + r * (qrPx + gapPx);
       ctx.drawImage(imgs[i], x, y, qrPx, qrPx);
       i++;
     }
   }
-  return { placed: Math.min(imgs.length, capacity), cols, rows, qrPx, gapPx };
-}
-
-// =========================
-/* PDF builder (A4 mm) */
-// =========================
-async function buildPdf(imgs, qrMM, gapMM){
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit: 'mm', format: 'a4' }); // 210 × 297 mm
-  const pageW = 210, pageH = 297;
-
-  function fit(q, g){
-    const cols = Math.max(1, Math.floor((pageW + g) / (q + g)));
-    const rows = Math.max(1, Math.floor((pageH + g) / (q + g)));
-    return { cols, rows, capacity: cols * rows };
-  }
-
-  let qr = qrMM, gap = gapMM;
-  let { cols, rows, capacity } = fit(qr, gap);
-
-  if (capacity < imgs.length && autoFitInput.checked){
-    for (let k=0; k<600 && capacity < imgs.length; k++){
-      qr = Math.max(3, Math.round((qr - 0.2) * 10) / 10);
-      ({ cols, rows, capacity } = fit(qr, gap));
-      if (qr <= 3) break;
-    }
-  }
-
-  let i = 0;
-  for (let r=0; r<rows && i<imgs.length; r++){
-    for (let c=0; c<cols && i<imgs.length; c++){
-      const x = c * (qr + gap);
-      const y = r * (qr + gap);
-      const dataUrl = imageToJpegDataURL(imgs[i]);
-      doc.addImage(dataUrl, 'JPEG', x, y, qr, qr);
-      i++;
-    }
-  }
-  return doc.output('blob');
+  return { placed: Math.min(imgs.length, capacity) };
 }
 
 function imageToJpegDataURL(img){
@@ -293,128 +206,80 @@ function imageToJpegDataURL(img){
   return t.toDataURL('image/jpeg', 0.92);
 }
 
-// =========================
-/* Arrange + PDF + UI */
-// =========================
-$('arrange').onclick = async () => {
+async function buildPdf(imgs, qrMM, gapMM){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' }); // 210 × 297 mm
+
+  const pageW = 210, pageH = 297;
+  const availW = pageW - 2*MARGIN_MM;
+  const availH = pageH - 2*MARGIN_MM;
+
+  function fit(q, g){
+    const cols = Math.max(1, Math.floor( (availW + g) / (q + g) ));
+    const rows = Math.max(1, Math.floor( (availH + g) / (q + g) ));
+    return { cols, rows, capacity: cols*rows };
+  }
+
+  let qr = qrMM, gap = gapMM;
+  let { cols, rows, capacity } = fit(qr, gap);
+
+  if (capacity < imgs.length && autoFitInput.checked){
+    // shrink until fits or min size reached
+    for (let k=0; k<800 && capacity < imgs.length; k++){
+      qr = Math.max(3, Math.round((qr - 0.2) * 10) / 10);
+      ({ cols, rows, capacity } = fit(qr, gap));
+      if (qr <= 3) break;
+    }
+  }
+
+  // Optional: margin guide (comment out to hide)
+  // doc.setDrawColor(220);
+  // doc.rect(MARGIN_MM, MARGIN_MM, availW, availH);
+
+  let i = 0;
+  for (let r=0; r<rows && i<imgs.length; r++){
+    for (let c=0; c<cols && i<imgs.length; c++){
+      const x = MARGIN_MM + c * (qr + gap);
+      const y = MARGIN_MM + r * (qr + gap);
+      const dataUrl = imageToJpegDataURL(imgs[i]);
+      doc.addImage(dataUrl, 'JPEG', x, y, qr, qr);
+      i++;
+    }
+  }
+  return doc.output('blob');
+}
+
+// Arrange → PDF and enable download
+arrangeBtn.onclick = async () => {
   try{
     note.textContent = "Reading files…";
     prog.hidden = false; prog.value = 5;
     const imgs = await readAllImagesFromInput(filesEl.files);
     if (!imgs.length){ note.textContent = "No images found."; prog.hidden = true; return; }
-    if (imgs.length > 200) imgs.length = 200;
+    if (imgs.length > MAX_IMAGES) imgs.length = MAX_IMAGES;
 
     prog.value = 25; note.textContent = `Loaded ${imgs.length} image(s). Arranging…`;
 
     const qrMM = parseFloat(qrSizeInput.value) || 15;
     const gapMM = parseFloat(gapInput.value) || 5;
 
-    imagesToCanvasLayout(imgs, qrMM, gapMM);
-    prog.value = 55; note.textContent = "Building A4 PDF…";
+    previewLayout(imgs, qrMM, gapMM);
 
-    outputBlob = await buildPdf(imgs, qrMM, gapMM);
-    const url = URL.createObjectURL(outputBlob);
+    prog.value = 55; note.textContent = "Building A4 PDF…";
+    const blob = await buildPdf(imgs, qrMM, gapMM);
+
+    const url = URL.createObjectURL(blob);
     downloadPdf.href = url;
     downloadPdf.setAttribute('aria-disabled','false');
 
-    prog.value = 85; note.textContent = "PDF ready. You can upload to Drive.";
-    uploadBtn.disabled = !accessToken;
-    prog.value = 100; setTimeout(() => prog.hidden = true, 400);
+    prog.value = 100; note.textContent = "PDF ready. Click Download PDF.";
+    setTimeout(() => prog.hidden = true, 400);
   } catch(e){
     console.error(e);
     note.textContent = "Error arranging or building PDF.";
     prog.hidden = true;
   }
 };
-
-// =========================
-/* Drive upload + sharing */
-// =========================
-$('upload').onclick = async () => {
-  if (!accessToken){ note.textContent = "Sign in to Google first."; return; }
-  if (!outputBlob){ note.textContent = "Create the PDF first."; return; }
-
-  try{
-    note.textContent = "Uploading to Drive…";
-    prog.hidden = false; prog.value = 15;
-
-    const metadata = {
-      name: `qr_a4_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.pdf`,
-      mimeType: 'application/pdf'
-      // parents: ['<OPTIONAL_FOLDER_ID>']
-    };
-
-    const boundary = 'b' + Math.random().toString(36).slice(2);
-    const delimiter = `--${boundary}\r\n`;
-    const closeDelim = `--${boundary}--`;
-
-    const pdfBase64 = await blobToBase64(outputBlob);
-
-    const body =
-      delimiter +
-      'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
-      JSON.stringify(metadata) + '\r\n' +
-      delimiter +
-      'Content-Type: application/pdf\r\n' +
-      'Content-Transfer-Encoding: base64\r\n\r\n' +
-      pdfBase64 + '\r\n' +
-      closeDelim;
-
-    // Upload
-    const uploadRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink,webContentLink', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + accessToken,
-        'Content-Type': 'multipart/related; boundary=' + boundary
-      },
-      body
-    });
-    if (!uploadRes.ok) throw new Error('Upload failed: ' + uploadRes.statusText);
-    const file = await uploadRes.json();
-    prog.value = 55;
-
-    // Set sharing
-    if (PUBLIC_LINK){
-      await fetch(`https://www.googleapis.com/drive/v3/files/${file.id}/permissions`, {
-        method: 'POST',
-        headers: { 'Authorization': 'Bearer ' + accessToken, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role: 'reader', type: 'anyone' })
-      });
-    } else if (SHARE_WITH_EMAIL){
-      await fetch(`https://www.googleapis.com/drive/v3/files/${file.id}/permissions`, {
-        method: 'POST',
-        headers: { 'Authorization': 'Bearer ' + accessToken, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role: 'reader', type: 'user', emailAddress: SHARE_WITH_EMAIL })
-      });
-    }
-
-    prog.value = 80;
-
-    // Retrieve links
-    const metaRes = await fetch(`https://www.googleapis.com/drive/v3/files/${file.id}?fields=webViewLink,webContentLink`, {
-      headers: { 'Authorization': 'Bearer ' + accessToken }
-    });
-    const meta = await metaRes.json();
-
-    driveUrl.hidden = false;
-    driveUrl.textContent = (meta.webViewLink || meta.webContentLink || 'Uploaded, link unavailable.');
-    note.textContent = "Uploaded and shared. URL shown below.";
-    prog.value = 100; setTimeout(() => prog.hidden = true, 400);
-  } catch(e){
-    console.error(e);
-    note.textContent = "Drive upload failed: " + e.message;
-    prog.hidden = true;
-  }
-};
-
-function blobToBase64(blob){
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(',')[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
 </script>
 </body>
 </html>
