@@ -4,27 +4,15 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>WELCOME TO THE WORLD OF CELL</title>
-
-  <!-- Put plotly.min.js in the SAME folder as this file -->
-  <script src="plotly.min.js"></script>
-
   <style>
     :root{
-      --bg1:#0f1021;
-      --bg2:#1b1e3c;
-      --bg3:#1d3557;
-      --accent:#f1fa8c;
-      --glow:#ffd166;
-      --card:#0b0d1a;
-      --cardText:#e8ecff;
+      --bg1:#0f1021; --bg2:#1b1e3c; --bg3:#1d3557; --cardText:#e8ecff;
     }
     html, body { height:100%; margin:0; }
     body {
-      min-height:100vh;
-      color:#eef2ff;
+      min-height:100vh; color:#eef2ff;
       font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       overflow:hidden;
-      animation: bgFade 2.5s ease both;
       background: radial-gradient(1200px 800px at 20% 10%, #2b2d69 0%, transparent 60%),
                   linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
       background-size: 200% 200%;
@@ -33,94 +21,30 @@
     @keyframes bgPan { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
     @keyframes bgFade { from{opacity:0} to{opacity:1} }
 
-    /* Shiny welcome banner */
-    .banner {
-      position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
-      text-align: center; z-index: 10; padding: 8px 12px;
-      user-select:none; pointer-events:none;
-    }
-    .title {
-      font-weight: 900; letter-spacing: 1px; margin: 0;
-      font-size: clamp(20px, 3.8vw, 44px);
-      position: relative; display: inline-block;
-      color: #ffffff;
-    }
-    .title .shine {
-      background: linear-gradient(120deg, #ffffff 5%, #fff7, #ffffff 95%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      background-size: 200% 100%;
-      animation: sheen 6s ease-in-out infinite;
-      text-shadow: 0 0 18px rgba(255,255,255,0.12);
-    }
-    @keyframes sheen {
-      0% { background-position: 200% 0; }
-      50% { background-position: 0% 0; }
-      100% { background-position: -200% 0; }
-    }
-    .subtitle {
-      margin-top: 6px; font-size: clamp(12px, 1.6vw, 16px); opacity: .85;
-    }
-    .credit {
-      margin-top: 4px; font-size: clamp(12px, 1.5vw, 15px); color: #c2c8ff;
-      text-shadow: 0 0 10px rgba(255,255,255,0.08);
-    }
+    .banner { position:absolute; top:16px; left:50%; transform:translateX(-50%); text-align:center; z-index:10; padding:8px 12px; user-select:none; pointer-events:none; }
+    .title { font-weight:900; letter-spacing:1px; margin:0; font-size:clamp(20px,3.8vw,44px); position:relative; display:inline-block; color:#fff; }
+    .title .shine { background: linear-gradient(120deg, #ffffff 5%, #fff7, #ffffff 95%); -webkit-background-clip:text; background-clip:text; color:transparent; background-size:200% 100%; animation: sheen 6s ease-in-out infinite; text-shadow:0 0 18px rgba(255,255,255,0.12); }
+    @keyframes sheen { 0%{background-position:200% 0} 50%{background-position:0% 0} 100%{background-position:-200% 0} }
+    .subtitle { margin-top:6px; font-size:clamp(12px,1.6vw,16px); opacity:.85; }
+    .credit { margin-top:4px; font-size:clamp(12px,1.5vw,15px); color:#c2c8ff; text-shadow:0 0 10px rgba(255,255,255,0.08); }
+    .glow { position:absolute; top:-40px; left:50%; transform:translateX(-50%); width:66vw; height:120px; border-radius:999px; background: radial-gradient(ellipse at center, rgba(255,209,102,0.22), transparent 60%); filter:blur(12px); z-index:1; pointer-events:none; animation:pulse 5.5s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:.6} 50%{opacity:.95} }
 
-    /* Plot area */
-    #plot { width: 100vw; height: 100vh; }
+    #plot { width:100vw; height:100vh; }
 
-    /* Floating info panel */
-    .panel {
-      position: absolute; right: 16px; top: 96px; width: min(380px, 86vw);
-      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-      border: 1px solid rgba(255,255,255,0.14);
-      border-radius: 12px; padding: 14px 14px 12px 14px; z-index: 20;
-      backdrop-filter: blur(10px) saturate(120%);
-      box-shadow: 0 10px 40px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.05);
-      color: var(--cardText);
-      opacity: 0; transform: translateY(-8px); pointer-events: none;
-      transition: opacity .35s ease, transform .35s ease;
-    }
-    .panel.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
-    .panel h3 { margin: 0 0 6px 0; font-size: 18px }
-    .panel p { margin: 6px 0; font-size: 14px; line-height: 1.5 }
-    .panel .hint { font-size: 12px; opacity: .8; margin-top: 8px }
-    .panel .close {
-      position:absolute; top:6px; right:8px; background:transparent; border:0; color:#fff;
-      font-size:18px; cursor:pointer; opacity:.8;
-    }
+    .panel { position:absolute; right:16px; top:96px; width:min(380px,86vw); background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); border:1px solid rgba(255,255,255,0.14); border-radius:12px; padding:14px; z-index:20; backdrop-filter: blur(10px) saturate(120%); box-shadow: 0 10px 40px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.05); color:var(--cardText); opacity:0; transform:translateY(-8px); pointer-events:none; transition:opacity .35s ease, transform .35s ease; }
+    .panel.show { opacity:1; transform:translateY(0); pointer-events:auto; }
+    .panel h3 { margin:0 0 6px 0; font-size:18px }
+    .panel p { margin:6px 0; font-size:14px; line-height:1.5 }
+    .panel .hint { font-size:12px; opacity:.8; margin-top:8px }
+    .panel .close { position:absolute; top:6px; right:8px; background:transparent; border:0; color:#fff; font-size:18px; cursor:pointer; opacity:.8; }
     .panel .close:hover { opacity:1 }
 
-    /* Status badge (errors/loading) */
-    #status {
-      position: absolute; left: 12px; bottom: 12px; z-index: 50;
-      padding: 6px 10px; background: rgba(0,0,0,0.6); color: #fff;
-      border-radius: 8px; font-size: 13px;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.35);
-    }
+    #status { position:absolute; left:12px; bottom:12px; z-index:50; padding:6px 10px; background:rgba(0,0,0,0.6); color:#fff; border-radius:8px; font-size:13px; box-shadow:0 4px 18px rgba(0,0,0,0.35); }
     #status.error { background:#b00020 }
-
-    /* Click hint */
-    .hintTop {
-      position: absolute; right: 16px; top: 60px; z-index: 15; font-size: 12px; opacity: .85;
-      background: rgba(0,0,0,0.35); color:#fff; padding: 6px 10px; border-radius: 8px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-      user-select: none;
-    }
-
-    /* Gentle glow ring around scene title area */
-    .glow {
-      position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
-      width: 66vw; height: 120px; border-radius: 999px;
-      background: radial-gradient(ellipse at center, rgba(255,209,102,0.22), transparent 60%);
-      filter: blur(12px); z-index: 1; pointer-events: none;
-      animation: pulse 5.5s ease-in-out infinite;
-    }
-    @keyframes pulse { 0%,100%{ opacity:.6 } 50%{ opacity: .95 } }
+    .hintTop { position:absolute; right:16px; top:60px; z-index:15; font-size:12px; opacity:.85; background:rgba(0,0,0,0.35); color:#fff; padding:6px 10px; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.25); user-select:none; }
   </style>
 </head>
-
 <body>
   <div class="banner" aria-live="polite">
     <div class="glow"></div>
@@ -131,10 +55,9 @@
 
   <div class="hintTop">Tip: rotate (drag), zoom (wheel), pan (right‑drag). Click organelles for info.</div>
 
-  <div id="status">Loading…</div>
+  <div id="status">Loading Plotly…</div>
   <div id="plot" role="img" aria-label="Interactive 3D human cell with labeled organelles"></div>
 
-  <!-- Info Panel -->
   <div id="panel" class="panel" aria-live="polite">
     <button class="close" id="closePanel" title="Close">×</button>
     <h3 id="orgTitle">Organelle</h3>
@@ -143,284 +66,285 @@
   </div>
 
   <script>
+  // --- Dynamic local loader: tries several common paths for plotly.min.js ---
   (function(){
     const statusEl = document.getElementById('status');
-    const panel = document.getElementById('panel');
-    const titleEl = document.getElementById('orgTitle');
-    const introEl = document.getElementById('orgIntro');
-    document.getElementById('closePanel').addEventListener('click', ()=> panel.classList.remove('show'));
-
+    const candidates = [
+      'plotly.min.js',
+      'js/plotly.min.js',
+      'assets/plotly.min.js',
+      'assets/js/plotly.min.js',
+      'lib/plotly.min.js'
+    ];
+    let tried = [];
     function fail(msg){
       statusEl.classList.add('error');
-      statusEl.textContent = msg;
+      statusEl.textContent = msg + (tried.length ? ' Tried: ' + tried.join(', ') : '');
+    }
+    function loadScript(src){
+      return new Promise((resolve, reject)=>{
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = ()=> resolve(src);
+        s.onerror = ()=> reject(new Error('Failed to load ' + src));
+        document.head.appendChild(s);
+      });
+    }
+    async function ensurePlotly(){
+      for (const src of candidates){
+        try {
+          tried.push(src);
+          await loadScript(src);
+          if (typeof Plotly !== 'undefined') {
+            statusEl.textContent = 'Plotly loaded';
+            return true;
+          }
+        } catch(e) { /* try next */ }
+      }
+      return false;
     }
 
-    if (typeof Plotly === 'undefined') {
-      fail('Plotly failed to load. Place plotly.min.js next to this index.html.');
-      return;
-    }
-
-    // ------------ geometry helpers ------------
-    function linspace(a,b,n){ if(n<2) return [a]; const s=(b-a)/(n-1), arr=new Array(n); for(let i=0;i<n;i++) arr[i]=a+s*i; return arr; }
-    function zerosLike2D(M){ const Z=new Array(M.length); for(let i=0;i<M.length;i++){ Z[i]=new Array(M[i].length).fill(0) } return Z; }
-    function ellipsoid(center, radii, nu, nv){
-      const [cx,cy,cz]=center, [rx,ry,rz]=radii;
-      const u=linspace(0,2*Math.PI,nu), v=linspace(0,Math.PI,nv);
-      const X=new Array(nu), Y=new Array(nu), Z=new Array(nu);
-      for(let i=0;i<nu;i++){
-        const cu=Math.cos(u[i]), su=Math.sin(u[i]);
-        X[i]=new Array(nv); Y[i]=new Array(nv); Z[i]=new Array(nv);
-        for(let j=0;j<nv;j++){
-          const sv=Math.sin(v[j]), cv=Math.cos(v[j]);
-          X[i][j]=rx*cu*sv+cx; Y[i][j]=ry*su*sv+cy; Z[i][j]=rz*cv+cz;
-        }
+    ensurePlotly().then(ok=>{
+      if (!ok) {
+        fail('Plotly failed to load locally. Place plotly.min.js next to index.html or in one of the candidate folders.');
+        return;
       }
-      return {X,Y,Z};
-    }
-    function surface(X,Y,Z,color,opacity,name){
-      return {
-        type:'surface', x:X,y:Y,z:Z,
-        surfacecolor: zerosLike2D(X),
-        colorscale: [[0,color],[1,color]],
-        showscale:false, opacity:opacity, name:name, hoverinfo:'name',
-        lighting:{ambient:.5,diffuse:.5,specular:.2,roughness:.9},
-        contours:{
-          x:{show:true, color:'rgba(255,255,255,0.12)', width:1},
-          y:{show:true, color:'rgba(255,255,255,0.12)', width:1},
-          z:{show:true, color:'rgba(0,0,0,0.22)', width:1}
-        }
-      };
-    }
-    function randomPointsInShell(n, inner_r, outer_r, avoid_center, avoid_radius){
-      const pts=[]; let attempts=0;
-      while(pts.length<n && attempts<40000){
-        const u=Math.random();
-        const r=Math.pow((Math.pow(outer_r,3)-Math.pow(inner_r,3))*u + Math.pow(inner_r,3), 1/3);
-        const z=Math.random()*2-1, t=Math.random()*2*Math.PI, s=Math.sqrt(1-z*z);
-        const x=r*s*Math.cos(t), y=r*s*Math.sin(t), zc=r*z;
-        if(avoid_center && typeof avoid_radius==='number'){
-          const dx=x-avoid_center[0], dy=y-avoid_center[1], dz=zc-avoid_center[2];
-          if(Math.hypot(dx,dy,dz) < avoid_radius){ attempts++; continue; }
-        }
-        pts.push([x,y,zc]); attempts++;
-      }
-      return pts;
-    }
-    function polyline3d(curveFn, t0, t1, steps){
-      const t=linspace(t0,t1,steps), X=new Array(steps),Y=new Array(steps),Z=new Array(steps);
-      for(let i=0;i<steps;i++){ const p=curveFn(t[i]); X[i]=p[0]; Y[i]=p[1]; Z[i]=p[2]; }
-      return {X,Y,Z};
-    }
-    function lineTrace(xs,ys,zs,color,width,name){
-      return {type:'scatter3d',mode:'lines',x:xs,y:ys,z:zs,line:{color,width},name,hoverinfo:'name',opacity:0.95};
-    }
-
-    // ------------ organelle info ------------
-    const INFO = {
-      'Cell membrane': 'Selective barrier (phospholipid bilayer) that encloses the cell and regulates entry/exit.',
-      'Cytoplasm': 'Gel-like cytosol plus suspended organelles; site of many metabolic reactions.',
-      'Nucleus': 'Double-membrane compartment that houses DNA and regulates gene expression.',
-      'Nucleolus': 'Dense region inside nucleus; produces rRNA and assembles ribosome subunits.',
-      'Mitochondrion': 'Powerhouse organelle; generates ATP via cellular respiration (double membrane).',
-      'Golgi apparatus': 'Modifies, sorts, and packages proteins and lipids for secretion or delivery.',
-      'Rough ER': 'Endoplasmic reticulum with ribosomes; synthesizes and folds secreted/membrane proteins.',
-      'Smooth ER': 'ER without ribosomes; lipid synthesis, calcium storage, detox functions.',
-      'Ribosome': 'Molecular machine that translates mRNA into proteins (free or bound to RER).',
-      'Lysosome': 'Acidic vesicle with hydrolases; breaks down waste and macromolecules.',
-      'Peroxisome': 'Oxidative organelle; breaks down very-long-chain fatty acids and detoxifies peroxides.',
-      'Centrosome': 'Microtubule-organizing center; contains a pair of centrioles in animal cells.',
-      'Cytoskeleton': 'Network of microtubules, microfilaments, and intermediate filaments for shape and transport.',
-      'Chromatin': 'DNA-protein complex inside nucleus; condenses into chromosomes during division.'
-    };
-
-    function openInfo(name){
-      titleEl.textContent = name;
-      introEl.textContent = INFO[name] || 'No details available.';
-      panel.classList.add('show');
-    }
-
-    // ------------ build scene ------------
-    const CELL_R = 10.0;
-    const NUCLEUS_R = 3.5;
-    const NUCLEOLUS_R = 1.2;
-
-    const traces = [];
-
-    // Cytoplasm: faint inner fill for clickability
-    (function(){
-      const e = ellipsoid([0,0,0],[CELL_R*0.98, CELL_R*0.93, CELL_R*0.88], 38, 22);
-      const t = surface(e.X,e.Y,e.Z,'#5e81ac',0.05,'Cytoplasm');
-      traces.push(t);
-    })();
-
-    // Cell membrane
-    (function(){
-      const e = ellipsoid([0,0,0],[CELL_R, CELL_R*0.95, CELL_R*0.90], 62, 34);
-      const t = surface(e.X,e.Y,e.Z,'#8ecae6',0.18,'Cell membrane');
-      traces.push(t);
-    })();
-
-    // Nucleus
-    (function(){
-      const e = ellipsoid([1.0,0.5,0.0],[NUCLEUS_R*1.05, NUCLEUS_R, NUCLEUS_R*0.9], 54, 30);
-      traces.push(surface(e.X,e.Y,e.Z,'#bdb2ff',0.45,'Nucleus'));
-    })();
-
-    // Nucleolus
-    (function(){
-      const e = ellipsoid([1.4,0.8,0.2],[NUCLEOLUS_R, NUCLEOLUS_R, NUCLEOLUS_R*0.9], 40, 24);
-      traces.push(surface(e.X,e.Y,e.Z,'#ffadad',0.85,'Nucleolus'));
-    })();
-
-    // Chromatin (inside nucleus) - a few gentle loops
-    (function(){
-      function spiral(cx,cy,cz,rad,turns,phase,color){
-        const curve = (t)=>[ cx + (rad+0.25*Math.sin(3*t+phase))*Math.cos(t),
-                             cy + (rad+0.25*Math.cos(2*t+phase))*Math.sin(t),
-                             cz + 0.6*Math.sin(1.2*t+phase) ];
-        const pl = polyline3d(curve, 0, 2*Math.PI*turns, 320);
-        traces.push(lineTrace(pl.X,pl.Y,pl.Z,'#b97aff',3,'Chromatin'));
-      }
-      spiral(1.0,0.5,0.0,1.2,1.6,0.0);
-      spiral(1.0,0.5,0.0,1.0,1.4,1.2);
-    })();
-
-    // Mitochondria
-    (function(){
-      const centers = randomPointsInShell(14, NUCLEUS_R+2.0, CELL_R-2.2, [1.0,0.5,0.0], NUCLEUS_R+1.0);
-      for(const c of centers){
-        const e = ellipsoid(c,[0.85,0.48,0.48], 28, 18);
-        traces.push(surface(e.X,e.Y,e.Z,'#fb8500',0.9,'Mitochondrion'));
-      }
-    })();
-
-    // Golgi apparatus (stacks)
-    (function(){
-      const gc=[3.0,-0.9,0.4]; const scales=[1.0,0.9,0.8,0.7,0.6];
-      for(let i=0;i<scales.length;i++){
-        const s=scales[i], center=[gc[0]+0.16*i, gc[1]+0.05*i, gc[2]];
-        const e = ellipsoid(center,[1.7*s,0.78*s,0.24*s], 36, 18);
-        const g = surface(e.X,e.Y,e.Z,'#ffd166',0.95,'Golgi apparatus');
-        traces.push(g);
-      }
-    })();
-
-    // ER: rough (green with ribosomes) and smooth (teal)
-    (function(){
-      function makeER(cx,cy,cz,amp,rad,twist,phase){
-        return function(t){
-          return [
-            cx + (rad + amp*Math.sin(t*twist + phase)) * Math.cos(t),
-            cy + (rad + amp*Math.cos(t*twist + phase)) * Math.sin(t),
-            cz + 0.45*Math.sin(1.4*t + phase)
-          ];
-        }
-      }
-      const cent=[1.0,0.5,0.0];
-      // Rough ER (3 loops)
-      const phasesR=[0.0, 1.0, 2.0];
-      for(let i=0;i<phasesR.length;i++){
-        const cx=cent[0]-0.9+0.45*i, cy=cent[1]+0.15*i, cz=cent[2];
-        const curve=makeER(cx,cy,cz,1.0,3.8-0.35*i,2.0,phasesR[i]);
-        const pl=polyline3d(curve,0,2*Math.PI,280);
-        traces.push(lineTrace(pl.X,pl.Y,pl.Z,'#2a9d8f',6,'Rough ER'));
-        // ribosomes along the rough ER
-        const rsX=[],rsY=[],rsZ=[];
-        for(let k=0;k<pl.X.length;k+=18){ rsX.push(pl.X[k]); rsY.push(pl.Y[k]); rsZ.push(pl.Z[k]); }
-        traces.push({type:'scatter3d',mode:'markers',x:rsX,y:rsY,z:rsZ,
-                     marker:{size:2.5,color:'#264653',opacity:.9},name:'Ribosome',hoverinfo:'name'});
-      }
-      // Smooth ER (2 loops)
-      const phasesS=[0.5, 1.7];
-      for(let i=0;i<phasesS.length;i++){
-        const cx=cent[0]+0.6-0.25*i, cy=cent[1]-0.2+0.2*i, cz=cent[2];
-        const curve=makeER(cx,cy,cz,0.9,3.2-0.25*i,1.8,phasesS[i]);
-        const pl=polyline3d(curve,0,2*Math.PI,240);
-        traces.push(lineTrace(pl.X,pl.Y,pl.Z,'#5ac6d0',5,'Smooth ER'));
-      }
-    })();
-
-    // Lysosomes
-    (function(){
-      const centers = randomPointsInShell(10, NUCLEUS_R+1.6, CELL_R-2.2, [1.0,0.5,0.0], NUCLEUS_R+0.9);
-      for(const c of centers){
-        const e=ellipsoid(c,[0.38,0.38,0.38], 18, 12);
-        traces.push(surface(e.X,e.Y,e.Z,'#f4a261',0.7,'Lysosome'));
-      }
-    })();
-
-    // Peroxisomes
-    (function(){
-      const centers = randomPointsInShell(8, NUCLEUS_R+1.4, CELL_R-2.2, [1.0,0.5,0.0], NUCLEUS_R+0.8);
-      for(const c of centers){
-        const e=ellipsoid(c,[0.34,0.34,0.34], 18, 12);
-        traces.push(surface(e.X,e.Y,e.Z,'#90be6d',0.72,'Peroxisome'));
-      }
-    })();
-
-    // Centrosome (two short orthogonal bundles)
-    (function(){
-      const c0=[-1.6,-2.1,0.0], a1=[0.9,0.0,0.25], a2=[0.0,0.9,-0.25];
-      const l1={x:[c0[0]-a1[0],c0[0]+a1[0]], y:[c0[1]-a1[1],c0[1]+a1[1]], z:[c0[2]-a1[2],c0[2]+a1[2]]};
-      const l2={x:[c0[0]-a2[0],c0[0]+a2[0]], y:[c0[1]-a2[1],c0[1]+a2[1]], z:[c0[2]-a2[2],c0[2]+a2[2]]};
-      traces.push({type:'scatter3d',mode:'lines',x:l1.x,y:l1.y,z:l1.z,line:{color:'#6a4c93',width:6},name:'Centrosome',hoverinfo:'name'});
-      traces.push({type:'scatter3d',mode:'lines',x:l2.x,y:l2.y,z:l2.z,line:{color:'#6a4c93',width:6},name:'Centrosome',hoverinfo:'name'});
-    })();
-
-    // Cytoskeleton (a few filaments)
-    (function(){
-      function filament(cx,cy,cz,amp,rad,twist,len,color,width,name){
-        const curve=(t)=>[
-          cx + (rad + amp*Math.sin(t*twist))*Math.cos(t),
-          cy + (rad + amp*Math.cos(t*twist))*Math.sin(t),
-          cz + 0.7*Math.sin(1.1*t)
-        ];
-        const pl=polyline3d(curve,0,len,360);
-        traces.push(lineTrace(pl.X,pl.Y,pl.Z,color,width,name));
-      }
-      filament(0,0,0,0.6,6.0,2.0,4*Math.PI,'#89c2ff',4,'Cytoskeleton');
-      filament(-1.5,1.0,0.2,0.5,5.0,2.5,4*Math.PI,'#ff6b6b',3,'Cytoskeleton');
-      filament(1.2,-0.8,-0.3,0.7,4.5,1.7,4*Math.PI,'#c0c7d1',3,'Cytoskeleton');
-    })();
-
-    // Ribosomes (free in cytosol)
-    (function(){
-      const pts = randomPointsInShell(260, NUCLEUS_R+1.2, CELL_R-1.6, [1.0,0.5,0.0], NUCLEUS_R+0.6);
-      const xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]), zs=pts.map(p=>p[2]);
-      traces.push({type:'scatter3d',mode:'markers',x:xs,y:ys,z:zs,marker:{size:2, color:'#1f4451', opacity:0.85},name:'Ribosome',hoverinfo:'name'});
-    })();
-
-    // ------------ render ------------
-    const layout = {
-      title: '',
-      showlegend: true,
-      legend: {orientation:'h', yanchor:'bottom', y:0.02, xanchor:'center', x:0.5, font:{color:'#e8ecff'}},
-      paper_bgcolor: 'rgba(0,0,0,0)',
-      margin: {l:0,r:0,t:0,b:0},
-      scene: {
-        xaxis:{visible:false}, yaxis:{visible:false}, zaxis:{visible:false},
-        aspectmode:'data',
-        camera:{eye:{x:1.7,y:1.9,z:1.15}},
-        bgcolor: 'rgba(0,0,0,0)'
-      }
-    };
-
-    const plotEl = document.getElementById('plot');
-
-    Plotly.newPlot(plotEl, traces, layout, {responsive:true}).then(()=>{
-      statusEl.textContent = 'Ready • Click any organelle';
-      setTimeout(()=>{ statusEl.style.opacity = .0; }, 2200);
-    }).catch(e=>fail('Plot render error: '+e.message));
-
-    // Click-to-open info
-    plotEl.on('plotly_click', function(ev){
-      if(!ev || !ev.points || !ev.points.length) return;
-      const name = ev.points[0].fullData.name || 'Organelles';
-      openInfo(name);
+      startApp(); // proceed once Plotly is available
     });
 
-    // Ensure resize works
-    window.addEventListener('resize', ()=>Plotly.Plots.resize(plotEl));
+    // ----------------- App code (runs after Plotly loads) -----------------
+    function startApp(){
+      const panel = document.getElementById('panel');
+      const titleEl = document.getElementById('orgTitle');
+      const introEl = document.getElementById('orgIntro');
+      document.getElementById('closePanel').addEventListener('click', ()=> panel.classList.remove('show'));
+
+      // Helpers
+      function linspace(a,b,n){ if(n<2) return [a]; const s=(b-a)/(n-1), arr=new Array(n); for(let i=0;i<n;i++) arr[i]=a+s*i; return arr; }
+      function zerosLike2D(M){ const Z=new Array(M.length); for(let i=0;i<M.length;i++){ Z[i]=new Array(M[i].length).fill(0) } return Z; }
+      function ellipsoid(center, radii, nu, nv){
+        const [cx,cy,cz]=center, [rx,ry,rz]=radii;
+        const u=linspace(0,2*Math.PI,nu), v=linspace(0,Math.PI,nv);
+        const X=new Array(nu), Y=new Array(nu), Z=new Array(nu);
+        for(let i=0;i<nu;i++){
+          const cu=Math.cos(u[i]), su=Math.sin(u[i]);
+          X[i]=new Array(nv); Y[i]=new Array(nv); Z[i]=new Array(nv);
+          for(let j=0;j<nv;j++){
+            const sv=Math.sin(v[j]), cv=Math.cos(v[j]);
+            X[i][j]=rx*cu*sv+cx; Y[i][j]=ry*su*sv+cy; Z[i][j]=rz*cv+cz;
+          }
+        }
+        return {X,Y,Z};
+      }
+      function surface(X,Y,Z,color,opacity,name){
+        return {
+          type:'surface', x:X,y:Y,z:Z,
+          surfacecolor: zerosLike2D(X),
+          colorscale: [[0,color],[1,color]],
+          showscale:false, opacity:opacity, name:name, hoverinfo:'name',
+          lighting:{ambient:.5,diffuse:.5,specular:.2,roughness:.9},
+          contours:{
+            x:{show:true, color:'rgba(255,255,255,0.12)', width:1},
+            y:{show:true, color:'rgba(255,255,255,0.12)', width:1},
+            z:{show:true, color:'rgba(0,0,0,0.22)', width:1}
+          }
+        };
+      }
+      function randomPointsInShell(n, inner_r, outer_r, avoid_center, avoid_radius){
+        const pts=[]; let attempts=0;
+        while(pts.length<n && attempts<40000){
+          const u=Math.random();
+          const r=Math.pow((Math.pow(outer_r,3)-Math.pow(inner_r,3))*u + Math.pow(inner_r,3), 1/3);
+          const z=Math.random()*2-1, t=Math.random()*2*Math.PI, s=Math.sqrt(1-z*z);
+          const x=r*s*Math.cos(t), y=r*s*Math.sin(t), zc=r*z;
+          if(avoid_center && typeof avoid_radius==='number'){
+            const dx=x-avoid_center[0], dy=y-avoid_center[1], dz=zc-avoid_center[2];
+            if(Math.hypot(dx,dy,dz) < avoid_radius){ attempts++; continue; }
+          }
+          pts.push([x,y,zc]); attempts++;
+        }
+        return pts;
+      }
+      function polyline3d(curveFn, t0, t1, steps){
+        const t=linspace(t0,t1,steps), X=new Array(steps),Y=new Array(steps),Z=new Array(steps);
+        for(let i=0;i<steps;i++){ const p=curveFn(t[i]); X[i]=p[0]; Y[i]=p[1]; Z[i]=p[2]; }
+        return {X,Y,Z};
+      }
+      function lineTrace(xs,ys,zs,color,width,name){
+        return {type:'scatter3d',mode:'lines',x:xs,y:ys,z:zs,line:{color,width},name,hoverinfo:'name',opacity:0.95};
+      }
+
+      // Organelle info
+      const INFO = {
+        'Cell membrane': 'Selective barrier (phospholipid bilayer) that encloses the cell and regulates entry/exit.',
+        'Cytoplasm': 'Gel-like cytosol plus suspended organelles; site of many metabolic reactions.',
+        'Nucleus': 'Double-membrane compartment that houses DNA and regulates gene expression.',
+        'Nucleolus': 'Dense region inside nucleus; produces rRNA and assembles ribosome subunits.',
+        'Mitochondrion': 'Generates ATP via cellular respiration (double membrane).',
+        'Golgi apparatus': 'Modifies, sorts, and packages proteins and lipids for delivery.',
+        'Rough ER': 'ER with ribosomes; synthesizes secreted/membrane proteins.',
+        'Smooth ER': 'ER without ribosomes; lipid synthesis, Ca²⁺ storage, detox.',
+        'Ribosome': 'Translates mRNA into proteins (free or ER-bound).',
+        'Lysosome': 'Acidic vesicle; degrades waste and macromolecules.',
+        'Peroxisome': 'Oxidative reactions; fatty acid breakdown and peroxide detox.',
+        'Centrosome': 'Microtubule-organizing center with centrioles (animal cells).',
+        'Cytoskeleton': 'Microtubules, microfilaments, intermediate filaments for shape and transport.',
+        'Chromatin': 'DNA-protein complex inside nucleus.'
+      };
+      function openInfo(name){
+        document.getElementById('orgTitle').textContent = name;
+        document.getElementById('orgIntro').textContent = INFO[name] || 'No details available.';
+        panel.classList.add('show');
+      }
+
+      // Build scene
+      const CELL_R=10.0, NUCLEUS_R=3.5, NUCLEOLUS_R=1.2;
+      const traces = [];
+
+      // Cytoplasm
+      (function(){
+        const e = ellipsoid([0,0,0],[CELL_R*0.98, CELL_R*0.93, CELL_R*0.88], 38, 22);
+        traces.push(surface(e.X,e.Y,e.Z,'#5e81ac',0.05,'Cytoplasm'));
+      })();
+
+      // Cell membrane
+      (function(){
+        const e = ellipsoid([0,0,0],[CELL_R, CELL_R*0.95, CELL_R*0.90], 62, 34);
+        traces.push(surface(e.X,e.Y,e.Z,'#8ecae6',0.18,'Cell membrane'));
+      })();
+
+      // Nucleus
+      (function(){
+        const e = ellipsoid([1.0,0.5,0.0],[NUCLEUS_R*1.05, NUCLEUS_R, NUCLEUS_R*0.9], 54, 30);
+        traces.push(surface(e.X,e.Y,e.Z,'#bdb2ff',0.45,'Nucleus'));
+      })();
+
+      // Nucleolus
+      (function(){
+        const e = ellipsoid([1.4,0.8,0.2],[NUCLEOLUS_R, NUCLEOLUS_R, NUCLEOLUS_R*0.9], 40, 24);
+        traces.push(surface(e.X,e.Y,e.Z,'#ffadad',0.85,'Nucleolus'));
+      })();
+
+      // Chromatin loops
+      (function(){
+        function spiral(cx,cy,cz,rad,turns,phase,color){
+          const curve = (t)=>[ cx + (rad+0.25*Math.sin(3*t+phase))*Math.cos(t),
+                               cy + (rad+0.25*Math.cos(2*t+phase))*Math.sin(t),
+                               cz + 0.6*Math.sin(1.2*t+phase) ];
+          const pl = polyline3d(curve, 0, 2*Math.PI*turns, 320);
+          traces.push(lineTrace(pl.X,pl.Y,pl.Z,'#b97aff',3,'Chromatin'));
+        }
+        spiral(1.0,0.5,0.0,1.2,1.6,0.0);
+        spiral(1.0,0.5,0.0,1.0,1.4,1.2);
+      })();
+
+      // Mitochondria
+      (function(){
+        const centers = randomPointsInShell(14, NUCLEUS_R+2.0, CELL_R-2.2, [1.0,0.5,0.0], NUCLEUS_R+1.0);
+        for(const c of centers){
+          const e = ellipsoid(c,[0.85,0.48,0.48], 28, 18);
+          traces.push(surface(e.X,e.Y,e.Z,'#fb8500',0.9,'Mitochondrion'));
+        }
+      })();
+
+      // Golgi
+      (function(){
+        const gc=[3.0,-0.9,0.4]; const scales=[1.0,0.9,0.8,0.7,0.6];
+        for(let i=0;i<scales.length;i++){
+          const s=scales[i], center=[gc[0]+0.16*i, gc[1]+0.05*i, gc[2]];
+          const e = ellipsoid(center,[1.7*s,0.78*s,0.24*s], 36, 18);
+          traces.push(surface(e.X,e.Y,e.Z,'#ffd166',0.95,'Golgi apparatus'));
+        }
+      })();
+
+      // ER (rough + smooth)
+      (function(){
+        function makeER(cx,cy,cz,amp,rad,twist,phase){
+          return function(t){
+            return [
+              cx + (rad + amp*Math.sin(t*twist + phase)) * Math.cos(t),
+              cy + (rad + amp*Math.cos(t*twist + phase)) * Math.sin(t),
+              cz + 0.45*Math.sin(1.4*t + phase)
+            ];
+          }
+        }
+        const cent=[1.0,0.5,0.0];
+        const phasesR=[0.0, 1.0, 2.0];
+        for(let i=0;i<phasesR.length;i++){
+          const cx=cent[0]-0.9+0.45*i, cy=cent[1]+0.15*i, cz=cent[2];
+          const curve=makeER(cx,cy,cz,1.0,3.8-0.35*i,2.0,phasesR[i]);
+          const pl=polyline3d(curve,0,2*Math.PI,280);
+          traces.push(lineTrace(pl.X,pl.Y,pl.Z,'#2a9d8f',6,'Rough ER'));
+          const rsX=[],rsY=[],rsZ=[];
+          for(let k=0;k<pl.X.length;k+=18){ rsX.push(pl.X[k]); rsY.push(pl.Y[k]); rsZ.push(pl.Z[k]); }
+          traces.push({type:'scatter3d',mode:'markers',x:rsX,y:rsY,z:rsZ,marker:{size:2.5,color:'#264653',opacity:.9},name:'Ribosome',hoverinfo:'name'});
+        }
+        const phasesS=[0.5, 1.7];
+        for(let i=0;i<phasesS.length;i++){
+          const cx=cent[0]+0.6-0.25*i, cy=cent[1]-0.2+0.2*i, cz=cent[2];
+          const curve=makeER(cx,cy,cz,0.9,3.2-0.25*i,1.8,phasesS[i]);
+          const pl=polyline3d(curve,0,2*Math.PI,240);
+          traces.push(lineTrace(pl.X,pl.Y,pl.Z,'#5ac6d0',5,'Smooth ER'));
+        }
+      })();
+
+      // Lysosomes
+      (function(){
+        const centers = randomPointsInShell(10, NUCLEUS_R+1.6, CELL_R-2.2, [1.0,0.5,0.0], NUCLEUS_R+0.9);
+        for(const c of centers){
+          const e=ellipsoid(c,[0.38,0.38,0.38], 18, 12);
+          traces.push(surface(e.X,e.Y,e.Z,'#f4a261',0.7,'Lysosome'));
+        }
+      })();
+
+      // Peroxisomes
+      (function(){
+        const centers = randomPointsInShell(8, NUCLEUS_R+1.4, CELL_R-2.2, [1.0,0.5,0.0], NUCLEUS_R+0.8);
+        for(const c of centers){
+          const e=ellipsoid(c,[0.34,0.34,0.34], 18, 12);
+          traces.push(surface(e.X,e.Y,e.Z,'#90be6d',0.72,'Peroxisome'));
+        }
+      })();
+
+      // Centrosome
+      (function(){
+        const c0=[-1.6,-2.1,0.0], a1=[0.9,0.0,0.25], a2=[0.0,0.9,-0.25];
+        traces.push({type:'scatter3d',mode:'lines',x:[c0[0]-a1[0],c0[0]+a1[0]],y:[c0[1]-a1[1],c0[1]+a1[1]],z:[c0[2]-a1[2],c0[2]+a1[2]],line:{color:'#6a4c93',width:6},name:'Centrosome',hoverinfo:'name'});
+        traces.push({type:'scatter3d',mode:'lines',x:[c0[0]-a2[0],c0[0]+a2[0]],y:[c0[1]-a2[1],c0[1]+a2[1]],z:[c0[2]-a2[2],c0[2]+a2[2]],line:{color:'#6a4c93',width:6},name:'Centrosome',hoverinfo:'name'});
+      })();
+
+      // Free ribosomes
+      (function(){
+        const pts = randomPointsInShell(260, NUCLEUS_R+1.2, CELL_R-1.6, [1.0,0.5,0.0], NUCLEUS_R+0.6);
+        traces.push({type:'scatter3d',mode:'markers',x:pts.map(p=>p[0]),y:pts.map(p=>p[1]),z:pts.map(p=>p[2]),marker:{size:2,color:'#1f4451',opacity:0.85},name:'Ribosome',hoverinfo:'name'});
+      })();
+
+      const layout = {
+        title: '', showlegend:true,
+        legend:{orientation:'h', yanchor:'bottom', y:0.02, xanchor:'center', x:0.5, font:{color:'#e8ecff'}},
+        paper_bgcolor:'rgba(0,0,0,0)', margin:{l:0,r:0,t:0,b:0},
+        scene:{ xaxis:{visible:false}, yaxis:{visible:false}, zaxis:{visible:false}, aspectmode:'data', camera:{eye:{x:1.7,y:1.9,z:1.15}}, bgcolor:'rgba(0,0,0,0)' }
+      };
+
+      const plotEl = document.getElementById('plot');
+      Plotly.newPlot(plotEl, traces, layout, {responsive:true}).then(()=>{
+        statusEl.textContent = 'Ready • Click any organelle';
+        setTimeout(()=>{ statusEl.style.opacity = .0; }, 2200);
+      }).catch(e=>{
+        statusEl.classList.add('error');
+        statusEl.textContent = 'Plot render error: ' + e.message;
+      });
+
+      // Open info on click
+      plotEl.on('plotly_click', function(ev){
+        if(!ev || !ev.points || !ev.points.length) return;
+        const name = ev.points[0].fullData.name || 'Organelles';
+        openInfo(name);
+      });
+
+      function openInfo(name){ titleEl.textContent=name; introEl.textContent = INFO[name] || 'No details available.'; panel.classList.add('show'); }
+      window.addEventListener('resize', ()=>Plotly.Plots.resize(plotEl));
+    }
   })();
   </script>
 </body>
