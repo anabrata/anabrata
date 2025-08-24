@@ -4,256 +4,244 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Schematic 3D Human (Animal) Cell</title>
-  <!-- Local Plotly bundle: put plotly.min.js in the same folder -->
+  <!-- Put plotly.min.js in the SAME folder as this file -->
   <script src="plotly.min.js"></script>
   <style>
-    html, body { height: 100%; margin: 0; }
-    #plot { width: 100%; height: 100%; }
+    html, body { margin:0; padding:0; height:100%; }
+    body { min-height:100vh; }
+    #plot { width:100vw; height:100vh; }
+    #status {
+      position: fixed; inset: 12px auto auto 12px;
+      padding: 6px 10px; background: rgba(0,0,0,0.65); color: #fff;
+      font: 14px/1.3 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      border-radius: 6px; z-index: 9999;
+    }
+    #status.error { background: #b00020; }
   </style>
+  <noscript>
+    <div style="padding:12px;background:#b00020;color:#fff;font-family:system-ui">Enable JavaScript to view the 3D cell.</div>
+  </noscript>
 </head>
 <body>
+  <div id="status">Loading…</div>
   <div id="plot"></div>
+
   <script>
-    // ---------- helpers ----------
-    function linspace(a, b, n) {
-      if (n < 2) return [a];
-      var arr = new Array(n);
-      var step = (b - a) / (n - 1);
-      for (var i = 0; i < n; i++) arr[i] = a + step * i;
-      return arr;
+  window.addEventListener('load', function() {
+    var status = document.getElementById('status');
+    var plotEl = document.getElementById('plot');
+
+    function fail(msg) {
+      status.classList.add('error');
+      status.textContent = msg;
     }
-    function zerosLike2D(M) {
-      var Z = new Array(M.length);
-      for (var i = 0; i < M.length; i++) {
-        Z[i] = new Array(M[i].length);
-        for (var j = 0; j < M[i].length; j++) Z[i][j] = 0;
+
+    if (typeof Plotly === 'undefined') {
+      fail('Plotly failed to load. Ensure plotly.min.js is in the same folder.');
+      return;
+    }
+
+    try {
+      // ---------- helpers ----------
+      function linspace(a, b, n) {
+        if (n < 2) return [a];
+        var arr = new Array(n), step = (b - a) / (n - 1);
+        for (var i = 0; i < n; i++) arr[i] = a + step * i;
+        return arr;
       }
-      return Z;
-    }
-    function ellipsoid(center, radii, nu, nv) {
-      var cx = center[0], cy = center[1], cz = center[2];
-      var rx = radii[0], ry = radii[1], rz = radii[2];
-      var u = linspace(0, 2*Math.PI, nu);
-      var v = linspace(0, Math.PI, nv);
-      var X = new Array(nu), Y = new Array(nu), Z = new Array(nu);
-      for (var i = 0; i < nu; i++) {
-        var cu = Math.cos(u[i]), su = Math.sin(u[i]);
-        X[i] = new Array(nv); Y[i] = new Array(nv); Z[i] = new Array(nv);
-        for (var j = 0; j < nv; j++) {
-          var sv = Math.sin(v[j]), cv = Math.cos(v[j]);
-          X[i][j] = rx * cu * sv + cx;
-          Y[i][j] = ry * su * sv + cy;
-          Z[i][j] = rz * cv + cz;
+      function zerosLike2D(M) {
+        var Z = new Array(M.length);
+        for (var i = 0; i < M.length; i++) {
+          Z[i] = new Array(M[i].length);
+          for (var j = 0; j < M[i].length; j++) Z[i][j] = 0;
         }
+        return Z;
       }
-      return {X:X, Y:Y, Z:Z};
-    }
-    function surfaceTrace(X, Y, Z, color, opacity, name) {
-      return {
-        type: 'surface',
-        x: X, y: Y, z: Z,
-        surfacecolor: zerosLike2D(X),
-        colorscale: [[0, color], [1, color]],
-        showscale: false,
-        opacity: opacity,
-        name: name,
-        hoverinfo: 'name',
-        lighting: {ambient:0.5, diffuse:0.5, specular:0.2, roughness:0.9}
-      };
-    }
-    function randomPointsInShell(n, inner_r, outer_r, avoid_center, avoid_radius) {
-      var pts = [];
-      var attempts = 0;
-      while (pts.length < n && attempts < 20000) {
-        var u = Math.random();
-        var r = Math.pow((Math.pow(outer_r,3)-Math.pow(inner_r,3))*u + Math.pow(inner_r,3), 1/3);
-        var z = Math.random()*2 - 1;
-        var t = Math.random()*2*Math.PI;
-        var s = Math.sqrt(1 - z*z);
-        var x = r * s * Math.cos(t);
-        var y = r * s * Math.sin(t);
-        var zc = r * z;
-        if (avoid_center && typeof avoid_radius === 'number') {
-          var dx = x - avoid_center[0];
-          var dy = y - avoid_center[1];
-          var dz = zc - avoid_center[2];
-          var d = Math.sqrt(dx*dx + dy*dy + dz*dz);
-          if (d < avoid_radius) { attempts++; continue; }
+      function ellipsoid(center, radii, nu, nv) {
+        var cx = center[0], cy = center[1], cz = center[2];
+        var rx = radii[0], ry = radii[1], rz = radii[2];
+        var u = linspace(0, 2*Math.PI, nu);
+        var v = linspace(0, Math.PI, nv);
+        var X = new Array(nu), Y = new Array(nu), Z = new Array(nu);
+        for (var i = 0; i < nu; i++) {
+          var cu = Math.cos(u[i]), su = Math.sin(u[i]);
+          X[i] = new Array(nv); Y[i] = new Array(nv); Z[i] = new Array(nv);
+          for (var j = 0; j < nv; j++) {
+            var sv = Math.sin(v[j]), cv = Math.cos(v[j]);
+            X[i][j] = rx * cu * sv + cx;
+            Y[i][j] = ry * su * sv + cy;
+            Z[i][j] = rz * cv + cz;
+          }
         }
-        pts.push([x,y,zc]);
-        attempts++;
+        return {X:X, Y:Y, Z:Z};
       }
-      return pts;
-    }
-    function polyline3d(curveFn, t0, t1, steps) {
-      var t = linspace(t0, t1, steps);
-      var X = new Array(steps), Y = new Array(steps), Z = new Array(steps);
-      for (var i = 0; i < steps; i++) {
-        var p = curveFn(t[i]);
-        X[i] = p[0]; Y[i] = p[1]; Z[i] = p[2];
-      }
-      return {X:X, Y:Y, Z:Z};
-    }
-    function lineTrace(x0,y0,z0, x1,y1,z1, color, width, name) {
-      return {
-        type:'scatter3d',
-        mode:'lines',
-        x:[x0,x1], y:[y0,y1], z:[z0,z1],
-        line:{color:color, width:width},
-        name:name,
-        hoverinfo:'name'
-      };
-    }
-
-    // ---------- scene constants ----------
-    var CELL_R = 10.0;
-    var NUCLEUS_R = 3.5;
-    var NUCLEOLUS_R = 1.2;
-
-    var traces = [];
-
-    // Cell membrane
-    (function() {
-      var e = ellipsoid([0,0,0], [CELL_R, CELL_R*0.95, CELL_R*0.90], 80, 40);
-      traces.push(surfaceTrace(e.X, e.Y, e.Z, '#8ecae6', 0.18, 'Cell membrane'));
-    })();
-
-    // Nucleus
-    (function() {
-      var e = ellipsoid([1.0, 0.5, 0.0], [NUCLEUS_R*1.05, NUCLEUS_R, NUCLEUS_R*0.9], 60, 36);
-      traces.push(surfaceTrace(e.X, e.Y, e.Z, '#bdb2ff', 0.45, 'Nucleus'));
-    })();
-
-    // Nucleolus
-    (function() {
-      var e = ellipsoid([1.4, 0.8, 0.2], [NUCLEOLUS_R, NUCLEOLUS_R, NUCLEOLUS_R*0.9], 50, 30);
-      traces.push(surfaceTrace(e.X, e.Y, e.Z, '#ffadad', 0.85, 'Nucleolus'));
-    })();
-
-    // Mitochondria
-    (function() {
-      var centers = randomPointsInShell(
-        14,
-        NUCLEUS_R + 2.0,
-        CELL_R - 2.0,
-        [1.0, 0.5, 0.0],
-        NUCLEUS_R + 1.0
-      );
-      for (var i = 0; i < centers.length; i++) {
-        var c = centers[i];
-        var e = ellipsoid(c, [0.8, 0.45, 0.45], 28, 18);
-        traces.push(surfaceTrace(e.X, e.Y, e.Z, '#fb8500', 0.9, 'Mitochondrion'));
-      }
-    })();
-
-    // Golgi apparatus
-    (function() {
-      var gc = [3.2, -0.8, 0.4];
-      var scales = [1.0, 0.9, 0.8, 0.7, 0.6];
-      for (var i = 0; i < scales.length; i++) {
-        var s = scales[i];
-        var center = [gc[0] + 0.15*i, gc[1] + 0.05*i, gc[2]];
-        var e = ellipsoid(center, [1.8*s, 0.8*s, 0.25*s], 40, 20);
-        traces.push(surfaceTrace(e.X, e.Y, e.Z, '#ffd166', 0.95, 'Golgi stack'));
-      }
-    })();
-
-    // Endoplasmic reticulum (meandering near nucleus)
-    (function() {
-      function makeERCurve(cx, cy, cz, amp, rad, twist, phase) {
-        return function(t) {
-          var x = cx + (rad + amp*Math.sin(t*twist + phase)) * Math.cos(t);
-          var y = cy + (rad + amp*Math.cos(t*twist + phase)) * Math.sin(t);
-          var z = cz + 0.5*Math.sin(1.5*t + phase);
-          return [x,y,z];
+      function surfaceTrace(X, Y, Z, color, opacity, name) {
+        return {
+          type: 'surface',
+          x: X, y: Y, z: Z,
+          surfacecolor: zerosLike2D(X),
+          colorscale: [[0, color], [1, color]],
+          showscale: false,
+          opacity: opacity,
+          name: name,
+          hoverinfo: 'name',
+          lighting: {ambient:0.5, diffuse:0.5, specular:0.2, roughness:0.9}
         };
       }
-      var cent = [1.0, 0.5, 0.0];
-      var phases = [0.0, 0.9, 1.8];
-      for (var i = 0; i < phases.length; i++) {
-        var cx = cent[0] - 0.8 + 0.4*i;
-        var cy = cent[1] + 0.2*i;
-        var cz = cent[2];
-        var curve = makeERCurve(cx, cy, cz, 1.0, 4.0-0.4*i, 2.0, phases[i]);
-        var pl = polyline3d(curve, 0, 2*Math.PI, 400);
-        traces.push({
-          type:'scatter3d',
-          mode:'lines',
-          x: pl.X, y: pl.Y, z: pl.Z,
-          line:{color:'#2a9d8f', width:5},
-          name:'Endoplasmic reticulum',
-          hoverinfo:'name',
-          opacity:0.9
-        });
+      function randomPointsInShell(n, inner_r, outer_r, avoid_center, avoid_radius) {
+        var pts = [], attempts = 0;
+        while (pts.length < n && attempts < 30000) {
+          var u = Math.random();
+          var r = Math.pow((Math.pow(outer_r,3)-Math.pow(inner_r,3))*u + Math.pow(inner_r,3), 1/3);
+          var z = Math.random()*2 - 1;
+          var t = Math.random()*2*Math.PI;
+          var s = Math.sqrt(1 - z*z);
+          var x = r * s * Math.cos(t);
+          var y = r * s * Math.sin(t);
+          var zc = r * z;
+          if (avoid_center && typeof avoid_radius === 'number') {
+            var dx = x - avoid_center[0], dy = y - avoid_center[1], dz = zc - avoid_center[2];
+            if (Math.sqrt(dx*dx + dy*dy + dz*dz) < avoid_radius) { attempts++; continue; }
+          }
+          pts.push([x,y,zc]); attempts++;
+        }
+        return pts;
       }
-    })();
+      function polyline3d(curveFn, t0, t1, steps) {
+        var t = linspace(t0, t1, steps);
+        var X = new Array(steps), Y = new Array(steps), Z = new Array(steps);
+        for (var i = 0; i < steps; i++) {
+          var p = curveFn(t[i]); X[i]=p[0]; Y[i]=p[1]; Z[i]=p[2];
+        }
+        return {X:X, Y:Y, Z:Z};
+      }
 
-    // Ribosomes
-    (function() {
-      var pts = randomPointsInShell(
-        450,
-        NUCLEUS_R + 1.2,
-        CELL_R - 1.5,
-        [1.0, 0.5, 0.0],
-        NUCLEUS_R + 0.6
-      );
-      var xs = [], ys = [], zs = [];
-      for (var i = 0; i < pts.length; i++) { xs.push(pts[i][0]); ys.push(pts[i][1]); zs.push(pts[i][2]); }
-      traces.push({
-        type:'scatter3d',
-        mode:'markers',
-        x: xs, y: ys, z: zs,
-        marker:{size:2, color:'#264653', opacity:0.8},
-        name:'Ribosomes',
-        hoverinfo:'name'
+      // ---------- scene ----------
+      var CELL_R = 10.0;
+      var NUCLEUS_R = 3.5;
+      var NUCLEOLUS_R = 1.2;
+      var traces = [];
+
+      // Cell membrane
+      (function() {
+        var e = ellipsoid([0,0,0], [CELL_R, CELL_R*0.95, CELL_R*0.90], 60, 32);
+        traces.push(surfaceTrace(e.X, e.Y, e.Z, '#8ecae6', 0.18, 'Cell membrane'));
+      })();
+
+      // Nucleus
+      (function() {
+        var e = ellipsoid([1.0, 0.5, 0.0], [NUCLEUS_R*1.05, NUCLEUS_R, NUCLEUS_R*0.9], 48, 28);
+        traces.push(surfaceTrace(e.X, e.Y, e.Z, '#bdb2ff', 0.45, 'Nucleus'));
+      })();
+
+      // Nucleolus
+      (function() {
+        var e = ellipsoid([1.4, 0.8, 0.2], [NUCLEOLUS_R, NUCLEOLUS_R, NUCLEOLUS_R*0.9], 36, 22);
+        traces.push(surfaceTrace(e.X, e.Y, e.Z, '#ffadad', 0.85, 'Nucleolus'));
+      })();
+
+      // Mitochondria (slightly reduced count for lighter render)
+      (function() {
+        var centers = randomPointsInShell(12, NUCLEUS_R + 2.0, CELL_R - 2.0, [1.0, 0.5, 0.0], NUCLEUS_R + 1.0);
+        for (var i = 0; i < centers.length; i++) {
+          var e = ellipsoid(centers[i], [0.8, 0.45, 0.45], 24, 16);
+          traces.push(surfaceTrace(e.X, e.Y, e.Z, '#fb8500', 0.9, 'Mitochondrion'));
+        }
+      })();
+
+      // Golgi
+      (function() {
+        var gc = [3.2, -0.8, 0.4], scales = [1.0, 0.9, 0.8, 0.7];
+        for (var i = 0; i < scales.length; i++) {
+          var s = scales[i];
+          var center = [gc[0] + 0.15*i, gc[1] + 0.05*i, gc[2]];
+          var e = ellipsoid(center, [1.8*s, 0.8*s, 0.25*s], 32, 16);
+          traces.push(surfaceTrace(e.X, e.Y, e.Z, '#ffd166', 0.95, 'Golgi stack'));
+        }
+      })();
+
+      // Endoplasmic reticulum
+      (function() {
+        function makeERCurve(cx, cy, cz, amp, rad, twist, phase) {
+          return function(t) {
+            var x = cx + (rad + amp*Math.sin(t*twist + phase)) * Math.cos(t);
+            var y = cy + (rad + amp*Math.cos(t*twist + phase)) * Math.sin(t);
+            var z = cz + 0.5*Math.sin(1.5*t + phase);
+            return [x,y,z];
+          };
+        }
+        var cent = [1.0, 0.5, 0.0], phases = [0.0, 1.0, 2.0];
+        for (var i = 0; i < phases.length; i++) {
+          var cx = cent[0] - 0.8 + 0.4*i, cy = cent[1] + 0.2*i, cz = cent[2];
+          var curve = makeERCurve(cx, cy, cz, 1.0, 3.6-0.4*i, 2.0, phases[i]);
+          var pl = polyline3d(curve, 0, 2*Math.PI, 260);
+          traces.push({ type:'scatter3d', mode:'lines', x:pl.X, y:pl.Y, z:pl.Z,
+                        line:{color:'#2a9d8f', width:5}, name:'Endoplasmic reticulum',
+                        hoverinfo:'name', opacity:0.9 });
+        }
+      })();
+
+      // Ribosomes
+      (function() {
+        var pts = randomPointsInShell(320, NUCLEUS_R + 1.2, CELL_R - 1.5, [1.0,0.5,0.0], NUCLEUS_R + 0.6);
+        var xs=[], ys=[], zs=[];
+        for (var i=0;i<pts.length;i++){ xs.push(pts[i][0]); ys.push(pts[i][1]); zs.push(pts[i][2]); }
+        traces.push({ type:'scatter3d', mode:'markers', x:xs, y:ys, z:zs,
+                      marker:{size:2, color:'#264653', opacity:0.8},
+                      name:'Ribosomes', hoverinfo:'name' });
+      })();
+
+      // Vesicles / lysosomes
+      (function() {
+        var centers = randomPointsInShell(16, NUCLEUS_R + 1.5, CELL_R - 2.0, [1.0,0.5,0.0], NUCLEUS_R + 0.8);
+        for (var i = 0; i < centers.length; i++) {
+          var e = ellipsoid(centers[i], [0.35, 0.35, 0.35], 18, 12);
+          traces.push(surfaceTrace(e.X, e.Y, e.Z, '#90be6d', 0.65, 'Vesicle'));
+        }
+      })();
+
+      // Centrosome
+      (function() {
+        function lineTrace(x0,y0,z0, x1,y1,z1, color, width, name) {
+          return { type:'scatter3d', mode:'lines', x:[x0,x1], y:[y0,y1], z:[z0,z1],
+                   line:{color:color, width:width}, name:name, hoverinfo:'name' };
+        }
+        var c0 = [-1.5, -2.0, 0.0], a1 = [0.8, 0.0, 0.2], a2 = [0.0, 0.8, -0.2];
+        traces.push(lineTrace(c0[0]-a1[0], c0[1]-a1[1], c0[2]-a1[2],
+                              c0[0]+a1[0], c0[1]+a1[1], c0[2]+a1[2],
+                              '#6a4c93', 6, 'Centrosome'));
+        traces.push(lineTrace(c0[0]-a2[0], c0[1]-a2[1], c0[2]-a2[2],
+                              c0[0]+a2[0], c0[1]+a2[1], c0[2]+a2[2],
+                              '#6a4c93', 6, 'Centrosome'));
+      })();
+
+      var layout = {
+        title: 'Schematic 3D Human (Animal) Cell',
+        showlegend: true,
+        legend: {orientation:'h', yanchor:'bottom', y:0.02, xanchor:'center', x:0.5},
+        margin: {l:0, r:0, t:40, b:0},
+        paper_bgcolor: 'white',
+        scene: {
+          xaxis: {visible:false},
+          yaxis: {visible:false},
+          zaxis: {visible:false},
+          aspectmode: 'data',
+          camera: {eye: {x:1.6, y:1.8, z:1.1}}
+        }
+      };
+
+      Plotly.newPlot(plotEl, traces, layout, {responsive:true}).then(function() {
+        status.remove();
+      }).catch(function(e) {
+        fail('Plot render error: ' + e.message);
       });
-    })();
 
-    // Vesicles / lysosomes
-    (function() {
-      var centers = randomPointsInShell(
-        18,
-        NUCLEUS_R + 1.5,
-        CELL_R - 2.0,
-        [1.0, 0.5, 0.0],
-        NUCLEUS_R + 0.8
-      );
-      for (var i = 0; i < centers.length; i++) {
-        var e = ellipsoid(centers[i], [0.35, 0.35, 0.35], 20, 14);
-        traces.push(surfaceTrace(e.X, e.Y, e.Z, '#90be6d', 0.65, 'Vesicle'));
-      }
-    })();
-
-    // Centrosome (two short orthogonal bundles)
-    (function() {
-      var c0 = [-1.5, -2.0, 0.0];
-      var a1 = [0.8, 0.0, 0.2];
-      var a2 = [0.0, 0.8, -0.2];
-      traces.push(lineTrace(c0[0]-a1[0], c0[1]-a1[1], c0[2]-a1[2],
-                            c0[0]+a1[0], c0[1]+a1[1], c0[2]+a1[2],
-                            '#6a4c93', 6, 'Centrosome'));
-      traces.push(lineTrace(c0[0]-a2[0], c0[1]-a2[1], c0[2]-a2[2],
-                            c0[0]+a2[0], c0[1]+a2[1], c0[2]+a2[2],
-                            '#6a4c93', 6, 'Centrosome'));
-    })();
-
-    // ---------- plot ----------
-    var layout = {
-      title: 'Schematic 3D Human (Animal) Cell',
-      showlegend: true,
-      legend: {orientation:'h', yanchor:'bottom', y:0.02, xanchor:'center', x:0.5},
-      margin: {l:0, r:0, t:40, b:0},
-      paper_bgcolor: 'white',
-      scene: {
-        xaxis: {visible:false},
-        yaxis: {visible:false},
-        zaxis: {visible:false},
-        aspectmode: 'data',
-        camera: {eye: {x:1.6, y:1.8, z:1.1}}
-      }
-    };
-
-    Plotly.newPlot('plot', traces, layout, {responsive:true});
+      // Resize handler
+      window.addEventListener('resize', function(){ Plotly.Plots.resize(plotEl); });
+    } catch (e) {
+      fail('Script error: ' + e.message);
+    }
+  });
   </script>
 </body>
 </html>
