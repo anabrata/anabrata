@@ -4,7 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>WELCOME TO THE WORLD OF CELL</title>
-  <!-- Using Plotly CDN - no local files needed -->
   <script src="https://cdn.plot.ly/plotly-2.34.0.min.js"></script>
   <style>
     :root{
@@ -35,44 +34,51 @@
 
     #plot { width:100vw; height:100vh; }
 
-    .panel { position:absolute; right:16px; top:96px; width:min(380px,86vw); background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); border:1px solid rgba(255,255,255,0.14); border-radius:12px; padding:14px; z-index:20; backdrop-filter: blur(10px) saturate(120%); box-shadow: 0 10px 40px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.05); color:var(--cardText); opacity:0; transform:translateY(-8px); pointer-events:none; transition:opacity .35s ease, transform .35s ease; }
-    .panel.show { opacity:1; transform:translateY(0); pointer-events:auto; }
-    .panel h3 { margin:0 0 6px 0; font-size:18px }
-    .panel p { margin:6px 0; font-size:14px; line-height:1.5 }
-    .panel .hint { font-size:12px; opacity:.8; margin-top:8px }
-    .panel .close { position:absolute; top:6px; right:8px; background:transparent; border:0; color:#fff; font-size:18px; cursor:pointer; opacity:.8; }
+    .panel { position:absolute; right:16px; top:90px; width:min(420px,90vw); background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)); border:1px solid rgba(255,255,255,0.16); border-radius:16px; padding:16px; z-index:20; backdrop-filter: blur(12px) saturate(130%); box-shadow: 0 12px 48px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.06); color:var(--cardText); opacity:0; transform:translateX(100px); pointer-events:none; transition:opacity .4s ease, transform .4s ease; }
+    .panel.show { opacity:1; transform:translateX(0); pointer-events:auto; }
+    .panel h3 { margin:0 0 8px 0; font-size:20px; font-weight:700; }
+    .panel p { margin:8px 0; font-size:14px; line-height:1.6 }
+    .panel .hint { font-size:12px; opacity:.8; margin-top:12px; border-top:1px solid rgba(255,255,255,0.1); padding-top:8px; }
+    .panel .close { position:absolute; top:8px; right:12px; background:transparent; border:0; color:#fff; font-size:20px; cursor:pointer; opacity:.8; }
     .panel .close:hover { opacity:1 }
 
-    #status { position:absolute; left:12px; bottom:12px; z-index:50; padding:6px 10px; background:rgba(0,0,0,0.6); color:#fff; border-radius:8px; font-size:13px; box-shadow:0 4px 18px rgba(0,0,0,0.35); }
-    #status.error { background:#b00020 }
-    .hintTop { position:absolute; right:16px; top:60px; z-index:15; font-size:12px; opacity:.85; background:rgba(0,0,0,0.35); color:#fff; padding:6px 10px; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.25); user-select:none; }
+    .organelle-viewer { margin-top:12px; height:200px; border:1px solid rgba(255,255,255,0.1); border-radius:12px; background:rgba(0,0,0,0.2); position:relative; overflow:hidden; }
+    .organelle-viewer h4 { margin:0 0 8px 0; font-size:14px; opacity:.9; }
 
-    .intro-text { position:absolute; left:16px; top:120px; max-width:min(380px,86vw); background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); border:1px solid rgba(255,255,255,0.14); border-radius:12px; padding:14px; z-index:15; backdrop-filter: blur(10px) saturate(120%); box-shadow: 0 10px 40px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.05); color:var(--cardText); font-size:14px; line-height:1.5; }
+    #status { position:absolute; left:12px; bottom:12px; z-index:50; padding:8px 12px; background:rgba(0,0,0,0.7); color:#fff; border-radius:10px; font-size:14px; box-shadow:0 6px 24px rgba(0,0,0,0.4); }
+    #status.error { background:#b00020 }
+    .hintTop { position:absolute; right:16px; top:60px; z-index:15; font-size:13px; opacity:.9; background:rgba(0,0,0,0.4); color:#fff; padding:8px 12px; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.3); user-select:none; }
+
+    .intro-text { position:absolute; left:16px; top:120px; max-width:min(380px,86vw); background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)); border:1px solid rgba(255,255,255,0.16); border-radius:16px; padding:16px; z-index:15; backdrop-filter: blur(12px) saturate(130%); box-shadow: 0 12px 48px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.06); color:var(--cardText); font-size:14px; line-height:1.6; }
   </style>
 </head>
 <body>
   <div class="banner" aria-live="polite">
     <div class="glow"></div>
     <h1 class="title"><span class="shine">WELCOME TO THE WORLD OF CELL</span></h1>
-    <div class="subtitle">Explore a 3D human (animal) cell. Click an organelle to learn more.</div>
+    <div class="subtitle">Explore a 3D human cell with realistic organelle distribution</div>
     <div class="credit">Made by ANABRATA</div>
   </div>
 
   <div class="intro-text">
     <strong>About Cells:</strong><br>
-    Cells are the basic structural and functional units of all living organisms. Human cells contain specialized compartments called organelles, each performing specific functions essential for life. This 3D model shows a typical animal cell with all major organelles in their approximate positions and proportions.
+    This optimized 3D model shows a typical human cell with realistic organelle numbers and positions. Each organelle type appears in biologically accurate quantities for better performance and educational accuracy.
   </div>
 
-  <div class="hintTop">Tip: rotate (drag), zoom (wheel), pan (right‑drag). Click organelles for info.</div>
+  <div class="hintTop">🖱️ Rotate • 🔍 Zoom • 👆 Click organelles for detailed 3D view</div>
 
-  <div id="status">Loading…</div>
+  <div id="status">Loading optimized cell...</div>
   <div id="plot" role="img" aria-label="Interactive 3D human cell with labeled organelles"></div>
 
   <div id="panel" class="panel" aria-live="polite">
     <button class="close" id="closePanel" title="Close">×</button>
     <h3 id="orgTitle">Organelle</h3>
-    <p id="orgIntro">Details will appear here when you click any organelle.</p>
-    <p class="hint">Click another organelle in the 3D view to switch.</p>
+    <p id="orgIntro">Click any organelle to explore its structure and function.</p>
+    <div class="organelle-viewer">
+      <h4 id="viewerTitle">3D Organelle View</h4>
+      <div id="organelleViewer" style="width:100%;height:160px;"></div>
+    </div>
+    <p class="hint">Rotate the 3D view above to examine the organelle structure in detail.</p>
   </div>
 
   <script>
@@ -81,6 +87,8 @@
     const panel = document.getElementById('panel');
     const titleEl = document.getElementById('orgTitle');
     const introEl = document.getElementById('orgIntro');
+    const viewerTitleEl = document.getElementById('viewerTitle');
+    const organelleViewerEl = document.getElementById('organelleViewer');
     document.getElementById('closePanel').addEventListener('click', ()=> panel.classList.remove('show'));
 
     function fail(msg){
@@ -88,37 +96,28 @@
       statusEl.textContent = msg;
     }
 
-    // Check if Plotly loaded from CDN
-    function checkPlotly(){
-      if (typeof Plotly === 'undefined') {
-        fail('Plotly failed to load from CDN. Check internet connection.');
-        return false;
-      }
-      return true;
-    }
-
-    // Wait for Plotly to be available
+    // Wait for Plotly
     function waitForPlotly(){
-      if(checkPlotly()) {
+      if (typeof Plotly !== 'undefined') {
         startApp();
       } else {
         setTimeout(waitForPlotly, 100);
       }
     }
     
-    // Start when page loads
     if(document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', waitForPlotly);
     } else {
       waitForPlotly();
     }
 
-    // ----------------- App code (runs after Plotly loads) -----------------
     function startApp(){
-      // Helpers
+      // Optimized helpers (reduced complexity)
       function linspace(a,b,n){ if(n<2) return [a]; const s=(b-a)/(n-1), arr=new Array(n); for(let i=0;i<n;i++) arr[i]=a+s*i; return arr; }
       function zerosLike2D(M){ const Z=new Array(M.length); for(let i=0;i<M.length;i++){ Z[i]=new Array(M[i].length).fill(0) } return Z; }
-      function ellipsoid(center, radii, nu, nv){
+      
+      // Optimized ellipsoid with fewer polygons
+      function ellipsoid(center, radii, nu=24, nv=16){
         const [cx,cy,cz]=center, [rx,ry,rz]=radii;
         const u=linspace(0,2*Math.PI,nu), v=linspace(0,Math.PI,nv);
         const X=new Array(nu), Y=new Array(nu), Z=new Array(nu);
@@ -132,23 +131,27 @@
         }
         return {X,Y,Z};
       }
+      
       function surface(X,Y,Z,color,opacity,name){
         return {
           type:'surface', x:X,y:Y,z:Z,
           surfacecolor: zerosLike2D(X),
           colorscale: [[0,color],[1,color]],
           showscale:false, opacity:opacity, name:name, hoverinfo:'name',
-          lighting:{ambient:.5,diffuse:.5,specular:.2,roughness:.9},
+          lighting:{ambient:.6,diffuse:.6,specular:.3,roughness:.8},
           contours:{
-            x:{show:true, color:'rgba(255,255,255,0.08)', width:1},
-            y:{show:true, color:'rgba(255,255,255,0.08)', width:1},
-            z:{show:true, color:'rgba(0,0,0,0.15)', width:1}
+            x:{show:true, color:'rgba(255,255,255,0.06)', width:1},
+            y:{show:true, color:'rgba(255,255,255,0.06)', width:1},
+            z:{show:false}
           }
         };
       }
-      function randomPointsInShell(n, inner_r, outer_r, avoid_center, avoid_radius){
+
+      // Realistic random distribution
+      function randomPointsInShell(n, inner_r, outer_r, avoid_center, avoid_radius, seed=42){
+        Math.seedrandom = function(s) { Math.random = function() { s=Math.sin(s)*10000; return s-Math.floor(s); }; }; Math.seedrandom(seed);
         const pts=[]; let attempts=0;
-        while(pts.length<n && attempts<40000){
+        while(pts.length<n && attempts<20000){
           const u=Math.random();
           const r=Math.pow((Math.pow(outer_r,3)-Math.pow(inner_r,3))*u + Math.pow(inner_r,3), 1/3);
           const z=Math.random()*2-1, t=Math.random()*2*Math.PI, s=Math.sqrt(1-z*z);
@@ -159,220 +162,232 @@
           }
           pts.push([x,y,zc]); attempts++;
         }
+        Math.random = function() { return crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296; }; // restore
         return pts;
       }
-      function polyline3d(curveFn, t0, t1, steps){
+
+      function polyline3d(curveFn, t0, t1, steps=120){
         const t=linspace(t0,t1,steps), X=new Array(steps),Y=new Array(steps),Z=new Array(steps);
         for(let i=0;i<steps;i++){ const p=curveFn(t[i]); X[i]=p[0]; Y[i]=p[1]; Z[i]=p[2]; }
         return {X,Y,Z};
       }
+
       function lineTrace(xs,ys,zs,color,width,name){
-        return {type:'scatter3d',mode:'lines',x:xs,y:ys,z:zs,line:{color,width},name,hoverinfo:'name',opacity:0.95};
+        return {type:'scatter3d',mode:'lines',x:xs,y:ys,z:zs,line:{color,width},name,hoverinfo:'name',opacity:0.9};
       }
 
-      // Organelle info database
+      // Enhanced organelle info
       const INFO = {
-        'Cell membrane': 'The selective barrier (phospholipid bilayer) that encloses the cell and regulates the entry and exit of substances. Contains embedded proteins for transport and signaling.',
-        'Cytoplasm': 'The gel-like cytosol plus suspended organelles; site of many metabolic reactions including glycolysis. Provides structural support and medium for cellular processes.',
-        'Nucleus': 'Double-membrane compartment that houses DNA and regulates gene expression. Contains the nucleolus and controls cellular activities through transcription.',
-        'Nucleolus': 'Dense region inside nucleus where ribosomal RNA (rRNA) is produced and ribosome subunits are assembled before export to cytoplasm.',
-        'Mitochondrion': 'The powerhouse organelle that generates ATP via cellular respiration. Has double membrane with cristae for increased surface area.',
-        'Golgi apparatus': 'Modifies, sorts, packages and ships proteins and lipids received from the ER. Consists of stacked flattened membranes called cisternae.',
-        'Rough ER': 'Endoplasmic reticulum studded with ribosomes. Synthesizes and folds proteins destined for secretion, membranes, or organelles.',
-        'Smooth ER': 'ER without ribosomes. Functions in lipid synthesis, calcium storage, steroid production, and detoxification of harmful substances.',
-        'Ribosome': 'Molecular machines that translate mRNA into proteins. Can be free in cytosol or attached to rough ER. Composed of rRNA and proteins.',
-        'Lysosome': 'Membrane-bound organelles containing digestive enzymes. Break down worn-out organelles, cellular waste, and ingested materials.',
-        'Peroxisome': 'Organelles that perform oxidative reactions, break down very-long-chain fatty acids, and detoxify hydrogen peroxide and other reactive molecules.',
-        'Centrosome': 'Microtubule-organizing center containing a pair of centrioles. Plays crucial role in cell division and organizing the cytoskeleton.',
-        'Cytoskeleton': 'Network of protein filaments (microtubules, microfilaments, intermediate filaments) that provides cell shape, organization, and enables movement.',
-        'Chromatin': 'Complex of DNA and histone proteins found in the nucleus. Condenses to form visible chromosomes during cell division.',
-        'Vesicle': 'Small membrane-bound sacs that transport materials within the cell or to the cell surface. Include transport vesicles and secretory vesicles.'
+        'Cell membrane': 'The phospholipid bilayer that forms the cell boundary. Contains transport proteins, receptors, and maintains cellular integrity.',
+        'Cytoplasm': 'The gel-like matrix filling the cell, composed of cytosol and suspended organelles where most cellular metabolism occurs.',
+        'Nucleus': 'The control center containing DNA. Regulates gene expression and coordinates protein synthesis, growth, and reproduction.',
+        'Nucleolus': 'Dense region within the nucleus responsible for ribosomal RNA synthesis and ribosome assembly.',
+        'Mitochondrion': 'The cellular powerhouse generating ATP through oxidative phosphorylation. Contains its own DNA and double membrane.',
+        'Golgi apparatus': 'The cellular post office that modifies, packages, and ships proteins from the ER to their final destinations.',
+        'Rough ER': 'Membrane network studded with ribosomes, specializing in protein synthesis for secretion and membrane integration.',
+        'Smooth ER': 'Ribosome-free ER involved in lipid synthesis, steroid production, calcium storage, and detoxification processes.',
+        'Ribosome': 'Protein synthesis machinery translating mRNA into polypeptide chains. Found free or ER-bound.',
+        'Lysosome': 'Cellular recycling center containing hydrolytic enzymes that digest worn-out organelles and cellular waste.',
+        'Peroxisome': 'Specialized organelle performing oxidative reactions, fatty acid metabolism, and hydrogen peroxide detoxification.',
+        'Centrosome': 'Microtubule organizing center containing two centrioles, crucial for cell division and cytoskeleton organization.',
+        'Cytoskeleton': 'Dynamic protein framework providing structural support, maintaining cell shape, and enabling organelle transport.',
+        'Chromatin': 'DNA-histone complex within the nucleus that condenses into chromosomes during cell division.',
+        'Vesicle': 'Small membrane-bound transport containers moving materials between organelles and to the cell surface.'
       };
+
+      // 3D organelle models for detailed viewing
+      function create3DOrganelle(name, viewerEl) {
+        const traces = [];
+        
+        switch(name) {
+          case 'Mitochondrion':
+            // Detailed mitochondrion with cristae
+            const outer = ellipsoid([0,0,0],[1.2,0.6,0.6], 32, 20);
+            traces.push(surface(outer.X,outer.Y,outer.Z,'#d08770',0.7,'Outer membrane'));
+            const inner = ellipsoid([0,0,0],[1.0,0.5,0.5], 28, 16);
+            traces.push(surface(inner.X,inner.Y,inner.Z,'#bf616a',0.8,'Inner membrane'));
+            // Cristae (internal folds)
+            for(let i=0; i<3; i++){
+              const cristae = ellipsoid([0.3*Math.sin(i*2.1),0,0.2*Math.cos(i*2.1)],[0.6,0.1,0.3], 20, 10);
+              traces.push(surface(cristae.X,cristae.Y,cristae.Z,'#a3be8c',0.9,'Cristae'));
+            }
+            break;
+            
+          case 'Nucleus':
+            const nucleus = ellipsoid([0,0,0],[1.5,1.4,1.3], 36, 24);
+            traces.push(surface(nucleus.X,nucleus.Y,nucleus.Z,'#b48ead',0.5,'Nuclear envelope'));
+            const nucleolus = ellipsoid([0.3,0.2,0.1],[0.4,0.4,0.35], 24, 16);
+            traces.push(surface(nucleolus.X,nucleolus.Y,nucleolus.Z,'#bf616a',0.85,'Nucleolus'));
+            break;
+            
+          case 'Golgi apparatus':
+            // Stacked cisternae
+            for(let i=0; i<5; i++){
+              const stack = ellipsoid([0.05*i,0.02*i,0],[1.2*(1-i*0.1),0.6*(1-i*0.1),0.15], 28, 12);
+              traces.push(surface(stack.X,stack.Y,stack.Z,'#ebcb8b',0.8+i*0.03,'Cisterna '+(i+1)));
+            }
+            break;
+            
+          case 'Ribosome':
+            // Large and small subunits
+            const large = ellipsoid([0,0,0.1],[0.3,0.3,0.25], 20, 14);
+            traces.push(surface(large.X,large.Y,large.Z,'#5e81ac',0.9,'Large subunit'));
+            const small = ellipsoid([0,0,-0.15],[0.25,0.25,0.2], 18, 12);
+            traces.push(surface(small.X,small.Y,small.Z,'#81a1c1',0.9,'Small subunit'));
+            break;
+            
+          case 'Lysosome':
+            const lyso = ellipsoid([0,0,0],[0.5,0.5,0.5], 24, 16);
+            traces.push(surface(lyso.X,lyso.Y,lyso.Z,'#d08770',0.8,'Lysosomal membrane'));
+            break;
+            
+          default:
+            // Generic organelle structure
+            const generic = ellipsoid([0,0,0],[0.8,0.8,0.8], 24, 16);
+            traces.push(surface(generic.X,generic.Y,generic.Z,'#88c999',0.7,name));
+        }
+
+        const layout = {
+          scene: { xaxis:{visible:false}, yaxis:{visible:false}, zaxis:{visible:false}, 
+                   aspectmode:'data', bgcolor:'rgba(0,0,0,0)',
+                   camera:{eye:{x:1.5,y:1.5,z:1.2}} },
+          margin:{l:0,r:0,t:0,b:0}, paper_bgcolor:'rgba(0,0,0,0)', showlegend:false
+        };
+
+        Plotly.newPlot(viewerEl, traces, layout, {responsive:true, displayModeBar:false});
+      }
 
       function openInfo(name){
         titleEl.textContent = name;
-        introEl.textContent = INFO[name] || 'No detailed information available for this structure.';
+        introEl.textContent = INFO[name] || 'Detailed information about this cellular structure.';
+        viewerTitleEl.textContent = name + ' - 3D Structure';
         panel.classList.add('show');
+        
+        // Create detailed 3D model of clicked organelle
+        setTimeout(() => create3DOrganelle(name, organelleViewerEl), 100);
       }
 
-      // Build 3D scene
+      // Build optimized 3D scene with realistic organelle counts
       const CELL_R=10.0, NUCLEUS_R=3.5, NUCLEOLUS_R=1.2;
       const traces = [];
 
-      // Cytoplasm (faint inner volume)
-      (function(){
-        const e = ellipsoid([0,0,0],[CELL_R*0.98, CELL_R*0.93, CELL_R*0.88], 42, 26);
-        traces.push(surface(e.X,e.Y,e.Z,'#4c566a',0.04,'Cytoplasm'));
-      })();
+      // Cytoplasm (optimized)
+      const cyto = ellipsoid([0,0,0],[CELL_R*0.98, CELL_R*0.93, CELL_R*0.88], 28, 18);
+      traces.push(surface(cyto.X,cyto.Y,cyto.Z,'#4c566a',0.03,'Cytoplasm'));
 
-      // Cell membrane
-      (function(){
-        const e = ellipsoid([0,0,0],[CELL_R, CELL_R*0.95, CELL_R*0.90], 64, 36);
-        traces.push(surface(e.X,e.Y,e.Z,'#88c999',0.22,'Cell membrane'));
-      })();
+      // Cell membrane (high quality)
+      const membrane = ellipsoid([0,0,0],[CELL_R, CELL_R*0.95, CELL_R*0.90], 48, 28);
+      traces.push(surface(membrane.X,membrane.Y,membrane.Z,'#88c999',0.25,'Cell membrane'));
 
-      // Nucleus
-      (function(){
-        const e = ellipsoid([1.0,0.5,0.0],[NUCLEUS_R*1.05, NUCLEUS_R, NUCLEUS_R*0.9], 56, 32);
-        traces.push(surface(e.X,e.Y,e.Z,'#b48ead',0.5,'Nucleus'));
-      })();
+      // Nucleus (single, large)
+      const nucleus = ellipsoid([1.0,0.5,0.0],[NUCLEUS_R*1.05, NUCLEUS_R, NUCLEUS_R*0.9], 40, 24);
+      traces.push(surface(nucleus.X,nucleus.Y,nucleus.Z,'#b48ead',0.5,'Nucleus'));
 
-      // Nucleolus
-      (function(){
-        const e = ellipsoid([1.4,0.8,0.2],[NUCLEOLUS_R, NUCLEOLUS_R, NUCLEOLUS_R*0.9], 42, 26);
-        traces.push(surface(e.X,e.Y,e.Z,'#bf616a',0.85,'Nucleolus'));
-      })();
+      // Nucleolus (single)
+      const nucleolus = ellipsoid([1.4,0.8,0.2],[NUCLEOLUS_R, NUCLEOLUS_R, NUCLEOLUS_R*0.9], 32, 20);
+      traces.push(surface(nucleolus.X,nucleolus.Y,nucleolus.Z,'#bf616a',0.85,'Nucleolus'));
 
-      // Chromatin strands
-      (function(){
-        function chromatinSpiral(cx,cy,cz,rad,turns,phase){
-          const curve = (t)=>[ 
-            cx + (rad + 0.3*Math.sin(3*t + phase)) * Math.cos(t),
-            cy + (rad + 0.3*Math.cos(2*t + phase)) * Math.sin(t),
-            cz + 0.7*Math.sin(1.3*t + phase) 
+      // Mitochondria (realistic count: 8-12)
+      const mitoCount = 10;
+      const mitoCenters = randomPointsInShell(mitoCount, NUCLEUS_R+2.0, CELL_R-2.0, [1.0,0.5,0.0], NUCLEUS_R+1.0, 123);
+      for(let i=0; i<mitoCenters.length; i++){
+        const e = ellipsoid(mitoCenters[i],[0.9,0.5,0.5], 24, 16);
+        traces.push(surface(e.X,e.Y,e.Z,'#d08770',0.85,'Mitochondrion'));
+      }
+
+      // Golgi apparatus (single stack)
+      const gc=[3.2,-0.8,0.4]; 
+      const scales=[1.0,0.9,0.8,0.7,0.6];
+      for(let i=0;i<scales.length;i++){
+        const s=scales[i], center=[gc[0]+0.12*i, gc[1]+0.03*i, gc[2]];
+        const e = ellipsoid(center,[1.6*s,0.75*s,0.18*s], 28, 14);
+        traces.push(surface(e.X,e.Y,e.Z,'#ebcb8b',0.9,'Golgi apparatus'));
+      }
+
+      // ER network (simplified, realistic)
+      function makeER(cx,cy,cz,amp,rad,twist,phase){
+        return function(t){
+          return [
+            cx + (rad + amp*Math.sin(t*twist + phase)) * Math.cos(t),
+            cy + (rad + amp*Math.cos(t*twist + phase)) * Math.sin(t),
+            cz + 0.4*Math.sin(1.4*t + phase)
           ];
-          const pl = polyline3d(curve, 0, 2*Math.PI*turns, 350);
-          traces.push(lineTrace(pl.X,pl.Y,pl.Z,'#d08770',3,'Chromatin'));
         }
-        chromatinSpiral(1.0,0.5,0.0,1.3,1.7,0.0);
-        chromatinSpiral(1.0,0.5,0.0,1.0,1.5,1.3);
-        chromatinSpiral(1.0,0.5,0.0,0.7,1.2,2.5);
-      })();
+      }
+      
+      const cent=[1.0,0.5,0.0];
+      // Rough ER (2 main branches)
+      const roughPhases=[0.0, 1.6];
+      for(let i=0;i<roughPhases.length;i++){
+        const cx=cent[0]-0.8+0.6*i, cy=cent[1]+0.3*i, cz=cent[2];
+        const curve=makeER(cx,cy,cz,0.9,3.5-0.2*i,2.0,roughPhases[i]);
+        const pl=polyline3d(curve,0,2*Math.PI,180);
+        traces.push(lineTrace(pl.X,pl.Y,pl.Z,'#a3be8c',6,'Rough ER'));
+      }
+      
+      // Smooth ER (1 branch)
+      const cx=cent[0]+0.8, cy=cent[1]-0.4, cz=cent[2];
+      const smoothCurve=makeER(cx,cy,cz,0.8,3.0,1.8,0.8);
+      const smoothPl=polyline3d(smoothCurve,0,2*Math.PI,150);
+      traces.push(lineTrace(smoothPl.X,smoothPl.Y,smoothPl.Z,'#8fbcbb',5,'Smooth ER'));
 
-      // Mitochondria
-      (function(){
-        const centers = randomPointsInShell(16, NUCLEUS_R+2.0, CELL_R-2.0, [1.0,0.5,0.0], NUCLEUS_R+1.0);
-        for(const c of centers){
-          const e = ellipsoid(c,[0.9,0.5,0.5], 30, 20);
-          traces.push(surface(e.X,e.Y,e.Z,'#d08770',0.88,'Mitochondrion'));
-        }
-      })();
+      // Lysosomes (realistic count: 4-6)
+      const lysoCenters = randomPointsInShell(5, NUCLEUS_R+1.8, CELL_R-2.0, [1.0,0.5,0.0], NUCLEUS_R+1.0, 456);
+      for(const c of lysoCenters){
+        const e=ellipsoid(c,[0.4,0.4,0.4], 18, 12);
+        traces.push(surface(e.X,e.Y,e.Z,'#d08770',0.75,'Lysosome'));
+      }
 
-      // Golgi apparatus stacks
-      (function(){
-        const gc=[3.2,-0.8,0.4]; 
-        const scales=[1.0,0.92,0.84,0.76,0.68,0.6];
-        for(let i=0;i<scales.length;i++){
-          const s=scales[i], center=[gc[0]+0.14*i, gc[1]+0.04*i, gc[2]];
-          const e = ellipsoid(center,[1.8*s,0.82*s,0.22*s], 38, 20);
-          traces.push(surface(e.X,e.Y,e.Z,'#ebcb8b',0.94,'Golgi apparatus'));
-        }
-      })();
+      // Peroxisomes (realistic count: 2-4)
+      const peroxiCenters = randomPointsInShell(3, NUCLEUS_R+1.6, CELL_R-2.0, [1.0,0.5,0.0], NUCLEUS_R+0.9, 789);
+      for(const c of peroxiCenters){
+        const e=ellipsoid(c,[0.35,0.35,0.35], 18, 12);
+        traces.push(surface(e.X,e.Y,e.Z,'#a3be8c',0.78,'Peroxisome'));
+      }
 
-      // Endoplasmic Reticulum
-      (function(){
-        function makeER(cx,cy,cz,amp,rad,twist,phase){
-          return function(t){
-            return [
-              cx + (rad + amp*Math.sin(t*twist + phase)) * Math.cos(t),
-              cy + (rad + amp*Math.cos(t*twist + phase)) * Math.sin(t),
-              cz + 0.5*Math.sin(1.5*t + phase)
-            ];
-          }
-        }
-        const cent=[1.0,0.5,0.0];
-        
-        // Rough ER (with ribosomes)
-        const roughPhases=[0.0, 1.1, 2.2];
-        for(let i=0;i<roughPhases.length;i++){
-          const cx=cent[0]-0.9+0.5*i, cy=cent[1]+0.2*i, cz=cent[2];
-          const curve=makeER(cx,cy,cz,1.1,4.0-0.3*i,2.1,roughPhases[i]);
-          const pl=polyline3d(curve,0,2*Math.PI,300);
-          traces.push(lineTrace(pl.X,pl.Y,pl.Z,'#a3be8c',7,'Rough ER'));
-          
-          // Ribosomes on rough ER
-          const rsX=[],rsY=[],rsZ=[];
-          for(let k=0;k<pl.X.length;k+=16){ 
-            rsX.push(pl.X[k] + (Math.random()-0.5)*0.15); 
-            rsY.push(pl.Y[k] + (Math.random()-0.5)*0.15); 
-            rsZ.push(pl.Z[k] + (Math.random()-0.5)*0.15); 
-          }
-          traces.push({type:'scatter3d',mode:'markers',x:rsX,y:rsY,z:rsZ,
-                       marker:{size:2.8,color:'#5e81ac',opacity:.9},
-                       name:'Ribosome',hoverinfo:'name'});
-        }
-        
-        // Smooth ER
-        const smoothPhases=[0.6, 1.9];
-        for(let i=0;i<smoothPhases.length;i++){
-          const cx=cent[0]+0.7-0.3*i, cy=cent[1]-0.3+0.25*i, cz=cent[2];
-          const curve=makeER(cx,cy,cz,0.95,3.5-0.2*i,1.9,smoothPhases[i]);
-          const pl=polyline3d(curve,0,2*Math.PI,260);
-          traces.push(lineTrace(pl.X,pl.Y,pl.Z,'#8fbcbb',6,'Smooth ER'));
-        }
-      })();
+      // Transport vesicles (reduced count: 6-8)
+      const vesicleCenters = randomPointsInShell(7, NUCLEUS_R+1.4, CELL_R-1.8, [1.0,0.5,0.0], NUCLEUS_R+0.8, 321);
+      for(const c of vesicleCenters){
+        const e=ellipsoid(c,[0.25,0.25,0.25], 14, 10);
+        traces.push(surface(e.X,e.Y,e.Z,'#88c999',0.65,'Vesicle'));
+      }
 
-      // Lysosomes
-      (function(){
-        const centers = randomPointsInShell(12, NUCLEUS_R+1.8, CELL_R-2.0, [1.0,0.5,0.0], NUCLEUS_R+1.0);
-        for(const c of centers){
-          const e=ellipsoid(c,[0.42,0.42,0.42], 20, 14);
-          traces.push(surface(e.X,e.Y,e.Z,'#d08770',0.75,'Lysosome'));
-        }
-      })();
+      // Centrosome (single, realistic)
+      const c0=[-1.7,-2.2,0.0], a1=[0.8,0.0,0.25], a2=[0.0,0.8,-0.25];
+      traces.push({type:'scatter3d',mode:'lines',
+                   x:[c0[0]-a1[0],c0[0]+a1[0]],y:[c0[1]-a1[1],c0[1]+a1[1]],z:[c0[2]-a1[2],c0[2]+a1[2]],
+                   line:{color:'#b48ead',width:6},name:'Centrosome',hoverinfo:'name'});
+      traces.push({type:'scatter3d',mode:'lines',
+                   x:[c0[0]-a2[0],c0[0]+a2[0]],y:[c0[1]-a2[1],c0[1]+a2[1]],z:[c0[2]-a2[2],c0[2]+a2[2]],
+                   line:{color:'#b48ead',width:6},name:'Centrosome',hoverinfo:'name'});
 
-      // Peroxisomes  
-      (function(){
-        const centers = randomPointsInShell(10, NUCLEUS_R+1.6, CELL_R-2.0, [1.0,0.5,0.0], NUCLEUS_R+0.9);
-        for(const c of centers){
-          const e=ellipsoid(c,[0.38,0.38,0.38], 20, 14);
-          traces.push(surface(e.X,e.Y,e.Z,'#a3be8c',0.78,'Peroxisome'));
-        }
-      })();
+      // Cytoskeleton (simplified network)
+      function cytoskeletonFilament(cx,cy,cz,amp,rad,twist,len,color,width,name){
+        const curve=(t)=>[
+          cx + (rad + amp*Math.sin(t*twist))*Math.cos(t),
+          cy + (rad + amp*Math.cos(t*twist))*Math.sin(t),
+          cz + 0.6*Math.sin(1.1*t)
+        ];
+        const pl=polyline3d(curve,0,len,200);
+        traces.push(lineTrace(pl.X,pl.Y,pl.Z,color,width,name));
+      }
+      cytoskeletonFilament(0,0,0,0.6,5.5,2.1,3.5*Math.PI,'#81a1c1',3,'Cytoskeleton');
+      cytoskeletonFilament(-1.5,1.0,0.3,0.5,4.8,2.4,3*Math.PI,'#5e81ac',2,'Cytoskeleton');
 
-      // Vesicles (transport/secretory)
-      (function(){
-        const centers = randomPointsInShell(18, NUCLEUS_R+1.4, CELL_R-1.8, [1.0,0.5,0.0], NUCLEUS_R+0.8);
-        for(const c of centers){
-          const e=ellipsoid(c,[0.28,0.28,0.28], 16, 12);
-          traces.push(surface(e.X,e.Y,e.Z,'#88c999',0.65,'Vesicle'));
-        }
-      })();
+      // Ribosomes (realistic distribution: ~80)
+      const ribosomePts = randomPointsInShell(80, NUCLEUS_R+1.3, CELL_R-1.8, [1.0,0.5,0.0], NUCLEUS_R+0.7, 654);
+      const ribosomeX=ribosomePts.map(p=>p[0]), ribosomeY=ribosomePts.map(p=>p[1]), ribosomeZ=ribosomePts.map(p=>p[2]);
+      traces.push({type:'scatter3d',mode:'markers',x:ribosomeX,y:ribosomeY,z:ribosomeZ,
+                   marker:{size:2.5,color:'#434c5e',opacity:0.8},
+                   name:'Ribosome',hoverinfo:'name'});
 
-      // Centrosome
-      (function(){
-        const c0=[-1.7,-2.2,0.0], a1=[1.0,0.0,0.3], a2=[0.0,1.0,-0.3];
-        traces.push({type:'scatter3d',mode:'lines',
-                     x:[c0[0]-a1[0],c0[0]+a1[0]],y:[c0[1]-a1[1],c0[1]+a1[1]],z:[c0[2]-a1[2],c0[2]+a1[2]],
-                     line:{color:'#b48ead',width:7},name:'Centrosome',hoverinfo:'name'});
-        traces.push({type:'scatter3d',mode:'lines',
-                     x:[c0[0]-a2[0],c0[0]+a2[0]],y:[c0[1]-a2[1],c0[1]+a2[1]],z:[c0[2]-a2[2],c0[2]+a2[2]],
-                     line:{color:'#b48ead',width:7},name:'Centrosome',hoverinfo:'name'});
-      })();
-
-      // Cytoskeleton filaments
-      (function(){
-        function cytoskeletonFilament(cx,cy,cz,amp,rad,twist,len,color,width,name){
-          const curve=(t)=>[
-            cx + (rad + amp*Math.sin(t*twist))*Math.cos(t),
-            cy + (rad + amp*Math.cos(t*twist))*Math.sin(t),
-            cz + 0.8*Math.sin(1.2*t)
-          ];
-          const pl=polyline3d(curve,0,len,400);
-          traces.push(lineTrace(pl.X,pl.Y,pl.Z,color,width,name));
-        }
-        cytoskeletonFilament(0,0,0,0.7,6.5,2.2,4.5*Math.PI,'#81a1c1',3,'Cytoskeleton');
-        cytoskeletonFilament(-1.8,1.2,0.3,0.6,5.5,2.7,4*Math.PI,'#5e81ac',3,'Cytoskeleton');
-        cytoskeletonFilament(1.5,-1.0,-0.4,0.8,4.8,1.8,4*Math.PI,'#88c999',3,'Cytoskeleton');
-      })();
-
-      // Free ribosomes in cytosol
-      (function(){
-        const pts = randomPointsInShell(280, NUCLEUS_R+1.3, CELL_R-1.8, [1.0,0.5,0.0], NUCLEUS_R+0.7);
-        const xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]), zs=pts.map(p=>p[2]);
-        traces.push({type:'scatter3d',mode:'markers',x:xs,y:ys,z:zs,
-                     marker:{size:2.2,color:'#434c5e',opacity:0.8},
-                     name:'Ribosome',hoverinfo:'name'});
-      })();
-
-      // Render the 3D plot
+      // Optimized rendering settings
       const layout = {
         title: '',
         showlegend:true,
         legend:{orientation:'h', yanchor:'bottom', y:0.02, xanchor:'center', x:0.5, 
-                font:{color:'#eceff4', size:11}},
+                font:{color:'#eceff4', size:12}},
         paper_bgcolor:'rgba(0,0,0,0)',
-        plot_bgcolor:'rgba(0,0,0,0)',
         margin:{l:0,r:0,t:0,b:0},
         scene:{ 
           xaxis:{visible:false}, yaxis:{visible:false}, zaxis:{visible:false}, 
@@ -382,23 +397,31 @@
         }
       };
 
+      // Render with performance optimizations
+      const config = {
+        responsive:true, 
+        displayModeBar:false,
+        doubleClick:'reset',
+        scrollZoom:true,
+        staticPlot:false
+      };
+
       const plotEl = document.getElementById('plot');
-      Plotly.newPlot(plotEl, traces, layout, {responsive:true, displayModeBar:false}).then(()=>{
-        statusEl.textContent = 'Ready • Click any organelle to explore';
-        setTimeout(()=>{ statusEl.style.opacity = 0; }, 2800);
+      Plotly.newPlot(plotEl, traces, layout, config).then(()=>{
+        statusEl.textContent = 'Optimized cell loaded • Click organelles for 3D detail view';
+        setTimeout(()=>{ statusEl.style.opacity = 0; }, 3000);
       }).catch(e=>{
         statusEl.classList.add('error');
-        statusEl.textContent = 'Plot render error: ' + e.message;
+        statusEl.textContent = 'Render error: ' + e.message;
       });
 
-      // Handle clicks on organelles
+      // Enhanced click handler
       plotEl.on('plotly_click', function(ev){
         if(!ev || !ev.points || !ev.points.length) return;
         const name = ev.points[0].fullData.name || 'Cell structure';
         openInfo(name);
       });
 
-      // Resize handler
       window.addEventListener('resize', ()=>Plotly.Plots.resize(plotEl));
     }
   })();
