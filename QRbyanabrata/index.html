@@ -3,160 +3,102 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>QR A4 Arranger • Made by ANABRATA</title>
+<title>QR Arranger (A4 only) • Made by ANABRATA</title>
 <meta name="color-scheme" content="light dark" />
 <style>
   :root{
-    /* Vibrant palette */
-    --green: #10b981;
-    --yellow:#fde047;
-    --blue:  #3b82f6;
-    --white: #ffffff;
-
-    /* UI tones on top of animated background */
-    --card-bg: rgba(255,255,255,0.86);
-    --card-text: #0b1020;
-    --muted: #4b5563;
-    --ring: rgba(0,0,0,0.12);
-
-    /* Buttons */
-    --btn-grad: linear-gradient(135deg, var(--green), var(--blue), var(--yellow));
+    --green:#10b981; --yellow:#fde047; --blue:#3b82f6; --white:#ffffff;
+    --card:#ffffffee; --text:#0b1020; --muted:#4b5563; --ring:rgba(0,0,0,.12);
+    --grad: linear-gradient(135deg, var(--green), var(--blue), var(--yellow));
+    --field-bg:#f8fafc; --field-bd:#e5e7eb; --field-focus:#93c5fd;
   }
-
   /* Animated multi-color background */
   body{
-    margin:0;
-    font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;
-    color:var(--card-text);
+    margin:0; font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif; color:var(--text);
     background:
-      radial-gradient(1200px 800px at 10% 10%, rgba(16,185,129,0.25), transparent 60%),
-      radial-gradient(1200px 800px at 90% 20%, rgba(59,130,246,0.25), transparent 60%),
-      radial-gradient(1200px 800px at 50% 100%, rgba(253,224,71,0.25), transparent 60%),
+      radial-gradient(1200px 800px at 10% 10%, rgba(16,185,129,.25), transparent 60%),
+      radial-gradient(1200px 800px at 90% 20%, rgba(59,130,246,.25), transparent 60%),
+      radial-gradient(1200px 800px at 50% 100%, rgba(253,224,71,.25), transparent 60%),
       linear-gradient(120deg, #e8fdf6, #eef4ff 40%, #fffbe6 80%, #ffffff);
-    background-size: 140% 140%;
-    animation: bgShift 18s ease-in-out infinite alternate;
+    background-size:140% 140%; animation:bgShift 18s ease-in-out infinite alternate;
   }
   @keyframes bgShift{
-    0% { background-position: 0% 0%, 100% 0%, 50% 100%, 0% 0% }
-    100%{ background-position: 50% 30%, 50% 20%, 60% 70%, 100% 100% }
+    0%{ background-position:0% 0%, 100% 0%, 50% 100%, 0% 0% }
+    100%{ background-position:50% 30%, 50% 20%, 60% 70%, 100% 100% }
   }
+  .wrap{ width:min(1120px,94%); margin:0 auto; }
 
-  .wrap{ width:min(1100px,94%); margin:0 auto; }
-
-  /* Hero */
-  .hero{
-    position:relative;
-    min-height: 48vh;
-    display:grid;
-    place-items:center;
-    text-align:center;
-    padding: clamp(2rem, 6vw, 4rem) 0 1rem;
-  }
+  /* Hero with FADE welcome */
+  header.hero{ min-height:42vh; display:grid; place-items:center; text-align:center; padding: clamp(2rem,6vw,4rem) 0 1rem; }
   .welcome{
-    font-weight:900;
-    letter-spacing:.06em;
-    line-height:1.1;
-    background: linear-gradient(90deg, var(--green), var(--blue), var(--yellow), var(--green));
+    font-weight:900; letter-spacing:.06em; line-height:1.1;
+    background:linear-gradient(90deg, var(--green), var(--blue), var(--yellow), var(--green));
     -webkit-background-clip:text; background-clip:text; color:transparent;
-    background-size: 200% 100%;
-    animation: hue 10s linear infinite;
+    background-size:200% 100%;
     font-size: clamp(1.4rem, 4.5vw, 2.8rem);
+    animation: fadeInOut 4s ease-in-out infinite, hue 10s linear infinite;
   }
-  @keyframes hue{
-    0%{ background-position: 0% 50% }
-    100%{ background-position: 200% 50% }
-  }
-  .type{
-    display:inline-block;
-    border-right: 2px solid rgba(0,0,0,0.5);
-    padding-right:.15em;
-    animation: caret 0.9s steps(1) infinite;
-  }
-  @keyframes caret{
-    50%{ border-right-color: transparent }
+  @keyframes hue{ 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
+  @keyframes fadeInOut{
+    0%   { opacity: 0 }
+    15%  { opacity: 1 }
+    85%  { opacity: 1 }
+    100% { opacity: 0 }
   }
   .byline{
-    margin-top:.6rem;
-    font-weight:700;
-    color:#0b1020;
-    background: linear-gradient(90deg, rgba(16,185,129,0.18), rgba(59,130,246,0.18), rgba(253,224,71,0.18));
-    display:inline-block; padding:.35rem .7rem; border-radius:.6rem;
-    box-shadow: 0 4px 18px rgba(59,130,246,0.18);
+    margin-top:.6rem; font-weight:800; color:#0b1020; display:inline-block; padding:.4rem .8rem; border-radius:.7rem;
+    background:linear-gradient(90deg, rgba(16,185,129,.18), rgba(59,130,246,.18), rgba(253,224,71,.18));
+    box-shadow:0 6px 22px rgba(16,185,129,.14), 0 4px 16px rgba(59,130,246,.12);
   }
 
-  /* Card + controls */
-  .card{
-    background: var(--card-bg);
-    backdrop-filter: blur(6px);
-    border: 1px solid var(--ring);
-    border-radius: 14px;
-    padding: 1rem;
-    box-shadow: 0 10px 28px rgba(0,0,0,0.08);
-  }
-  .controls{
-    margin-top: 1rem;
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: 1fr;
-  }
+  /* Cards and UI */
+  .card{ background:var(--card); backdrop-filter:blur(6px); border:1px solid var(--ring); border-radius:14px; padding:1rem; box-shadow:0 10px 28px rgba(0,0,0,.08) }
+  .pill{ display:inline-block; padding:.28rem .6rem; border:1px solid var(--ring); border-radius:999px; font-size:.85rem; color:var(--muted);
+         background: linear-gradient(135deg, rgba(16,185,129,.08), rgba(59,130,246,.08), rgba(253,224,71,.08)); }
   .row{ display:flex; gap:.8rem; align-items:center; flex-wrap:wrap }
-  label,input,button{ font:inherit }
-  input[type="number"]{ width:6.5rem }
+  .controls{ display:grid; gap:1rem; grid-template-columns:1fr }
+
   .btn{
-    background: var(--btn-grad);
-    color:#073b2b;
-    border:0; padding:.72rem 1.05rem; border-radius:.7rem; font-weight:800; cursor:pointer;
-    box-shadow: 0 6px 18px rgba(16,185,129,0.22), 0 3px 12px rgba(59,130,246,0.14);
-    transition: transform .12s ease, filter .2s ease;
+    background:var(--grad); color:#073b2b; border:0; padding:.76rem 1.05rem; border-radius:.8rem; font-weight:900; cursor:pointer;
+    box-shadow:0 6px 18px rgba(16,185,129,.22), 0 3px 12px rgba(59,130,246,.14); transition:transform .12s ease, filter .2s ease;
   }
-  .btn:hover{ transform: translateY(-1px); filter: brightness(1.05) }
-  .btn.ghost{
-    background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(59,130,246,0.12));
-    color:#0b1020; border:1px solid var(--ring);
-  }
-  .pill{
-    display:inline-block; padding:.28rem .6rem; border:1px solid var(--ring); border-radius:999px; font-size:.85rem; color:var(--muted);
-    background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(59,130,246,0.08), rgba(253,224,71,0.08));
-  }
-  .muted{ color: var(--muted) }
+  .btn:hover{ transform:translateY(-1px); filter:brightness(1.05) }
+  .btn.ghost{ background:linear-gradient(135deg, rgba(16,185,129,.12), rgba(59,130,246,.12)); color:#0b1020; border:1px solid var(--ring) }
+  .muted{ color:var(--muted) }
   progress{ width:100% }
 
-  /* Grid layout */
-  .grid{ display:grid; gap:1rem; grid-template-columns: 1.1fr .9fr; align-items:start; margin: 1rem 0 2rem }
-  @media (max-width: 980px){ .grid{ grid-template-columns: 1fr } }
+  /* Fancy fields */
+  .field{ position:relative; display:flex; align-items:center; gap:.5rem; background:var(--field-bg);
+          border:1px solid var(--field-bd); border-radius:.8rem; padding:.45rem .65rem }
+  .field:focus-within{ outline:2px solid var(--field-focus); outline-offset:2px; border-color:transparent; background:#fff }
+  .field input[type="number"], .field input[type="text"]{
+    border:0; background:transparent; outline:none; font:inherit; color:inherit; padding:.35rem .2rem; min-width:6ch
+  }
+
+  /* Dropzone */
+  .dropzone{
+    position:relative; display:grid; place-items:center; text-align:center; padding:1.2rem; border-radius:1rem;
+    border:2px dashed #cbd5e1; background:linear-gradient(135deg, rgba(16,185,129,.08), rgba(59,130,246,.08), rgba(253,224,71,.08));
+    transition:border-color .2s, background .2s;
+  }
+  .dropzone.drag{ border-color:#60a5fa; background:linear-gradient(135deg, rgba(16,185,129,.12), rgba(59,130,246,.12), rgba(253,224,71,.12)); }
+  .dz-title{ font-weight:800 }
+  .dz-sub{ color:var(--muted); font-size:.95rem }
+  .dz-actions{ margin-top:.7rem; display:flex; gap:.6rem; justify-content:center; flex-wrap:wrap }
+
+  /* Layout */
+  .grid{ display:grid; gap:1rem; grid-template-columns:1.1fr .9fr; align-items:start; margin:1rem 0 2rem }
+  @media (max-width: 980px){ .grid{ grid-template-columns:1fr } }
 
   canvas{ width:100%; background:#fff; border-radius:10px; border:1px solid #e5e7eb }
 
-  /* Bottom info (less prominent) */
-  .info-bar{
-    margin: 2rem 0 3rem;
-    border-radius: 14px;
-    overflow: hidden;
-    border: 1px solid var(--ring);
-  }
-  .info-head{
-    background: linear-gradient(90deg, rgba(16,185,129,0.25), rgba(59,130,246,0.25), rgba(253,224,71,0.25));
-    padding: .8rem 1rem;
-    display:flex; justify-content:space-between; align-items:center;
-  }
-  .info-body{
-    background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.96));
-    padding: .9rem 1rem;
-    color:#1f2937;
-  }
-  details summary{ cursor: pointer; font-weight: 700 }
-  footer{
-    text-align:center; padding: 1.2rem 0 2.2rem; color:#111827;
-    opacity: .9;
-  }
+  .info{ margin:1.2rem 0 2.2rem; text-align:center; color:#111827; opacity:.9 }
 </style>
 </head>
 <body>
   <header class="hero">
     <div class="wrap">
-      <div class="welcome">
-        <span id="welcomeText" class="type">WELCOME IN THE WORLD OF QR CODE</span>
-      </div>
+      <div class="welcome" id="welcomeText">WELCOME IN THE WORLD OF QR CODE</div>
       <div class="byline">Made by ANABRATA</div>
     </div>
   </header>
@@ -165,29 +107,39 @@
     <section class="card">
       <div class="row" style="justify-content:space-between">
         <div class="row">
-          <span class="pill">A4: 210 × 297 mm</span>
+          <span class="pill">Page: A4 (210 × 297 mm)</span>
           <span class="pill">Margins: 20 mm each side</span>
           <span class="pill">Max per page: 200</span>
         </div>
       </div>
 
       <div class="controls">
+        <!-- Fancy file input / dropzone -->
+        <div class="dropzone" id="dropzone">
+          <div>
+            <div class="dz-title">Choose or drop your QR images</div>
+            <div class="dz-sub">ZIP or multiple images (max 200). Trimming removes outer white borders.</div>
+            <div class="dz-actions">
+              <button class="btn" id="chooseBtn" type="button">Choose files</button>
+              <button class="btn ghost" id="arrange" type="button">Arrange → PDF</button>
+              <a id="downloadPdf" class="btn ghost" download="qr_a4_layout.pdf" href="#" aria-disabled="true">Download PDF</a>
+            </div>
+          </div>
+          <input id="files" type="file" accept=".zip,image/*" multiple style="position:absolute; inset:0; opacity:0; cursor:pointer" />
+        </div>
+        <div class="muted" id="fileNote"></div>
+
+        <!-- Sizing + options -->
         <div class="row">
-          <input id="files" type="file" accept=".zip,image/*" multiple />
-          <button id="arrange" class="btn" type="button">Arrange → PDF</button>
-          <a id="downloadPdf" class="btn ghost" download="qr_a4.pdf" href="#" aria-disabled="true">Download PDF</a>
+          <div class="field"><span>QR tile (mm)</span><input id="qrSize" type="number" value="15" step="0.1" min="3"></div>
+          <div class="field"><span>Gap (mm)</span><input id="gap" type="number" value="5" step="0.1" min="0"></div>
+          <label class="field" style="gap:.5rem"><input id="autoFit" type="checkbox" checked> <span>Auto‑fit to one page</span></label>
         </div>
 
         <div class="row">
-          <label>QR tile size (mm): <input id="qrSize" type="number" value="15" step="0.1" min="3"></label>
-          <label>Gap (mm): <input id="gap" type="number" value="5" step="0.1" min="0"></label>
-          <label><input id="autoFit" type="checkbox" checked> Auto‑fit to one A4 page</label>
-        </div>
-
-        <div class="row">
-          <label><input id="trim" type="checkbox" checked> Trim outer white/transparent border</label>
-          <label>Inner padding (mm): <input id="pad" type="number" value="0" step="0.1" min="0"></label>
-          <label><input id="rulers" type="checkbox"> Add 100 mm rulers (calibration)</label>
+          <label class="field" style="gap:.5rem"><input id="trim" type="checkbox" checked> <span>Trim outer white/transparent border</span></label>
+          <div class="field"><span>Inner padding (mm)</span><input id="pad" type="number" value="0" step="0.1" min="0"></div>
+          <label class="field" style="gap:.5rem"><input id="rulers" type="checkbox"> <span>Add 100 mm rulers</span></label>
         </div>
 
         <div>
@@ -199,81 +151,53 @@
 
     <section class="grid">
       <div class="card">
-        <h3 style="margin:.2rem 0 0.8rem">Preview (scaled)</h3>
-        <canvas id="preview" width="794" height="1123" aria-label="Preview canvas"></canvas>
+        <h3 style="margin:.2rem 0 .8rem">Preview (scaled)</h3>
+        <canvas id="preview" width="840" height="1188" aria-label="Preview canvas"></canvas>
         <p class="muted" style="margin:.5rem 0 0">
-          Tip: For a true 0.5 cm gap, set Gap = 5 mm, keep Trim ON, Inner padding = 0, and print the PDF at 100% scale.
+          Tip: For a true 0.5 cm gap, set Gap = 5 mm, keep Trim ON, Padding = 0, and print the PDF at 100% (no fit/scaling).
         </p>
       </div>
       <div class="card">
-        <h3 style="margin:.2rem 0 0.8rem">Quick notes</h3>
+        <h3 style="margin:.2rem 0 .8rem">Quick notes</h3>
         <ul class="muted" style="margin:.2rem 0 0; padding-left:1rem; list-style:disc">
-          <li>Reads images from ZIP or picker (max 200)</li>
-          <li>Arranges inside 20 mm margins on A4</li>
-          <li>Keeps requested size/gap; auto‑shrinks tiles if needed (optional)</li>
-          <li>Outputs a single‑page, mm‑accurate A4 PDF</li>
+          <li>Use ZIP for many images at once (max 200)</li>
+          <li>2 cm margins ensure printers don’t clip</li>
+          <li>Auto‑fit shrinks tiles so everything fits on one page</li>
+          <li>A4 is 210 × 297 mm; layout and PDF use precise millimeters</li>
         </ul>
       </div>
     </section>
 
-    <!-- Bottom info (less prominent) -->
-    <section class="info-bar">
-      <div class="info-head">
-        <strong>About this site</strong>
-        <span class="pill">Info below (optional)</span>
-      </div>
-      <div class="info-body">
-        <details>
-          <summary>What this website does</summary>
-          <p style="margin:.6rem 0 0">
-            This tool arranges multiple QR code images into a tight, printable grid on a single A4 page
-            with precise millimeter control. Set the exact QR tile size and the exact gap between them.
-            Images are trimmed to remove outer white borders, so the printed gap matches your setting.
-          </p>
-          <p style="margin:.6rem 0 0">
-            Use ZIP upload for many images at once. Keep “Auto‑fit” enabled to fit up to 200 QRs on one page.
-            Print at 100% scale for accuracy. Optional rulers help verify printer scaling.
-          </p>
-        </details>
-      </div>
-    </section>
+    <div class="info">© <span id="year"></span> Made by ANABRATA</div>
   </main>
-
-  <footer>© <span id="year"></span> Made by ANABRATA</footer>
 
   <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
   <script>
-  // ===== Hero: typewriter animation =====
-  (function(){
-    const el = document.getElementById('welcomeText');
-    const text = 'WELCOME IN THE WORLD OF QR CODE';
-    el.textContent = '';
-    let i = 0;
-    const timer = setInterval(() => {
-      el.textContent = text.slice(0, i+1);
-      i++;
-      if (i >= text.length) clearInterval(timer);
-    }, 45);
-  })();
-
   // Year
   document.getElementById('year').textContent = new Date().getFullYear();
 
-  // ===== Core app (no login, accurate mm layout, 20 mm margins) =====
-  const MARGIN_MM = 20;
+  // Constants
+  const PAGE_W_MM = 210, PAGE_H_MM = 297; // A4
+  const MARGIN_MM = 20; // 2 cm
   const MAX_IMAGES = 200;
 
+  // Elements
   const $ = id => document.getElementById(id);
   const filesEl = $('files');
+  const chooseBtn = $('chooseBtn');
+  const dz = $('dropzone');
+  const fileNote = $('fileNote');
+
   const arrangeBtn = $('arrange');
   const downloadPdf = $('downloadPdf');
   const note = $('note');
   const prog = $('prog');
   const canvas = $('preview');
   const ctx = canvas.getContext('2d');
+
   const qrSizeInput = $('qrSize');
   const gapInput = $('gap');
   const autoFitInput = $('autoFit');
@@ -281,6 +205,22 @@
   const padInput = $('pad');
   const rulersInput = $('rulers');
 
+  // --- Fancy dropzone interactions ---
+  chooseBtn.addEventListener('click', () => filesEl.click());
+  dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('drag'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+  dz.addEventListener('drop', (e) => {
+    e.preventDefault(); dz.classList.remove('drag');
+    filesEl.files = e.dataTransfer.files;
+    updateFileNote();
+  });
+  filesEl.addEventListener('change', updateFileNote);
+  function updateFileNote(){
+    const n = filesEl.files?.length || 0;
+    fileNote.textContent = n ? `${n} file(s) selected` : '';
+  }
+
+  // --- File reading helpers ---
   function blobToImage(blob){
     return new Promise((res, rej) => {
       const url = URL.createObjectURL(blob);
@@ -290,7 +230,6 @@
       img.src = url;
     });
   }
-
   async function readAllImagesFromInput(fileList){
     const imgs = [];
     const files = Array.from(fileList || []);
@@ -308,7 +247,6 @@
       }
       if (imgs.length >= MAX_IMAGES) break;
     }
-
     for (const f of singles){
       const img = await blobToImage(f);
       imgs.push(img);
@@ -317,7 +255,7 @@
     return imgs.slice(0, MAX_IMAGES);
   }
 
-  // Trim outer white/transparent margins to ensure visible gap is exact
+  // --- Trimming (to ensure visible gap is exact) ---
   function trimToContentCanvas(img, threshold = 250){
     const w = img.naturalWidth || img.width;
     const h = img.naturalHeight || img.height;
@@ -343,16 +281,13 @@
       }
     }
     if (maxX < minX || maxY < minY) return t;
-
     const tw = Math.max(1, maxX - minX + 1);
     const th = Math.max(1, maxY - minY + 1);
-
     const out = document.createElement('canvas');
     out.width = tw; out.height = th;
     out.getContext('2d').drawImage(t, minX, minY, tw, th, 0, 0, tw, th);
     return out;
   }
-
   function imageToCanvas(img){
     const w = img.naturalWidth || img.width;
     const h = img.naturalHeight || img.height;
@@ -361,36 +296,31 @@
     t.getContext('2d').drawImage(img, 0, 0, w, h);
     return t;
   }
-
   function prepareImages(imgs, doTrim){
     return imgs.map(img => doTrim ? trimToContentCanvas(img) : imageToCanvas(img));
-  }
+    }
 
-  function canvasToJpegDataURL(cv, quality=0.92){
-    return cv.toDataURL('image/jpeg', quality);
-  }
+  function canvasToJpegDataURL(cv, q=0.92){ return cv.toDataURL('image/jpeg', q); }
 
-  // Preview (scaled) with margins and exact gaps
+  // --- Preview layout (scaled to A4 width) ---
   function previewLayout(prepared, tileMM, gapMM, padMM, showRulers){
-    const pageWmm = 210, pageHmm = 297;
+    const pageWmm = PAGE_W_MM, pageHmm = PAGE_H_MM;
     const pxPerMM = canvas.width / pageWmm;
     const pageWpx = Math.round(pageWmm * pxPerMM);
     const pageHpx = Math.round(pageHmm * pxPerMM);
-
     const marginPx = Math.round(MARGIN_MM * pxPerMM);
     const availW = pageWpx - 2*marginPx;
     const availH = pageHpx - 2*marginPx;
 
     let tilePx = Math.max(1, Math.round(tileMM * pxPerMM));
-    let gapPx = Math.max(0, Math.round(gapMM * pxPerMM));
-    let padPx = Math.max(0, Math.round(padMM * pxPerMM));
+    let gapPx  = Math.max(0, Math.round(gapMM  * pxPerMM));
+    let padPx  = Math.max(0, Math.round(padMM  * pxPerMM));
 
     function fit(tile, gap){
       const cols = Math.max(1, Math.floor((availW + gap) / (tile + gap)));
       const rows = Math.max(1, Math.floor((availH + gap) / (tile + gap)));
-      return { cols, rows, capacity: cols*rows };
+      return { cols, rows, capacity: cols * rows };
     }
-
     let { cols, rows, capacity } = fit(tilePx, gapPx);
     if (capacity < prepared.length && autoFitInput.checked){
       while (capacity < prepared.length && tilePx > 3){
@@ -399,14 +329,10 @@
       }
     }
 
-    // White page
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, pageWpx, pageHpx);
-
-    // Margin guide
-    ctx.strokeStyle = '#d1d5db';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(marginPx + 0.5, marginPx + 0.5, availW - 1, availH - 1);
+    // Paint page + margin guide
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,pageWpx,pageHpx);
+    ctx.strokeStyle = '#d1d5db'; ctx.lineWidth = 1;
+    ctx.strokeRect(marginPx + .5, marginPx + .5, availW - 1, availH - 1);
 
     // Optional rulers (100 mm)
     if (showRulers){
@@ -427,21 +353,20 @@
         const y = marginPx + r * (tilePx + gapPx);
         const inner = prepared[i];
         const w = Math.max(1, tilePx - 2*padPx);
-        const h = w;
-        ctx.drawImage(inner, x + padPx, y + padPx, w, h);
+        ctx.drawImage(inner, x + padPx, y + padPx, w, w);
         i++;
       }
     }
-    return { placed: Math.min(prepared.length, capacity) };
+    return { placed: Math.min(prepared.length, capacity), cols, rows };
   }
 
-  // PDF generator (millimeter-accurate)
+  // --- PDF builder (A4 mm accurate) ---
   async function buildPdf(prepared, tileMM, gapMM, padMM, showRulers){
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-    const pageW = 210, pageH = 297;
-    const availW = pageW - 2*MARGIN_MM;
-    const availH = pageH - 2*MARGIN_MM;
+    const doc = new jsPDF({ unit: 'mm', format: [PAGE_W_MM, PAGE_H_MM] });
+
+    const availW = PAGE_W_MM - 2*MARGIN_MM;
+    const availH = PAGE_H_MM - 2*MARGIN_MM;
 
     function fit(tile, gap){
       const cols = Math.max(1, Math.floor((availW + gap) / (tile + gap)));
@@ -451,7 +376,6 @@
 
     let tile = tileMM, gap = gapMM, pad = padMM;
     let { cols, rows, capacity } = fit(tile, gap);
-
     if (capacity < prepared.length && autoFitInput.checked){
       for (let k=0; k<800 && capacity < prepared.length; k++){
         tile = Math.max(3, Math.round((tile - 0.2) * 10) / 10);
@@ -475,16 +399,15 @@
         const y = MARGIN_MM + r * (tile + gap);
         const inner = prepared[i];
         const w = Math.max(0.1, tile - 2*pad);
-        const h = w;
         const dataUrl = canvasToJpegDataURL(inner);
-        doc.addImage(dataUrl, 'JPEG', x + pad, y + pad, w, h);
+        doc.addImage(dataUrl, 'JPEG', x + pad, y + pad, w, w);
         i++;
       }
     }
     return doc.output('blob');
   }
 
-  // Arrange → PDF
+  // --- Arrange → PDF ---
   arrangeBtn.onclick = async () => {
     try{
       note.textContent = "Reading files…";
@@ -493,32 +416,31 @@
       const imgs = await readAllImagesFromInput(filesEl.files);
       if (!imgs.length){ note.textContent = "No images found."; prog.hidden = true; return; }
       if (imgs.length > MAX_IMAGES) imgs.length = MAX_IMAGES;
+      fileNote.textContent = `${imgs.length} image(s) loaded`;
 
-      prog.value = 25; note.textContent = `Loaded ${imgs.length} image(s). Preparing…`;
-
-      const doTrim = !!trimInput.checked;
-      const padMM = Math.max(0, parseFloat(padInput.value) || 0);
-      const prepared = prepareImages(imgs, doTrim);
+      prog.value = 25; note.textContent = "Preparing images…";
+      const prepared = prepareImages(imgs, !!trimInput.checked);
 
       const tileMM = parseFloat(qrSizeInput.value) || 15;
       const gapMM  = parseFloat(gapInput.value) || 5;
+      const padMM  = Math.max(0, parseFloat(padInput.value) || 0);
       const showRulers = !!rulersInput.checked;
 
       prog.value = 45; note.textContent = "Arranging on page…";
       previewLayout(prepared, tileMM, gapMM, padMM, showRulers);
 
-      prog.value = 68; note.textContent = "Building A4 PDF…";
+      prog.value = 70; note.textContent = "Building PDF…";
       const blob = await buildPdf(prepared, tileMM, gapMM, padMM, showRulers);
 
       const url = URL.createObjectURL(blob);
       downloadPdf.href = url;
       downloadPdf.setAttribute('aria-disabled','false');
 
-      prog.value = 100; note.textContent = "PDF ready. Download and print at 100% (no fit/scaling).";
+      prog.value = 100; note.textContent = "PDF ready. Download and print at 100% scale.";
       setTimeout(() => prog.hidden = true, 400);
     } catch(e){
       console.error(e);
-      note.textContent = "Error arranging or building PDF.";
+      note.textContent = "Error: " + e.message;
       prog.hidden = true;
     }
   };
