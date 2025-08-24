@@ -11,8 +11,6 @@
     --card:#ffffffee; --text:#0b1020; --muted:#4b5563; --ring:rgba(0,0,0,.12);
     --grad:linear-gradient(135deg,var(--green),var(--blue),var(--yellow));
   }
-
-  /* Background + floral sides */
   body{
     margin:0; font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif; color:var(--text);
     background:
@@ -23,26 +21,7 @@
     background-size:140% 140%; animation:bgShift 18s ease-in-out infinite alternate;
   }
   @keyframes bgShift{0%{background-position:0% 0%,100% 0%,50% 100%,0% 0%}100%{background-position:50% 30%,50% 20%,60% 70%,100% 100%}}
-  .decor{position:fixed;top:0;bottom:0;width:160px;pointer-events:none;z-index:0;opacity:.9}
-  .decor.left{left:0;background:
-      radial-gradient(60px 60px at 40% 12%, rgba(16,185,129,.35), transparent 60%),
-      radial-gradient(48px 48px at 70% 28%, rgba(59,130,246,.30), transparent 60%),
-      radial-gradient(56px 56px at 32% 62%, rgba(253,224,71,.35), transparent 60%),
-      radial-gradient(44px 44px at 20% 86%, rgba(249,168,212,.28), transparent 60%);
-    mask-image:linear-gradient(90deg, rgba(0,0,0,.85), rgba(0,0,0,.35), transparent);
-    animation:floatL 12s ease-in-out infinite alternate;}
-  .decor.right{right:0;background:
-      radial-gradient(58px 58px at 60% 20%, rgba(59,130,246,.32), transparent 60%),
-      radial-gradient(52px 52px at 30% 42%, rgba(16,185,129,.34), transparent 60%),
-      radial-gradient(50px 50px at 68% 74%, rgba(253,224,71,.34), transparent 60%),
-      radial-gradient(42px 42px at 80% 88%, rgba(249,168,212,.26), transparent 60%);
-    mask-image:linear-gradient(270deg, rgba(0,0,0,.85), rgba(0,0,0,.35), transparent);
-    animation:floatR 13s ease-in-out infinite alternate;}
-  @keyframes floatL{0%{transform:translateY(0)}100%{transform:translateY(12px)}}
-  @keyframes floatR{0%{transform:translateY(8px)}100%{transform:translateY(-6px)}}
-
-  .wrap{width:min(1200px,94%); margin:0 auto; position:relative; z-index:1}
-
+  .wrap{width:min(1200px,94%); margin:0 auto}
   header.hero{min-height:26vh; display:grid; place-items:center; text-align:center; padding: clamp(1.2rem,5vw,2.4rem) 0 1rem;}
   .welcome{
     font-weight:900; letter-spacing:.05em; line-height:1.1;
@@ -59,20 +38,14 @@
 
   .shiny{position:relative;width:min(940px,96%);margin:0 auto 1rem;border-radius:22px;padding:1.4rem;
     background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(255,255,255,.90));
-    border:1px solid rgba(255,255,255,.7);box-shadow:0 24px 60px rgba(59,130,246,.28),0 16px 40px rgba(16,185,129,.24),inset 0 1px 0 rgba(255,255,255,.7);
+    border:1px solid rgba(255,255,255,.7);box-shadow:0 24px 60px rgba(59,130,246,0.28),0 16px 40px rgba(16,185,129,0.24),inset 0 1px 0 rgba(255,255,255,.7);
     backdrop-filter:blur(12px);overflow:hidden;text-align:center}
-  .shiny::before{content:"";position:absolute;inset:-60% -40% auto -40%;height:220%;width:180%;
-    background:linear-gradient(120deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,.08) 55%,rgba(255,255,255,0) 75%);
-    transform:translateX(-60%) rotate(18deg);animation:sheen 7s linear infinite;mix-blend-mode:screen;pointer-events:none}
-  @keyframes sheen{0%{transform:translateX(-60%) rotate(18deg)}100%{transform:translateX(60%) rotate(18deg)}}
-
   .row{display:flex;gap:.9rem;align-items:center;flex-wrap:wrap;justify-content:center}
   .btn{background:var(--grad);color:#073b2b;border:0;padding:.9rem 1.2rem;border-radius:1rem;font-weight:900;cursor:pointer;
     box-shadow:0 8px 22px rgba(16,185,129,.22),0 4px 14px rgba(59,130,246,.14);font-size:1.02rem}
   .btn.ghost{background:linear-gradient(135deg,rgba(16,185,129,.12),rgba(59,130,246,.12));color:#0b1020;border:1px solid var(--ring)}
   .field{display:flex;align-items:center;gap:.55rem;background:#f8fafc;border:1px solid #e5e7eb;border-radius:.9rem;padding:.55rem .75rem}
   .field input,.field select{border:0;background:transparent;outline:none;font:inherit;color:inherit;padding:.3rem .25rem}
-
   .panel{background:var(--card);border:1px solid var(--ring);border-radius:14px;padding:1rem;box-shadow:0 10px 28px rgba(0,0,0,.08)}
   .muted{color:#4b5563}
   progress{width:100%}
@@ -80,16 +53,12 @@
   .grid{display:grid;gap:1rem;grid-template-columns:1fr 1fr;align-items:start;margin:1rem 0 2rem}
   @media (max-width:980px){.grid{grid-template-columns:1fr}}
   canvas{width:100%;background:#fff;border-radius:12px;border:1px solid #e5e7eb}
-
   .chip{display:inline-flex;align-items:center;gap:.45rem;padding:.3rem .6rem;border-radius:.8rem;border:1px solid #e5e7eb;background:#fff}
   .swatch{width:18px;height:18px;border-radius:50%;border:1px solid #d1d5db}
   .info{text-align:center;color:#111827;opacity:.9;margin:1.2rem 0 2.2rem}
 </style>
 </head>
 <body>
-  <div class="decor left"></div>
-  <div class="decor right"></div>
-
   <header class="hero">
     <div class="wrap">
       <div class="welcome">WELCOME TO THE WORLD OF PDFs</div>
@@ -100,7 +69,7 @@
   <main class="wrap">
     <section class="shiny">
       <div style="font-weight:900; font-size:1.15rem">Remove background watermarks (client‑side)</div>
-      <div class="muted" style="margin-top:.15rem">Preview on page 1, tweak settings, then Clean → PDF for all pages.</div>
+      <div class="muted" style="margin-top:.15rem">Preview on page 1, tweak, then Clean → PDF for all pages.</div>
 
       <div class="row" style="margin-top:.8rem">
         <button class="btn" id="pick">Choose PDF</button>
@@ -122,15 +91,15 @@
         <div class="field">
           <label>Mode</label>
           <select id="mode">
-            <option value="auto" selected>Auto gray (light/low‑sat → white)</option>
-            <option value="color">Color target (click preview)</option>
+            <option value="auto" selected>Auto Gray (light/low‑sat → white)</option>
+            <option value="color">Color Target (click original)</option>
           </select>
         </div>
 
         <div class="field" id="colorBox" style="display:none">
           <span>Target</span>
           <span class="chip"><span class="swatch" id="swatch"></span><span id="rgbText">—</span></span>
-          <span class="muted">Click on the cleaned preview to pick color</span>
+          <span class="muted">Click the Original preview to sample</span>
         </div>
 
         <div class="field">
@@ -140,12 +109,11 @@
 
         <div class="field" id="tolBox" style="display:none">
           <label>Tolerance</label>
-          <input id="tol" type="range" min="6" max="80" step="1" value="24">
+          <input id="tol" type="range" min="6" max="90" step="1" value="28">
         </div>
 
-        <div class="field">
-          <label><input id="protectInk" type="checkbox" checked> Protect dark text/lines</label>
-        </div>
+        <div class="field"><label><input id="protectInk" type="checkbox" checked> Protect dark text/lines</label></div>
+        <div class="field"><label>Text boost</label><input id="boost" type="range" min="0" max="0.35" step="0.01" value="0.08"></div>
       </div>
 
       <input id="file" type="file" accept="application/pdf" hidden>
@@ -157,20 +125,12 @@
 
     <section class="grid">
       <div class="panel">
-        <h3 style="margin:.2rem 0 .6rem">Original (page 1)</h3>
+        <h3 style="margin:.2rem 0 .6rem">Original (page 1) — click to pick color</h3>
         <canvas id="src" width="1024" height="768"></canvas>
       </div>
       <div class="panel">
         <h3 style="margin:.2rem 0 .6rem">Cleaned preview</h3>
-        <canvas id="dst" width="1024" height="768" title="Click to pick color in Color target mode"></canvas>
-      </div>
-    </section>
-
-    <section class="panel">
-      <div style="font-weight:800; margin-bottom:.4rem">Tip</div>
-      <div class="muted">
-        - Auto gray works best for light gray or faint low‑saturation watermarks on white pages.<br>
-        - For colored watermarks, switch to Color target, click on the mark to sample its color, then adjust Tolerance and Strength. Dark text is preserved.
+        <canvas id="dst" width="1024" height="768"></canvas>
       </div>
     </section>
 
@@ -210,6 +170,7 @@ const tolBox = document.getElementById('tolBox');
 const colorBox = document.getElementById('colorBox');
 const swatch = document.getElementById('swatch');
 const rgbText = document.getElementById('rgbText');
+const boostRange = document.getElementById('boost');
 
 let pdfFile = null;
 let pdfDoc = null;
@@ -232,18 +193,17 @@ modeSel.onchange = () => {
   tolBox.style.display = isColor ? '' : 'none';
   colorBox.style.display = isColor ? '' : 'none';
 };
+modeSel.dispatchEvent(new Event('change'));
 
-dst.addEventListener('click', (e) => {
+src.addEventListener('click', (e) => {
   if (modeSel.value !== 'color') return;
-  // sample color under cursor from cleaned preview
-  const rect = dst.getBoundingClientRect();
-  const x = Math.floor((e.clientX - rect.left) * (dst.width / rect.width));
-  const y = Math.floor((e.clientY - rect.top)  * (dst.height / rect.height));
-  const data = dctx.getImageData(x, y, 1, 1).data;
+  const rect = src.getBoundingClientRect();
+  const x = Math.floor((e.clientX - rect.left) * (src.width / rect.width));
+  const y = Math.floor((e.clientY - rect.top)  * (src.height / rect.height));
+  const data = sctx.getImageData(x, y, 1, 1).data;
   targetColor = { r: data[0], g: data[1], b: data[2] };
   swatch.style.background = `rgb(${targetColor.r},${targetColor.g},${targetColor.b})`;
   rgbText.textContent = `rgb(${targetColor.r},${targetColor.g},${targetColor.b})`;
-  // re-run preview quickly
   if (firstPageInfo) runPreviewClean(firstPageInfo.canvas);
 });
 
@@ -267,23 +227,23 @@ convertBtn.onclick = async () => {
     const pages = [];
     for (let p=1; p<=total; p++){
       note.textContent = `Rendering page ${p}/${total}…`;
-      prog.value = Math.round(5 + (p/total)*45);
+      prog.value = Math.round(5 + (p/total)*40);
       pages.push(await renderPageToCanvas(pdfDoc, p, dpi));
     }
 
     note.textContent = "Cleaning pages…";
-    prog.value = 55;
+    prog.value = 50;
 
     const cleaned = [];
     for (let i=0; i<pages.length; i++){
       const { canvas, widthInches, heightInches } = pages[i];
-      const cleanCanvas = await cleanCanvas(canvas);
-      cleaned.push({ canvas: cleanCanvas, widthInches, heightInches });
-      prog.value = Math.round(55 + ((i+1)/pages.length)*30);
+      const outCanvas = await cleanCanvas(canvas); // FIX: no name shadowing
+      cleaned.push({ canvas: outCanvas, widthInches, heightInches });
+      prog.value = Math.round(50 + ((i+1)/pages.length)*40);
     }
 
     note.textContent = "Building PDF…";
-    prog.value = 90;
+    prog.value = 92;
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit:'in', format: [cleaned[0].widthInches, cleaned[0].heightInches] });
@@ -316,7 +276,7 @@ async function loadPdfAndRenderFirst(){
 
     firstPageInfo = await renderPageToCanvas(pdfDoc, 1, dpi);
     fitToCanvases(firstPageInfo.canvas);
-    note.textContent = "Page 1 ready. Click preview to clean, or Clean → PDF to process all pages.";
+    note.textContent = "Page 1 ready. Adjust settings and click Preview/Clean.";
   } catch(e){
     console.error(e);
     note.textContent = "Failed to load PDF: " + (e?.message || e);
@@ -341,9 +301,7 @@ async function renderPageToCanvas(pdf, pageNum, dpi){
   return { canvas, widthInches, heightInches };
 }
 
-/* Preview helpers */
 function fitToCanvases(pageCanvas){
-  // set preview canvases same size as rendered image (but CSS scales)
   [src, dst].forEach(c => { c.width = pageCanvas.width; c.height = pageCanvas.height; });
   sctx.drawImage(pageCanvas, 0, 0);
   dctx.drawImage(pageCanvas, 0, 0);
@@ -356,26 +314,29 @@ function runPreviewClean(pageCanvas){
   });
 }
 
-/* Cleaning pipeline */
+/* Cleaning pipeline (edge‑aware) */
 async function cleanCanvas(inCanvas){
   const w = inCanvas.width, h = inCanvas.height;
-  // copy source to imageData
   const ctx = inCanvas.getContext('2d');
-  const src = ctx.getImageData(0,0,w,h);
-  const out = new ImageData(w,h);
+  const srcData = ctx.getImageData(0,0,w,h);
+  const out = new ImageData(w, h);
+
+  // Edge map from lightly blurred luminance (reduces noise)
+  const blurred = boxBlur(srcData, w, h, 1);
+  const edges = sobelEdges(blurred, w, h); // 0..1
 
   const mode = modeSel.value;
-  const strength = parseFloat(strengthRange.value);  // 0..1
-  const tol = parseInt(tolRange.value, 10);          // RGB distance 0..~441
+  const k = parseFloat(strengthRange.value);
+  const tol = parseInt(tolRange.value, 10);
   const protectInk = protectInkChk.checked;
+  const boost = parseFloat(boostRange.value);
 
   if (mode === 'auto'){
-    autoGrayClean(src, out, strength, protectInk);
+    autoGrayCleanEdgeAware(srcData, out, edges, k, protectInk, boost);
   } else {
-    colorTargetClean(src, out, targetColor, tol, strength, protectInk);
+    colorTargetCleanEdgeAware(srcData, out, edges, targetColor, tol, k, protectInk, boost);
   }
 
-  // draw to canvas
   const c = document.createElement('canvas');
   c.width = w; c.height = h;
   c.getContext('2d').putImageData(out, 0, 0);
@@ -383,61 +344,146 @@ async function cleanCanvas(inCanvas){
 }
 
 /* Algorithms */
-function autoGrayClean(src, out, k, protectInk){
-  // Rule: if low saturation and medium-high luminance, push toward white.
+function clamp(x,a,b){ return x<a?a:(x>b?b:x); }
+
+function rgb2hsl(r,g,b){
+  r/=255; g/=255; b/=255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b);
+  let h,s,l=(max+min)/2;
+  if(max===min){ h=s=0 }
+  else{
+    const d=max-min;
+    s=l>0.5? d/(2-max-min) : d/(max+min);
+    switch(max){
+      case r: h=(g-b)/d + (g<b?6:0); break;
+      case g: h=(b-r)/d + 2; break;
+      case b: h=(r-g)/d + 4; break;
+    } h/=6;
+  }
+  return {h,s,l};
+}
+
+function boxBlur(img, w, h, r){
+  const s = img.data;
+  const t = new Uint8ClampedArray(s.length);
+  const o = new Uint8ClampedArray(s.length);
+
+  // horiz
+  for (let y=0; y<h; y++){
+    let R=0,G=0,B=0,A=0;
+    const row = y*w*4;
+    for (let dx=-r; dx<=r; dx++){
+      const x = (dx<0?0:(dx>=w?w-1:dx))*4 + row;
+      R+=s[x]; G+=s[x+1]; B+=s[x+2]; A+=s[x+3];
+    }
+    for (let x=0; x<w; x++){
+      const i = row + x*4, outN=2*r+1;
+      t[i]=R/outN; t[i+1]=G/outN; t[i+2]=B/outN; t[i+3]=A/outN;
+      const xOut = (x-r<0?0:x-r)*4 + row;
+      const xIn  = (x+r+1>=w?w-1:x+r+1)*4 + row;
+      R += s[xIn]-s[xOut]; G += s[xIn+1]-s[xOut+1]; B += s[xIn+2]-s[xOut+2]; A += s[xIn+3]-s[xOut+3];
+    }
+  }
+  // vert
+  for (let x=0; x<w; x++){
+    let R=0,G=0,B=0,A=0;
+    const col = x*4;
+    for (let dy=-r; dy<=r; dy++){
+      const y = (dy<0?0:(dy>=h?h-1:dy))*w*4 + col;
+      R+=t[y]; G+=t[y+1]; B+=t[y+2]; A+=t[y+3];
+    }
+    for (let y=0; y<h; y++){
+      const i = y*w*4 + col, outN=2*r+1;
+      o[i]=R/outN; o[i+1]=G/outN; o[i+2]=B/outN; o[i+3]=A/outN;
+      const yOut = (y-r<0?0:y-r)*w*4 + col;
+      const yIn  = (y+r+1>=h?h-1:y+r+1)*w*4 + col;
+      R += t[yIn]-t[yOut]; G += t[yIn+1]-t[yOut+1]; B += t[yIn+2]-t[yOut+2]; A += t[yIn+3]-t[yOut+3];
+    }
+  }
+  const out = new ImageData(w,h);
+  out.data.set(o);
+  return out;
+}
+
+function sobelEdges(img, w, h){
+  const a = img.data;
+  const out = new Float32Array(w*h);
+  const gxK = [-1,0,1,-2,0,2,-1,0,1];
+  const gyK = [-1,-2,-1,0,0,0,1,2,1];
+  function lum(i){ return (a[i]*0.299 + a[i+1]*0.587 + a[i+2]*0.114); }
+  for (let y=1; y<h-1; y++){
+    for (let x=1; x<w-1; x++){
+      let gx=0, gy=0, k=0;
+      for (let j=-1; j<=1; j++){
+        for (let i=-1; i<=1; i++){
+          const idx = ((y+j)*w + (x+i))*4;
+          const L = lum(idx);
+          gx += L * gxK[k]; gy += L * gyK[k]; k++;
+        }
+      }
+      out[y*w + x] = clamp(Math.hypot(gx, gy)/255, 0, 1);
+    }
+  }
+  // gentle normalization
+  for (let i=0;i<out.length;i++) out[i] = Math.min(1, out[i]*1.2);
+  return out;
+}
+
+function autoGrayCleanEdgeAware(src, out, edges, k, protectInk, boost){
   const s = src.data, d = out.data;
-  for (let i=0; i<s.length; i+=4){
+  for (let p=0, i=0; p<edges.length; p++, i+=4){
     let r=s[i], g=s[i+1], b=s[i+2], a=s[i+3];
-    const { l, sat } = rgb2ls(r,g,b);
-    const isInk = (l < 0.45) || (r+g+b < 360); // dark or dense
-    if (protectInk && isInk){
-      d[i]=r; d[i+1]=g; d[i+2]=b; d[i+3]=a; continue;
+    const {s:sat,l} = rgb2hsl(r,g,b);
+    const e = edges[p]; // 0..1
+    const isInk = (l < 0.45) || (r+g+b < 360) || e>0.35;
+
+    // lift only light, low-sat pixels; reduce near edges to avoid halos
+    if (!(protectInk && isInk) && sat < 0.32 && l > 0.55){
+      const kk = k * (1 - 0.75*e);
+      r = r + kk*(255 - r);
+      g = g + kk*(255 - g);
+      b = b + kk*(255 - b);
     }
-    if (sat < 0.32 && l > 0.55){
-      // lighten toward white by strength k
-      r = r + k*(255 - r);
-      g = g + k*(255 - g);
-      b = b + k*(255 - b);
+
+    // optional text boost on dark/edge areas
+    if (boost>0 && isInk){
+      const m = clamp(0.6*(1-l) + 0.4*e, 0, 1) * boost;
+      r = r*(1-m); g = g*(1-m); b = b*(1-m);
     }
+
     d[i]=r|0; d[i+1]=g|0; d[i+2]=b|0; d[i+3]=a;
   }
 }
 
-function colorTargetClean(src, out, tgt, tol, k, protectInk){
+function colorTargetCleanEdgeAware(src, out, edges, tgt, tol, k, protectInk, boost){
   const s = src.data, d = out.data;
   const tr=tgt.r, tg=tgt.g, tb=tgt.b;
   const tol2 = tol*tol;
-  for (let i=0; i<s.length; i+=4){
+  for (let p=0, i=0; p<edges.length; p++, i+=4){
     let r=s[i], g=s[i+1], b=s[i+2], a=s[i+3];
-    const { l } = rgb2ls(r,g,b);
-    const isInk = (l < 0.45) || (r+g+b < 360);
-    if (protectInk && isInk){
-      d[i]=r; d[i+1]=g; d[i+2]=b; d[i+3]=a; continue;
-    }
-    const dr = r - tr, dg = g - tg, db = b - tb;
+    const {l} = rgb2hsl(r,g,b);
+    const e = edges[p];
+    const isInk = (l < 0.45) || (r+g+b < 360) || e>0.35;
+
+    const dr=r-tr, dg=g-tg, db=b-tb;
     const dist2 = dr*dr + dg*dg + db*db;
-    if (dist2 <= tol2){
-      r = r + k*(255 - r);
-      g = g + k*(255 - g);
-      b = b + k*(255 - b);
+
+    if (!(protectInk && isInk) && dist2 <= tol2){
+      const closeness = 1 - Math.sqrt(dist2)/tol;            // 1 near color, 0 at edge of tol
+      const kk = k * closeness * (1 - 0.75*e);               // less near edges
+      r = r + kk*(255 - r);
+      g = g + kk*(255 - g);
+      b = b + kk*(255 - b);
     }
+
+    if (boost>0 && isInk){
+      const m = clamp(0.6*(1-l) + 0.4*e, 0, 1) * boost;
+      r = r*(1-m); g = g*(1-m); b = b*(1-m);
+    }
+
     d[i]=r|0; d[i+1]=g|0; d[i+2]=b|0; d[i+3]=a;
   }
 }
-
-/* Color helpers */
-function rgb2ls(r,g,b){
-  // fast luminance + saturation approx
-  const max = Math.max(r,g,b), min = Math.min(r,g,b);
-  const l = (max + min) / 510; // 0..1
-  const sat = (max === 0) ? 0 : (max - min) / max; // 0..1
-  return { l, sat };
-}
-
-/* UI init */
-modeSel.dispatchEvent(new Event('change'));
-swatch.style.background = `rgb(${targetColor.r},${targetColor.g},${targetColor.b})`;
-rgbText.textContent = '—';
 </script>
 </body>
 </html>
