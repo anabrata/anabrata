@@ -26,6 +26,7 @@
   }
   .wrap{ width:min(1120px,94%); margin:0 auto; }
 
+  /* Hero */
   header.hero{ min-height:34vh; display:grid; place-items:center; text-align:center; padding: clamp(1.6rem,6vw,3rem) 0 1rem; }
   .welcome{
     font-weight:900; letter-spacing:.06em; line-height:1.1;
@@ -41,22 +42,52 @@
            background:linear-gradient(90deg, rgba(16,185,129,.18), rgba(59,130,246,.18), rgba(253,224,71,.18));
            box-shadow:0 6px 22px rgba(16,185,129,.14), 0 4px 16px rgba(59,130,246,.12) }
 
+  /* Shiny centered menu panel */
+  .menu-wrap{
+    display:grid; place-items:center; margin: 0 auto 1rem; width:100%;
+  }
+  .shiny-panel{
+    position:relative; width:min(720px, 96%); border-radius:18px; padding:1.2rem;
+    background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.86));
+    border:1px solid rgba(255,255,255,0.6);
+    box-shadow:
+      0 20px 50px rgba(59,130,246,0.25),
+      0 12px 32px rgba(16,185,129,0.22),
+      inset 0 1px 0 rgba(255,255,255,0.6);
+    backdrop-filter: blur(10px);
+    overflow:hidden;
+  }
+  .shiny-panel::before{
+    content:""; position:absolute; inset:-60% -40% auto -40%; height:220%; width:180%;
+    background: linear-gradient(120deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.08) 55%, rgba(255,255,255,0) 75%);
+    transform: translateX(-60%) rotate(18deg);
+    animation: sheen 6.5s linear infinite;
+    pointer-events:none; mix-blend-mode: screen;
+  }
+  @keyframes sheen{
+    0%{ transform: translateX(-60%) rotate(18deg) }
+    100%{ transform: translateX(60%) rotate(18deg) }
+  }
+
+  /* Inner card and controls */
   .card{ background:var(--card); backdrop-filter:blur(6px); border:1px solid var(--ring); border-radius:14px; padding:1rem; box-shadow:0 10px 28px rgba(0,0,0,.08) }
   .row{ display:flex; gap:.8rem; align-items:center; flex-wrap:wrap }
   .btn{ background:var(--grad); color:#073b2b; border:0; padding:.74rem 1.05rem; border-radius:.8rem; font-weight:900; cursor:pointer;
         box-shadow:0 6px 18px rgba(16,185,129,.22), 0 3px 12px rgba(59,130,246,.14) }
   .btn.ghost{ background:linear-gradient(135deg, rgba(16,185,129,.12), rgba(59,130,246,.12)); color:#0b1020; border:1px solid var(--ring) }
-
-  .field{ position:relative; display:flex; align-items:center; gap:.5rem; background:#f8fafc;
-          border:1px solid #e5e7eb; border-radius:.8rem; padding:.45rem .65rem }
+  .field{ position:relative; display:flex; align-items:center; gap:.5rem; background:#f8fafc; border:1px solid #e5e7eb; border-radius:.8rem; padding:.45rem .65rem }
   .field input{ border:0; background:transparent; outline:none; font:inherit; color:inherit; padding:.35rem .2rem; min-width:6ch }
 
-  .dropzone{ position:relative; display:grid; place-items:center; text-align:center; padding:1.1rem; border-radius:1rem;
-             border:2px dashed #cbd5e1; background:linear-gradient(135deg, rgba(16,185,129,.08), rgba(59,130,246,.08), rgba(253,224,71,.08)) }
+  /* Dropzone centered inside panel */
+  .dropzone{
+    position:relative; display:grid; place-items:center; text-align:center; padding:1.4rem; border-radius:1rem;
+    border:2px dashed #cbd5e1; background:linear-gradient(135deg, rgba(16,185,129,.08), rgba(59,130,246,.08), rgba(253,224,71,.08));
+  }
   #file{ display:none }
-  .thumb{ margin-top:.6rem; display:flex; gap:.6rem; align-items:center; justify-content:center }
+  .thumb{ margin-top:.7rem; display:flex; gap:.6rem; align-items:center; justify-content:center }
   .thumb img{ width:84px; height:63px; object-fit:cover; border-radius:.5rem; border:1px solid #e5e7eb; background:#fff } /* 4×3 preview */
 
+  /* Layout area */
   .grid{ display:grid; gap:1rem; grid-template-columns:1.2fr .8fr; align-items:start; margin:1rem 0 2rem }
   @media (max-width:980px){ .grid{ grid-template-columns:1fr } }
   canvas{ width:100%; background:#fff; border-radius:10px; border:1px solid #e5e7eb }
@@ -73,18 +104,13 @@
   </header>
 
   <main class="wrap">
-    <section class="card">
-      <div class="row" style="justify-content:space-between">
-        <div class="row">
-          <span class="muted">A4 portrait: 210 × 297 mm • Photo: 4 × 3 cm • 6 columns • Starts at top with 10 mm margin</span>
-        </div>
-      </div>
-
-      <div class="row" style="margin-top:.7rem">
+    <!-- Shiny centered Choose-one-photo menu -->
+    <section class="menu-wrap">
+      <div class="shiny-panel">
         <div class="dropzone">
           <div>
-            <div style="font-weight:800">Choose one photo</div>
-            <div class="muted" style="font-size:.95rem">Default copies: 6. Tiles print exactly 4 × 3 cm.</div>
+            <div style="font-weight:800; font-size:1.05rem">Choose one photo</div>
+            <div class="muted" style="font-size:.95rem">Default copies: 6 • Each tile prints 4 × 3 cm • 6 per row</div>
             <div class="row" style="justify-content:center; margin-top:.6rem">
               <button class="btn" id="chooseBtn" type="button">Choose photo</button>
               <button class="btn ghost" id="arrange" type="button">Arrange → PDF</button>
@@ -98,12 +124,13 @@
           <input id="file" type="file" accept="image/*" />
         </div>
       </div>
+    </section>
 
-      <div class="row" style="margin-top:.7rem">
+    <section class="card">
+      <div class="row" style="gap:.9rem">
         <div class="field"><span>Number of photos</span><input id="copies" type="number" value="6" min="1" step="1"></div>
         <div class="field"><span>Gap (mm)</span><input id="gap" type="number" value="2" step="0.5" min="0"></div>
       </div>
-
       <div style="margin-top:.6rem">
         <progress id="prog" value="0" max="100" hidden></progress>
         <div id="note" class="muted" style="margin-top:.35rem"></div>
@@ -113,16 +140,16 @@
     <section class="grid">
       <div class="card">
         <h3 style="margin:.2rem 0 .8rem">Preview (scaled)</h3>
-        <!-- A4 portrait preview -->
         <canvas id="preview" width="840" height="1188" aria-label="Preview canvas"></canvas>
-        <p class="muted" style="margin:.5rem 0 0">Print at 100% scale (no “Fit to page”). Each tile = 40 × 30 mm.</p>
+        <p class="muted" style="margin:.5rem 0 0">Print at 100% (no “Fit to page”). Each tile = 40 × 30 mm. Starts at 10 mm top/left margin.</p>
       </div>
       <div class="card">
         <h3 style="margin:.2rem 0 .8rem">Layout details</h3>
         <ul class="muted" style="margin:.2rem 0 0; padding-left:1rem; list-style:disc">
-          <li>Photos begin at the top-left inside a 10 mm margin.</li>
-          <li>6 columns fixed; horizontal gap is auto‑clamped so 6 always fit.</li>
-          <li>Rows per page depend on vertical gap; extra photos continue on new A4 pages.</li>
+          <li>A4 portrait: 210 × 297 mm</li>
+          <li>Top-left origin inside a 10 mm printer-safe margin</li>
+          <li>6 columns fixed; horizontal gap auto‑clamped so they fit</li>
+          <li>Rows paginate to new A4 pages if needed</li>
         </ul>
       </div>
     </section>
@@ -136,10 +163,10 @@
   // Year
   document.getElementById('year').textContent = new Date().getFullYear();
 
-  // A4 portrait
+  // A4 portrait constants
   const PAGE_W_MM = 210, PAGE_H_MM = 297;
-  const MARGIN_MM = 10; // small printer-safe margin
-  // Base tile is 4×3 cm (40×30). Internally we may swap to 3×4 (30×40) to keep 6 across on portrait.
+  const MARGIN_MM = 10; // start top-left inside 10 mm margin
+  // Base tile: 4×3 cm (40×30). If 6 across won’t fit, we silently rotate to 3×4 (30×40) to keep 6 columns.
   const TILE_W_4x3 = 40, TILE_H_4x3 = 30;
   const TILE_W_3x4 = 30, TILE_H_3x4 = 40;
   const COLS = 6;
@@ -160,6 +187,7 @@
   const canvas = $('preview');
   const ctx = canvas.getContext('2d');
 
+  // File select
   chooseBtn.addEventListener('click', () => fileEl.click());
   fileEl.addEventListener('change', () => {
     if (fileEl.files && fileEl.files[0]){
@@ -180,7 +208,6 @@
       img.src = url;
     });
   }
-  // Center-crop to fill destination
   function drawImageCover(ctx, img, dx, dy, dW, dH){
     const iw = img.naturalWidth || img.width;
     const ih = img.naturalHeight || img.height;
@@ -191,12 +218,11 @@
     ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dW, dH);
   }
 
-  // Decide tile orientation (hidden auto-rotate) to keep 6 across on A4 portrait
+  // Hidden auto-rotate to keep 6 across on portrait
   function pickTileSize(userGap){
     const availW = PAGE_W_MM - 2*MARGIN_MM;
     const maxGX_4x3 = (availW - COLS*TILE_W_4x3) / (COLS - 1);
     const maxGX_3x4 = (availW - COLS*TILE_W_3x4) / (COLS - 1);
-    // Prefer 4×3 if it fits; else 3×4
     if (maxGX_4x3 >= 0){ return { tw: TILE_W_4x3, th: TILE_H_4x3, maxGX: Math.max(0, maxGX_4x3) }; }
     return { tw: TILE_W_3x4, th: TILE_H_3x4, maxGX: Math.max(0, maxGX_3x4) };
   }
@@ -206,17 +232,16 @@
     return Math.max(1, Math.floor((availH + gapY) / (tileH + gapY)));
   }
 
-  // Build a layout plan (top-left origin)
   function planLayout(userGap, copies){
     const { tw, th, maxGX } = pickTileSize(userGap);
-    const gapX = Math.min(userGap, maxGX);   // clamp horizontally to keep 6 across
-    const gapY = userGap;                    // vertical gap from user
-    const rpp  = rowsPerPage(th, gapY);      // rows per page
+    const gapX = Math.min(userGap, maxGX);
+    const gapY = userGap;
+    const rpp  = rowsPerPage(th, gapY);
     const capacityPerPage = COLS * rpp;
     return { tw, th, gapX, gapY, rpp, capacityPerPage };
   }
 
-  // Preview (first page only) — starts at top-left with margin
+  // Preview (first page), origin at top-left margin
   async function previewLayout(img, copies, userGap){
     const p = planLayout(userGap, copies);
     const { tw, th, gapX, gapY, rpp } = p;
@@ -230,14 +255,11 @@
     const gapYpx  = Math.round(gapY * pxPerMM);
     const marginPx = Math.round(MARGIN_MM * pxPerMM);
 
-    // White page + margin box (optional guide)
     ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,pageWpx,pageHpx);
     ctx.strokeStyle = '#d1d5db'; ctx.lineWidth = 1;
     ctx.strokeRect(marginPx + .5, marginPx + .5, pageWpx - 2*marginPx - 1, pageHpx - 2*marginPx - 1);
 
-    // Top-left origin inside margin
-    const ox = marginPx, oy = marginPx;
-
+    const ox = marginPx, oy = marginPx; // start at top-left margin
     let i = 0, placed = Math.min(copies, COLS * rpp);
     for (let r=0; r<rpp && i<placed; r++){
       for (let c=0; c<COLS && i<placed; c++){
@@ -247,13 +269,12 @@
         i++;
       }
     }
-
     const { maxGX } = pickTileSize(userGap);
-    $('note').textContent = (userGap > maxGX) ? `Horizontal gap reduced to ${gapX.toFixed(2)} mm to keep 6 in a row.` : '';
+    $('note').textContent = (userGap > maxGX) ? `Horizontal gap reduced to ${gapX.toFixed(2)} mm to keep 6 columns.` : '';
     return p;
   }
 
-  // PDF builder (multi-page) — starts at top-left with margin
+  // PDF builder (multi-page), origin at top-left margin
   async function buildPdf(img, copies, userGap){
     const { jsPDF } = window.jspdf;
     const p = planLayout(userGap, copies);
@@ -261,7 +282,7 @@
 
     const doc = new jsPDF({ unit:'mm', format:[PAGE_W_MM, PAGE_H_MM] }); // portrait
 
-    // Prepare one high‑quality tile
+    // Prepare high‑quality tile once
     const pxPerMM = 10; // ~254 dpi
     const off = document.createElement('canvas');
     off.width  = Math.round(tw * pxPerMM);
@@ -271,7 +292,7 @@
     drawImageCover(oc, img, 0, 0, off.width, off.height);
     const tileURL = off.toDataURL('image/jpeg', 0.92);
 
-    const ox = MARGIN_MM, oy = MARGIN_MM; // top-left start
+    const ox = MARGIN_MM, oy = MARGIN_MM;
 
     let remaining = copies;
     let first = true;
