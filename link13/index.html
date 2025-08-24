@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>World of PDFs • Watermark Remover • Made by ANABRATA</title>
+<title>World of PDFs • Lossless Watermark Remover • Made by ANABRATA</title>
 <meta name="color-scheme" content="light dark" />
 <style>
   :root{
@@ -21,41 +21,35 @@
     background-size:140% 140%; animation:bgShift 18s ease-in-out infinite alternate;
   }
   @keyframes bgShift{0%{background-position:0% 0%,100% 0%,50% 100%,0% 0%}100%{background-position:50% 30%,50% 20%,60% 70%,100% 100%}}
-  .wrap{width:min(1200px,94%); margin:0 auto}
-  header.hero{min-height:26vh; display:grid; place-items:center; text-align:center; padding: clamp(1.2rem,5vw,2.4rem) 0 1rem;}
+  .wrap{ width:min(980px,94%); margin:0 auto; position:relative; z-index:1 }
+  header.hero{ min-height:24vh; display:grid; place-items:center; text-align:center; padding: clamp(1.2rem,5vw,2.2rem) 0 1rem; }
   .welcome{
     font-weight:900; letter-spacing:.05em; line-height:1.1;
     background:linear-gradient(90deg, var(--green), var(--blue), var(--yellow), var(--pink), var(--green));
     -webkit-background-clip:text; background-clip:text; color:transparent;
     background-size:220% 100%; animation:hue 14s linear infinite, fadeInOut 8s ease-in-out infinite;
-    font-size: clamp(1.2rem, 4.2vw, 2.3rem);
+    font-size: clamp(1.1rem, 4.2vw, 2.2rem);
   }
   @keyframes hue{0%{background-position:0% 50%}100%{background-position:220% 50%}}
   @keyframes fadeInOut{0%{opacity:0}18%{opacity:1}82%{opacity:1}100%{opacity:0}}
-  .byline{margin-top:.5rem;font-weight:800;color:#0b1020;display:inline-block;padding:.35rem .7rem;border-radius:.7rem;
-    background:linear-gradient(90deg, rgba(16,185,129,.18), rgba(59,130,246,.18), rgba(253,224,71,.18));
-    box-shadow:0 6px 22px rgba(16,185,129,.14), 0 4px 16px rgba(59,130,246,.12)}
-
-  .shiny{position:relative;width:min(940px,96%);margin:0 auto 1rem;border-radius:22px;padding:1.4rem;
-    background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(255,255,255,.90));
-    border:1px solid rgba(255,255,255,.7);box-shadow:0 24px 60px rgba(59,130,246,0.28),0 16px 40px rgba(16,185,129,0.24),inset 0 1px 0 rgba(255,255,255,.7);
-    backdrop-filter:blur(12px);overflow:hidden;text-align:center}
-  .row{display:flex;gap:.9rem;align-items:center;flex-wrap:wrap;justify-content:center}
-  .btn{background:var(--grad);color:#073b2b;border:0;padding:.9rem 1.2rem;border-radius:1rem;font-weight:900;cursor:pointer;
-    box-shadow:0 8px 22px rgba(16,185,129,.22),0 4px 14px rgba(59,130,246,.14);font-size:1.02rem}
-  .btn.ghost{background:linear-gradient(135deg,rgba(16,185,129,.12),rgba(59,130,246,.12));color:#0b1020;border:1px solid var(--ring)}
-  .field{display:flex;align-items:center;gap:.55rem;background:#f8fafc;border:1px solid #e5e7eb;border-radius:.9rem;padding:.55rem .75rem}
-  .field input,.field select{border:0;background:transparent;outline:none;font:inherit;color:inherit;padding:.3rem .25rem}
-  .panel{background:var(--card);border:1px solid var(--ring);border-radius:14px;padding:1rem;box-shadow:0 10px 28px rgba(0,0,0,.08)}
-  .muted{color:#4b5563}
-  progress{width:100%}
-
-  .grid{display:grid;gap:1rem;grid-template-columns:1fr 1fr;align-items:start;margin:1rem 0 2rem}
-  @media (max-width:980px){.grid{grid-template-columns:1fr}}
-  canvas{width:100%;background:#fff;border-radius:12px;border:1px solid #e5e7eb}
-  .chip{display:inline-flex;align-items:center;gap:.45rem;padding:.3rem .6rem;border-radius:.8rem;border:1px solid #e5e7eb;background:#fff}
-  .swatch{width:18px;height:18px;border-radius:50%;border:1px solid #d1d5db}
-  .info{text-align:center;color:#111827;opacity:.9;margin:1.2rem 0 2.2rem}
+  .byline{ margin-top:.5rem; font-weight:800; color:#0b1020; display:inline-block; padding:.35rem .7rem; border-radius:.7rem;
+           background:linear-gradient(90deg, rgba(16,185,129,.18), rgba(59,130,246,.18), rgba(253,224,71,.18));
+           box-shadow:0 6px 22px rgba(16,185,129,.14), 0 4px 16px rgba(59,130,246,.12) }
+  .shiny{ position:relative; width:100%; border-radius:18px; padding:1.2rem;
+          background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(255,255,255,.90));
+          border:1px solid rgba(255,255,255,.7); box-shadow:0 24px 60px rgba(59,130,246,.28),0 16px 40px rgba(16,185,129,.24),inset 0 1px 0 rgba(255,255,255,.7);
+          backdrop-filter:blur(12px); overflow:hidden; text-align:center }
+  .row{ display:flex; gap:.9rem; align-items:center; flex-wrap:wrap; justify-content:center }
+  .btn{ background:var(--grad); color:#073b2b; border:0; padding:.9rem 1.2rem; border-radius:1rem; font-weight:900; cursor:pointer;
+        box-shadow:0 8px 22px rgba(16,185,129,.22), 0 4px 14px rgba(59,130,246,.14); font-size:1.02rem }
+  .btn.ghost{ background:linear-gradient(135deg, rgba(16,185,129,.12), rgba(59,130,246,.12)); color:#0b1020; border:1px solid var(--ring) }
+  .field{ display:flex; align-items:center; gap:.55rem; background:#f8fafc; border:1px solid #e5e7eb; border-radius:.9rem; padding:.55rem .75rem }
+  .muted{ color:#4b5563 }
+  .panel{ background:var(--card); border:1px solid var(--ring); border-radius:14px; padding:1rem; box-shadow:0 10px 28px rgba(0,0,0,.08); margin-top:1rem }
+  progress{ width:100% }
+  .list{ text-align:left; margin:.6rem auto 0; max-width:720px }
+  .tag{ display:inline-block; margin:.15rem .25rem; padding:.25rem .5rem; border-radius:.6rem; border:1px solid #e5e7eb; background:#fff; font-size:.9rem }
+  .info{ text-align:center; color:#111827; opacity:.9; margin:1.2rem 0 2.2rem }
 </style>
 </head>
 <body>
@@ -68,421 +62,356 @@
 
   <main class="wrap">
     <section class="shiny">
-      <div style="font-weight:900; font-size:1.15rem">Remove background watermarks (client‑side)</div>
-      <div class="muted" style="margin-top:.15rem">Preview on page 1, tweak, then Clean → PDF for all pages.</div>
-
+      <div style="font-weight:900; font-size:1.15rem">Lossless background watermark removal</div>
+      <div class="muted" style="margin-top:.15rem">No DPI change • No rasterization • Pages stay vector and text. Only watermark objects are removed.</div>
       <div class="row" style="margin-top:.8rem">
         <button class="btn" id="pick">Choose PDF</button>
-        <button class="btn ghost" id="previewBtn" disabled>Preview clean (page 1)</button>
-        <button class="btn ghost" id="convert" disabled>Clean → PDF</button>
-        <a id="download" class="btn ghost" download="cleaned.pdf" href="#" aria-disabled="true">Download PDF</a>
+        <button class="btn ghost" id="scan" disabled>Scan watermarks</button>
+        <button class="btn ghost" id="clean" disabled>Remove and download</button>
+        <a id="download" class="btn ghost" download="cleaned.pdf" href="#" aria-disabled="true">Download</a>
       </div>
-
-      <div class="row" style="margin-top:.8rem">
-        <div class="field">
-          <label>Quality</label>
-          <select id="dpi">
-            <option value="120">Balanced (120 DPI)</option>
-            <option value="150" selected>Sharp (150 DPI)</option>
-            <option value="200">Extra (200 DPI)</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label>Mode</label>
-          <select id="mode">
-            <option value="auto" selected>Auto Gray (light/low‑sat → white)</option>
-            <option value="color">Color Target (click original)</option>
-          </select>
-        </div>
-
-        <div class="field" id="colorBox" style="display:none">
-          <span>Target</span>
-          <span class="chip"><span class="swatch" id="swatch"></span><span id="rgbText">—</span></span>
-          <span class="muted">Click the Original preview to sample</span>
-        </div>
-
-        <div class="field">
-          <label>Strength</label>
-          <input id="strength" type="range" min="0" max="1" step="0.02" value="0.85">
-        </div>
-
-        <div class="field" id="tolBox" style="display:none">
-          <label>Tolerance</label>
-          <input id="tol" type="range" min="6" max="90" step="1" value="28">
-        </div>
-
-        <div class="field"><label><input id="protectInk" type="checkbox" checked> Protect dark text/lines</label></div>
-        <div class="field"><label>Text boost</label><input id="boost" type="range" min="0" max="0.35" step="0.01" value="0.08"></div>
-      </div>
-
       <input id="file" type="file" accept="application/pdf" hidden>
-      <div style="margin-top:.8rem" class="panel">
+      <div class="panel">
         <progress id="prog" value="0" max="100" hidden></progress>
         <div id="note" class="muted" style="margin-top:.35rem; min-height:1.2em"></div>
+        <div id="findings" class="list"></div>
       </div>
     </section>
 
-    <section class="grid">
-      <div class="panel">
-        <h3 style="margin:.2rem 0 .6rem">Original (page 1) — click to pick color</h3>
-        <canvas id="src" width="1024" height="768"></canvas>
-      </div>
-      <div class="panel">
-        <h3 style="margin:.2rem 0 .6rem">Cleaned preview</h3>
-        <canvas id="dst" width="1024" height="768"></canvas>
+    <section class="panel">
+      <div style="font-weight:800; margin-bottom:.4rem">What this tool removes (losslessly)</div>
+      <div class="muted">
+        - Watermark/stamp annotations<br>
+        - Optional Content Groups (layers) whose names suggest watermarks (e.g., “Watermark”, “DRAFT”, “CONFIDENTIAL”, “Background”) — removed or hidden<br>
+        - Marked-content blocks tagged with /OC … BDC … EMC that reference those layers<br>
+        If a PDF has the watermark burned into images, lossless removal is not possible anywhere without re-making those images.
       </div>
     </section>
 
     <div class="info">© <span id="year"></span> Made by ANABRATA</div>
   </main>
 
-  <!-- pdf.js (UMD) -->
-  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
-  <script>
-    window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
-  </script>
-  <!-- jsPDF to rebuild PDF -->
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <!-- pdf-lib for lossless edits -->
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <!-- pako for Flate streams (inflate/deflate) -->
+  <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
 
 <script>
 document.getElementById('year').textContent = new Date().getFullYear();
 
 const pickBtn = document.getElementById('pick');
-const fileIn  = document.getElementById('file');
-const previewBtn = document.getElementById('previewBtn');
-const convertBtn = document.getElementById('convert');
-const downloadA  = document.getElementById('download');
+const scanBtn = document.getElementById('scan');
+const cleanBtn = document.getElementById('clean');
+const downloadA = document.getElementById('download');
+const fileIn = document.getElementById('file');
 const note = document.getElementById('note');
 const prog = document.getElementById('prog');
+const findingsBox = document.getElementById('findings');
 
-const src = document.getElementById('src');
-const dst = document.getElementById('dst');
-const sctx = src.getContext('2d');
-const dctx = dst.getContext('2d');
-
-const dpiSel = document.getElementById('dpi');
-const modeSel = document.getElementById('mode');
-const strengthRange = document.getElementById('strength');
-const protectInkChk = document.getElementById('protectInk');
-const tolRange = document.getElementById('tol');
-const tolBox = document.getElementById('tolBox');
-const colorBox = document.getElementById('colorBox');
-const swatch = document.getElementById('swatch');
-const rgbText = document.getElementById('rgbText');
-const boostRange = document.getElementById('boost');
-
-let pdfFile = null;
-let pdfDoc = null;
-let firstPageInfo = null;
-let targetColor = {r: 180, g: 180, b: 180};
+let pdfBytes = null;
+let lastScan = null;
 
 pickBtn.onclick = () => fileIn.click();
 fileIn.onchange = async () => {
   if (!fileIn.files || !fileIn.files[0]) return;
-  pdfFile = fileIn.files[0];
-  previewBtn.disabled = false;
-  convertBtn.disabled = false;
+  pdfBytes = new Uint8Array(await fileIn.files[0].arrayBuffer());
+  scanBtn.disabled = false;
+  cleanBtn.disabled = false;
   downloadA.setAttribute('aria-disabled','true'); downloadA.removeAttribute('href');
-  note.textContent = `Selected: ${pdfFile.name}`;
-  await loadPdfAndRenderFirst();
+  note.textContent = `Selected: ${fileIn.files[0].name}`;
+  findingsBox.innerHTML = '';
 };
 
-modeSel.onchange = () => {
-  const isColor = modeSel.value === 'color';
-  tolBox.style.display = isColor ? '' : 'none';
-  colorBox.style.display = isColor ? '' : 'none';
-};
-modeSel.dispatchEvent(new Event('change'));
+const NAME_HINTS = ['watermark','draft','confidential','sample','background','bg','test','do not copy'];
 
-src.addEventListener('click', (e) => {
-  if (modeSel.value !== 'color') return;
-  const rect = src.getBoundingClientRect();
-  const x = Math.floor((e.clientX - rect.left) * (src.width / rect.width));
-  const y = Math.floor((e.clientY - rect.top)  * (src.height / rect.height));
-  const data = sctx.getImageData(x, y, 1, 1).data;
-  targetColor = { r: data[0], g: data[1], b: data[2] };
-  swatch.style.background = `rgb(${targetColor.r},${targetColor.g},${targetColor.b})`;
-  rgbText.textContent = `rgb(${targetColor.r},${targetColor.g},${targetColor.b})`;
-  if (firstPageInfo) runPreviewClean(firstPageInfo.canvas);
-});
-
-previewBtn.onclick = async () => {
-  if (!firstPageInfo) await loadPdfAndRenderFirst();
-  if (firstPageInfo) runPreviewClean(firstPageInfo.canvas);
-};
-
-convertBtn.onclick = async () => {
-  if (!pdfFile){ note.textContent = "Choose a PDF first."; return; }
+scanBtn.onclick = async () => {
   try{
-    note.textContent = "Loading PDF…";
-    prog.hidden = false; prog.value = 5;
+    requirePDF();
+    prog.hidden = false; prog.value = 8; note.textContent = "Loading and scanning…";
+    const { PDFDocument, PDFName, PDFDict, PDFArray } = PDFLib;
+    const doc = await PDFDocument.load(pdfBytes, { updateMetadata:false, ignoreEncryption: false });
+    const ctx = doc.context;
+    const cat = doc.catalog.dict;
 
-    const arrayBuf = await pdfFile.arrayBuffer();
-    const loadingTask = window.pdfjsLib.getDocument({ data: arrayBuf });
-    pdfDoc = await loadingTask.promise;
-
-    const dpi = parseInt(dpiSel.value, 10);
-    const total = pdfDoc.numPages;
-    const pages = [];
-    for (let p=1; p<=total; p++){
-      note.textContent = `Rendering page ${p}/${total}…`;
-      prog.value = Math.round(5 + (p/total)*40);
-      pages.push(await renderPageToCanvas(pdfDoc, p, dpi));
+    let ocPropsRef = cat.get(PDFName.of('OCProperties'));
+    let ocgNames = [];
+    let ocgRefs = [];
+    if (ocPropsRef){
+      const ocProps = ctx.lookup(ocPropsRef, PDFDict);
+      const ocgsArr = ctx.lookup(ocProps.get(PDFName.of('OCGs')), PDFArray);
+      for (let i=0;i<ocgsArr.size();i++){
+        const ref = ocgsArr.get(i);
+        const odict = ctx.lookup(ref, PDFDict);
+        const nm = odict.get(PDFName.of('Name'));
+        const name = nm ? String(nm.decodeText ? nm.decodeText() : nm.toString()).replace(/^\/?/,'') : '(unnamed)';
+        ocgNames.push(name);
+        ocgRefs.push({ ref, name });
+      }
     }
 
-    note.textContent = "Cleaning pages…";
-    prog.value = 50;
-
-    const cleaned = [];
-    for (let i=0; i<pages.length; i++){
-      const { canvas, widthInches, heightInches } = pages[i];
-      const outCanvas = await cleanCanvas(canvas); // FIX: no name shadowing
-      cleaned.push({ canvas: outCanvas, widthInches, heightInches });
-      prog.value = Math.round(50 + ((i+1)/pages.length)*40);
+    // Scan annotations that look like watermarks/stamps
+    const pages = doc.getPages();
+    let annotCount = 0;
+    for (const p of pages){
+      const annotsRef = p.node.get(PDFName.of('Annots'));
+      if (!annotsRef) continue;
+      const arr = ctx.lookup(annotsRef, PDFArray);
+      for (let i=0;i<arr.size();i++){
+        const aref = arr.get(i);
+        const adict = ctx.lookup(aref, PDFDict);
+        const subtype = adict.get(PDFName.of('Subtype'));
+        const nm = adict.get(PDFName.of('NM')) || adict.get(PDFName.of('Name')) || adict.get(PDFName.of('T'));
+        const label = nm ? String(nm.toString()).toLowerCase() : '';
+        const kind = subtype ? String(subtype.toString()) : '';
+        if (kind === '/Watermark' || kind === '/Stamp' || NAME_HINTS.some(h=>label.includes(h))){
+          annotCount++;
+        }
+      }
     }
 
-    note.textContent = "Building PDF…";
-    prog.value = 92;
+    // Guess candidates
+    const likely = ocgRefs.filter(o => NAME_HINTS.some(h => o.name.toLowerCase().includes(h)));
+    lastScan = { ocgRefs, likely, annotCount };
 
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit:'in', format: [cleaned[0].widthInches, cleaned[0].heightInches] });
-    for (let i=0; i<cleaned.length; i++){
-      if (i>0) doc.addPage([cleaned[i].widthInches, cleaned[i].heightInches], cleaned[i].widthInches >= cleaned[i].heightInches ? 'landscape':'portrait');
-      const dataUrl = cleaned[i].canvas.toDataURL('image/jpeg', 0.92);
-      doc.addImage(dataUrl, 'JPEG', 0, 0, cleaned[i].widthInches, cleaned[i].heightInches);
+    findingsBox.innerHTML = '';
+    if (ocgRefs.length){
+      addFinding(`Layers found: ${ocgRefs.length}`);
+      ocgRefs.forEach(o => addTag(o.name));
+    } else {
+      addFinding('No layers (OCGs) found in catalog.');
     }
-    const blob = doc.output('blob');
+    if (likely.length){
+      addFinding(`Likely watermark layers:`);
+      likely.forEach(o => addTag(o.name));
+    }
+    if (annotCount){
+      addFinding(`Watermark/Stamp annotations detected: ${annotCount}`);
+    }
+    if (!ocgRefs.length && !annotCount){
+      addFinding('Nothing obvious to remove losslessly. If the watermark is baked into images, lossless removal is not possible.');
+    }
+    prog.value = 100; setTimeout(()=>prog.hidden=true, 300);
+    note.textContent = "Scan complete. Click “Remove and download”.";
+  } catch(e){
+    console.error(e);
+    prog.hidden = true;
+    note.textContent = "Scan failed: " + (e?.message || e);
+  }
+};
+
+cleanBtn.onclick = async () => {
+  try{
+    requirePDF();
+    prog.hidden = false; prog.value = 10; note.textContent = "Cleaning (lossless)…";
+
+    const cleaned = await losslessRemoveWatermark(pdfBytes, lastScan);
+    const blob = new Blob([cleaned], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
     downloadA.href = url;
     downloadA.setAttribute('aria-disabled','false');
-
-    prog.value = 100; note.textContent = "Done. Download your cleaned PDF.";
-  } catch(err){
-    console.error(err);
-    note.textContent = "Conversion failed: " + (err?.message || err);
-  } finally {
+    prog.value = 100; setTimeout(()=>prog.hidden=true, 300);
+    note.textContent = "Done. Download your cleaned PDF.";
+  } catch(e){
+    console.error(e);
     prog.hidden = true;
+    note.textContent = "Cleaning failed: " + (e?.message || e);
   }
 };
 
-/* PDF rendering */
-async function loadPdfAndRenderFirst(){
-  try{
-    const arrayBuf = await pdfFile.arrayBuffer();
-    const loadingTask = window.pdfjsLib.getDocument({ data: arrayBuf });
-    pdfDoc = await loadingTask.promise;
-    const dpi = parseInt(dpiSel.value, 10);
+/* Helpers */
+function addFinding(text){ const p=document.createElement('div'); p.className='muted'; p.textContent=text; findingsBox.appendChild(p); }
+function addTag(text){ const s=document.createElement('span'); s.className='tag'; s.textContent=text; findingsBox.appendChild(s); }
+function requirePDF(){ if (!pdfBytes) throw new Error('Choose a PDF first'); }
 
-    firstPageInfo = await renderPageToCanvas(pdfDoc, 1, dpi);
-    fitToCanvases(firstPageInfo.canvas);
-    note.textContent = "Page 1 ready. Adjust settings and click Preview/Clean.";
-  } catch(e){
-    console.error(e);
-    note.textContent = "Failed to load PDF: " + (e?.message || e);
-  }
-}
+/* Core lossless cleaning */
+async function losslessRemoveWatermark(inputBytes, scan){
+  const { PDFDocument, PDFName, PDFDict, PDFArray, PDFRawStream } = PDFLib;
+  const doc = await PDFDocument.load(inputBytes, { updateMetadata:false, ignoreEncryption:false });
+  const ctx = doc.context;
+  const cat = doc.catalog.dict;
 
-async function renderPageToCanvas(pdf, pageNum, dpi){
-  const page = await pdf.getPage(pageNum);
-  const [x0, y0, x1, y1] = page.view; // points
-  const widthInches  = (x1 - x0) / 72;
-  const heightInches = (y1 - y0) / 72;
-
-  const scale = dpi / 96; // pdf.js baseline 96 css px/in
-  const viewport = page.getViewport({ scale });
-
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d', { willReadFrequently:false });
-  canvas.width = Math.ceil(viewport.width);
-  canvas.height = Math.ceil(viewport.height);
-  await page.render({ canvasContext: ctx, viewport, intent:'print' }).promise;
-  page.cleanup?.();
-  return { canvas, widthInches, heightInches };
-}
-
-function fitToCanvases(pageCanvas){
-  [src, dst].forEach(c => { c.width = pageCanvas.width; c.height = pageCanvas.height; });
-  sctx.drawImage(pageCanvas, 0, 0);
-  dctx.drawImage(pageCanvas, 0, 0);
-}
-
-function runPreviewClean(pageCanvas){
-  cleanCanvas(pageCanvas).then(out => {
-    dctx.clearRect(0,0,dst.width,dst.height);
-    dctx.drawImage(out, 0, 0);
-  });
-}
-
-/* Cleaning pipeline (edge‑aware) */
-async function cleanCanvas(inCanvas){
-  const w = inCanvas.width, h = inCanvas.height;
-  const ctx = inCanvas.getContext('2d');
-  const srcData = ctx.getImageData(0,0,w,h);
-  const out = new ImageData(w, h);
-
-  // Edge map from lightly blurred luminance (reduces noise)
-  const blurred = boxBlur(srcData, w, h, 1);
-  const edges = sobelEdges(blurred, w, h); // 0..1
-
-  const mode = modeSel.value;
-  const k = parseFloat(strengthRange.value);
-  const tol = parseInt(tolRange.value, 10);
-  const protectInk = protectInkChk.checked;
-  const boost = parseFloat(boostRange.value);
-
-  if (mode === 'auto'){
-    autoGrayCleanEdgeAware(srcData, out, edges, k, protectInk, boost);
-  } else {
-    colorTargetCleanEdgeAware(srcData, out, edges, targetColor, tol, k, protectInk, boost);
-  }
-
-  const c = document.createElement('canvas');
-  c.width = w; c.height = h;
-  c.getContext('2d').putImageData(out, 0, 0);
-  return c;
-}
-
-/* Algorithms */
-function clamp(x,a,b){ return x<a?a:(x>b?b:x); }
-
-function rgb2hsl(r,g,b){
-  r/=255; g/=255; b/=255;
-  const max=Math.max(r,g,b), min=Math.min(r,g,b);
-  let h,s,l=(max+min)/2;
-  if(max===min){ h=s=0 }
-  else{
-    const d=max-min;
-    s=l>0.5? d/(2-max-min) : d/(max+min);
-    switch(max){
-      case r: h=(g-b)/d + (g<b?6:0); break;
-      case g: h=(b-r)/d + 2; break;
-      case b: h=(r-g)/d + 4; break;
-    } h/=6;
-  }
-  return {h,s,l};
-}
-
-function boxBlur(img, w, h, r){
-  const s = img.data;
-  const t = new Uint8ClampedArray(s.length);
-  const o = new Uint8ClampedArray(s.length);
-
-  // horiz
-  for (let y=0; y<h; y++){
-    let R=0,G=0,B=0,A=0;
-    const row = y*w*4;
-    for (let dx=-r; dx<=r; dx++){
-      const x = (dx<0?0:(dx>=w?w-1:dx))*4 + row;
-      R+=s[x]; G+=s[x+1]; B+=s[x+2]; A+=s[x+3];
+  // 1) Remove Watermark/Stamp annotations
+  let removedAnnots = 0;
+  for (const page of doc.getPages()){
+    const annotsRef = page.node.get(PDFName.of('Annots'));
+    if (!annotsRef) continue;
+    const arr = ctx.lookup(annotsRef, PDFArray);
+    const kept = [];
+    for (let i=0;i<arr.size();i++){
+      const aref = arr.get(i);
+      const adict = ctx.lookup(aref, PDFDict);
+      const subtype = adict.get(PDFName.of('Subtype'));
+      const nm = adict.get(PDFName.of('NM')) || adict.get(PDFName.of('Name')) || adict.get(PDFName.of('T'));
+      const label = nm ? String(nm.toString()).toLowerCase() : '';
+      const kind = subtype ? String(subtype.toString()) : '';
+      const looksWM = (kind === '/Watermark') || (kind === '/Stamp') || NAME_HINTS.some(h=>label.includes(h));
+      if (looksWM){ removedAnnots++; continue; }
+      kept.push(aref);
     }
-    for (let x=0; x<w; x++){
-      const i = row + x*4, outN=2*r+1;
-      t[i]=R/outN; t[i+1]=G/outN; t[i+2]=B/outN; t[i+3]=A/outN;
-      const xOut = (x-r<0?0:x-r)*4 + row;
-      const xIn  = (x+r+1>=w?w-1:x+r+1)*4 + row;
-      R += s[xIn]-s[xOut]; G += s[xIn+1]-s[xOut+1]; B += s[xIn+2]-s[xOut+2]; A += s[xIn+3]-s[xOut+3];
+    if (kept.length !== arr.size()){
+      const newArr = PDFArray.withContext(ctx);
+      kept.forEach(r => newArr.push(r));
+      page.node.set(PDFName.of('Annots'), newArr);
     }
   }
-  // vert
-  for (let x=0; x<w; x++){
-    let R=0,G=0,B=0,A=0;
-    const col = x*4;
-    for (let dy=-r; dy<=r; dy++){
-      const y = (dy<0?0:(dy>=h?h-1:dy))*w*4 + col;
-      R+=t[y]; G+=t[y+1]; B+=t[y+2]; A+=t[y+3];
+
+  // 2) Gather OCG layer names we plan to remove/hide
+  let ocPropsRef = cat.get(PDFName.of('OCProperties'));
+  const toRemoveNames = new Set();
+  if (ocPropsRef){
+    const ocProps = ctx.lookup(ocPropsRef, PDFDict);
+    const ocgsArr = ctx.lookup(ocProps.get(PDFName.of('OCGs')), PDFArray);
+    for (let i=0;i<ocgsArr.size();i++){
+      const ref = ocgsArr.get(i);
+      const odict = ctx.lookup(ref, PDFDict);
+      const nm = odict.get(PDFName.of('Name'));
+      const name = nm ? String(nm.decodeText ? nm.decodeText() : nm.toString()).replace(/^\/?/,'') : '';
+      if (NAME_HINTS.some(h=>name.toLowerCase().includes(h))) toRemoveNames.add(name);
     }
-    for (let y=0; y<h; y++){
-      const i = y*w*4 + col, outN=2*r+1;
-      o[i]=R/outN; o[i+1]=G/outN; o[i+2]=B/outN; o[i+3]=A/outN;
-      const yOut = (y-r<0?0:y-r)*w*4 + col;
-      const yIn  = (y+r+1>=h?h-1:y+r+1)*w*4 + col;
-      R += t[yIn]-t[yOut]; G += t[yIn+1]-t[yOut+1]; B += t[yIn+2]-t[yOut+2]; A += t[yIn+3]-t[yOut+3];
+
+    // Also update default config to turn off these layers
+    const D = ocProps.get(PDFName.of('D'));
+    if (D){
+      const dDict = ctx.lookup(D, PDFDict);
+      const offArr = dDict.get(PDFName.of('OFF')) ? ctx.lookup(dDict.get(PDFName.of('OFF')), PDFArray) : PDFArray.withContext(ctx);
+      // push all matching OCG refs into OFF
+      for (let i=0;i<ocgsArr.size();i++){
+        const ref = ocgsArr.get(i);
+        const odict = ctx.lookup(ref, PDFDict);
+        const nm = odict.get(PDFName.of('Name'));
+        const name = nm ? String(nm.decodeText ? nm.decodeText() : nm.toString()).replace(/^\/?/,'') : '';
+        if (toRemoveNames.has(name)) offArr.push(ref);
+      }
+      dDict.set(PDFName.of('OFF'), offArr);
+      ocProps.set(PDFName.of('D'), dDict);
+      cat.set(PDFName.of('OCProperties'), ocProps);
     }
   }
-  const out = new ImageData(w,h);
-  out.data.set(o);
-  return out;
+
+  // 3) Remove marked-content blocks tagged /OC that reference these OCG names
+  if (toRemoveNames.size){
+    for (const page of doc.getPages()){
+      const contentsRef = page.node.get(PDFName.of('Contents'));
+      if (!contentsRef) continue;
+
+      // Normalize to array
+      const contentRefs = contentsRef instanceof PDFArray ? contentsRef : (() => { const a=PDFArray.withContext(ctx); a.push(contentsRef); return a; })();
+
+      const newStreams = PDFArray.withContext(ctx);
+
+      for (let ci=0; ci<contentRefs.size(); ci++){
+        const sref = contentRefs.get(ci);
+        const stream = ctx.lookup(sref, PDFRawStream);
+        const dict = stream.dict;
+        const filter = dict.get(PDFName.of('Filter'));
+        const raw = stream.getContents();
+
+        // Inflate if FlateDecode
+        let bytes = raw;
+        const fName = filter && String(filter.toString());
+        if (fName === '/FlateDecode'){
+          bytes = pako.inflate(raw);
+        }
+
+        // Decode to string
+        const srcStr = new TextDecoder('latin1').decode(bytes);
+
+        // Remove any /OC … BDC … EMC blocks that reference a targeted OCG name in Properties map
+        // Strategy:
+        //  - Find Properties (Resources/Properties) mapping like /OC1 << /Type /OCG /Name (WATERMARK) >>
+        //  - Build map of property name -> OCG name
+        //  - Strip content between "/OC /OC1 BDC" ... "EMC" when mapped OCG name is targeted
+
+        // Build property map from page Resources/Properties where available
+        let propMap = {};
+        const resRef = page.node.get(PDFName.of('Resources'));
+        if (resRef){
+          const res = ctx.lookup(resRef, PDFDict);
+          const propsRef = res.get(PDFName.of('Properties'));
+          if (propsRef){
+            const props = ctx.lookup(propsRef, PDFDict);
+            props.keys().forEach(k => {
+              const key = String(k);
+              const pRef = props.get(k);
+              const pDict = ctx.lookup(pRef, PDFDict);
+              const maybeType = pDict.get(PDFName.of('Type'));
+              const isOCG = maybeType && String(maybeType.toString()) === '/OCG';
+              const nm = pDict.get(PDFName.of('Name'));
+              const nmStr = nm ? String(nm.decodeText ? nm.decodeText() : nm.toString()).replace(/^\/?/,'') : '';
+              if (isOCG && nmStr) propMap[key] = nmStr;
+            });
+          }
+        }
+
+        // Parser to remove targeted BDC/EMC blocks
+        const stripped = stripOCBlocks(srcStr, propMap, toRemoveNames);
+
+        // Re-encode and (re)compress if needed
+        let outBytes = new TextEncoder().encode(stripped);
+        let outFilter = filter;
+        if (fName === '/FlateDecode'){
+          outBytes = pako.deflate(outBytes);
+          outFilter = PDFName.of('FlateDecode');
+        }
+
+        // Create new stream
+        const newDict = dict.clone(ctx);
+        newDict.set(PDFName.of('Length'), ctx.obj(outBytes.length));
+        if (outFilter) newDict.set(PDFName.of('Filter'), outFilter);
+        else newDict.delete(PDFName.of('Filter'));
+        const newStream = ctx.flateStream ? ctx.flateStream(outBytes, newDict) : ctx.register(new PDFRawStream(newDict, outBytes));
+        newStreams.push(newStream);
+      }
+
+      // Replace contents
+      page.node.set(PDFName.of('Contents'), newStreams);
+    }
+  }
+
+  // Save unchanged quality
+  return await doc.save({ useObjectStreams: true, addDefaultPage: false, updateFieldAppearances: false });
 }
 
-function sobelEdges(img, w, h){
-  const a = img.data;
-  const out = new Float32Array(w*h);
-  const gxK = [-1,0,1,-2,0,2,-1,0,1];
-  const gyK = [-1,-2,-1,0,0,0,1,2,1];
-  function lum(i){ return (a[i]*0.299 + a[i+1]*0.587 + a[i+2]*0.114); }
-  for (let y=1; y<h-1; y++){
-    for (let x=1; x<w-1; x++){
-      let gx=0, gy=0, k=0;
-      for (let j=-1; j<=1; j++){
-        for (let i=-1; i<=1; i++){
-          const idx = ((y+j)*w + (x+i))*4;
-          const L = lum(idx);
-          gx += L * gxK[k]; gy += L * gyK[k]; k++;
+/* Strip /OC ... BDC ... EMC for targeted OCGs */
+function stripOCBlocks(src, propMap, toRemoveNames){
+  // Recognize forms:
+  //   /OC /OC1 BDC .... EMC
+  //   /OC << /OCGs [..] /Name /Watermark ... >> BDC ... EMC  (rare)
+  // We use a conservative parser scanning tokens; remove only when property name resolves to targeted OCG.
+  const tokens = src.split(/(\s+)/); // keep whitespace as tokens to preserve spacing
+  const out = [];
+  let i=0;
+  while (i<tokens.length){
+    // look for "/OC", ws, "/OCkey", ws, "BDC"
+    if (tokens[i] === '/OC'){
+      // peek ahead for property name then BDC
+      const j = i+2; // skip optional whitespace handled by split keeping spaces
+      const maybeName = tokens[i+2] || '';
+      const maybeBDC = tokens[i+4] || '';
+      if (maybeName.startsWith('/') && maybeBDC.trim() === 'BDC'){
+        const propName = maybeName; // e.g. /OC1
+        const ocgName = propMap[propName];
+        if (ocgName && toRemoveNames.has(ocgName)){
+          // skip until matching EMC (balanced nested BDC/EMC)
+          let depth = 0;
+          i += 5; // move past BDC
+          while (i<tokens.length){
+            const tk = tokens[i].trim();
+            if (tk === 'BDC') depth++;
+            if (tk === 'EMC'){
+              if (depth===0){ i++; break; }
+              depth--;
+            }
+            i++;
+          }
+          continue; // removed block
         }
       }
-      out[y*w + x] = clamp(Math.hypot(gx, gy)/255, 0, 1);
     }
+    out.push(tokens[i]);
+    i++;
   }
-  // gentle normalization
-  for (let i=0;i<out.length;i++) out[i] = Math.min(1, out[i]*1.2);
-  return out;
-}
-
-function autoGrayCleanEdgeAware(src, out, edges, k, protectInk, boost){
-  const s = src.data, d = out.data;
-  for (let p=0, i=0; p<edges.length; p++, i+=4){
-    let r=s[i], g=s[i+1], b=s[i+2], a=s[i+3];
-    const {s:sat,l} = rgb2hsl(r,g,b);
-    const e = edges[p]; // 0..1
-    const isInk = (l < 0.45) || (r+g+b < 360) || e>0.35;
-
-    // lift only light, low-sat pixels; reduce near edges to avoid halos
-    if (!(protectInk && isInk) && sat < 0.32 && l > 0.55){
-      const kk = k * (1 - 0.75*e);
-      r = r + kk*(255 - r);
-      g = g + kk*(255 - g);
-      b = b + kk*(255 - b);
-    }
-
-    // optional text boost on dark/edge areas
-    if (boost>0 && isInk){
-      const m = clamp(0.6*(1-l) + 0.4*e, 0, 1) * boost;
-      r = r*(1-m); g = g*(1-m); b = b*(1-m);
-    }
-
-    d[i]=r|0; d[i+1]=g|0; d[i+2]=b|0; d[i+3]=a;
-  }
-}
-
-function colorTargetCleanEdgeAware(src, out, edges, tgt, tol, k, protectInk, boost){
-  const s = src.data, d = out.data;
-  const tr=tgt.r, tg=tgt.g, tb=tgt.b;
-  const tol2 = tol*tol;
-  for (let p=0, i=0; p<edges.length; p++, i+=4){
-    let r=s[i], g=s[i+1], b=s[i+2], a=s[i+3];
-    const {l} = rgb2hsl(r,g,b);
-    const e = edges[p];
-    const isInk = (l < 0.45) || (r+g+b < 360) || e>0.35;
-
-    const dr=r-tr, dg=g-tg, db=b-tb;
-    const dist2 = dr*dr + dg*dg + db*db;
-
-    if (!(protectInk && isInk) && dist2 <= tol2){
-      const closeness = 1 - Math.sqrt(dist2)/tol;            // 1 near color, 0 at edge of tol
-      const kk = k * closeness * (1 - 0.75*e);               // less near edges
-      r = r + kk*(255 - r);
-      g = g + kk*(255 - g);
-      b = b + kk*(255 - b);
-    }
-
-    if (boost>0 && isInk){
-      const m = clamp(0.6*(1-l) + 0.4*e, 0, 1) * boost;
-      r = r*(1-m); g = g*(1-m); b = b*(1-m);
-    }
-
-    d[i]=r|0; d[i+1]=g|0; d[i+2]=b|0; d[i+3]=a;
-  }
+  return out.join('');
 }
 </script>
 </body>
