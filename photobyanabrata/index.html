@@ -22,10 +22,7 @@
       linear-gradient(120deg, #e8fdf6, #eef4ff 40%, #fffbe6 80%, #ffffff);
     background-size:140% 140%; animation:bgShift 18s ease-in-out infinite alternate;
   }
-  @keyframes bgShift{
-    0%{ background-position:0% 0%, 100% 0%, 50% 100%, 0% 0% }
-    100%{ background-position:50% 30%, 50% 20%, 60% 70%, 100% 100% }
-  }
+  @keyframes bgShift{ 0%{background-position:0% 0%, 100% 0%, 50% 100%, 0% 0%} 100%{background-position:50% 30%, 50% 20%, 60% 70%, 100% 100%} }
   .wrap{ width:min(1120px,94%); margin:0 auto; }
 
   /* Hero with slower FADE welcome */
@@ -39,12 +36,7 @@
     animation: fadeInOut 8s ease-in-out infinite, hue 14s linear infinite;
   }
   @keyframes hue{ 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
-  @keyframes fadeInOut{
-    0%   { opacity: 0 }
-    18%  { opacity: 1 }
-    82%  { opacity: 1 }
-    100% { opacity: 0 }
-  }
+  @keyframes fadeInOut{ 0%{opacity:0} 18%{opacity:1} 82%{opacity:1} 100%{opacity:0} }
   .byline{
     margin-top:.6rem; font-weight:800; color:#0b1020; display:inline-block; padding:.4rem .8rem; border-radius:.7rem;
     background:linear-gradient(90deg, rgba(16,185,129,.18), rgba(59,130,246,.18), rgba(253,224,71,.18));
@@ -85,7 +77,9 @@
   .dz-title{ font-weight:800 }
   .dz-sub{ color:var(--muted); font-size:.95rem }
   .dz-actions{ margin-top:.7rem; display:flex; gap:.6rem; justify-content:center; flex-wrap:wrap }
-  #files{ display:none } /* hidden; chooseBtn triggers it */
+  #file{ display:none } /* hidden; Choose button opens it */
+  .thumb{ margin-top:.7rem; display:flex; gap:.6rem; align-items:center; justify-content:center }
+  .thumb img{ width:84px; height:63px; object-fit:cover; border-radius:.5rem; border:1px solid #e5e7eb; background:#fff }
 
   /* Layout */
   .grid{ display:grid; gap:1rem; grid-template-columns:1.2fr .8fr; align-items:start; margin:1rem 0 2rem }
@@ -115,23 +109,27 @@
       </div>
 
       <div class="controls">
-        <!-- Dropzone -->
+        <!-- Dropzone (single photo + live preview) -->
         <div class="dropzone" id="dropzone">
           <div>
-            <div class="dz-title">Choose your photos</div>
-            <div class="dz-sub">Pick multiple files or select a folder. Every tile prints at 4 × 3 cm.</div>
+            <div class="dz-title">Choose one photo</div>
+            <div class="dz-sub">We’ll duplicate it into a 4 × 3 cm grid on A4.</div>
             <div class="dz-actions">
-              <button class="btn" id="chooseBtn" type="button">Choose files / folder</button>
+              <button class="btn" id="chooseBtn" type="button">Choose photo</button>
               <button class="btn ghost" id="arrange" type="button">Arrange → PDF</button>
               <a id="downloadPdf" class="btn ghost" download="photos_a4_4x3cm.pdf" href="#" aria-disabled="true">Download PDF</a>
             </div>
+            <div class="thumb" id="thumb" style="display:none">
+              <img id="thumbImg" alt="Selected photo preview" />
+              <span class="muted" id="fileNote"></span>
+            </div>
           </div>
-          <input id="files" type="file" accept="image/*" multiple webkitdirectory directory />
+          <input id="file" type="file" accept="image/*" />
         </div>
-        <div class="muted" id="fileNote"></div>
 
         <!-- Options -->
         <div class="row">
+          <div class="field"><span>Number of photos</span><input id="copies" type="number" value="24" min="1" step="1"></div>
           <div class="field"><span>Gap (mm)</span><input id="gap" type="number" value="5" step="0.5" min="0"></div>
           <label class="field" style="gap:.5rem"><input id="centerGrid" type="checkbox" checked> <span>Center on page</span></label>
         </div>
@@ -155,10 +153,9 @@
       <div class="card">
         <h3 style="margin:.2rem 0 .8rem">How it works</h3>
         <ul class="muted" style="margin:.2rem 0 0; padding-left:1rem; list-style:disc">
-          <li>Uploads multiple images (or a folder) and places them in order.</li>
-          <li>Every tile is 40 mm wide × 30 mm tall. Images are center‑cropped to fit this size.</li>
-          <li>Rows and columns are computed from the A4 page, 20 mm margins, and the chosen gap.</li>
-          <li>If photos exceed one page, new A4 pages are added automatically.</li>
+          <li>Select one photo; choose how many copies to place.</li>
+          <li>Each tile is 40 mm × 30 mm; images are center‑cropped to fit.</li>
+          <li>Rows/columns are calculated from margins and gap. Extra photos spill to more A4 pages.</li>
         </ul>
       </div>
     </section>
@@ -180,10 +177,14 @@
 
   // Elements
   const $ = id => document.getElementById(id);
-  const filesEl = $('files');
+  const fileEl = $('file');
   const chooseBtn = $('chooseBtn');
   const dz = $('dropzone');
+  const thumb = $('thumb');
+  const thumbImg = $('thumbImg');
   const fileNote = $('fileNote');
+
+  const copiesInput = $('copies');
   const gapInput = $('gap');
   const centerGridInput = $('centerGrid');
 
@@ -195,20 +196,30 @@
   const ctx = canvas.getContext('2d');
 
   // Dropzone interactions
-  chooseBtn.addEventListener('click', () => filesEl.click());
+  chooseBtn.addEventListener('click', () => fileEl.click());
   dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('drag'); });
   dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
   dz.addEventListener('drop', (e) => {
     e.preventDefault(); dz.classList.remove('drag');
-    if (e.dataTransfer.files && e.dataTransfer.files.length){
-      filesEl.files = e.dataTransfer.files;
-      updateFileNote();
+    if (e.dataTransfer.files && e.dataTransfer.files[0]){
+      fileEl.files = e.dataTransfer.files;
+      updateThumb();
     }
   });
-  filesEl.addEventListener('change', updateFileNote);
-  function updateFileNote(){
-    const n = filesEl.files?.length || 0;
-    fileNote.textContent = n ? `${n} file(s) selected` : '';
+  fileEl.addEventListener('change', updateThumb);
+
+  function updateThumb(){
+    if (fileEl.files && fileEl.files[0]){
+      const f = fileEl.files[0];
+      fileNote.textContent = f.name;
+      const url = URL.createObjectURL(f);
+      thumbImg.src = url;
+      thumb.style.display = '';
+    } else {
+      thumb.style.display = 'none';
+      thumbImg.removeAttribute('src');
+      fileNote.textContent = '';
+    }
   }
 
   // Helpers
@@ -236,17 +247,6 @@
 
   function canvasToJpegDataURL(cv, q=0.92){ return cv.toDataURL('image/jpeg', q); }
 
-  async function readAllImages(){
-    const files = Array.from(filesEl.files || []);
-    const images = [];
-    for (const f of files){
-      if (!/^image\//i.test(f.type)) continue;
-      images.push(await blobToImage(f));
-    }
-    return images;
-  }
-
-  // Compute grid for given gap
   function computeGrid(gapMM){
     const availW = PAGE_W_MM - 2*MARGIN_MM;
     const availH = PAGE_H_MM - 2*MARGIN_MM;
@@ -258,7 +258,7 @@
   }
 
   // Preview (first page only)
-  function previewLayout(images, gapMM, centerGrid){
+  async function previewLayout(img, copies, gapMM, centerGrid){
     const pxPerMM = canvas.width / PAGE_W_MM;
     const pageWpx = Math.round(PAGE_W_MM * pxPerMM);
     const pageHpx = Math.round(PAGE_H_MM * pxPerMM);
@@ -272,31 +272,27 @@
     const ox = centerGrid ? Math.round((PAGE_W_MM - gridW) * pxPerMM / 2) : Math.round(MARGIN_MM * pxPerMM);
     const oy = centerGrid ? Math.round((PAGE_H_MM - gridH) * pxPerMM / 2) : Math.round(MARGIN_MM * pxPerMM);
 
-    // White page
+    // White page + margin box
     ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,pageWpx,pageHpx);
-
-    // Margin guide
     const marginPx = Math.round(MARGIN_MM * pxPerMM);
     const availW = pageWpx - 2*marginPx, availH = pageHpx - 2*marginPx;
     ctx.strokeStyle = '#d1d5db'; ctx.lineWidth = 1;
     ctx.strokeRect(marginPx + .5, marginPx + .5, availW - 1, availH - 1);
 
-    // Draw tiles
-    let i = 0, maxOnPage = cols*rows;
-    const count = Math.min(images.length, maxOnPage);
+    // Draw tiles (first page)
+    let i = 0, count = Math.min(copies, cols*rows);
     for (let r=0; r<rows && i<count; r++){
       for (let c=0; c<cols && i<count; c++){
         const x = ox + c * (tileWpx + gapPx);
         const y = oy + r * (tileHpx + gapPx);
-        drawImageCover(ctx, images[i], x, y, tileWpx, tileHpx);
+        drawImageCover(ctx, img, x, y, tileWpx, tileHpx);
         i++;
       }
     }
-    return { cols, rows };
   }
 
   // Build PDF (multi-page)
-  async function buildPdf(images, gapMM, centerGrid){
+  async function buildPdf(img, copies, gapMM, centerGrid){
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit:'mm', format:[PAGE_W_MM, PAGE_H_MM] }); // portrait
 
@@ -305,34 +301,29 @@
     const ox = centerGrid ? Math.max(0, (PAGE_W_MM - gridW) / 2) : MARGIN_MM;
     const oy = centerGrid ? Math.max(0, (PAGE_H_MM - gridH) / 2) : MARGIN_MM;
 
-    // Prepare scaled tiles once per image for quality/perf
+    // Prepare a high-quality tile once (reused)
     const pxPerMM = 10; // ~254 dpi
     const tilePxW = Math.round(TILE_W_MM * pxPerMM);
     const tilePxH = Math.round(TILE_H_MM * pxPerMM);
+    const off = document.createElement('canvas');
+    off.width = tilePxW; off.height = tilePxH;
+    const oc = off.getContext('2d');
+    oc.fillStyle = '#ffffff'; oc.fillRect(0,0,off.width, off.height);
+    drawImageCover(oc, img, 0, 0, off.width, off.height);
+    const tileURL = off.toDataURL('image/jpeg', 0.92);
 
-    function tileURLFromImage(img){
-      const off = document.createElement('canvas');
-      off.width = tilePxW; off.height = tilePxH;
-      const oc = off.getContext('2d');
-      oc.fillStyle = '#ffffff'; oc.fillRect(0,0,off.width, off.height);
-      drawImageCover(oc, img, 0, 0, off.width, off.height);
-      return off.toDataURL('image/jpeg', 0.92);
-    }
-
-    const tiles = await Promise.all(images.map(img => tileURLFromImage(img)));
-
-    let index = 0;
+    let remaining = copies;
     let first = true;
-    while (index < tiles.length){
+    while (remaining > 0){
       if (!first) doc.addPage([PAGE_W_MM, PAGE_H_MM], 'portrait');
       first = false;
 
-      for (let r=0; r<rows && index<tiles.length; r++){
-        for (let c=0; c<cols && index<tiles.length; c++){
+      for (let r=0; r<rows && remaining>0; r++){
+        for (let c=0; c<cols && remaining>0; c++){
           const x = ox + c * (TILE_W_MM + gapMM);
           const y = oy + r * (TILE_H_MM + gapMM);
-          doc.addImage(tiles[index], 'JPEG', x, y, TILE_W_MM, TILE_H_MM);
-          index++;
+          doc.addImage(tileURL, 'JPEG', x, y, TILE_W_MM, TILE_H_MM);
+          remaining--;
         }
       }
     }
@@ -342,20 +333,24 @@
   // Arrange → PDF
   arrangeBtn.onclick = async () => {
     try{
-      note.textContent = "Reading photos…";
+      note.textContent = "Reading photo…";
       prog.hidden = false; prog.value = 8;
 
-      const images = await readAllImages();
-      if (!images.length){ note.textContent = "No photos selected. Choose images or a folder."; prog.hidden = true; return; }
+      if (!fileEl.files || !fileEl.files[0]){
+        note.textContent = "No photo selected. Click ‘Choose photo’ first.";
+        prog.hidden = true; return;
+      }
+      const img = await blobToImage(fileEl.files[0]);
 
+      const copies = Math.max(1, parseInt(copiesInput.value || '1', 10));
       const gapMM  = Math.max(0, parseFloat(gapInput.value || '0'));
       const centerGrid = !!centerGridInput.checked;
 
       prog.value = 35; note.textContent = "Arranging preview…";
-      previewLayout(images, gapMM, centerGrid);
+      await previewLayout(img, copies, gapMM, centerGrid);
 
       prog.value = 60; note.textContent = "Building PDF…";
-      const blob = await buildPdf(images, gapMM, centerGrid);
+      const blob = await buildPdf(img, copies, gapMM, centerGrid);
 
       const url = URL.createObjectURL(blob);
       downloadPdf.href = url;
