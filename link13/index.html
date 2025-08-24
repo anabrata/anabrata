@@ -1,214 +1,259 @@
-# 3D Human Cell - schematic Plotly visualization
-# Requires: pip install plotly numpy
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Schematic 3D Human (Animal) Cell</title>
+  <!-- Local Plotly bundle: put plotly.min.js in the same folder -->
+  <script src="plotly.min.js"></script>
+  <style>
+    html, body { height: 100%; margin: 0; }
+    #plot { width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+  <div id="plot"></div>
+  <script>
+    // ---------- helpers ----------
+    function linspace(a, b, n) {
+      if (n < 2) return [a];
+      var arr = new Array(n);
+      var step = (b - a) / (n - 1);
+      for (var i = 0; i < n; i++) arr[i] = a + step * i;
+      return arr;
+    }
+    function zerosLike2D(M) {
+      var Z = new Array(M.length);
+      for (var i = 0; i < M.length; i++) {
+        Z[i] = new Array(M[i].length);
+        for (var j = 0; j < M[i].length; j++) Z[i][j] = 0;
+      }
+      return Z;
+    }
+    function ellipsoid(center, radii, nu, nv) {
+      var cx = center[0], cy = center[1], cz = center[2];
+      var rx = radii[0], ry = radii[1], rz = radii[2];
+      var u = linspace(0, 2*Math.PI, nu);
+      var v = linspace(0, Math.PI, nv);
+      var X = new Array(nu), Y = new Array(nu), Z = new Array(nu);
+      for (var i = 0; i < nu; i++) {
+        var cu = Math.cos(u[i]), su = Math.sin(u[i]);
+        X[i] = new Array(nv); Y[i] = new Array(nv); Z[i] = new Array(nv);
+        for (var j = 0; j < nv; j++) {
+          var sv = Math.sin(v[j]), cv = Math.cos(v[j]);
+          X[i][j] = rx * cu * sv + cx;
+          Y[i][j] = ry * su * sv + cy;
+          Z[i][j] = rz * cv + cz;
+        }
+      }
+      return {X:X, Y:Y, Z:Z};
+    }
+    function surfaceTrace(X, Y, Z, color, opacity, name) {
+      return {
+        type: 'surface',
+        x: X, y: Y, z: Z,
+        surfacecolor: zerosLike2D(X),
+        colorscale: [[0, color], [1, color]],
+        showscale: false,
+        opacity: opacity,
+        name: name,
+        hoverinfo: 'name',
+        lighting: {ambient:0.5, diffuse:0.5, specular:0.2, roughness:0.9}
+      };
+    }
+    function randomPointsInShell(n, inner_r, outer_r, avoid_center, avoid_radius) {
+      var pts = [];
+      var attempts = 0;
+      while (pts.length < n && attempts < 20000) {
+        var u = Math.random();
+        var r = Math.pow((Math.pow(outer_r,3)-Math.pow(inner_r,3))*u + Math.pow(inner_r,3), 1/3);
+        var z = Math.random()*2 - 1;
+        var t = Math.random()*2*Math.PI;
+        var s = Math.sqrt(1 - z*z);
+        var x = r * s * Math.cos(t);
+        var y = r * s * Math.sin(t);
+        var zc = r * z;
+        if (avoid_center && typeof avoid_radius === 'number') {
+          var dx = x - avoid_center[0];
+          var dy = y - avoid_center[1];
+          var dz = zc - avoid_center[2];
+          var d = Math.sqrt(dx*dx + dy*dy + dz*dz);
+          if (d < avoid_radius) { attempts++; continue; }
+        }
+        pts.push([x,y,zc]);
+        attempts++;
+      }
+      return pts;
+    }
+    function polyline3d(curveFn, t0, t1, steps) {
+      var t = linspace(t0, t1, steps);
+      var X = new Array(steps), Y = new Array(steps), Z = new Array(steps);
+      for (var i = 0; i < steps; i++) {
+        var p = curveFn(t[i]);
+        X[i] = p[0]; Y[i] = p[1]; Z[i] = p[2];
+      }
+      return {X:X, Y:Y, Z:Z};
+    }
+    function lineTrace(x0,y0,z0, x1,y1,z1, color, width, name) {
+      return {
+        type:'scatter3d',
+        mode:'lines',
+        x:[x0,x1], y:[y0,y1], z:[z0,z1],
+        line:{color:color, width:width},
+        name:name,
+        hoverinfo:'name'
+      };
+    }
 
-import numpy as np
-import plotly.graph_objects as go
+    // ---------- scene constants ----------
+    var CELL_R = 10.0;
+    var NUCLEUS_R = 3.5;
+    var NUCLEOLUS_R = 1.2;
 
-# -------------- geometry helpers --------------
+    var traces = [];
 
-def ellipsoid(center, radii, nu=50, nv=30):
-    """
-    Create parametric mesh grids for an ellipsoid surface.
-    center: (cx, cy, cz)
-    radii: (rx, ry, rz)
-    returns: X, Y, Z arrays of shape (nu, nv)
-    """
-    u = np.linspace(0, 2*np.pi, nu)
-    v = np.linspace(0, np.pi, nv)
-    cu, su = np.cos(u), np.sin(u)
-    sv, cv = np.sin(v), np.cos(v)
-    X = radii[0] * np.outer(cu, sv) + center[0]
-    Y = radii[1] * np.outer(su, sv) + center[1]
-    Z = radii[2] * np.outer(np.ones_like(u), cv) + center[2]
-    return X, Y, Z
+    // Cell membrane
+    (function() {
+      var e = ellipsoid([0,0,0], [CELL_R, CELL_R*0.95, CELL_R*0.90], 80, 40);
+      traces.push(surfaceTrace(e.X, e.Y, e.Z, '#8ecae6', 0.18, 'Cell membrane'));
+    })();
 
-def surface_trace(X, Y, Z, color="#cccccc", opacity=1.0, name="", showscale=False):
-    # Use a flat colorscale to simulate a solid color
-    # surfacecolor just needs to be same-shape array
-    C = np.zeros_like(X)
-    return go.Surface(
-        x=X, y=Y, z=Z,
-        surfacecolor=C,
-        colorscale=[[0, color], [1, color]],
-        showscale=showscale,
-        opacity=opacity,
-        name=name,
-        hoverinfo="name",
-        lighting=dict(ambient=0.5, diffuse=0.5, specular=0.2, roughness=0.9),
-    )
+    // Nucleus
+    (function() {
+      var e = ellipsoid([1.0, 0.5, 0.0], [NUCLEUS_R*1.05, NUCLEUS_R, NUCLEUS_R*0.9], 60, 36);
+      traces.push(surfaceTrace(e.X, e.Y, e.Z, '#bdb2ff', 0.45, 'Nucleus'));
+    })();
 
-def random_points_in_shell(n, inner_r, outer_r, avoid_center=None, avoid_radius=None, seed=0):
-    """
-    Uniform random points inside a spherical shell between inner_r and outer_r.
-    If avoid_center and avoid_radius provided, reject points that fall inside that sphere.
-    """
-    rng = np.random.default_rng(seed)
-    pts = []
-    attempts = 0
-    while len(pts) < n and attempts < 10000:
-        # sample radius with r^3 distribution for uniform volume
-        u = rng.random()
-        r = ((outer_r**3 - inner_r**3)*u + inner_r**3) ** (1/3)
-        # random direction
-        z = rng.uniform(-1, 1)
-        t = rng.uniform(0, 2*np.pi)
-        s = np.sqrt(1 - z*z)
-        x = r * s * np.cos(t)
-        y = r * s * np.sin(t)
-        zc = r * z
-        if avoid_center is not None and avoid_radius is not None:
-            if np.linalg.norm(np.array([x, y, zc]) - np.array(avoid_center)) < avoid_radius:
-                attempts += 1
-                continue
-        pts.append((x, y, zc))
-        attempts += 1
-    return np.array(pts)
+    // Nucleolus
+    (function() {
+      var e = ellipsoid([1.4, 0.8, 0.2], [NUCLEOLUS_R, NUCLEOLUS_R, NUCLEOLUS_R*0.9], 50, 30);
+      traces.push(surfaceTrace(e.X, e.Y, e.Z, '#ffadad', 0.85, 'Nucleolus'));
+    })();
 
-def polyline3d(curve_fn, t0, t1, steps):
-    t = np.linspace(t0, t1, steps)
-    xyz = np.array([curve_fn(tt) for tt in t])
-    return xyz[:,0], xyz[:,1], xyz[:,2]
+    // Mitochondria
+    (function() {
+      var centers = randomPointsInShell(
+        14,
+        NUCLEUS_R + 2.0,
+        CELL_R - 2.0,
+        [1.0, 0.5, 0.0],
+        NUCLEUS_R + 1.0
+      );
+      for (var i = 0; i < centers.length; i++) {
+        var c = centers[i];
+        var e = ellipsoid(c, [0.8, 0.45, 0.45], 28, 18);
+        traces.push(surfaceTrace(e.X, e.Y, e.Z, '#fb8500', 0.9, 'Mitochondrion'));
+      }
+    })();
 
-# -------------- scene constants --------------
+    // Golgi apparatus
+    (function() {
+      var gc = [3.2, -0.8, 0.4];
+      var scales = [1.0, 0.9, 0.8, 0.7, 0.6];
+      for (var i = 0; i < scales.length; i++) {
+        var s = scales[i];
+        var center = [gc[0] + 0.15*i, gc[1] + 0.05*i, gc[2]];
+        var e = ellipsoid(center, [1.8*s, 0.8*s, 0.25*s], 40, 20);
+        traces.push(surfaceTrace(e.X, e.Y, e.Z, '#ffd166', 0.95, 'Golgi stack'));
+      }
+    })();
 
-# Overall cell size (arbitrary units)
-CELL_R = 10.0
-NUCLEUS_R = 3.5
-NUCLEOLUS_R = 1.2
+    // Endoplasmic reticulum (meandering near nucleus)
+    (function() {
+      function makeERCurve(cx, cy, cz, amp, rad, twist, phase) {
+        return function(t) {
+          var x = cx + (rad + amp*Math.sin(t*twist + phase)) * Math.cos(t);
+          var y = cy + (rad + amp*Math.cos(t*twist + phase)) * Math.sin(t);
+          var z = cz + 0.5*Math.sin(1.5*t + phase);
+          return [x,y,z];
+        };
+      }
+      var cent = [1.0, 0.5, 0.0];
+      var phases = [0.0, 0.9, 1.8];
+      for (var i = 0; i < phases.length; i++) {
+        var cx = cent[0] - 0.8 + 0.4*i;
+        var cy = cent[1] + 0.2*i;
+        var cz = cent[2];
+        var curve = makeERCurve(cx, cy, cz, 1.0, 4.0-0.4*i, 2.0, phases[i]);
+        var pl = polyline3d(curve, 0, 2*Math.PI, 400);
+        traces.push({
+          type:'scatter3d',
+          mode:'lines',
+          x: pl.X, y: pl.Y, z: pl.Z,
+          line:{color:'#2a9d8f', width:5},
+          name:'Endoplasmic reticulum',
+          hoverinfo:'name',
+          opacity:0.9
+        });
+      }
+    })();
 
-# -------------- build organelles --------------
+    // Ribosomes
+    (function() {
+      var pts = randomPointsInShell(
+        450,
+        NUCLEUS_R + 1.2,
+        CELL_R - 1.5,
+        [1.0, 0.5, 0.0],
+        NUCLEUS_R + 0.6
+      );
+      var xs = [], ys = [], zs = [];
+      for (var i = 0; i < pts.length; i++) { xs.push(pts[i][0]); ys.push(pts[i][1]); zs.push(pts[i][2]); }
+      traces.push({
+        type:'scatter3d',
+        mode:'markers',
+        x: xs, y: ys, z: zs,
+        marker:{size:2, color:'#264653', opacity:0.8},
+        name:'Ribosomes',
+        hoverinfo:'name'
+      });
+    })();
 
-traces = []
+    // Vesicles / lysosomes
+    (function() {
+      var centers = randomPointsInShell(
+        18,
+        NUCLEUS_R + 1.5,
+        CELL_R - 2.0,
+        [1.0, 0.5, 0.0],
+        NUCLEUS_R + 0.8
+      );
+      for (var i = 0; i < centers.length; i++) {
+        var e = ellipsoid(centers[i], [0.35, 0.35, 0.35], 20, 14);
+        traces.push(surfaceTrace(e.X, e.Y, e.Z, '#90be6d', 0.65, 'Vesicle'));
+      }
+    })();
 
-# Cell membrane (semi-transparent sphere)
-Xm, Ym, Zm = ellipsoid(center=(0,0,0), radii=(CELL_R, CELL_R*0.95, CELL_R*0.9), nu=80, nv=40)
-traces.append(surface_trace(Xm, Ym, Zm, color="#8ecae6", opacity=0.18, name="Cell membrane"))
+    // Centrosome (two short orthogonal bundles)
+    (function() {
+      var c0 = [-1.5, -2.0, 0.0];
+      var a1 = [0.8, 0.0, 0.2];
+      var a2 = [0.0, 0.8, -0.2];
+      traces.push(lineTrace(c0[0]-a1[0], c0[1]-a1[1], c0[2]-a1[2],
+                            c0[0]+a1[0], c0[1]+a1[1], c0[2]+a1[2],
+                            '#6a4c93', 6, 'Centrosome'));
+      traces.push(lineTrace(c0[0]-a2[0], c0[1]-a2[1], c0[2]-a2[2],
+                            c0[0]+a2[0], c0[1]+a2[1], c0[2]+a2[2],
+                            '#6a4c93', 6, 'Centrosome'));
+    })();
 
-# Nucleus
-Xn, Yn, Zn = ellipsoid(center=(1.0, 0.5, 0.0), radii=(NUCLEUS_R*1.05, NUCLEUS_R, NUCLEUS_R*0.9), nu=60, nv=36)
-traces.append(surface_trace(Xn, Yn, Zn, color="#bdb2ff", opacity=0.45, name="Nucleus"))
+    // ---------- plot ----------
+    var layout = {
+      title: 'Schematic 3D Human (Animal) Cell',
+      showlegend: true,
+      legend: {orientation:'h', yanchor:'bottom', y:0.02, xanchor:'center', x:0.5},
+      margin: {l:0, r:0, t:40, b:0},
+      paper_bgcolor: 'white',
+      scene: {
+        xaxis: {visible:false},
+        yaxis: {visible:false},
+        zaxis: {visible:false},
+        aspectmode: 'data',
+        camera: {eye: {x:1.6, y:1.8, z:1.1}}
+      }
+    };
 
-# Nucleolus
-Xnu, Ynu, Znu = ellipsoid(center=(1.4, 0.8, 0.2), radii=(NUCLEOLUS_R, NUCLEOLUS_R, NUCLEOLUS_R*0.9), nu=50, nv=30)
-traces.append(surface_trace(Xnu, Ynu, Znu, color="#ffadad", opacity=0.85, name="Nucleolus"))
-
-# Mitochondria (multiple small ellipsoids distributed in cytoplasm, avoiding nucleus)
-mito_centers = random_points_in_shell(
-    n=14,
-    inner_r=NUCLEUS_R + 2.0,
-    outer_r=CELL_R - 2.0,
-    avoid_center=(1.0, 0.5, 0.0),
-    avoid_radius=NUCLEUS_R + 1.0,
-    seed=42
-)
-
-for (mx, my, mz) in mito_centers:
-    rx, ry, rz = 0.8, 0.45, 0.45
-    Xmi, Ymi, Zmi = ellipsoid(center=(mx, my, mz), radii=(rx, ry, rz), nu=28, nv=18)
-    traces.append(surface_trace(Xmi, Ymi, Zmi, color="#fb8500", opacity=0.9, name="Mitochondrion"))
-
-# Golgi apparatus (stack of flattened ellipsoids near nucleus)
-golgi_center = (3.2, -0.8, 0.4)
-for i, shrink in enumerate([1.0, 0.9, 0.8, 0.7, 0.6]):
-    Xg, Yg, Zg = ellipsoid(
-        center=(golgi_center[0] + 0.15*i, golgi_center[1] + 0.05*i, golgi_center[2]),
-        radii=(1.8*shrink, 0.8*shrink, 0.25*shrink),
-        nu=40, nv=20
-    )
-    traces.append(surface_trace(Xg, Yg, Zg, color="#ffd166", opacity=0.95, name="Golgi stack"))
-
-# Endoplasmic reticulum (meandering polylines near nucleus)
-def make_er_curve(cx, cy, cz, amp=1.1, rad=4.5, twist=2.2, phase=0.0):
-    def curve(t):
-        # toroidal-ish meander around nucleus offset
-        x = cx + (rad + amp*np.sin(t*twist + phase)) * np.cos(t)
-        y = cy + (rad + amp*np.cos(t*twist + phase)) * np.sin(t)
-        z = cz + 0.5*np.sin(1.5*t + phase)
-        return np.array([x, y, z])
-    return curve
-
-er_colors = ["#2a9d8f", "#2a9d8f", "#2a9d8f"]
-cent = (1.0, 0.5, 0.0)
-for idx, ph in enumerate([0.0, 0.9, 1.8]):
-    cx = cent[0] - 0.8 + 0.4*idx
-    cy = cent[1] + 0.2*idx
-    cz = cent[2]
-    curve_fn = make_er_curve(cx, cy, cz, amp=1.0, rad=4.0-0.4*idx, twist=2.0, phase=ph)
-    Xc, Yc, Zc = polyline3d(curve_fn, 0, 2*np.pi, steps=400)
-    traces.append(go.Scatter3d(
-        x=Xc, y=Yc, z=Zc,
-        mode="lines",
-        line=dict(color=er_colors[idx], width=5),
-        name="Endoplasmic reticulum",
-        hoverinfo="name",
-        opacity=0.9
-    ))
-
-# Ribosomes (small points, enriched near ER and cytosol)
-ribos = random_points_in_shell(
-    n=450,
-    inner_r=NUCLEUS_R + 1.2,
-    outer_r=CELL_R - 1.5,
-    avoid_center=(1.0, 0.5, 0.0),
-    avoid_radius=NUCLEUS_R + 0.6,
-    seed=7
-)
-traces.append(go.Scatter3d(
-    x=ribos[:,0], y=ribos[:,1], z=ribos[:,2],
-    mode="markers",
-    marker=dict(size=2, color="#264653", opacity=0.8),
-    name="Ribosomes",
-    hoverinfo="name"
-))
-
-# Lysosomes / vesicles (small spheres)
-ves_centers = random_points_in_shell(
-    n=18,
-    inner_r=NUCLEUS_R + 1.5,
-    outer_r=CELL_R - 2.0,
-    avoid_center=(1.0, 0.5, 0.0),
-    avoid_radius=NUCLEUS_R + 0.8,
-    seed=21
-)
-for (vx, vy, vz) in ves_centers:
-    Xv, Yv, Zv = ellipsoid(center=(vx, vy, vz), radii=(0.35, 0.35, 0.35), nu=20, nv=14)
-    traces.append(surface_trace(Xv, Yv, Zv, color="#90be6d", opacity=0.65, name="Vesicle"))
-
-# Centrosome (two short orthogonal microtubule bundles near nucleus)
-c0 = np.array([ -1.5, -2.0, 0.0 ])
-axis1 = np.array([0.8, 0.0, 0.2])
-axis2 = np.array([0.0, 0.8, -0.2])
-
-def segment_trace(p0, p1, color, name):
-    return go.Scatter3d(
-        x=[p0[0], p1[0]], y=[p0[1], p1[1]], z=[p0[2], p1[2]],
-        mode="lines",
-        line=dict(color=color, width=6),
-        name=name,
-        hoverinfo="name"
-    )
-
-traces.append(segment_trace(c0 - axis1, c0 + axis1, "#6a4c93", "Centrosome"))
-traces.append(segment_trace(c0 - axis2, c0 + axis2, "#6a4c93", "Centrosome"))
-
-# -------------- assemble scene --------------
-
-fig = go.Figure(data=traces)
-
-fig.update_scenes(
-    xaxis=dict(visible=False),
-    yaxis=dict(visible=False),
-    zaxis=dict(visible=False),
-    aspectmode="data",
-    camera=dict(eye=dict(x=1.6, y=1.8, z=1.1)),
-)
-
-fig.update_layout(
-    title="Schematic 3D Human (Animal) Cell",
-    showlegend=True,
-    legend=dict(orientation="h", yanchor="bottom", y=0.02, xanchor="center", x=0.5),
-    margin=dict(l=0, r=0, t=40, b=0),
-    paper_bgcolor="white",
-)
-
-fig.show()
+    Plotly.newPlot('plot', traces, layout, {responsive:true});
+  </script>
+</body>
+</html>
