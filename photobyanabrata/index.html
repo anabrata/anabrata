@@ -49,7 +49,7 @@
 
   .field{ position:relative; display:flex; align-items:center; gap:.5rem; background:#f8fafc;
           border:1px solid #e5e7eb; border-radius:.8rem; padding:.45rem .65rem }
-  .field input, .field label{ border:0; background:transparent; outline:none; font:inherit; color:inherit; padding:.35rem .2rem }
+  .field input{ border:0; background:transparent; outline:none; font:inherit; color:inherit; padding:.35rem .2rem; min-width:6ch }
 
   .dropzone{ position:relative; display:grid; place-items:center; text-align:center; padding:1.1rem; border-radius:1rem;
              border:2px dashed #cbd5e1; background:linear-gradient(135deg, rgba(16,185,129,.08), rgba(59,130,246,.08), rgba(253,224,71,.08)) }
@@ -76,7 +76,7 @@
     <section class="card">
       <div class="row" style="justify-content:space-between">
         <div class="row">
-          <span class="muted">A4 portrait: 210 × 297 mm • Photo: 4 × 3 cm • 6 columns (auto‑rotate to fit)</span>
+          <span class="muted">A4 portrait: 210 × 297 mm • Photo: 4 × 3 cm • 6 columns • Starts at top with 10 mm margin</span>
         </div>
       </div>
 
@@ -102,8 +102,6 @@
       <div class="row" style="margin-top:.7rem">
         <div class="field"><span>Number of photos</span><input id="copies" type="number" value="6" min="1" step="1"></div>
         <div class="field"><span>Gap (mm)</span><input id="gap" type="number" value="2" step="0.5" min="0"></div>
-        <label class="field" style="gap:.5rem"><input id="centerGrid" type="checkbox" checked> <span>Center grid</span></label>
-        <label class="field" style="gap:.5rem"><input id="autoRotate" type="checkbox" checked> <span>Auto‑rotate 4×3 ↔ 3×4</span></label>
       </div>
 
       <div style="margin-top:.6rem">
@@ -120,11 +118,11 @@
         <p class="muted" style="margin:.5rem 0 0">Print at 100% scale (no “Fit to page”). Each tile = 40 × 30 mm.</p>
       </div>
       <div class="card">
-        <h3 style="margin:.2rem 0 .8rem">How 6 columns work on portrait</h3>
+        <h3 style="margin:.2rem 0 .8rem">Layout details</h3>
         <ul class="muted" style="margin:.2rem 0 0; padding-left:1rem; list-style:disc">
-          <li>Margins are 10 mm on all sides to allow 6 across.</li>
-          <li>If needed, tiles auto‑rotate to 3×4 (30 mm wide) so 6 fit within portrait width.</li>
-          <li>Horizontal gap is clamped so 6 columns always fit; rows flow to new pages.</li>
+          <li>Photos begin at the top-left inside a 10 mm margin.</li>
+          <li>6 columns fixed; horizontal gap is auto‑clamped so 6 always fit.</li>
+          <li>Rows per page depend on vertical gap; extra photos continue on new A4 pages.</li>
         </ul>
       </div>
     </section>
@@ -140,8 +138,8 @@
 
   // A4 portrait
   const PAGE_W_MM = 210, PAGE_H_MM = 297;
-  const MARGIN_MM = 10;                 // 1 cm margins to allow 6 columns
-  // Base tile size is 4×3 cm (40×30). We can swap to 3×4 (30×40) if autoRotate is ON.
+  const MARGIN_MM = 10; // small printer-safe margin
+  // Base tile is 4×3 cm (40×30). Internally we may swap to 3×4 (30×40) to keep 6 across on portrait.
   const TILE_W_4x3 = 40, TILE_H_4x3 = 30;
   const TILE_W_3x4 = 30, TILE_H_3x4 = 40;
   const COLS = 6;
@@ -155,8 +153,6 @@
   const fileNote = $('fileNote');
   const copiesInput = $('copies');
   const gapInput = $('gap');
-  const centerGridInput = $('centerGrid');
-  const autoRotateInput = $('autoRotate');
   const arrangeBtn = $('arrange');
   const downloadPdf = $('downloadPdf');
   const note = $('note');
@@ -195,76 +191,35 @@
     ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dW, dH);
   }
 
-  // Pick tile orientation. If autoRotate, choose the one that permits 6 across with non-negative gap.
+  // Decide tile orientation (hidden auto-rotate) to keep 6 across on A4 portrait
   function pickTileSize(userGap){
     const availW = PAGE_W_MM - 2*MARGIN_MM;
-    // For 4×3 orientation
     const maxGX_4x3 = (availW - COLS*TILE_W_4x3) / (COLS - 1);
-    // For 3×4 orientation
     const maxGX_3x4 = (availW - COLS*TILE_W_3x4) / (COLS - 1);
-
-    if (!autoRotateInput.checked){
-      const use3x4 = TILE_W_4x3 > availW / COLS; // if 4×3 can't fit even without gaps, fall back to 3×4
-      const tw = use3x4 ? TILE_W_3x4 : TILE_W_4x3;
-      const th = use3x4 ? TILE_H_3x4 : TILE_H_4x3;
-      const maxGX = use3x4 ? maxGX_3x4 : maxGX_4x3;
-      return { tw, th, maxGX: Math.max(0, maxGX) };
-    }
-
-    // Prefer orientation that can accommodate the user's gap (or largest max gap)
-    const canA = maxGX_4x3 >= 0;
-    const canB = maxGX_3x4 >= 0;
-
-    if (canA && canB){
-      // Choose the one whose max gap is closer to userGap (allows larger spacing)
-      if (Math.abs(maxGX_4x3 - userGap) <= Math.abs(maxGX_3x4 - userGap)){
-        return { tw: TILE_W_4x3, th: TILE_H_4x3, maxGX: Math.max(0, maxGX_4x3) };
-      } else {
-        return { tw: TILE_W_3x4, th: TILE_H_3x4, maxGX: Math.max(0, maxGX_3x4) };
-      }
-    } else if (canA){
-      return { tw: TILE_W_4x3, th: TILE_H_4x3, maxGX: Math.max(0, maxGX_4x3) };
-    } else {
-      return { tw: TILE_W_3x4, th: TILE_H_3x4, maxGX: Math.max(0, maxGX_3x4) };
-    }
+    // Prefer 4×3 if it fits; else 3×4
+    if (maxGX_4x3 >= 0){ return { tw: TILE_W_4x3, th: TILE_H_4x3, maxGX: Math.max(0, maxGX_4x3) }; }
+    return { tw: TILE_W_3x4, th: TILE_H_3x4, maxGX: Math.max(0, maxGX_3x4) };
   }
 
   function rowsPerPage(tileH, gapY){
     const availH = PAGE_H_MM - 2*MARGIN_MM;
     return Math.max(1, Math.floor((availH + gapY) / (tileH + gapY)));
   }
-  function solveGapYForRows(tileH, rows){
-    if (rows <= 1) return 0;
-    const availH = PAGE_H_MM - 2*MARGIN_MM;
-    return Math.max(0, (availH - rows*tileH) / (rows - 1));
-  }
 
+  // Build a layout plan (top-left origin)
   function planLayout(userGap, copies){
     const { tw, th, maxGX } = pickTileSize(userGap);
-    const gapX = Math.min(userGap, maxGX);
-    const rowsNeeded = Math.ceil(copies / COLS);
-
-    // Try with user vertical gap first
-    let gapY = userGap;
-    let rpp = rowsPerPage(th, gapY);
-
-    if (rowsNeeded > rpp){
-      // Try shrinking vertical gap to fit rowsNeeded
-      gapY = solveGapYForRows(th, rowsNeeded);
-      rpp = rowsPerPage(th, gapY);
-    }
-
-    const paginate = rowsNeeded > rpp;
-    const rowsFirstPage = paginate ? rpp : rowsNeeded;
-    const capacityFirst = COLS * rowsFirstPage;
-
-    return { tw, th, gapX, gapY, rowsFirstPage, capacityFirst, paginate, rpp };
+    const gapX = Math.min(userGap, maxGX);   // clamp horizontally to keep 6 across
+    const gapY = userGap;                    // vertical gap from user
+    const rpp  = rowsPerPage(th, gapY);      // rows per page
+    const capacityPerPage = COLS * rpp;
+    return { tw, th, gapX, gapY, rpp, capacityPerPage };
   }
 
-  // Preview (first page)
-  async function previewLayout(img, copies, userGap, center){
+  // Preview (first page only) — starts at top-left with margin
+  async function previewLayout(img, copies, userGap){
     const p = planLayout(userGap, copies);
-    const { tw, th, gapX, gapY, rowsFirstPage, capacityFirst } = p;
+    const { tw, th, gapX, gapY, rpp } = p;
 
     const pxPerMM = canvas.width / PAGE_W_MM;
     const pageWpx = Math.round(PAGE_W_MM * pxPerMM);
@@ -273,22 +228,19 @@
     const tileHpx = Math.round(th * pxPerMM);
     const gapXpx  = Math.round(gapX * pxPerMM);
     const gapYpx  = Math.round(gapY * pxPerMM);
-
-    const gridWmm = COLS*tw + (COLS-1)*gapX;
-    const gridHmm = rowsFirstPage*th + (rowsFirstPage-1)*gapY;
-
-    const ox = center ? Math.round((PAGE_W_MM - gridWmm) * pxPerMM / 2) : Math.round(MARGIN_MM * pxPerMM);
-    const oy = center ? Math.round((PAGE_H_MM - gridHmm) * pxPerMM / 2) : Math.round(MARGIN_MM * pxPerMM);
-
-    // Page + margins
-    ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,pageWpx,pageHpx);
     const marginPx = Math.round(MARGIN_MM * pxPerMM);
+
+    // White page + margin box (optional guide)
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,pageWpx,pageHpx);
     ctx.strokeStyle = '#d1d5db'; ctx.lineWidth = 1;
     ctx.strokeRect(marginPx + .5, marginPx + .5, pageWpx - 2*marginPx - 1, pageHpx - 2*marginPx - 1);
 
-    let i = 0, place = Math.min(copies, capacityFirst);
-    for (let r=0; r<rowsFirstPage && i<place; r++){
-      for (let c=0; c<COLS && i<place; c++){
+    // Top-left origin inside margin
+    const ox = marginPx, oy = marginPx;
+
+    let i = 0, placed = Math.min(copies, COLS * rpp);
+    for (let r=0; r<rpp && i<placed; r++){
+      for (let c=0; c<COLS && i<placed; c++){
         const x = ox + c * (tileWpx + gapXpx);
         const y = oy + r * (tileHpx + gapYpx);
         drawImageCover(ctx, img, x, y, tileWpx, tileHpx);
@@ -296,18 +248,13 @@
       }
     }
 
-    // Notes
     const { maxGX } = pickTileSize(userGap);
-    if (userGap > maxGX){
-      note.textContent = `Horizontal gap reduced to ${gapX.toFixed(2)} mm to keep 6 columns.`;
-    } else {
-      note.textContent = '';
-    }
+    $('note').textContent = (userGap > maxGX) ? `Horizontal gap reduced to ${gapX.toFixed(2)} mm to keep 6 in a row.` : '';
     return p;
   }
 
-  // Build PDF (multi-page if needed)
-  async function buildPdf(img, copies, userGap, center){
+  // PDF builder (multi-page) — starts at top-left with margin
+  async function buildPdf(img, copies, userGap){
     const { jsPDF } = window.jspdf;
     const p = planLayout(userGap, copies);
     const { tw, th, gapX, gapY, rpp } = p;
@@ -324,29 +271,22 @@
     drawImageCover(oc, img, 0, 0, off.width, off.height);
     const tileURL = off.toDataURL('image/jpeg', 0.92);
 
-    function drawPage(startIndex){
-      const rowsOnPage = rpp;
-      const gridWmm = COLS*tw + (COLS-1)*gapX;
-      const gridHmm = rowsOnPage*th + (rowsOnPage-1)*gapY;
-      const ox = center ? Math.max(0, (PAGE_W_MM - gridWmm) / 2) : MARGIN_MM;
-      const oy = center ? Math.max(0, (PAGE_H_MM - gridHmm) / 2) : MARGIN_MM;
+    const ox = MARGIN_MM, oy = MARGIN_MM; // top-left start
 
-      let idx = startIndex;
-      for (let r=0; r<rowsOnPage && idx<copies; r++){
-        for (let c=0; c<COLS && idx<copies; c++){
+    let remaining = copies;
+    let first = true;
+    while (remaining > 0){
+      if (!first) doc.addPage([PAGE_W_MM, PAGE_H_MM], 'portrait');
+      first = false;
+
+      for (let r=0; r<rpp && remaining>0; r++){
+        for (let c=0; c<COLS && remaining>0; c++){
           const x = ox + c * (tw + gapX);
           const y = oy + r * (th + gapY);
           doc.addImage(tileURL, 'JPEG', x, y, tw, th);
-          idx++;
+          remaining--;
         }
       }
-      return idx;
-    }
-
-    let index = 0;
-    while (index < copies){
-      index = drawPage(index);
-      if (index < copies) doc.addPage([PAGE_W_MM, PAGE_H_MM], 'portrait');
     }
     return doc.output('blob');
   }
@@ -354,35 +294,34 @@
   // Arrange → PDF
   $('arrange').onclick = async () => {
     try{
-      note.textContent = "Reading photo…";
-      prog.hidden = false; prog.value = 10;
+      $('note').textContent = "Reading photo…";
+      $('prog').hidden = false; $('prog').value = 10;
 
       if (!fileEl.files || !fileEl.files[0]){
-        note.textContent = "No photo selected. Click ‘Choose photo’.";
-        prog.hidden = true; return;
+        $('note').textContent = "No photo selected. Click ‘Choose photo’.";
+        $('prog').hidden = true; return;
       }
       const img = await blobToImage(fileEl.files[0]);
 
-      const copies = Math.max(1, parseInt(copiesInput.value || '6', 10));
-      const userGap = Math.max(0, parseFloat(gapInput.value || '0'));
-      const center = !!centerGridInput.checked;
+      const copies = Math.max(1, parseInt($('copies').value || '6', 10));
+      const userGap = Math.max(0, parseFloat($('gap').value || '0'));
 
-      prog.value = 35; note.textContent = "Arranging preview…";
-      await previewLayout(img, copies, userGap, center);
+      $('prog').value = 35; $('note').textContent = "Arranging preview…";
+      await previewLayout(img, copies, userGap);
 
-      prog.value = 60; note.textContent = "Building PDF…";
-      const blob = await buildPdf(img, copies, userGap, center);
+      $('prog').value = 60; $('note').textContent = "Building PDF…";
+      const blob = await buildPdf(img, copies, userGap);
 
       const url = URL.createObjectURL(blob);
-      downloadPdf.href = url;
-      downloadPdf.setAttribute('aria-disabled','false');
+      $('downloadPdf').href = url;
+      $('downloadPdf').setAttribute('aria-disabled','false');
 
-      prog.value = 100; note.textContent = "PDF ready. Print at 100% scale (no fit).";
-      setTimeout(() => prog.hidden = true, 400);
+      $('prog').value = 100; $('note').textContent = "PDF ready. Print at 100% scale (no fit).";
+      setTimeout(() => $('prog').hidden = true, 400);
     } catch(e){
       console.error(e);
-      note.textContent = "Error: " + e.message;
-      prog.hidden = true;
+      $('note').textContent = "Error: " + e.message;
+      $('prog').hidden = true;
     }
   };
   </script>
