@@ -3,283 +3,411 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>QR A4 Arranger (2 cm margins, no login)</title>
+<title>Ghibli‑style Photo Maker • Made by ANABRATA</title>
 <meta name="color-scheme" content="light dark" />
 <style>
   :root{
-    --bg:#0b1220; --card:#121a2b; --text:#e6eef8; --muted:#92a0b3; --ring:#1f375a; --accent:#0ea5a4;
+    --green:#10b981; --yellow:#fde047; --blue:#3b82f6; --pink:#f9a8d4;
+    --card:#ffffffee; --text:#0b1020; --muted:#4b5563; --ring:rgba(0,0,0,.12);
+    --grad: linear-gradient(135deg, var(--green), var(--blue), var(--yellow));
   }
-  @media (prefers-color-scheme: light){
-    :root{ --bg:#f6f7fb; --card:#ffffff; --text:#0b1220; --muted:#4a5568; --ring:#d6d9e0; --accent:#0ea5a4 }
+  /* Soft animated + shiny floral sides */
+  body{
+    margin:0; font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif; color:var(--text);
+    background:
+      radial-gradient(1200px 800px at 10% 10%, rgba(16,185,129,.22), transparent 60%),
+      radial-gradient(1200px 800px at 90% 20%, rgba(59,130,246,.22), transparent 60%),
+      radial-gradient(1200px 800px at 50% 100%, rgba(253,224,71,.22), transparent 60%),
+      linear-gradient(120deg, #e8fdf6, #eef4ff 40%, #fffbe6 80%, #ffffff);
+    background-size:140% 140%; animation:bgShift 18s ease-in-out infinite alternate;
   }
-  *{ box-sizing:border-box }
-  body{ margin:0; font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif; background:var(--bg); color:var(--text) }
-  .wrap{ width:min(1000px,94%); margin:2rem auto }
-  .card{ background:var(--card); border:1px solid var(--ring); border-radius:12px; padding:1rem }
-  h1{ margin:.2rem 0 1rem; font-size:clamp(1.4rem,2.8vw,2rem) }
-  .row{ display:flex; gap:.8rem; align-items:center; flex-wrap:wrap }
-  .btn{ background:var(--accent); color:#002; border:0; padding:.7rem 1rem; border-radius:.6rem; font-weight:700; cursor:pointer }
-  .btn.ghost{ background:transparent; border:1px solid var(--ring); color:var(--text) }
-  label,input,button{ font:inherit }
-  input[type="number"]{ width:6.5rem }
-  .muted{ color:var(--muted) }
-  .grid{ display:grid; gap:1rem; grid-template-columns:1fr 1fr }
-  @media (max-width: 860px){ .grid{ grid-template-columns:1fr } }
-  progress{ width:100% }
-  .out{ word-break:break-all; padding:.6rem .7rem; border-radius:.5rem; border:1px dashed var(--ring); background:transparent; color:var(--text) }
-  .pill{ display:inline-block; padding:.25rem .5rem; border:1px solid var(--ring); border-radius:999px; font-size:.85rem; color:var(--muted) }
-  canvas{ width:100%; background:#fff; border-radius:8px }
-  ul.flat { list-style: disc; padding-left: 1.2rem; margin: .4rem 0 0 }
+  @keyframes bgShift{
+    0%{ background-position:0% 0%, 100% 0%, 50% 100%, 0% 0% }
+    100%{ background-position:50% 30%, 50% 20%, 60% 70%, 100% 100% }
+  }
+  .decor{ position:fixed; top:0; bottom:0; width:160px; pointer-events:none; z-index:0; opacity:.9 }
+  .decor.left{ left:0;
+    background:
+      radial-gradient(60px 60px at 40% 12%, rgba(16,185,129,.35), transparent 60%),
+      radial-gradient(48px 48px at 70% 28%, rgba(59,130,246,.30), transparent 60%),
+      radial-gradient(56px 56px at 32% 62%, rgba(253,224,71,.35), transparent 60%),
+      radial-gradient(44px 44px at 20% 86%, rgba(249,168,212,.28), transparent 60%);
+    mask-image: linear-gradient(90deg, rgba(0,0,0,.85), rgba(0,0,0,.35), transparent);
+    animation: floatL 12s ease-in-out infinite alternate;
+  }
+  .decor.right{ right:0;
+    background:
+      radial-gradient(58px 58px at 60% 20%, rgba(59,130,246,.32), transparent 60%),
+      radial-gradient(52px 52px at 30% 42%, rgba(16,185,129,.34), transparent 60%),
+      radial-gradient(50px 50px at 68% 74%, rgba(253,224,71,.34), transparent 60%),
+      radial-gradient(42px 42px at 80% 88%, rgba(249,168,212,.26), transparent 60%);
+    mask-image: linear-gradient(270deg, rgba(0,0,0,.85), rgba(0,0,0,.35), transparent);
+    animation: floatR 13s ease-in-out infinite alternate;
+  }
+  @keyframes floatL{ 0%{ transform:translateY(0) } 100%{ transform:translateY(12px) } }
+  @keyframes floatR{ 0%{ transform:translateY(8px) } 100%{ transform:translateY(-6px) } }
+
+  .wrap{ width:min(1200px,94%); margin:0 auto; position:relative; z-index:1 }
+
+  header.hero{ min-height:28vh; display:grid; place-items:center; text-align:center; padding: clamp(1.4rem,5vw,2.6rem) 0 1rem; }
+  .welcome{
+    font-weight:900; letter-spacing:.05em; line-height:1.1;
+    background:linear-gradient(90deg, var(--green), var(--blue), var(--yellow), var(--pink), var(--green));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    background-size:220% 100%; animation: hue 14s linear infinite, fadeInOut 8s ease-in-out infinite;
+    font-size: clamp(1.2rem, 4.2vw, 2.4rem);
+  }
+  @keyframes hue{ 0%{background-position:0% 50%} 100%{background-position:220% 50%} }
+  @keyframes fadeInOut{ 0%{opacity:0} 18%{opacity:1} 82%{opacity:1} 100%{opacity:0} }
+  .byline{ margin-top:.5rem; font-weight:800; color:#0b1020; display:inline-block; padding:.35rem .7rem; border-radius:.7rem;
+           background:linear-gradient(90deg, rgba(16,185,129,.18), rgba(59,130,246,.18), rgba(253,224,71,.18));
+           box-shadow:0 6px 22px rgba(16,185,129,.14), 0 4px 16px rgba(59,130,246,.12) }
+
+  .panel{
+    position:relative; width:100%; border-radius:18px; padding:1rem; background:var(--card);
+    border:1px solid var(--ring); box-shadow:0 10px 28px rgba(0,0,0,.08)
+  }
+  .shiny{
+    position:relative; width:min(900px, 96%); margin:0 auto 1rem; border-radius:22px; padding:1.4rem;
+    background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.90));
+    border:1px solid rgba(255,255,255,0.7); box-shadow:0 24px 60px rgba(59,130,246,0.28), 0 16px 40px rgba(16,185,129,0.24), inset 0 1px 0 rgba(255,255,255,0.7);
+    backdrop-filter: blur(12px); overflow:hidden; text-align:center;
+  }
+  .shiny::before{
+    content:""; position:absolute; inset:-60% -40% auto -40%; height:220%; width:180%;
+    background: linear-gradient(120deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.08) 55%, rgba(255,255,255,0) 75%);
+    transform: translateX(-60%) rotate(18deg); animation: sheen 7s linear infinite; mix-blend-mode: screen; pointer-events:none;
+  }
+  @keyframes sheen{ 0%{ transform: translateX(-60%) rotate(18deg) } 100%{ transform: translateX(60%) rotate(18deg) } }
+
+  .row{ display:flex; gap:.9rem; align-items:center; flex-wrap:wrap; justify-content:center }
+  .btn{
+    background:var(--grad); color:#073b2b; border:0; padding:.9rem 1.2rem; border-radius:1rem; font-weight:900; cursor:pointer;
+    box-shadow:0 8px 22px rgba(16,185,129,.22), 0 4px 14px rgba(59,130,246,.14); font-size:1.02rem
+  }
+  .btn.ghost{ background:linear-gradient(135deg, rgba(16,185,129,.12), rgba(59,130,246,.12)); color:#0b1020; border:1px solid var(--ring) }
+  .field{ display:flex; align-items:center; gap:.5rem; background:#f8fafc; border:1px solid #e5e7eb; border-radius:.9rem; padding:.55rem .75rem }
+  .field input, .field select{ border:0; background:transparent; outline:none; font:inherit; color:inherit; padding:.3rem .25rem }
+
+  .grid{ display:grid; gap:1rem; grid-template-columns:1fr 1fr; align-items:start; margin:1rem 0 2rem }
+  @media (max-width:980px){ .grid{ grid-template-columns:1fr } }
+  .card{ background:var(--card); border:1px solid var(--ring); border-radius:14px; padding:1rem; box-shadow:0 10px 28px rgba(0,0,0,.08) }
+  canvas{ width:100%; border-radius:12px; background:#fff; border:1px solid #e5e7eb }
+  .muted{ color:#4b5563 }
+  .info{ text-align:center; color:#111827; opacity:.9; margin:1.2rem 0 2.2rem }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>QR code arranger (A4 • 2 cm margins • no login)</h1>
-  <p class="muted">Upload a ZIP (or images), arrange inside 20 mm margins, auto‑fit to one page, and download a print‑ready PDF.</p>
+  <div class="decor left"></div>
+  <div class="decor right"></div>
 
-  <div class="card" style="margin-bottom:1rem">
-    <div class="row" style="justify-content:space-between">
-      <div class="row">
-        <span class="pill">Max per page: 200</span>
-        <span class="pill">A4: 210 × 297 mm</span>
-        <span class="pill">Margins: 20 mm on all sides</span>
+  <header class="hero">
+    <div class="wrap">
+      <div class="welcome">WELCOME TO THE WORLD OF PHOTOS</div>
+      <div class="byline">Made by ANABRATA</div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="shiny">
+      <div style="font-weight:900; font-size:1.15rem">Choose a photo to Ghibli‑ize</div>
+      <div class="muted" style="margin-top:.15rem">All processing happens in your browser. Then download the result.</div>
+      <div class="row" style="margin-top:.8rem">
+        <button class="btn" id="pick">Choose photo</button>
+        <button class="btn ghost" id="convert" disabled>Convert → Ghibli‑style</button>
+        <a id="download" class="btn ghost" download="ghibli_style.png" href="#" aria-disabled="true">Download PNG</a>
       </div>
-    </div>
+      <div class="row" style="margin-top:.8rem">
+        <div class="field">
+          <label>Preset</label>
+          <select id="preset">
+            <option value="forest" selected>Soft Forest</option>
+            <option value="prairie">Sunny Prairie</option>
+            <option value="ocean">Ocean Breeze</option>
+            <option value="twilight">Twilight</option>
+          </select>
+        </div>
+        <div class="field"><label>Edges</label><input id="edge" type="range" min="0" max="1.2" step="0.05" value="0.7"></div>
+        <div class="field"><label>Posterize</label><input id="levels" type="range" min="4" max="24" step="1" value="12"></div>
+        <div class="field"><label>Saturation</label><input id="sat" type="range" min="0.6" max="1.6" step="0.02" value="1.15"></div>
+        <div class="field"><label>Warmth</label><input id="warm" type="range" min="-0.2" max="0.3" step="0.01" value="0.08"></div>
+      </div>
+      <input id="file" type="file" accept="image/*" hidden>
+      <div id="note" class="muted" style="margin-top:.6rem"></div>
+    </section>
 
-    <div class="row" style="margin-top:.6rem">
-      <input id="files" type="file" accept=".zip,image/*" multiple />
-      <button id="arrange" class="btn" type="button">Arrange → PDF</button>
-      <a id="downloadPdf" class="btn ghost" download="qr_a4.pdf" href="#" aria-disabled="true">Download PDF</a>
-    </div>
+    <section class="grid">
+      <div class="card">
+        <h3 style="margin:.2rem 0 .6rem">Original</h3>
+        <canvas id="src" width="1024" height="768"></canvas>
+      </div>
+      <div class="card">
+        <h3 style="margin:.2rem 0 .6rem">Ghibli‑style</h3>
+        <canvas id="dst" width="1024" height="768"></canvas>
+      </div>
+    </section>
 
-    <div class="row" style="margin-top:.6rem">
-      <label>QR size (mm): <input id="qrSize" type="number" value="15" step="0.1" min="3"></label>
-      <label>Gap (mm): <input id="gap" type="number" value="5" step="0.1" min="0"></label>
-      <label><input id="autoFit" type="checkbox" checked> Auto‑fit to one A4 page</label>
-    </div>
-
-    <div style="margin-top:.6rem">
-      <progress id="prog" value="0" max="100" hidden></progress>
-      <div id="note" class="muted" style="margin-top:.4rem"></div>
-    </div>
-  </div>
-
-  <div class="grid">
-    <div class="card">
-      <h3>Preview (scaled)</h3>
-      <canvas id="preview" width="794" height="1123" aria-label="Preview canvas"></canvas>
-      <ul class="muted flat">
-        <li>Print the generated PDF at 100% scale. Do not “fit to page”.</li>
-        <li>With 15 mm QR + 5 mm gap and 20 mm margins, about 104 fit; Auto‑fit shrinks to fit up to 200.</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h3>What it does</h3>
-      <ul class="muted flat">
-        <li>Reads images from ZIP or file picker (max 200)</li>
-        <li>Arranges inside a 20 mm margin on all sides</li>
-        <li>Keeps requested size/gap; shrinks if needed to fit on one page</li>
-        <li>Outputs a single‑page, millimeter‑accurate A4 PDF</li>
-      </ul>
-    </div>
-  </div>
-</div>
-
-<!-- JSZip for reading ZIPs -->
-<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-<!-- jsPDF for generating A4 PDF -->
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <div class="info">© <span id="year"></span> Made by ANABRATA</div>
+  </main>
 
 <script>
-// ===== Settings (fixed 20 mm margins) =====
-const MARGIN_MM = 20;  // 2 cm from each side
-const MAX_IMAGES = 200;
+document.getElementById('year').textContent = new Date().getFullYear();
 
-// ===== Elements =====
-const $ = id => document.getElementById(id);
-const filesEl = $('files');
-const arrangeBtn = $('arrange');
-const downloadPdf = $('downloadPdf');
-const note = $('note');
-const prog = $('prog');
-const canvas = $('preview');
-const ctx = canvas.getContext('2d');
-const qrSizeInput = $('qrSize');
-const gapInput = $('gap');
-const autoFitInput = $('autoFit');
+const pickBtn = document.getElementById('pick');
+const fileIn  = document.getElementById('file');
+const convertBtn = document.getElementById('convert');
+const downloadA  = document.getElementById('download');
+const note = document.getElementById('note');
 
-function blobToImage(blob){
-  return new Promise((res, rej) => {
-    const url = URL.createObjectURL(blob);
-    const img = new Image();
-    img.onload = () => { URL.revokeObjectURL(url); res(img); };
-    img.onerror = rej;
-    img.src = url;
-  });
-}
+const src = document.getElementById('src');
+const dst = document.getElementById('dst');
+const sctx = src.getContext('2d');
+const dctx = dst.getContext('2d');
 
-async function readAllImagesFromInput(fileList){
-  const imgs = [];
-  const files = Array.from(fileList || []);
-  const zips = files.filter(f => f.name.toLowerCase().endsWith('.zip'));
-  const singles = files.filter(f => !f.name.toLowerCase().endsWith('.zip'));
+const presetSel = document.getElementById('preset');
+const edgeRange = document.getElementById('edge');
+const lvlRange  = document.getElementById('levels');
+const satRange  = document.getElementById('sat');
+const warmRange = document.getElementById('warm');
 
-  for (const zf of zips){
-    const zip = await JSZip.loadAsync(zf);
-    const entries = Object.values(zip.files).filter(f => !f.dir && /\.(png|jpe?g|webp|bmp|gif|svg)$/i.test(f.name));
-    for (const entry of entries){
-      const blob = await entry.async("blob");
-      const img = await blobToImage(blob);
-      imgs.push(img);
-      if (imgs.length >= MAX_IMAGES) break;
-    }
-    if (imgs.length >= MAX_IMAGES) break;
-  }
+let imgBitmap = null;
 
-  for (const f of singles){
-    const img = await blobToImage(f);
-    imgs.push(img);
-    if (imgs.length >= MAX_IMAGES) break;
-  }
-
-  return imgs.slice(0, MAX_IMAGES);
-}
-
-// Preview layout on canvas (scaled to width)
-function previewLayout(imgs, qrMM, gapMM){
-  const pageWmm = 210, pageHmm = 297;
-  const pxPerMM = canvas.width / pageWmm;
-
-  const pageWpx = Math.round(pageWmm * pxPerMM);
-  const pageHpx = Math.round(pageHmm * pxPerMM);
-  const marginPx = Math.round(MARGIN_MM * pxPerMM);
-  let qrPx = Math.max(1, Math.round(qrMM * pxPerMM));
-  let gapPx = Math.max(0, Math.round(gapMM * pxPerMM));
-
-  // Available drawing area within margins
-  const availW = pageWpx - 2*marginPx;
-  const availH = pageHpx - 2*marginPx;
-
-  function fit(q, g){
-    const cols = Math.max(1, Math.floor( (availW + g) / (q + g) ));
-    const rows = Math.max(1, Math.floor( (availH + g) / (q + g) ));
-    return { cols, rows, capacity: cols*rows };
-  }
-
-  let { cols, rows, capacity } = fit(qrPx, gapPx);
-
-  if (capacity < imgs.length && autoFitInput.checked){
-    while (capacity < imgs.length && qrPx > 3){
-      qrPx -= 1; // shrink 1 px at a time
-      ({ cols, rows, capacity } = fit(qrPx, gapPx));
-    }
-  }
-
-  // White page
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, pageWpx, pageHpx);
-
-  // Draw margin guide (optional faint border)
-  ctx.strokeStyle = '#d0d0d0';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(marginPx + 0.5, marginPx + 0.5, availW - 1, availH - 1);
-
-  // Draw images inside margin
-  let i = 0;
-  for (let r=0; r<rows && i<imgs.length; r++){
-    for (let c=0; c<cols && i<imgs.length; c++){
-      const x = marginPx + c * (qrPx + gapPx);
-      const y = marginPx + r * (qrPx + gapPx);
-      ctx.drawImage(imgs[i], x, y, qrPx, qrPx);
-      i++;
-    }
-  }
-  return { placed: Math.min(imgs.length, capacity) };
-}
-
-function imageToJpegDataURL(img){
-  const t = document.createElement('canvas');
-  t.width = img.naturalWidth || 512;
-  t.height = img.naturalHeight || 512;
-  const c = t.getContext('2d');
-  c.drawImage(img, 0, 0, t.width, t.height);
-  return t.toDataURL('image/jpeg', 0.92);
-}
-
-async function buildPdf(imgs, qrMM, gapMM){
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit: 'mm', format: 'a4' }); // 210 × 297 mm
-
-  const pageW = 210, pageH = 297;
-  const availW = pageW - 2*MARGIN_MM;
-  const availH = pageH - 2*MARGIN_MM;
-
-  function fit(q, g){
-    const cols = Math.max(1, Math.floor( (availW + g) / (q + g) ));
-    const rows = Math.max(1, Math.floor( (availH + g) / (q + g) ));
-    return { cols, rows, capacity: cols*rows };
-  }
-
-  let qr = qrMM, gap = gapMM;
-  let { cols, rows, capacity } = fit(qr, gap);
-
-  if (capacity < imgs.length && autoFitInput.checked){
-    // shrink until fits or min size reached
-    for (let k=0; k<800 && capacity < imgs.length; k++){
-      qr = Math.max(3, Math.round((qr - 0.2) * 10) / 10);
-      ({ cols, rows, capacity } = fit(qr, gap));
-      if (qr <= 3) break;
-    }
-  }
-
-  // Optional: margin guide (comment out to hide)
-  // doc.setDrawColor(220);
-  // doc.rect(MARGIN_MM, MARGIN_MM, availW, availH);
-
-  let i = 0;
-  for (let r=0; r<rows && i<imgs.length; r++){
-    for (let c=0; c<cols && i<imgs.length; c++){
-      const x = MARGIN_MM + c * (qr + gap);
-      const y = MARGIN_MM + r * (qr + gap);
-      const dataUrl = imageToJpegDataURL(imgs[i]);
-      doc.addImage(dataUrl, 'JPEG', x, y, qr, qr);
-      i++;
-    }
-  }
-  return doc.output('blob');
-}
-
-// Arrange → PDF and enable download
-arrangeBtn.onclick = async () => {
-  try{
-    note.textContent = "Reading files…";
-    prog.hidden = false; prog.value = 5;
-    const imgs = await readAllImagesFromInput(filesEl.files);
-    if (!imgs.length){ note.textContent = "No images found."; prog.hidden = true; return; }
-    if (imgs.length > MAX_IMAGES) imgs.length = MAX_IMAGES;
-
-    prog.value = 25; note.textContent = `Loaded ${imgs.length} image(s). Arranging…`;
-
-    const qrMM = parseFloat(qrSizeInput.value) || 15;
-    const gapMM = parseFloat(gapInput.value) || 5;
-
-    previewLayout(imgs, qrMM, gapMM);
-
-    prog.value = 55; note.textContent = "Building A4 PDF…";
-    const blob = await buildPdf(imgs, qrMM, gapMM);
-
-    const url = URL.createObjectURL(blob);
-    downloadPdf.href = url;
-    downloadPdf.setAttribute('aria-disabled','false');
-
-    prog.value = 100; note.textContent = "PDF ready. Click Download PDF.";
-    setTimeout(() => prog.hidden = true, 400);
-  } catch(e){
-    console.error(e);
-    note.textContent = "Error arranging or building PDF.";
-    prog.hidden = true;
-  }
+// UI
+pickBtn.onclick = () => fileIn.click();
+fileIn.onchange = async () => {
+  if (!fileIn.files || !fileIn.files[0]) return;
+  await loadImage(fileIn.files[0]);
+  convertBtn.disabled = false;
+  note.textContent = "Photo loaded. Adjust controls and click Convert.";
 };
+convertBtn.onclick = async () => {
+  if (!imgBitmap) return;
+  note.textContent = "Converting…";
+  await ghibliize();
+  note.textContent = "Done. Use Download PNG.";
+  const url = dst.toDataURL('image/png');
+  downloadA.href = url;
+  downloadA.setAttribute('aria-disabled','false');
+};
+
+async function loadImage(file){
+  const blobURL = URL.createObjectURL(file);
+  const img = await createImageBitmap(await fetch(blobURL).then(r=>r.blob()), { premultiplyAlpha: 'none', colorSpaceConversion: 'default' });
+  URL.revokeObjectURL(blobURL);
+  imgBitmap = img;
+
+  // Fit into canvases (max dimension ~1400 for speed)
+  const maxDim = 1400;
+  let w = img.width, h = img.height;
+  const scale = Math.min(1, maxDim / Math.max(w, h));
+  w = Math.round(w * scale); h = Math.round(h * scale);
+
+  [src, dst].forEach(c => { c.width = w; c.height = h; });
+  sctx.drawImage(img, 0, 0, w, h);
+  dctx.clearRect(0,0,w,h);
+}
+
+// Core pipeline: posterize + pastel palette + edges + warmth + light grain
+async function ghibliize(){
+  const w = src.width, h = src.height;
+  const srcData = sctx.getImageData(0,0,w,h);
+  const out = dctx.createImageData(w,h);
+
+  const levels = parseInt(lvlRange.value, 10);        // posterize bins
+  const edgeK  = parseFloat(edgeRange.value);         // edge darkness
+  const satK   = parseFloat(satRange.value);          // saturation factor
+  const warmK  = parseFloat(warmRange.value);         // warmth shift
+
+  // 1) Gentle blur (box blur 2 passes) to smooth textures
+  const blurred = boxBlur(srcData, w, h, 1);
+  // 2) Edge map via Sobel on blurred luminance
+  const edges = sobelEdges(blurred, w, h);
+  // 3) Posterize and palette map
+  palettePosterize(blurred, out, levels, satK, warmK, presetSel.value);
+  // 4) Darken by edges
+  applyEdges(out, edges, edgeK);
+  // 5) Subtle film grain
+  addGrain(out, w, h, 0.02);
+
+  dctx.putImageData(out, 0, 0);
+}
+
+/* Utilities */
+
+function clamp(x, a, b){ return x < a ? a : (x > b ? b : x); }
+
+function boxBlur(img, w, h, r){
+  // simple two-pass box blur radius r (small smoothing)
+  const src = img.data;
+  const tmp = new Uint8ClampedArray(src.length);
+  const out = new ImageData(w,h);
+  const t = tmp, o = out.data;
+
+  // horizontal
+  for (let y=0; y<h; y++){
+    let sumR=0,sumG=0,sumB=0,sumA=0;
+    let idx = y*w*4;
+    for (let dx=-r; dx<=r; dx++){
+      const x = clamp(dx,0,w-1)*4 + idx;
+      sumR+=src[x]; sumG+=src[x+1]; sumB+=src[x+2]; sumA+=src[x+3];
+    }
+    for (let x=0; x<w; x++){
+      const i = idx + x*4;
+      t[i]  = sumR/(2*r+1);
+      t[i+1]= sumG/(2*r+1);
+      t[i+2]= sumB/(2*r+1);
+      t[i+3]= sumA/(2*r+1);
+      // slide
+      const xOut = clamp(x-r,0,w-1)*4 + idx;
+      const xIn  = clamp(x+r+1,0,w-1)*4 + idx;
+      sumR += src[xIn]-src[xOut];
+      sumG += src[xIn+1]-src[xOut+1];
+      sumB += src[xIn+2]-src[xOut+2];
+      sumA += src[xIn+3]-src[xOut+3];
+    }
+  }
+
+  // vertical
+  for (let x=0; x<w; x++){
+    let sumR=0,sumG=0,sumB=0,sumA=0;
+    let base = x*4;
+    for (let dy=-r; dy<=r; dy++){
+      const y = clamp(dy,0,h-1);
+      const i = y*w*4 + base;
+      sumR+=tmp[i]; sumG+=tmp[i+1]; sumB+=tmp[i+2]; sumA+=tmp[i+3];
+    }
+    for (let y=0; y<h; y++){
+      const i = y*w*4 + base;
+      o[i]  = sumR/(2*r+1);
+      o[i+1]= sumG/(2*r+1);
+      o[i+2]= sumB/(2*r+1);
+      o[i+3]= sumA/(2*r+1);
+      const yOut = clamp(y-r,0,h-1)*w*4 + base;
+      const yIn  = clamp(y+r+1,0,h-1)*w*4 + base;
+      sumR += tmp[yIn]-tmp[yOut];
+      sumG += tmp[yIn+1]-tmp[yOut+1];
+      sumB += tmp[yIn+2]-tmp[yOut+2];
+      sumA += tmp[yIn+3]-tmp[yOut+3];
+    }
+  }
+  return out;
+}
+
+function sobelEdges(img, w, h){
+  const a = img.data;
+  const out = new Float32Array(w*h);
+  const gxK = [-1,0,1,-2,0,2,-1,0,1];
+  const gyK = [-1,-2,-1,0,0,0,1,2,1];
+  function lum(i){ return (a[i]*0.299 + a[i+1]*0.587 + a[i+2]*0.114); }
+  for (let y=1; y<h-1; y++){
+    for (let x=1; x<w-1; x++){
+      let gx=0, gy=0, k=0;
+      for (let j=-1; j<=1; j++){
+        for (let i=-1; i<=1; i++){
+          const idx = ((y+j)*w + (x+i))*4;
+          const L = lum(idx);
+          gx += L * gxK[k]; gy += L * gyK[k]; k++;
+        }
+      }
+      const m = Math.hypot(gx, gy) / 255; // 0..~1+
+      out[y*w + x] = m;
+    }
+  }
+  // normalize softly
+  for (let i=0;i<out.length;i++) out[i] = clamp(out[i]*1.2, 0, 1);
+  return out;
+}
+
+function palettePosterize(src, out, levels, satK, warmK, preset){
+  const s = src.data, d = out.data;
+  const step = 255 / (levels-1);
+  // palette tints
+  let tint = { r:0, g:0, b:0 }, satMul = satK, gamma=1.0;
+  if (preset==='forest'){ tint={r: -6, g: 4, b: -2}; gamma=0.98; }
+  else if (preset==='prairie'){ tint={r: 8, g: 6, b:-6}; gamma=0.98; }
+  else if (preset==='ocean'){ tint={r:-6, g: 0, b: 8}; gamma=1.02; }
+  else if (preset==='twilight'){ tint={r: 8, g:-4, b:10}; gamma=0.95; }
+
+  for (let i=0; i<s.length; i+=4){
+    // posterize per channel
+    let r = Math.round(s[i]  / step) * step;
+    let g = Math.round(s[i+1]/ step) * step;
+    let b = Math.round(s[i+2]/ step) * step;
+
+    // convert to HSL for saturation + warmth (approx)
+    const hsl = rgb2hsl(r,g,b);
+    hsl.s = clamp(hsl.s*satMul, 0, 1);
+    // warmth shifts hue slightly toward reds/yellows
+    hsl.h = (hsl.h + warmK*0.07) % 1;
+    let rgb = hsl2rgb(hsl.h, hsl.s, Math.pow(hsl.l, gamma));
+
+    // palette tint
+    rgb.r = clamp(rgb.r + tint.r, 0, 255);
+    rgb.g = clamp(rgb.g + tint.g, 0, 255);
+    rgb.b = clamp(rgb.b + tint.b, 0, 255);
+
+    d[i]   = rgb.r|0;
+    d[i+1] = rgb.g|0;
+    d[i+2] = rgb.b|0;
+    d[i+3] = 255;
+  }
+}
+
+function applyEdges(img, edges, k){
+  const d = img.data;
+  for (let y=0, p=0; y<img.height; y++){
+    for (let x=0; x<img.width; x++, p++){
+      const e = edges[p];               // 0..1
+      const f = 1 - clamp(e*k, 0, 0.85); // darken factor
+      const i = p*4;
+      d[i]   = (d[i]*f)|0;
+      d[i+1] = (d[i+1]*f)|0;
+      d[i+2] = (d[i+2]*f)|0;
+    }
+  }
+}
+
+function addGrain(img, w, h, amt){
+  const d = img.data;
+  let seed = 1337;
+  function rand(){ seed ^= seed<<13; seed ^= seed>>>17; seed ^= seed<<5; return ((seed>>>0)%1000)/1000; }
+  for (let i=0;i<d.length;i+=4){
+    const n = (rand()-0.5)*255*amt;
+    d[i]   = clamp(d[i]  + n, 0, 255)|0;
+    d[i+1] = clamp(d[i+1]+ n, 0, 255)|0;
+    d[i+2] = clamp(d[i+2]+ n, 0, 255)|0;
+  }
+}
+
+/* Color helpers */
+function rgb2hsl(r,g,b){
+  r/=255; g/=255; b/=255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b);
+  let h,s,l=(max+min)/2;
+  if(max===min){ h=s=0 }
+  else{
+    const d=max-min;
+    s=l>0.5? d/(2-max-min) : d/(max+min);
+    switch(max){
+      case r: h=(g-b)/d + (g<b?6:0); break;
+      case g: h=(b-r)/d + 2; break;
+      case b: h=(r-g)/d + 4; break;
+    }
+    h/=6;
+  }
+  return {h,s,l};
+}
+function hsl2rgb(h,s,l){
+  let r,g,b;
+  if(s===0){ r=g=b=l }
+  else{
+    const hue2rgb=(p,q,t)=>{ if(t<0)t+=1; if(t>1)t-=1; if(t<1/6)return p+(q-p)*6*t; if(t<1/2)return q; if(t<2/3)return p+(q-p)*(2/3 - t)*6; return p; };
+    const q = l < 0.5 ? l*(1+s) : l + s - l*s;
+    const p = 2*l - q;
+    r=hue2rgb(p,q,h+1/3); g=hue2rgb(p,q,h); b=hue2rgb(p,q,h-1/3);
+  }
+  return { r: Math.round(r*255), g: Math.round(g*255), b: Math.round(b*255) };
+}
 </script>
 </body>
 </html>
