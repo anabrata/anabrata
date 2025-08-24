@@ -11,12 +11,14 @@
     --card:#ffffffee; --text:#0b1020; --muted:#4b5563; --ring:rgba(0,0,0,.12);
     --grad: linear-gradient(135deg, var(--green), var(--blue), var(--yellow));
   }
+
+  /* Soft animated background */
   body{
     margin:0; font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif; color:var(--text);
     background:
-      radial-gradient(1200px 800px at 10% 10%, rgba(16,185,129,.25), transparent 60%),
-      radial-gradient(1200px 800px at 90% 20%, rgba(59,130,246,.25), transparent 60%),
-      radial-gradient(1200px 800px at 50% 100%, rgba(253,224,71,.25), transparent 60%),
+      radial-gradient(1200px 800px at 10% 10%, rgba(16,185,129,.22), transparent 60%),
+      radial-gradient(1200px 800px at 90% 20%, rgba(59,130,246,.22), transparent 60%),
+      radial-gradient(1200px 800px at 50% 100%, rgba(253,224,71,.22), transparent 60%),
       linear-gradient(120deg, #e8fdf6, #eef4ff 40%, #fffbe6 80%, #ffffff);
     background-size:140% 140%; animation:bgShift 18s ease-in-out infinite alternate;
   }
@@ -24,7 +26,31 @@
     0%{ background-position:0% 0%, 100% 0%, 50% 100%, 0% 0% }
     100%{ background-position:50% 30%, 50% 20%, 60% 70%, 100% 100% }
   }
-  .wrap{ width:min(1120px,94%); margin:0 auto; }
+
+  /* Decorative “trees/flowers” side panels (pure CSS) */
+  .decor{ position:fixed; top:0; bottom:0; width:170px; pointer-events:none; z-index:0; opacity:.9; filter:saturate(1.1) }
+  .decor.left{ left:0;
+    background:
+      radial-gradient(60px 60px at 40% 12%, rgba(16,185,129,.35), transparent 60%),
+      radial-gradient(48px 48px at 70% 28%, rgba(59,130,246,.30), transparent 60%),
+      radial-gradient(56px 56px at 32% 62%, rgba(253,224,71,.35), transparent 60%),
+      conic-gradient(from 0deg at 58% 58%, rgba(16,185,129,.20), rgba(59,130,246,.20), rgba(253,224,71,.20), rgba(16,185,129,.20));
+    mask-image: linear-gradient(90deg, rgba(0,0,0,.85), rgba(0,0,0,.4), transparent);
+    animation: floatL 12s ease-in-out infinite alternate;
+  }
+  .decor.right{ right:0;
+    background:
+      radial-gradient(58px 58px at 60% 20%, rgba(59,130,246,.32), transparent 60%),
+      radial-gradient(52px 52px at 30% 42%, rgba(16,185,129,.34), transparent 60%),
+      radial-gradient(50px 50px at 68% 74%, rgba(253,224,71,.34), transparent 60%),
+      conic-gradient(from 180deg at 40% 50%, rgba(59,130,246,.20), rgba(16,185,129,.20), rgba(253,224,71,.20), rgba(59,130,246,.20));
+    mask-image: linear-gradient(270deg, rgba(0,0,0,.85), rgba(0,0,0,.4), transparent);
+    animation: floatR 13s ease-in-out infinite alternate;
+  }
+  @keyframes floatL{ 0%{ transform:translateY(0) } 100%{ transform:translateY(10px) } }
+  @keyframes floatR{ 0%{ transform:translateY(6px) } 100%{ transform:translateY(-4px) } }
+
+  .wrap{ width:min(1200px,94%); margin:0 auto; position:relative; z-index:1 }
 
   /* Hero */
   header.hero{ min-height:34vh; display:grid; place-items:center; text-align:center; padding: clamp(1.6rem,6vw,3rem) 0 1rem; }
@@ -33,59 +59,56 @@
     background:linear-gradient(90deg, var(--green), var(--blue), var(--yellow), var(--green));
     -webkit-background-clip:text; background-clip:text; color:transparent;
     background-size:200% 100%;
-    font-size: clamp(1.3rem, 4.2vw, 2.5rem);
+    font-size: clamp(1.3rem, 4.2vw, 2.6rem);
     animation: fadeInOut 8s ease-in-out infinite, hue 14s linear infinite;
   }
   @keyframes hue{ 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
   @keyframes fadeInOut{ 0%{opacity:0} 18%{opacity:1} 82%{opacity:1} 100%{opacity:0} }
-  .byline{ margin-top:.5rem; font-weight:800; color:#0b1020; display:inline-block; padding:.35rem .7rem; border-radius:.7rem;
+  .byline{ margin-top:.5rem; font-weight:800; color:#0b1020; display:inline-block; padding:.4rem .85rem; border-radius:.8rem;
            background:linear-gradient(90deg, rgba(16,185,129,.18), rgba(59,130,246,.18), rgba(253,224,71,.18));
            box-shadow:0 6px 22px rgba(16,185,129,.14), 0 4px 16px rgba(59,130,246,.12) }
 
-  /* Shiny centered menu panel */
-  .menu-wrap{
-    display:grid; place-items:center; margin: 0 auto 1rem; width:100%;
-  }
+  /* Shiny centered menu panel (bigger) */
+  .menu-wrap{ display:grid; place-items:center; margin: 0 auto 1.2rem; width:100%; }
   .shiny-panel{
-    position:relative; width:min(720px, 96%); border-radius:18px; padding:1.2rem;
-    background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.86));
-    border:1px solid rgba(255,255,255,0.6);
+    position:relative; width:min(900px, 96%); border-radius:22px; padding:1.6rem;
+    background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.90));
+    border:1px solid rgba(255,255,255,0.7);
     box-shadow:
-      0 20px 50px rgba(59,130,246,0.25),
-      0 12px 32px rgba(16,185,129,0.22),
-      inset 0 1px 0 rgba(255,255,255,0.6);
-    backdrop-filter: blur(10px);
+      0 24px 60px rgba(59,130,246,0.28),
+      0 16px 40px rgba(16,185,129,0.24),
+      inset 0 1px 0 rgba(255,255,255,0.7);
+    backdrop-filter: blur(12px);
     overflow:hidden;
   }
   .shiny-panel::before{
     content:""; position:absolute; inset:-60% -40% auto -40%; height:220%; width:180%;
     background: linear-gradient(120deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.08) 55%, rgba(255,255,255,0) 75%);
     transform: translateX(-60%) rotate(18deg);
-    animation: sheen 6.5s linear infinite;
+    animation: sheen 7s linear infinite;
     pointer-events:none; mix-blend-mode: screen;
   }
-  @keyframes sheen{
-    0%{ transform: translateX(-60%) rotate(18deg) }
-    100%{ transform: translateX(60%) rotate(18deg) }
-  }
+  @keyframes sheen{ 0%{ transform: translateX(-60%) rotate(18deg) } 100%{ transform: translateX(60%) rotate(18deg) } }
 
   /* Inner card and controls */
   .card{ background:var(--card); backdrop-filter:blur(6px); border:1px solid var(--ring); border-radius:14px; padding:1rem; box-shadow:0 10px 28px rgba(0,0,0,.08) }
-  .row{ display:flex; gap:.8rem; align-items:center; flex-wrap:wrap }
-  .btn{ background:var(--grad); color:#073b2b; border:0; padding:.74rem 1.05rem; border-radius:.8rem; font-weight:900; cursor:pointer;
-        box-shadow:0 6px 18px rgba(16,185,129,.22), 0 3px 12px rgba(59,130,246,.14) }
+  .row{ display:flex; gap:.9rem; align-items:center; flex-wrap:wrap }
+  .btn{
+    background:var(--grad); color:#073b2b; border:0; padding:.9rem 1.2rem; border-radius:1rem; font-weight:900; cursor:pointer;
+    box-shadow:0 8px 22px rgba(16,185,129,.22), 0 4px 14px rgba(59,130,246,.14); font-size:1.02rem
+  }
   .btn.ghost{ background:linear-gradient(135deg, rgba(16,185,129,.12), rgba(59,130,246,.12)); color:#0b1020; border:1px solid var(--ring) }
-  .field{ position:relative; display:flex; align-items:center; gap:.5rem; background:#f8fafc; border:1px solid #e5e7eb; border-radius:.8rem; padding:.45rem .65rem }
-  .field input{ border:0; background:transparent; outline:none; font:inherit; color:inherit; padding:.35rem .2rem; min-width:6ch }
+  .field{ position:relative; display:flex; align-items:center; gap:.6rem; background:#f8fafc; border:1px solid #e5e7eb; border-radius:.9rem; padding:.55rem .75rem }
+  .field input{ border:0; background:transparent; outline:none; font:inherit; color:inherit; padding:.4rem .25rem; min-width:6ch; font-size:1rem }
 
-  /* Dropzone centered inside panel */
+  /* Dropzone centered inside panel (bigger) */
   .dropzone{
-    position:relative; display:grid; place-items:center; text-align:center; padding:1.4rem; border-radius:1rem;
+    position:relative; display:grid; place-items:center; text-align:center; padding:1.6rem; border-radius:1.1rem;
     border:2px dashed #cbd5e1; background:linear-gradient(135deg, rgba(16,185,129,.08), rgba(59,130,246,.08), rgba(253,224,71,.08));
   }
   #file{ display:none }
-  .thumb{ margin-top:.7rem; display:flex; gap:.6rem; align-items:center; justify-content:center }
-  .thumb img{ width:84px; height:63px; object-fit:cover; border-radius:.5rem; border:1px solid #e5e7eb; background:#fff } /* 4×3 preview */
+  .thumb{ margin-top:.9rem; display:flex; gap:.7rem; align-items:center; justify-content:center }
+  .thumb img{ width:112px; height:84px; object-fit:cover; border-radius:.7rem; border:1px solid #e5e7eb; background:#fff } /* 4×3 preview */
 
   /* Layout area */
   .grid{ display:grid; gap:1rem; grid-template-columns:1.2fr .8fr; align-items:start; margin:1rem 0 2rem }
@@ -96,22 +119,26 @@
 </style>
 </head>
 <body>
+  <!-- Decorative sides -->
+  <div class="decor left"></div>
+  <div class="decor right"></div>
+
   <header class="hero">
     <div class="wrap">
-      <div class="welcome">WELCOME IN THE WORLD OF PHOTOS</div>
+      <div class="welcome">WELCOME TO THE WORLD OF PHOTOS</div>
       <div class="byline">Made by ANABRATA</div>
     </div>
   </header>
 
   <main class="wrap">
-    <!-- Shiny centered Choose-one-photo menu -->
+    <!-- Centered shiny Choose-one-photo menu -->
     <section class="menu-wrap">
       <div class="shiny-panel">
         <div class="dropzone">
           <div>
-            <div style="font-weight:800; font-size:1.05rem">Choose one photo</div>
-            <div class="muted" style="font-size:.95rem">Default copies: 6 • Each tile prints 4 × 3 cm • 6 per row</div>
-            <div class="row" style="justify-content:center; margin-top:.6rem">
+            <div style="font-weight:900; font-size:1.15rem">Choose one photo</div>
+            <div class="muted" style="font-size:1rem">Default copies: 6 • Each tile prints 4 × 3 cm • 6 per row</div>
+            <div class="row" style="justify-content:center; margin-top:.8rem">
               <button class="btn" id="chooseBtn" type="button">Choose photo</button>
               <button class="btn ghost" id="arrange" type="button">Arrange → PDF</button>
               <a id="downloadPdf" class="btn ghost" download="photos_a4_portrait_4x3cm_6cols.pdf" href="#" aria-disabled="true">Download PDF</a>
@@ -127,9 +154,8 @@
     </section>
 
     <section class="card">
-      <div class="row" style="gap:.9rem">
+      <div class="row">
         <div class="field"><span>Number of photos</span><input id="copies" type="number" value="6" min="1" step="1"></div>
-        <div class="field"><span>Gap (mm)</span><input id="gap" type="number" value="2" step="0.5" min="0"></div>
       </div>
       <div style="margin-top:.6rem">
         <progress id="prog" value="0" max="100" hidden></progress>
@@ -140,6 +166,7 @@
     <section class="grid">
       <div class="card">
         <h3 style="margin:.2rem 0 .8rem">Preview (scaled)</h3>
+        <!-- A4 portrait preview -->
         <canvas id="preview" width="840" height="1188" aria-label="Preview canvas"></canvas>
         <p class="muted" style="margin:.5rem 0 0">Print at 100% (no “Fit to page”). Each tile = 40 × 30 mm. Starts at 10 mm top/left margin.</p>
       </div>
@@ -148,7 +175,7 @@
         <ul class="muted" style="margin:.2rem 0 0; padding-left:1rem; list-style:disc">
           <li>A4 portrait: 210 × 297 mm</li>
           <li>Top-left origin inside a 10 mm printer-safe margin</li>
-          <li>6 columns fixed; horizontal gap auto‑clamped so they fit</li>
+          <li>6 columns fixed; small built‑in spacing keeps rows readable</li>
           <li>Rows paginate to new A4 pages if needed</li>
         </ul>
       </div>
@@ -165,8 +192,9 @@
 
   // A4 portrait constants
   const PAGE_W_MM = 210, PAGE_H_MM = 297;
-  const MARGIN_MM = 10; // start top-left inside 10 mm margin
-  // Base tile: 4×3 cm (40×30). If 6 across won’t fit, we silently rotate to 3×4 (30×40) to keep 6 columns.
+  const MARGIN_MM = 10;          // start top-left inside 10 mm margin
+  const GAP_MM    = 2;           // fixed small spacing (option removed)
+  // Base tile: 4×3 cm (40×30). If 6 across won’t fit, silently rotate to 3×4 (30×40) to keep 6 columns.
   const TILE_W_4x3 = 40, TILE_H_4x3 = 30;
   const TILE_W_3x4 = 30, TILE_H_3x4 = 40;
   const COLS = 6;
@@ -179,7 +207,6 @@
   const thumbImg = $('thumbImg');
   const fileNote = $('fileNote');
   const copiesInput = $('copies');
-  const gapInput = $('gap');
   const arrangeBtn = $('arrange');
   const downloadPdf = $('downloadPdf');
   const note = $('note');
@@ -198,7 +225,7 @@
     } else { thumb.style.display = 'none'; thumbImg.removeAttribute('src'); fileNote.textContent = ''; }
   });
 
-  // Utilities
+  // Helpers
   function blobToImage(blob){
     return new Promise((res, rej) => {
       const url = URL.createObjectURL(blob);
@@ -219,7 +246,7 @@
   }
 
   // Hidden auto-rotate to keep 6 across on portrait
-  function pickTileSize(userGap){
+  function pickTileSize(){
     const availW = PAGE_W_MM - 2*MARGIN_MM;
     const maxGX_4x3 = (availW - COLS*TILE_W_4x3) / (COLS - 1);
     const maxGX_3x4 = (availW - COLS*TILE_W_3x4) / (COLS - 1);
@@ -232,18 +259,18 @@
     return Math.max(1, Math.floor((availH + gapY) / (tileH + gapY)));
   }
 
-  function planLayout(userGap, copies){
-    const { tw, th, maxGX } = pickTileSize(userGap);
-    const gapX = Math.min(userGap, maxGX);
-    const gapY = userGap;
-    const rpp  = rowsPerPage(th, gapY);
+  function planLayout(copies){
+    const { tw, th, maxGX } = pickTileSize();
+    const gapX = Math.min(GAP_MM, maxGX); // clamp horizontally to keep 6 across
+    const gapY = GAP_MM;                  // fixed vertical spacing
+    const rpp  = rowsPerPage(th, gapY);   // rows per page
     const capacityPerPage = COLS * rpp;
     return { tw, th, gapX, gapY, rpp, capacityPerPage };
   }
 
   // Preview (first page), origin at top-left margin
-  async function previewLayout(img, copies, userGap){
-    const p = planLayout(userGap, copies);
+  async function previewLayout(img, copies){
+    const p = planLayout(copies);
     const { tw, th, gapX, gapY, rpp } = p;
 
     const pxPerMM = canvas.width / PAGE_W_MM;
@@ -259,7 +286,7 @@
     ctx.strokeStyle = '#d1d5db'; ctx.lineWidth = 1;
     ctx.strokeRect(marginPx + .5, marginPx + .5, pageWpx - 2*marginPx - 1, pageHpx - 2*marginPx - 1);
 
-    const ox = marginPx, oy = marginPx; // start at top-left margin
+    const ox = marginPx, oy = marginPx; // start at top-left
     let i = 0, placed = Math.min(copies, COLS * rpp);
     for (let r=0; r<rpp && i<placed; r++){
       for (let c=0; c<COLS && i<placed; c++){
@@ -269,15 +296,18 @@
         i++;
       }
     }
-    const { maxGX } = pickTileSize(userGap);
-    $('note').textContent = (userGap > maxGX) ? `Horizontal gap reduced to ${gapX.toFixed(2)} mm to keep 6 columns.` : '';
+
+    const { maxGX } = pickTileSize();
+    $('note').textContent = (GAP_MM > maxGX)
+      ? `Horizontal spacing auto‑reduced to ${gapX.toFixed(2)} mm to keep 6 across.`
+      : '';
     return p;
   }
 
   // PDF builder (multi-page), origin at top-left margin
-  async function buildPdf(img, copies, userGap){
+  async function buildPdf(img, copies){
     const { jsPDF } = window.jspdf;
-    const p = planLayout(userGap, copies);
+    const p = planLayout(copies);
     const { tw, th, gapX, gapY, rpp } = p;
 
     const doc = new jsPDF({ unit:'mm', format:[PAGE_W_MM, PAGE_H_MM] }); // portrait
@@ -325,13 +355,12 @@
       const img = await blobToImage(fileEl.files[0]);
 
       const copies = Math.max(1, parseInt($('copies').value || '6', 10));
-      const userGap = Math.max(0, parseFloat($('gap').value || '0'));
 
       $('prog').value = 35; $('note').textContent = "Arranging preview…";
-      await previewLayout(img, copies, userGap);
+      await previewLayout(img, copies);
 
       $('prog').value = 60; $('note').textContent = "Building PDF…";
-      const blob = await buildPdf(img, copies, userGap);
+      const blob = await buildPdf(img, copies);
 
       const url = URL.createObjectURL(blob);
       $('downloadPdf').href = url;
