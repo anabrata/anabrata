@@ -7,6 +7,7 @@
   <style>
     :root{
       --bg1:#0f1021; --bg2:#1b1e3c; --bg3:#1d3557; --cardText:#e8ecff;
+      --accent:#ffd166;
     }
     html, body { height:100%; margin:0; }
     body {
@@ -26,7 +27,7 @@
     .title .shine { background: linear-gradient(120deg, #ffffff 5%, #fff7, #ffffff 95%); -webkit-background-clip:text; background-clip:text; color:transparent; background-size:200% 100%; animation: sheen 6s ease-in-out infinite; text-shadow:0 0 18px rgba(255,255,255,0.12); }
     @keyframes sheen { 0%{background-position:200% 0} 50%{background-position:0% 0} 100%{background-position:-200% 0} }
     .subtitle { margin-top:6px; font-size:clamp(12px,1.6vw,16px); opacity:.85; }
-    .credit { margin-top:4px; font-size:clamp(12px,1.5vw,15px); color:#c2c8ff; text-shadow:0 0 10px rgba(255,255,255,0.08); }
+    .credit { margin-top:4px; font-size:clamp(12px,1.5vw,15px); color:#c2c8ff; text-shadow: 0 0 10px rgba(255,255,255,0.08); }
     .glow { position:absolute; top:-40px; left:50%; transform:translateX(-50%); width:66vw; height:120px; border-radius:999px; background: radial-gradient(ellipse at center, rgba(255,209,102,0.22), transparent 60%); filter:blur(12px); z-index:1; pointer-events:none; animation:pulse 5.5s ease-in-out infinite; }
     @keyframes pulse { 0%,100%{opacity:.6} 50%{opacity:.95} }
 
@@ -55,7 +56,7 @@
 
   <div class="hintTop">Tip: rotate (drag), zoom (wheel), pan (right‑drag). Click organelles for info.</div>
 
-  <div id="status">Loading Plotly…</div>
+  <div id="status">Loading…</div>
   <div id="plot" role="img" aria-label="Interactive 3D human cell with labeled organelles"></div>
 
   <div id="panel" class="panel" aria-live="polite">
@@ -66,20 +67,22 @@
   </div>
 
   <script>
-  // --- Dynamic local loader: tries several common paths for plotly.min.js ---
+  /*
+    IMPORTANT — set the exact local path to your Plotly bundle here.
+    Examples (relative to this index.html):
+      'plotly.min.js'
+      'js/plotly.min.js'
+      'docs/plotly.min.js'   (if index.html is in repo root but Pages serves from /docs, put both in /docs)
+      'plotly-2.34.0.min.js' (if you kept the versioned filename)
+  */
+  const PLOTLY_PATH = 'plotly.min.js';
+
   (function(){
     const statusEl = document.getElementById('status');
-    const candidates = [
-      'plotly.min.js',
-      'js/plotly.min.js',
-      'assets/plotly.min.js',
-      'assets/js/plotly.min.js',
-      'lib/plotly.min.js'
-    ];
-    let tried = [];
+
     function fail(msg){
       statusEl.classList.add('error');
-      statusEl.textContent = msg + (tried.length ? ' Tried: ' + tried.join(', ') : '');
+      statusEl.textContent = msg;
     }
     function loadScript(src){
       return new Promise((resolve, reject)=>{
@@ -90,26 +93,16 @@
         document.head.appendChild(s);
       });
     }
-    async function ensurePlotly(){
-      for (const src of candidates){
-        try {
-          tried.push(src);
-          await loadScript(src);
-          if (typeof Plotly !== 'undefined') {
-            statusEl.textContent = 'Plotly loaded';
-            return true;
-          }
-        } catch(e) { /* try next */ }
-      }
-      return false;
-    }
 
-    ensurePlotly().then(ok=>{
-      if (!ok) {
-        fail('Plotly failed to load locally. Place plotly.min.js next to index.html or in one of the candidate folders.');
+    // Try to load Plotly from the configured path
+    loadScript(PLOTLY_PATH).then(()=>{
+      if (typeof Plotly === 'undefined') {
+        fail('Plotly loaded but not available. Check the file integrity and path.');
         return;
       }
-      startApp(); // proceed once Plotly is available
+      startApp();
+    }).catch((e)=>{
+      fail('Plotly failed to load from "' + PLOTLY_PATH + '". Move plotly.min.js to this folder (or update PLOTLY_PATH).');
     });
 
     // ----------------- App code (runs after Plotly loads) -----------------
@@ -227,7 +220,7 @@
 
       // Chromatin loops
       (function(){
-        function spiral(cx,cy,cz,rad,turns,phase,color){
+        function spiral(cx,cy,cz,rad,turns,phase){
           const curve = (t)=>[ cx + (rad+0.25*Math.sin(3*t+phase))*Math.cos(t),
                                cy + (rad+0.25*Math.cos(2*t+phase))*Math.sin(t),
                                cz + 0.6*Math.sin(1.2*t+phase) ];
@@ -320,9 +313,11 @@
       })();
 
       const layout = {
-        title: '', showlegend:true,
+        title: '',
+        showlegend:true,
         legend:{orientation:'h', yanchor:'bottom', y:0.02, xanchor:'center', x:0.5, font:{color:'#e8ecff'}},
-        paper_bgcolor:'rgba(0,0,0,0)', margin:{l:0,r:0,t:0,b:0},
+        paper_bgcolor:'rgba(0,0,0,0)',
+        margin:{l:0,r:0,t:0,b:0},
         scene:{ xaxis:{visible:false}, yaxis:{visible:false}, zaxis:{visible:false}, aspectmode:'data', camera:{eye:{x:1.7,y:1.9,z:1.15}}, bgcolor:'rgba(0,0,0,0)' }
       };
 
@@ -347,16 +342,5 @@
     }
   })();
   </script>
-</body>
-</html>
-<!doctype html>
-<html>
-<head><meta charset="utf-8"><title>Plotly Test</title><script src="plotly.min.js"></script></head>
-<body>
-<div id="out">Testing…</div>
-<script>
-  const el = document.getElementById('out');
-  el.textContent = (typeof Plotly === 'undefined') ? 'Plotly NOT loaded' : 'Plotly loaded: ' + (Plotly.version || '');
-</script>
 </body>
 </html>
