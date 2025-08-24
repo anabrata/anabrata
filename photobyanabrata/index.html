@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>A4 Photo Sheet (4×3 cm • 6 per row • One page) • Made by ANABRATA</title>
+<title>A4 Photo Sheet (4×3 cm • 6 per row) • Made by ANABRATA</title>
 <meta name="color-scheme" content="light dark" />
 <style>
   :root{
@@ -42,7 +42,6 @@
            box-shadow:0 6px 22px rgba(16,185,129,.14), 0 4px 16px rgba(59,130,246,.12) }
 
   .card{ background:var(--card); backdrop-filter:blur(6px); border:1px solid var(--ring); border-radius:14px; padding:1rem; box-shadow:0 10px 28px rgba(0,0,0,.08) }
-  .pill{ display:inline-block; padding:.28rem .6rem; border:1px solid var(--ring); border-radius:999px; font-size:.85rem; color:var(--muted) }
   .row{ display:flex; gap:.8rem; align-items:center; flex-wrap:wrap }
   .btn{ background:var(--grad); color:#073b2b; border:0; padding:.74rem 1.05rem; border-radius:.8rem; font-weight:900; cursor:pointer;
         box-shadow:0 6px 18px rgba(16,185,129,.22), 0 3px 12px rgba(59,130,246,.14) }
@@ -50,7 +49,6 @@
 
   .field{ position:relative; display:flex; align-items:center; gap:.5rem; background:#f8fafc;
           border:1px solid #e5e7eb; border-radius:.8rem; padding:.45rem .65rem }
-  .field:focus-within{ outline:2px solid #93c5fd; outline-offset:2px; border-color:transparent; background:#fff }
   .field input{ border:0; background:transparent; outline:none; font:inherit; color:inherit; padding:.35rem .2rem; min-width:6ch }
 
   .dropzone{ position:relative; display:grid; place-items:center; text-align:center; padding:1.1rem; border-radius:1rem;
@@ -62,6 +60,7 @@
   .grid{ display:grid; gap:1rem; grid-template-columns:1.2fr .8fr; align-items:start; margin:1rem 0 2rem }
   @media (max-width:980px){ .grid{ grid-template-columns:1fr } }
   canvas{ width:100%; background:#fff; border-radius:10px; border:1px solid #e5e7eb }
+  .muted{ color:#4b5563 }
   .info{ text-align:center; color:#111827; opacity:.9; margin:1.2rem 0 2.2rem }
 </style>
 </head>
@@ -77,9 +76,7 @@
     <section class="card">
       <div class="row" style="justify-content:space-between">
         <div class="row">
-          <span class="pill">A4 landscape: 297 × 210 mm</span>
-          <span class="pill">Photo: 40 × 30 mm (4 × 3 cm)</span>
-          <span class="pill">6 per row • One-page fit</span>
+          <span class="muted">A4 landscape: 297 × 210 mm • Photo: 40 × 30 mm • 6 per row</span>
         </div>
       </div>
 
@@ -87,7 +84,7 @@
         <div class="dropzone">
           <div>
             <div style="font-weight:800">Choose one photo</div>
-            <div style="color:#4b5563;font-size:.95rem">It will repeat as 4 × 3 cm tiles, 6 per row.</div>
+            <div class="muted" style="font-size:.95rem">Default copies: 6. Tiles are 4 × 3 cm after printing.</div>
             <div class="row" style="justify-content:center; margin-top:.6rem">
               <button class="btn" id="chooseBtn" type="button">Choose photo</button>
               <button class="btn ghost" id="arrange" type="button">Arrange → PDF</button>
@@ -95,7 +92,7 @@
             </div>
             <div class="thumb" id="thumb" style="display:none">
               <img id="thumbImg" alt="Selected photo preview" />
-              <span class="pill" id="fileNote"></span>
+              <span class="muted" id="fileNote"></span>
             </div>
           </div>
           <input id="file" type="file" accept="image/*" />
@@ -103,14 +100,14 @@
       </div>
 
       <div class="row" style="margin-top:.7rem">
-        <div class="field"><span>Number of photos</span><input id="copies" type="number" value="24" min="1" step="1"></div>
+        <div class="field"><span>Number of photos</span><input id="copies" type="number" value="6" min="1" step="1"></div>
         <div class="field"><span>Gap (mm)</span><input id="gap" type="number" value="3" step="0.5" min="0"></div>
         <label class="field" style="gap:.5rem"><input id="centerGrid" type="checkbox" checked> <span>Center grid</span></label>
       </div>
 
       <div style="margin-top:.6rem">
         <progress id="prog" value="0" max="100" hidden></progress>
-        <div id="note" style="color:#4b5563; margin-top:.35rem"></div>
+        <div id="note" class="muted" style="margin-top:.35rem"></div>
       </div>
     </section>
 
@@ -118,14 +115,13 @@
       <div class="card">
         <h3 style="margin:.2rem 0 .8rem">Preview (scaled)</h3>
         <canvas id="preview" width="1188" height="840" aria-label="Preview canvas"></canvas>
-        <p style="color:#4b5563; margin:.5rem 0 0">Print at 100% scale (no “Fit to page”). Each tile = 40 × 30 mm.</p>
+        <p class="muted" style="margin:.5rem 0 0">Print at 100% scale (no “Fit to page”). Each tile = 40 × 30 mm.</p>
       </div>
       <div class="card">
-        <h3 style="margin:.2rem 0 .8rem">How it fits one A4</h3>
-        <ul style="color:#4b5563; margin:.2rem 0 0; padding-left:1rem; list-style:disc">
-          <li>6 across fixed; horizontal gap auto‑clamped so they always fit.</li>
-          <li>Vertical gap is reduced if needed so all requested copies fit on one A4.</li>
-          <li>If even gap = 0 cannot fit, the sheet caps at the maximum (30) and tells you.</li>
+        <h3 style="margin:.2rem 0 .8rem">How it fits</h3>
+        <ul class="muted" style="margin:.2rem 0 0; padding-left:1rem; list-style:disc">
+          <li>6 columns fixed; horizontal gap auto‑reduced if needed to keep all 6 across.</li>
+          <li>Rows per page depend on vertical gap and margins; extra photos continue to new pages.</li>
         </ul>
       </div>
     </section>
@@ -136,14 +132,13 @@
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
   <script>
-  // Year
   document.getElementById('year').textContent = new Date().getFullYear();
 
   // A4 landscape, 4×3 cm tiles, 6 per row
   const PAGE_W_MM = 297, PAGE_H_MM = 210;
   const MARGIN_MM = 20;           // 2 cm margins
   const TILE_W_MM = 40, TILE_H_MM = 30;
-  const COLS = 6;                 // fixed
+  const COLS = 6;                 // fixed columns
 
   // Elements
   const $ = id => document.getElementById(id);
@@ -169,11 +164,7 @@
       fileNote.textContent = f.name;
       thumbImg.src = URL.createObjectURL(f);
       thumb.style.display = '';
-    } else {
-      thumb.style.display = 'none';
-      thumbImg.removeAttribute('src');
-      fileNote.textContent = '';
-    }
+    } else { thumb.style.display = 'none'; thumbImg.removeAttribute('src'); fileNote.textContent = ''; }
   });
 
   // Utilities
@@ -186,6 +177,7 @@
       img.src = url;
     });
   }
+  // Center-crop to fill destination
   function drawImageCover(ctx, img, dx, dy, dW, dH){
     const iw = img.naturalWidth || img.width;
     const ih = img.naturalHeight || img.height;
@@ -196,45 +188,45 @@
     ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dW, dH);
   }
 
-  // Fit logic
+  // Fit helpers
   function maxHorizontalGap(){
     const availW = PAGE_W_MM - 2*MARGIN_MM;
-    return Math.max(0, (availW - COLS*TILE_W_MM) / (COLS - 1)); // 5 gaps
+    return Math.max(0, (availW - COLS*TILE_W_MM) / (COLS - 1)); // 5 gaps across
   }
-  function rowsThatFit(gapY){
+  function rowsPerPage(gapY){
     const availH = PAGE_H_MM - 2*MARGIN_MM;
     return Math.max(1, Math.floor((availH + gapY) / (TILE_H_MM + gapY)));
   }
-  function solveVerticalGapForRows(rows){
+  function solveGapYForRows(rows){
     if (rows <= 1) return 0;
     const availH = PAGE_H_MM - 2*MARGIN_MM;
     return Math.max(0, (availH - rows*TILE_H_MM) / (rows - 1));
   }
 
-  // Calculate effective gaps to fit ONE page with copies and 6 columns
-  function computeEffectiveGaps(userGap, copies){
+  // Apply constraints: 6 across, as many rows as needed; paginate if overflow
+  function computeGapsAndRows(userGap, copies){
     const gapX = Math.min(userGap, maxHorizontalGap());
     const rowsNeeded = Math.ceil(copies / COLS);
-    const gapYmax = solveVerticalGapForRows(rowsNeeded);
+    const gapYMaxToFit = solveGapYForRows(rowsNeeded);
+    const rppAtZero = rowsPerPage(0);
 
-    if (rowsNeeded <= rowsThatFit(userGap)){
-      // Fits already with user's gap vertically
-      return { gapX, gapY: Math.min(userGap, gapYmax), rows: rowsNeeded, capped: false, maxPerPage: COLS*rowsThatFit(0) };
+    if (rowsNeeded <= rowsPerPage(userGap)){
+      return { gapX, gapY: Math.min(userGap, gapYMaxToFit), rowsFirstPage: rowsNeeded, capacityFirst: COLS*rowsNeeded, paginate:false };
     }
-    // Try to shrink vertical gap to fit rowsNeeded
-    const rowsFitAtZero = rowsThatFit(0);
-    if (rowsNeeded <= rowsFitAtZero){
-      return { gapX, gapY: gapYmax, rows: rowsNeeded, capped: false, maxPerPage: COLS*rowsFitAtZero };
+    if (rowsNeeded <= rppAtZero){
+      return { gapX, gapY: gapYMaxToFit, rowsFirstPage: rowsNeeded, capacityFirst: COLS*rowsNeeded, paginate:false };
     }
-    // Even gap=0 cannot fit → cap to one-page maximum
-    return { gapX, gapY: 0, rows: rowsFitAtZero, capped: true, maxPerPage: COLS*rowsFitAtZero };
+    // Need pagination
+    const rpp = rppAtZero;
+    return { gapX, gapY: 0, rowsFirstPage: rpp, capacityFirst: COLS*rpp, paginate:true, rowsPerPage:rpp };
   }
 
-  // Preview (first/only page)
+  // Preview (first page only)
   async function previewLayout(img, copies, userGap, center){
-    const { gapX, gapY, rows, capped, maxPerPage } = computeEffectiveGaps(userGap, copies);
-    const placed = Math.min(copies, COLS*rows);
-    note.textContent = capped ? `Too many for one A4. Showing ${placed} (max ${maxPerPage}) on one page.` : (userGap>gapX ? `Horizontal gap reduced to ${gapX.toFixed(2)} mm to keep 6 in a row.` : '');
+    const plan = computeGapsAndRows(userGap, copies);
+    const gapX = plan.gapX, gapY = plan.gapY;
+    const rows = plan.rowsFirstPage;
+    const placed = Math.min(copies, plan.capacityFirst);
 
     const pxPerMM = canvas.width / PAGE_W_MM;
     const pageWpx = Math.round(PAGE_W_MM * pxPerMM);
@@ -250,13 +242,12 @@
     const ox = center ? Math.round((PAGE_W_MM - gridWmm) * pxPerMM / 2) : Math.round(MARGIN_MM * pxPerMM);
     const oy = center ? Math.round((PAGE_H_MM - gridHmm) * pxPerMM / 2) : Math.round(MARGIN_MM * pxPerMM);
 
-    // Background + margins box
+    // Page + margin guide
     ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,pageWpx,pageHpx);
     const marginPx = Math.round(MARGIN_MM * pxPerMM);
     ctx.strokeStyle = '#d1d5db'; ctx.lineWidth = 1;
     ctx.strokeRect(marginPx + .5, marginPx + .5, pageWpx - 2*marginPx - 1, pageHpx - 2*marginPx - 1);
 
-    // Draw tiles
     let i = 0;
     for (let r=0; r<rows && i<placed; r++){
       for (let c=0; c<COLS && i<placed; c++){
@@ -266,21 +257,24 @@
         i++;
       }
     }
-    return { placed, gapX, gapY };
+
+    // Note about auto gap reduction
+    const maxGX = maxHorizontalGap();
+    if (userGap > maxGX){
+      $('note').textContent = `Horizontal gap reduced to ${gapX.toFixed(2)} mm to keep 6 across.`;
+    } else {
+      $('note').textContent = '';
+    }
+    return plan;
   }
 
-  // Build one-page PDF
+  // Build PDF (multi-page if needed)
   async function buildPdf(img, copies, userGap, center){
     const { jsPDF } = window.jspdf;
-    const { gapX, gapY, rows, capped, maxPerPage } = computeEffectiveGaps(userGap, copies);
-    const placed = Math.min(copies, COLS*rows);
+    const plan = computeGapsAndRows(userGap, copies);
+    const gapX = plan.gapX, gapY = plan.gapY;
 
     const doc = new jsPDF({ unit:'mm', format:[PAGE_W_MM, PAGE_H_MM] }); // landscape
-
-    const gridWmm = COLS*TILE_W_MM + (COLS-1)*gapX;
-    const gridHmm = rows*TILE_H_MM + (rows-1)*gapY;
-    const ox = center ? Math.max(0, (PAGE_W_MM - gridWmm) / 2) : MARGIN_MM;
-    const oy = center ? Math.max(0, (PAGE_H_MM - gridHmm) / 2) : MARGIN_MM;
 
     // Prepare one high‑quality tile
     const pxPerMM = 10; // ~254 dpi
@@ -292,57 +286,67 @@
     drawImageCover(oc, img, 0, 0, off.width, off.height);
     const tileURL = off.toDataURL('image/jpeg', 0.92);
 
-    let i = 0;
-    for (let r=0; r<rows && i<placed; r++){
-      for (let c=0; c<COLS && i<placed; c++){
-        const x = ox + c * (TILE_W_MM + gapX);
-        const y = oy + r * (TILE_H_MM + gapY);
-        doc.addImage(tileURL, 'JPEG', x, y, TILE_W_MM, TILE_H_MM);
-        i++;
+    function drawPage(startIndex, rowsOnPage){
+      const gridWmm = COLS*TILE_W_MM + (COLS-1)*gapX;
+      const gridHmm = rowsOnPage*TILE_H_MM + (rowsOnPage-1)*gapY;
+      const ox = center ? Math.max(0, (PAGE_W_MM - gridWmm) / 2) : MARGIN_MM;
+      const oy = center ? Math.max(0, (PAGE_H_MM - gridHmm) / 2) : MARGIN_MM;
+
+      let idx = startIndex;
+      for (let r=0; r<rowsOnPage && idx<copies; r++){
+        for (let c=0; c<COLS && idx<copies; c++){
+          const x = ox + c * (TILE_W_MM + gapX);
+          const y = oy + r * (TILE_H_MM + gapY);
+          doc.addImage(tileURL, 'JPEG', x, y, TILE_W_MM, TILE_H_MM);
+          idx++;
+        }
+      }
+      return idx;
+    }
+
+    let index = 0;
+    let rowsThisPage = plan.paginate ? plan.rowsPerPage : plan.rowsFirstPage;
+    while (index < copies){
+      index = drawPage(index, rowsThisPage);
+      if (index < copies){
+        doc.addPage([PAGE_W_MM, PAGE_H_MM], 'landscape');
       }
     }
-
-    if (capped){
-      // Add a tiny note outside the print area to explain capping (non-intrusive)
-      doc.setFontSize(8);
-      doc.text(`Note: capped to ${maxPerPage} (one page limit with 20 mm margins).`, 5, PAGE_H_MM - 5);
-    }
-
     return doc.output('blob');
   }
 
   // Arrange → PDF
-  arrangeBtn.onclick = async () => {
+  $('arrange').onclick = async () => {
     try{
-      note.textContent = "Reading photo…";
-      prog.hidden = false; prog.value = 8;
+      $('note').textContent = "Reading photo…";
+      $('prog').hidden = false; $('prog').value = 10;
 
       if (!fileEl.files || !fileEl.files[0]){
-        note.textContent = "No photo selected. Click ‘Choose photo’.";
-        prog.hidden = true; return;
+        $('note').textContent = "No photo selected. Click ‘Choose photo’.";
+        $('prog').hidden = true; return;
       }
       const img = await blobToImage(fileEl.files[0]);
 
-      const copies = Math.max(1, parseInt(copiesInput.value || '1', 10));
-      const userGap = Math.max(0, parseFloat(gapInput.value || '0'));
-      const center = !!centerGridInput.checked;
+      const copies = Math.max(1, parseInt($('copies').value || '6', 10));
+      const userGap = Math.max(0, parseFloat($('gap').value || '0'));
+      const center = !!$('centerGrid').checked;
 
-      prog.value = 35; note.textContent = "Arranging preview…";
+      $('prog').value = 35; $('note').textContent = "Arranging preview…";
       await previewLayout(img, copies, userGap, center);
 
-      prog.value = 60; note.textContent = "Building one‑page PDF…";
+      $('prog').value = 60; $('note').textContent = "Building PDF…";
       const blob = await buildPdf(img, copies, userGap, center);
 
       const url = URL.createObjectURL(blob);
-      downloadPdf.href = url;
-      downloadPdf.setAttribute('aria-disabled','false');
+      $('downloadPdf').href = url;
+      $('downloadPdf').setAttribute('aria-disabled','false');
 
-      prog.value = 100; note.textContent = "PDF ready. Print at 100% scale (no fit).";
-      setTimeout(() => prog.hidden = true, 400);
+      $('prog').value = 100; $('note').textContent = "PDF ready. Print at 100% scale (no fit).";
+      setTimeout(() => $('prog').hidden = true, 400);
     } catch(e){
       console.error(e);
-      note.textContent = "Error: " + e.message;
-      prog.hidden = true;
+      $('note').textContent = "Error: " + e.message;
+      $('prog').hidden = true;
     }
   };
   </script>
