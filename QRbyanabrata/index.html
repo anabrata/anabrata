@@ -28,7 +28,7 @@
   }
   .wrap{ width:min(1120px,94%); margin:0 auto; }
 
-  /* Hero with FADE welcome */
+  /* Hero with slower FADE welcome */
   header.hero{ min-height:42vh; display:grid; place-items:center; text-align:center; padding: clamp(2rem,6vw,4rem) 0 1rem; }
   .welcome{
     font-weight:900; letter-spacing:.06em; line-height:1.1;
@@ -36,13 +36,13 @@
     -webkit-background-clip:text; background-clip:text; color:transparent;
     background-size:200% 100%;
     font-size: clamp(1.4rem, 4.5vw, 2.8rem);
-    animation: fadeInOut 4s ease-in-out infinite, hue 10s linear infinite;
+    animation: fadeInOut 8s ease-in-out infinite, hue 14s linear infinite; /* slower now */
   }
   @keyframes hue{ 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
   @keyframes fadeInOut{
     0%   { opacity: 0 }
-    15%  { opacity: 1 }
-    85%  { opacity: 1 }
+    18%  { opacity: 1 }
+    82%  { opacity: 1 }
     100% { opacity: 0 }
   }
   .byline{
@@ -75,7 +75,7 @@
     border:0; background:transparent; outline:none; font:inherit; color:inherit; padding:.35rem .2rem; min-width:6ch
   }
 
-  /* Dropzone */
+  /* Dropzone (fix: input no longer overlays buttons) */
   .dropzone{
     position:relative; display:grid; place-items:center; text-align:center; padding:1.2rem; border-radius:1rem;
     border:2px dashed #cbd5e1; background:linear-gradient(135deg, rgba(16,185,129,.08), rgba(59,130,246,.08), rgba(253,224,71,.08));
@@ -85,6 +85,7 @@
   .dz-title{ font-weight:800 }
   .dz-sub{ color:var(--muted); font-size:.95rem }
   .dz-actions{ margin-top:.7rem; display:flex; gap:.6rem; justify-content:center; flex-wrap:wrap }
+  #files{ display:none } /* input is hidden; chooseBtn triggers it */
 
   /* Layout */
   .grid{ display:grid; gap:1rem; grid-template-columns:1.1fr .9fr; align-items:start; margin:1rem 0 2rem }
@@ -109,7 +110,6 @@
         <div class="row">
           <span class="pill">Page: A4 (210 × 297 mm)</span>
           <span class="pill">Margins: 20 mm each side</span>
-          <span class="pill">Max per page: 200</span>
         </div>
       </div>
 
@@ -118,14 +118,14 @@
         <div class="dropzone" id="dropzone">
           <div>
             <div class="dz-title">Choose or drop your QR images</div>
-            <div class="dz-sub">ZIP or multiple images (max 200). Trimming removes outer white borders.</div>
+            <div class="dz-sub">ZIP or multiple images. Trimming removes outer white borders.</div>
             <div class="dz-actions">
               <button class="btn" id="chooseBtn" type="button">Choose files</button>
               <button class="btn ghost" id="arrange" type="button">Arrange → PDF</button>
               <a id="downloadPdf" class="btn ghost" download="qr_a4_layout.pdf" href="#" aria-disabled="true">Download PDF</a>
             </div>
           </div>
-          <input id="files" type="file" accept=".zip,image/*" multiple style="position:absolute; inset:0; opacity:0; cursor:pointer" />
+          <input id="files" type="file" accept=".zip,image/*" multiple />
         </div>
         <div class="muted" id="fileNote"></div>
 
@@ -160,7 +160,7 @@
       <div class="card">
         <h3 style="margin:.2rem 0 .8rem">Quick notes</h3>
         <ul class="muted" style="margin:.2rem 0 0; padding-left:1rem; list-style:disc">
-          <li>Use ZIP for many images at once (max 200)</li>
+          <li>Use ZIP for many images</li>
           <li>2 cm margins ensure printers don’t clip</li>
           <li>Auto‑fit shrinks tiles so everything fits on one page</li>
           <li>A4 is 210 × 297 mm; layout and PDF use precise millimeters</li>
@@ -182,7 +182,7 @@
   // Constants
   const PAGE_W_MM = 210, PAGE_H_MM = 297; // A4
   const MARGIN_MM = 20; // 2 cm
-  const MAX_IMAGES = 200;
+  const MAX_IMAGES = 200; // performance cap (not displayed)
 
   // Elements
   const $ = id => document.getElementById(id);
@@ -205,7 +205,7 @@
   const padInput = $('pad');
   const rulersInput = $('rulers');
 
-  // --- Fancy dropzone interactions ---
+  // --- Dropzone interactions (input is hidden; it won't block buttons) ---
   chooseBtn.addEventListener('click', () => filesEl.click());
   dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('drag'); });
   dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
@@ -298,9 +298,8 @@
   }
   function prepareImages(imgs, doTrim){
     return imgs.map(img => doTrim ? trimToContentCanvas(img) : imageToCanvas(img));
-    }
-
-  function canvasToJpegDataURL(cv, q=0.92){ return cv.toDataURL('image/jpeg', q); }
+  }
+  function canvasToJpegDataURL(cv, q=0.9){ return cv.toDataURL('image/jpeg', q); }
 
   // --- Preview layout (scaled to A4 width) ---
   function previewLayout(prepared, tileMM, gapMM, padMM, showRulers){
@@ -399,7 +398,7 @@
         const y = MARGIN_MM + r * (tile + gap);
         const inner = prepared[i];
         const w = Math.max(0.1, tile - 2*pad);
-        const dataUrl = canvasToJpegDataURL(inner);
+        const dataUrl = canvasToJpegDataURL(inner, 0.9);
         doc.addImage(dataUrl, 'JPEG', x + pad, y + pad, w, w);
         i++;
       }
@@ -414,7 +413,7 @@
       prog.hidden = false; prog.value = 5;
 
       const imgs = await readAllImagesFromInput(filesEl.files);
-      if (!imgs.length){ note.textContent = "No images found."; prog.hidden = true; return; }
+      if (!imgs.length){ note.textContent = "No images found. Choose or drop your QR images first."; prog.hidden = true; return; }
       if (imgs.length > MAX_IMAGES) imgs.length = MAX_IMAGES;
       fileNote.textContent = `${imgs.length} image(s) loaded`;
 
@@ -429,7 +428,7 @@
       prog.value = 45; note.textContent = "Arranging on page…";
       previewLayout(prepared, tileMM, gapMM, padMM, showRulers);
 
-      prog.value = 70; note.textContent = "Building PDF…";
+      prog.value = 70; note.textContent = "Building PDF… (this can take a moment)";
       const blob = await buildPdf(prepared, tileMM, gapMM, padMM, showRulers);
 
       const url = URL.createObjectURL(blob);
