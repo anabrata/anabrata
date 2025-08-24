@@ -3,266 +3,245 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>WELCOME TO THE WORLD OF CELL</title>
+  <title>ULTRA Lightweight 3D Human Cell</title>
   <script src="https://cdn.plot.ly/plotly-2.34.0.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js" integrity="sha512-EYnmF3YeyvyV7QIcPSzmZEtKMWofk/2T6ubIrO43l2FkJLweroMmRqUb4qZhDCQMbKq2LKj38P3aGk3PD8kFhg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <style>
-    :root {
-      --bg1:#0f1021; --bg2:#1b1e3c; --bg3:#1d3557; --cardText:#e8ecff;
-      --accent:#ffd166;
-    }
     html, body {
-      height: 100%; margin: 0; padding: 0;
+      margin: 0; padding: 0; height: 100%; overflow: hidden;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background:
-        radial-gradient(1200px 800px at 20% 10%, #2b2d69 0%, transparent 60%),
-        linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
-      background-size: 200% 200%;
-      animation: bgPan 20s linear infinite, bgFade 1.8s ease both;
-      color: var(--cardText);
-      overflow: hidden;
-      user-select: none;
-    }
-    @keyframes bgPan {
-      0%{background-position:0% 50%}
-      50%{background-position:100% 50%}
-      100%{background-position:0% 50%}
-    }
-    @keyframes bgFade {
-      from{opacity:0} to{opacity:1}
-    }
-    .banner {
-      position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
-      padding: 10px 15px; text-align: center; user-select: none; pointer-events: none;
-      z-index: 11; max-width: 90vw;
-    }
-    .title {
-      font-weight: 900; letter-spacing: 1px; margin: 0;
-      font-size: clamp(22px, 5vw, 48px);
-      color: #ffffff;
-      -webkit-background-clip: text;
-      background-clip: text;
-      background-image: linear-gradient(120deg, #ffffff 5%, #fff7 50%, #ffffff 95%);
-      color: transparent;
-      background-size: 200% 100%;
-      animation: sheen 6s ease-in-out infinite;
-      text-shadow: 0 0 22px rgba(255,255,255,0.14);
-    }
-    @keyframes sheen {
-      0% { background-position: 200% 0; }
-      50% { background-position: 0% 0; }
-      100% { background-position: -200% 0; }
-    }
-    .subtitle {
-      margin-top: 10px; font-size: clamp(12px, 2vw, 18px); opacity: .9;
+      background: #1b1e3c;
       color: #eee;
-      text-shadow: 0 0 8px rgba(0,0,0,0.5);
-    }
-    .credit {
-      margin-top: 6px; font-size: clamp(10px, 1.5vw, 16px);
-      font-weight: 600; color: #bbb;
-      text-shadow: 0 0 6px rgba(0,0,0,0.4);
+      user-select: none;
     }
     #plot {
-      width: 100vw; height: 100vh; touch-action: none;
-      -ms-touch-action: none;
-      user-select: none;
-    }
-    .panel {
-      position: absolute;
-      right: 8px;
-      top: 85px;
-      width: min(420px, 90vw);
-      max-height: 70vh;
-      overflow-y: auto;
-      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
-      border: 1px solid rgba(255,255,255,0.14);
-      border-radius: 18px;
-      padding: 18px 20px 24px 20px;
-      z-index: 20;
-      backdrop-filter: blur(14px) saturate(130%);
-      box-shadow: 0 12px 48px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.06);
-      color: var(--cardText);
-      font-size: 15px;
-      line-height: 1.6;
-      opacity: 0;
-      transform: translateX(120px);
-      pointer-events: none;
-      transition: opacity .45s ease, transform .45s ease;
-      user-select: text;
-    }
-    .panel.show {
-      opacity: 1;
-      transform: translateX(0);
-      pointer-events: auto;
-      scrollbar-width: thin;
-    }
-    .panel h3 {
-      margin: 0 0 10px 0;
-      font-size: 20px;
-      font-weight: 700;
-    }
-    .panel p {
-      margin: 10px 0 8px 0;
-    }
-    .panel .organelle-viewer {
-      width: 100%;
-      height: 200px;
-      border-radius: 14px;
-      background: rgba(0,0,0,0.15);
-      margin-top: 15px;
-      box-shadow: inset 0 0 8px rgba(255,255,255,0.12);
-    }
-    .panel .close {
-      position: absolute;
-      top: 12px;
-      right: 16px;
-      background: transparent;
-      border: 0;
-      color: #ddd;
-      font-size: 24px;
-      font-weight: 600;
-      cursor: pointer;
-      opacity: 0.8;
-      transition: opacity .2s ease;
-    }
-    .panel .close:hover {
-      opacity: 1;
+      width: 100vw; height: 100vh;
     }
     #status {
-      position: absolute;
-      left: 12px;
-      bottom: 12px;
-      z-index: 50;
-      padding: 8px 14px;
+      position: absolute; left: 12px; bottom: 12px; 
       background: rgba(0,0,0,0.7);
-      color: #fff;
-      border-radius: 12px;
+      padding: 8px 12px;
+      border-radius: 10px;
       font-size: 14px;
-      box-shadow: 0 6px 24px rgba(0,0,0,0.4);
-      user-select: none;
-    }
-    #status.error {
-      background: #b00020;
-    }
-    .hintTop {
-      position: absolute;
-      right: 16px;
-      top: 58px;
-      z-index: 15;
-      font-size: 13px;
-      opacity: 0.9;
-      background: rgba(0,0,0,0.38);
       color: #fff;
-      padding: 7px 12px;
-      border-radius: 12px;
-      box-shadow: 0 8px 22px rgba(0,0,0,0.4);
+      z-index: 99;
       user-select: none;
-      white-space: nowrap;
     }
   </style>
 </head>
 <body>
-  <div class="banner" aria-live="polite">
-    <h1 class="title">WELCOME TO THE WORLD OF CELL</h1>
-    <div class="subtitle">Explore a 3D human cell with detailed organelles</div>
-    <div class="credit">Made by ANABRATA</div>
-  </div>
-
-  <div class="hintTop">🖱️ Rotate • 🔍 Pinch Zoom • 👆 Tap organelles for detail</div>
-
-  <div id="status">Loading 3D cell...</div>
-  <div id="plot" role="img" aria-label="Interactive 3D human cell visualization"></div>
-
-  <div id="panel" class="panel" aria-live="polite" role="region" aria-labelledby="orgTitle" tabindex="0">
-    <button class="close" id="closePanel" title="Close Panel" aria-label="Close info panel">×</button>
-    <h3 id="orgTitle">Organelle</h3>
-    <p id="orgIntro">Tap any organelle to view detailed information and 3D structure.</p>
-    <div class="organelle-viewer" id="organelleViewer"></div>
-    <p class="hint">Use touch gestures or mouse to rotate the 3D organelle above.</p>
-  </div>
+  <div id="status">Loading...</div>
+  <div id="plot" role="img" aria-label="Lightweight 3D human cell model"></div>
 
   <script>
-  (function(){
-    const statusEl = document.getElementById('status');
-    const panel = document.getElementById('panel');
-    const titleEl = document.getElementById('orgTitle');
-    const introEl = document.getElementById('orgIntro');
-    const organelleViewerEl = document.getElementById('organelleViewer');
-    const closeBtn = document.getElementById('closePanel');
-    closeBtn.addEventListener('click', () => panel.classList.remove('show'));
-
-    function linspace(a,b,n){ if(n<2) return [a]; const s=(b-a)/(n-1), arr=new Array(n); for(let i=0;i<n;i++) arr[i]=a+s*i; return arr; }
-    function zerosLike2D(M){ const Z=new Array(M.length); for(let i=0;i<M.length;i++){ Z[i]=new Array(M[i].length).fill(0) } return Z; }
-    function ellipsoid(center, radii, nu=24, nv=16){
-      const [cx,cy,cz]=center, [rx,ry,rz]=radii;
-      const u=linspace(0,2*Math.PI,nu), v=linspace(0,Math.PI,nv);
-      const X=new Array(nu), Y=new Array(nu), Z=new Array(nu);
-      for(let i=0;i<nu;i++){
-        const cu=Math.cos(u[i]), su=Math.sin(u[i]);
-        X[i]=new Array(nv); Y[i]=new Array(nv); Z[i]=new Array(nv);
-        for(let j=0;j<nv;j++){
-          const sv=Math.sin(v[j]), cv=Math.cos(v[j]);
-          X[i][j]=rx*cu*sv+cx; Y[i][j]=ry*su*sv+cy; Z[i][j]=rz*cv+cz;
-        }
+    (function(){
+      const statusEl = document.getElementById('status');
+      const plotEl = document.getElementById('plot');
+      
+      function linspace(a,b,n){
+        if(n<2) return [a];
+        const s=(b-a)/(n-1), arr=new Array(n);
+        for(let i=0; i<n; i++) arr[i]=a+s*i;
+        return arr;
       }
-      return {X,Y,Z};
-    }
-    function surface(X,Y,Z,color,opacity,name){
-      // No contour lines for better performance and simple visuals
-      return {
-        type:'surface', x:X,y:Y,z:Z,
-        surfacecolor: zerosLike2D(X),
-        colorscale: [[0,color],[1,color]],
-        showscale:false, opacity:opacity, name:name, hoverinfo:'name',
-        lighting:{ambient:0.6,diffuse:0.6,specular:0.3,roughness:0.8},
-        contours:{ x:{show:false}, y:{show:false}, z:{show:false} }
+      function zerosLike2D(M){
+        const Z=new Array(M.length);
+        for(let i=0; i<M.length; i++){
+          Z[i] = new Array(M[i].length).fill(0);
+        }
+        return Z;
+      }
+      function ellipsoid(center, radii, nu=16, nv=12){
+        const [cx,cy,cz]=center, [rx,ry,rz]=radii;
+        const u=linspace(0,2*Math.PI,nu), v=linspace(0,Math.PI,nv);
+        const X=new Array(nu), Y=new Array(nu), Z=new Array(nu);
+        for(let i=0; i<nu; i++){
+          const cu=Math.cos(u[i]), su=Math.sin(u[i]);
+          X[i] = new Array(nv); Y[i] = new Array(nv); Z[i] = new Array(nv);
+          for(let j=0; j<nv; j++){
+            const sv=Math.sin(v[j]), cv=Math.cos(v[j]);
+            X[i][j] = rx*cu*sv+cx;
+            Y[i][j] = ry*su*sv+cy;
+            Z[i][j] = rz*cv+cz;
+          }
+        }
+        return {X,Y,Z};
+      }
+      function surface(X,Y,Z,color,opacity,name){
+        return {
+          type:'surface', x:X, y:Y, z:Z,
+          surfacecolor: zerosLike2D(X),
+          colorscale: [[0,color],[1,color]],
+          showscale:false, opacity:opacity, name:name, hoverinfo:'name',
+          lighting:{ambient:0.7,diffuse:0.7,specular:0.2,roughness:0.8},
+          contours:{x:{show:false}, y:{show:false}, z:{show:false}}
+        };
+      }
+      function lineTrace(xs,ys,zs,color,width,name){
+        return {type:'scatter3d',mode:'lines', x:xs, y:ys, z:zs, line:{color,width}, name, hoverinfo:'name', opacity:0.6};
+      }
+      function polyline3d(curveFn, t0, t1, steps=80){
+        const t=linspace(t0,t1,steps);
+        const X=[], Y=[], Z=[];
+        for(let i=0; i<steps; i++){
+          const p=curveFn(t[i]);
+          X.push(p[0]); Y.push(p[1]); Z.push(p[2]);
+        }
+        return {X,Y,Z};
+      }
+
+      // Information for tooltips
+      const INFO = {
+        'Cell membrane': 'Phospholipid bilayer enclosing the cell.',
+        'Plasma membrane': 'Alternate term for cell membrane.',
+        'Cytoplasm': 'Gel-like substance within cell.',
+        'Nucleus': 'Contains DNA and regulates cellular activity.',
+        'Mitochondrion': 'Produces energy (ATP) for the cell.',
+        'Golgi apparatus': 'Packages and ships proteins and lipids.',
+        'Rough ER': 'Studded with ribosomes; synthesizes proteins.',
+        'Smooth ER': 'Lipid synthesis and detoxification.',
+        'Ribosome': 'Protein synthesis machinery.',
+        'DNA Helix': 'DNA molecule inside nucleus.',
       };
-    }
-    function randomPointsInShell(n, inner_r, outer_r, avoid_center, avoid_radius, seed=123){
-      Math.seedrandom = function(s){ Math.random = function(){ s = Math.sin(s) * 10000; return s - Math.floor(s); } }
-      Math.seedrandom(seed);
-      const pts = [];
-      let attempts=0;
-      while(pts.length<n && attempts<20000){
-        const u = Math.random();
-        const r = Math.pow((Math.pow(outer_r,3)-Math.pow(inner_r,3))*u + Math.pow(inner_r,3), 1/3);
-        const z = Math.random()*2-1, t = Math.random()*2*Math.PI, s = Math.sqrt(1-z*z);
-        const x = r*s*Math.cos(t), y = r*s*Math.sin(t), zc = r*z;
-        if(avoid_center && typeof avoid_radius==='number'){
-          const dx=x-avoid_center[0], dy=y-avoid_center[1], dz=zc-avoid_center[2];
-          if(Math.hypot(dx,dy,dz)<avoid_radius){ attempts++; continue; }
-        }
-        pts.push([x,y,zc]);
-        attempts++;
-      }
-      Math.random = () => crypto.getRandomValues(new Uint32Array(1))[0]/4294967296;
-      return pts;
-    }
-    function polyline3d(curveFn,t0,t1,steps=120){
-      const t=linspace(t0,t1,steps), X=new Array(steps), Y=new Array(steps), Z=new Array(steps);
-      for(let i=0;i<steps;i++){
-        const p=curveFn(t[i]);
-        X[i] = p[0];
-        Y[i] = p[1];
-        Z[i] = p[2];
-      }
-      return {X,Y,Z};
-    }
-    function lineTrace(xs,ys,zs,color,width,name){
-      return {type:'scatter3d',mode:'lines',x:xs,y:ys,z:zs,line:{color,width},name,hoverinfo:'name',opacity:0.9};
-    }
 
-    // Info descriptions including DNA and RNA
-    const INFO = {
-      'Cell membrane': 'Phospholipid bilayer that encloses the cell, regulates exchange with environment, and provides structure.',
-      'Plasma membrane': 'Another term for cell membrane, selectively permeable and full of signaling proteins.',
-      'Cytoplasm': 'Gel-like fluid that fills the cell and supports organelles.',
-      'Nucleus': 'Control center with DNA, enclosed by a double nuclear membrane.',
-      'Nucleolus': 'Inside nucleus, produces ribosomes.',
-      'Mitochondrion': 'Powerhouse organelle producing ATP; has a double membrane and internal cristae.',
-      'Golgi apparatus': 'Packages and modifies proteins and lipids from the ER.',
-      'Rough ER': 'Ribosome-studded endoplasmic reticulum, synthesizes membrane and secreted proteins.',
+      // Build the cell model
+      const CELL_R = 10;
+      const NUCLEUS_R = 3.5;
+      const traces = [];
+
+      // Cytoplasm (transparent)
+      traces.push(surface(...Object.values(ellipsoid([0,0,0],[CELL_R*0.95,CELL_R*0.95,CELL_R*0.90])), '#445566', 0.04, 'Cytoplasm'));
+
+      // Plasma Membrane
+      traces.push(surface(...Object.values(ellipsoid([0,0,0],[CELL_R,CELL_R,CELL_R*0.95])), '#779977', 0.25, 'Plasma membrane'));
+
+      // Nucleus
+      traces.push(surface(...Object.values(ellipsoid([1,0,0],[NUCLEUS_R*1.1,NUCLEUS_R,NUCLEUS_R*0.9])), '#aa88cc', 0.5, 'Nucleus'));
+
+      // Mitochondria (6 units)
+      const mitoCenters = [
+        [5,2,1], [4,-3,-1], [-3,3,2], [-4,-4,-1], [2,-5,2], [3,3,-3]
+      ];
+      mitoCenters.forEach(c => {
+        traces.push(surface(...Object.values(ellipsoid(c,[1.1,0.6,0.6])), '#d2691e', 0.8, 'Mitochondrion'));
+      });
+
+      // Golgi apparatus (4 stacks)
+      for(let i=0;i<4;i++) {
+        const center = [3 + 0.15*i, -2 + 0.1*i, 0.5];
+        traces.push(surface(...Object.values(ellipsoid(center,[1.4,0.7,0.25])), '#deb887', 0.85, 'Golgi apparatus'));
+      }
+
+      // Rough ER (2 branches)
+      function erCurve(cx,cy,cz,amp,rad,twist,phase){
+        return t => [
+          cx+(rad+amp*Math.sin(t*twist+phase))*Math.cos(t),
+          cy+(rad+amp*Math.cos(t*twist+phase))*Math.sin(t),
+          cz+0.4*Math.sin(1.4*t + phase)
+        ];
+      }
+      [[-0.7,0.3,0,0.9,3,2,0],[0.1,0.6,0,0.8,2.6,2,1]].forEach(params => {
+        const pl = polyline3d(erCurve(...params), 0, 2*Math.PI, 140);
+        traces.push(lineTrace(pl.X,pl.Y,pl.Z,'#689f38',6,'Rough ER'));
+      });
+      // Smooth ER (1 branch)
+      const smoothCurve = polyline3d(erCurve(1.0, 0.1, 0, 0.7, 2.9, 1.8, 0.7), 0, 2*Math.PI, 110);
+      traces.push(lineTrace(smoothCurve.X, smoothCurve.Y, smoothCurve.Z, '#3f7d20', 4, 'Smooth ER'));
+
+      // Ribosomes (25 points)
+      const ribCenters = [
+        [1,1,0], [1.5, 0.3, 0.5], [0.3, 1.7, 0], [0.8, -0.8, 0.5], [-1, 0.4, 0.5],
+        [2, -1.5, 0.2], [2.1, 1, 0.2], [-0.8, -1, 0.7], [0,-1.5, 1.0], [1.8, 1.8, 0],
+        [4,1,0], [3, 2, 1], [1,-2,0.5], [0,2,0.6]
+      ];
+      ribCenters.forEach(c => {
+        traces.push(surface(...Object.values(ellipsoid(c,[0.3,0.3,0.25])), '#4a6f4a', 0.8, 'Ribosome'));
+      });
+
+      // DNA helix inside nucleus
+      function dnaHelix(t){
+        const radius=0.28;
+        const height = 0.05*t - 3;
+        return [
+          radius * Math.cos(5*t + Math.PI/2),
+          radius * Math.sin(5*t + Math.PI/2),
+          height
+        ];
+      }
+      const dnaPl = polyline3d(dnaHelix,0,10*Math.PI, 110);
+      traces.push(lineTrace(dnaPl.X, dnaPl.Y, dnaPl.Z, 'rgb(200,120,70)', 2.5, 'DNA Helix'));
+
+      const layout = {
+        scene: {
+          xaxis: {visible:false},
+          yaxis: {visible:false},
+          zaxis: {visible:false},
+          aspectmode: 'data',
+          camera: {eye: {x:1.8,y:2,z:1.2}},
+          bgcolor: 'rgba(0,0,0,0)'
+        },
+        margin: {l:0,r:0,t:0,b:0},
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        showlegend: true,
+        legend: {orientation:'h', yanchor:'bottom', y:0.02, xanchor:'center', x:0.5, font: {color:'#eee', size:11}}
+      };
+
+      const config = {
+        responsive:true,
+        displayModeBar:false,
+        scrollZoom:true,
+        scrollZoomSpeed:0.2,
+        doubleClick:'reset',
+        staticPlot:false
+      };
+
+      function openInfo(name){
+        const INFO = {
+          'Cell membrane': 'The membrane controls exchange and protects the cell.',
+          'Plasma membrane': 'Selective permeability barrier.',
+          'Cytoplasm': 'Fluid that fills the cell.',
+          'Nucleus': 'Control center with DNA.',
+          'Nucleolus': 'Ribosome factory in nucleus.',
+          'Mitochondrion': 'Powerhouse generates ATP.',
+          'Golgi apparatus': 'Modifies & ships proteins.',
+          'Rough ER': 'Protein synthesis with ribosomes.',
+          'Smooth ER': 'Lipid synthesis & detoxification.',
+          'Ribosome': 'Protein production machinery.',
+          'DNA Helix': 'Genetic code carrier in nucleus.'
+        };
+        const infoText = INFO[name] || 'Information not available.';
+        document.getElementById('orgTitle').textContent = name;
+        document.getElementById('orgIntro').textContent = infoText;
+        panel.classList.add('show');
+      }
+
+      Plotly.newPlot(plotEl, traces, layout, config).then(()=>{
+        statusEl.textContent = 'Loaded • Tap organelles for info';
+        setTimeout(()=>{ statusEl.style.opacity = 0; }, 3500);
+      }).catch(e=>{
+        statusEl.classList.add('error');
+        statusEl.textContent = 'Render error: ' + e.message;
+      });
+
+      plotEl.on('plotly_click', function(ev){
+        if(!ev || !ev.points || !ev.points.length) return;
+        const name = ev.points[0].fullData.name || 'Structure';
+        openInfo(name);
+      });
+
+      window.addEventListener('resize', () => Plotly.Plots.resize(plotEl));
+      document.getElementById('closePanel').addEventListener('click', () => panel.classList.remove('show'));
+    })();
+  </script>
+
+  <div id="panel" class="panel" role="region" aria-live="polite" aria-labelledby="orgTitle" tabindex="0">
+    <button class="close" id="closePanel" title="Close Panel" aria-label="Close info panel">×</button>
+    <h3 id="orgTitle">Click an organelle</h3>
+    <p id="orgIntro">Tap an organelle in the 3D model to see details here.</p>
+  </div>
+
+</body>
+</html>
+and secreted proteins.',
       'Smooth ER': 'Lacks ribosomes; synthesizes lipids and detoxifies chemicals.',
       'Ribosome': 'Translates mRNA into proteins; free or bound to rough ER.',
       'Lysosome': 'Contains digestive enzymes to break down waste and worn cell parts.',
