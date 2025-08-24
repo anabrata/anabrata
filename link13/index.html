@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>World of PDFs • Lossless Watermark Remover • Made by ANABRATA</title>
+<title>World of PDFs • Lossless Background Remover • Made by ANABRATA</title>
 <meta name="color-scheme" content="light dark" />
 <style>
   :root{
@@ -21,7 +21,7 @@
     background-size:140% 140%; animation:bgShift 18s ease-in-out infinite alternate;
   }
   @keyframes bgShift{0%{background-position:0% 0%,100% 0%,50% 100%,0% 0%}100%{background-position:50% 30%,50% 20%,60% 70%,100% 100%}}
-  .wrap{ width:min(980px,94%); margin:0 auto; position:relative; z-index:1 }
+  .wrap{ width:min(980px,94%); margin:0 auto }
   header.hero{ min-height:24vh; display:grid; place-items:center; text-align:center; padding: clamp(1.2rem,5vw,2.2rem) 0 1rem; }
   .welcome{
     font-weight:900; letter-spacing:.05em; line-height:1.1;
@@ -35,20 +35,16 @@
   .byline{ margin-top:.5rem; font-weight:800; color:#0b1020; display:inline-block; padding:.35rem .7rem; border-radius:.7rem;
            background:linear-gradient(90deg, rgba(16,185,129,.18), rgba(59,130,246,.18), rgba(253,224,71,.18));
            box-shadow:0 6px 22px rgba(16,185,129,.14), 0 4px 16px rgba(59,130,246,.12) }
-  .shiny{ position:relative; width:100%; border-radius:18px; padding:1.2rem;
-          background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(255,255,255,.90));
-          border:1px solid rgba(255,255,255,.7); box-shadow:0 24px 60px rgba(59,130,246,.28),0 16px 40px rgba(16,185,129,.24),inset 0 1px 0 rgba(255,255,255,.7);
-          backdrop-filter:blur(12px); overflow:hidden; text-align:center }
-  .row{ display:flex; gap:.9rem; align-items:center; flex-wrap:wrap; justify-content:center }
+  .panel{ background:var(--card); border:1px solid var(--ring); border-radius:14px; padding:1rem; box-shadow:0 10px 28px rgba(0,0,0,.08); margin-top:1rem }
+  .row{ display:flex; gap:.8rem; align-items:center; flex-wrap:wrap; justify-content:center }
   .btn{ background:var(--grad); color:#073b2b; border:0; padding:.9rem 1.2rem; border-radius:1rem; font-weight:900; cursor:pointer;
         box-shadow:0 8px 22px rgba(16,185,129,.22), 0 4px 14px rgba(59,130,246,.14); font-size:1.02rem }
   .btn.ghost{ background:linear-gradient(135deg, rgba(16,185,129,.12), rgba(59,130,246,.12)); color:#0b1020; border:1px solid var(--ring) }
   .field{ display:flex; align-items:center; gap:.55rem; background:#f8fafc; border:1px solid #e5e7eb; border-radius:.9rem; padding:.55rem .75rem }
   .muted{ color:#4b5563 }
-  .panel{ background:var(--card); border:1px solid var(--ring); border-radius:14px; padding:1rem; box-shadow:0 10px 28px rgba(0,0,0,.08); margin-top:1rem }
   progress{ width:100% }
-  .list{ text-align:left; margin:.6rem auto 0; max-width:720px }
-  .tag{ display:inline-block; margin:.15rem .25rem; padding:.25rem .5rem; border-radius:.6rem; border:1px solid #e5e7eb; background:#fff; font-size:.9rem }
+  .tags{ display:flex; flex-wrap:wrap; gap:.35rem; justify-content:center; margin-top:.4rem }
+  .tag{ padding:.25rem .55rem; border-radius:.7rem; background:#fff; border:1px solid #e5e7eb; font-size:.9rem }
   .info{ text-align:center; color:#111827; opacity:.9; margin:1.2rem 0 2.2rem }
 </style>
 </head>
@@ -61,39 +57,46 @@
   </header>
 
   <main class="wrap">
-    <section class="shiny">
-      <div style="font-weight:900; font-size:1.15rem">Lossless background watermark removal</div>
-      <div class="muted" style="margin-top:.15rem">No DPI change • No rasterization • Pages stay vector and text. Only watermark objects are removed.</div>
+    <section class="panel">
+      <div style="font-weight:900; font-size:1.15rem">Lossless background watermark remover</div>
+      <div class="muted" style="margin-top:.15rem">Keeps pages vector/text. Deletes only watermark drawing commands.</div>
+
       <div class="row" style="margin-top:.8rem">
         <button class="btn" id="pick">Choose PDF</button>
-        <button class="btn ghost" id="scan" disabled>Scan watermarks</button>
+        <button class="btn ghost" id="scan" disabled>Scan</button>
         <button class="btn ghost" id="clean" disabled>Remove and download</button>
         <a id="download" class="btn ghost" download="cleaned.pdf" href="#" aria-disabled="true">Download</a>
       </div>
-      <input id="file" type="file" accept="application/pdf" hidden>
+
+      <div class="row" style="margin-top:.8rem">
+        <div class="field"><label>Opacity threshold</label><input id="alpha" type="number" step="0.05" min="0" max="1" value="0.4"></div>
+        <div class="field"><label>Coverage threshold (%)</label><input id="cover" type="number" step="5" min="10" max="100" value="50"></div>
+        <div class="field"><label>Watermark words</label><input id="wmwords" type="text" value="watermark,draft,confidential,sample,do not copy"></div>
+      </div>
+
       <div class="panel">
         <progress id="prog" value="0" max="100" hidden></progress>
         <div id="note" class="muted" style="margin-top:.35rem; min-height:1.2em"></div>
-        <div id="findings" class="list"></div>
+        <div id="tags" class="tags"></div>
       </div>
     </section>
 
     <section class="panel">
-      <div style="font-weight:800; margin-bottom:.4rem">What this tool removes (losslessly)</div>
+      <div style="font-weight:800; margin-bottom:.4rem">What it removes (without changing quality)</div>
       <div class="muted">
         - Watermark/stamp annotations<br>
-        - Optional Content Groups (layers) whose names suggest watermarks (e.g., “Watermark”, “DRAFT”, “CONFIDENTIAL”, “Background”) — removed or hidden<br>
-        - Marked-content blocks tagged with /OC … BDC … EMC that reference those layers<br>
-        If a PDF has the watermark burned into images, lossless removal is not possible anywhere without re-making those images.
+        - OCG layers (and their marked-content) named like “Watermark”, “DRAFT”, “CONFIDENTIAL”, “Background”<br>
+        - Marked-content /Artifact /Background blocks<br>
+        - Low-opacity background fills/images that cover most of the page (common “behind text” watermarks)<br>
+        - Huge, rotated text watermarks with those words (BT…ET blocks)<br>
+        Everything else stays exactly as-is.
       </div>
     </section>
 
     <div class="info">© <span id="year"></span> Made by ANABRATA</div>
   </main>
 
-  <!-- pdf-lib for lossless edits -->
   <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-  <!-- pako for Flate streams (inflate/deflate) -->
   <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
 
 <script>
@@ -103,13 +106,20 @@ const pickBtn = document.getElementById('pick');
 const scanBtn = document.getElementById('scan');
 const cleanBtn = document.getElementById('clean');
 const downloadA = document.getElementById('download');
-const fileIn = document.getElementById('file');
 const note = document.getElementById('note');
 const prog = document.getElementById('prog');
-const findingsBox = document.getElementById('findings');
+const tags = document.getElementById('tags');
+
+const alphaInput = document.getElementById('alpha');
+const coverInput = document.getElementById('cover');
+const wordsInput = document.getElementById('wmwords');
+
+const fileIn = document.createElement('input');
+fileIn.type = 'file';
+fileIn.accept = 'application/pdf';
 
 let pdfBytes = null;
-let lastScan = null;
+let lastReport = null;
 
 pickBtn.onclick = () => fileIn.click();
 fileIn.onchange = async () => {
@@ -117,85 +127,22 @@ fileIn.onchange = async () => {
   pdfBytes = new Uint8Array(await fileIn.files[0].arrayBuffer());
   scanBtn.disabled = false;
   cleanBtn.disabled = false;
-  downloadA.setAttribute('aria-disabled','true'); downloadA.removeAttribute('href');
+  downloadA.removeAttribute('href'); downloadA.setAttribute('aria-disabled','true');
+  tags.innerHTML = '';
   note.textContent = `Selected: ${fileIn.files[0].name}`;
-  findingsBox.innerHTML = '';
 };
-
-const NAME_HINTS = ['watermark','draft','confidential','sample','background','bg','test','do not copy'];
 
 scanBtn.onclick = async () => {
   try{
     requirePDF();
-    prog.hidden = false; prog.value = 8; note.textContent = "Loading and scanning…";
-    const { PDFDocument, PDFName, PDFDict, PDFArray } = PDFLib;
-    const doc = await PDFDocument.load(pdfBytes, { updateMetadata:false, ignoreEncryption: false });
-    const ctx = doc.context;
-    const cat = doc.catalog.dict;
-
-    let ocPropsRef = cat.get(PDFName.of('OCProperties'));
-    let ocgNames = [];
-    let ocgRefs = [];
-    if (ocPropsRef){
-      const ocProps = ctx.lookup(ocPropsRef, PDFDict);
-      const ocgsArr = ctx.lookup(ocProps.get(PDFName.of('OCGs')), PDFArray);
-      for (let i=0;i<ocgsArr.size();i++){
-        const ref = ocgsArr.get(i);
-        const odict = ctx.lookup(ref, PDFDict);
-        const nm = odict.get(PDFName.of('Name'));
-        const name = nm ? String(nm.decodeText ? nm.decodeText() : nm.toString()).replace(/^\/?/,'') : '(unnamed)';
-        ocgNames.push(name);
-        ocgRefs.push({ ref, name });
-      }
-    }
-
-    // Scan annotations that look like watermarks/stamps
-    const pages = doc.getPages();
-    let annotCount = 0;
-    for (const p of pages){
-      const annotsRef = p.node.get(PDFName.of('Annots'));
-      if (!annotsRef) continue;
-      const arr = ctx.lookup(annotsRef, PDFArray);
-      for (let i=0;i<arr.size();i++){
-        const aref = arr.get(i);
-        const adict = ctx.lookup(aref, PDFDict);
-        const subtype = adict.get(PDFName.of('Subtype'));
-        const nm = adict.get(PDFName.of('NM')) || adict.get(PDFName.of('Name')) || adict.get(PDFName.of('T'));
-        const label = nm ? String(nm.toString()).toLowerCase() : '';
-        const kind = subtype ? String(subtype.toString()) : '';
-        if (kind === '/Watermark' || kind === '/Stamp' || NAME_HINTS.some(h=>label.includes(h))){
-          annotCount++;
-        }
-      }
-    }
-
-    // Guess candidates
-    const likely = ocgRefs.filter(o => NAME_HINTS.some(h => o.name.toLowerCase().includes(h)));
-    lastScan = { ocgRefs, likely, annotCount };
-
-    findingsBox.innerHTML = '';
-    if (ocgRefs.length){
-      addFinding(`Layers found: ${ocgRefs.length}`);
-      ocgRefs.forEach(o => addTag(o.name));
-    } else {
-      addFinding('No layers (OCGs) found in catalog.');
-    }
-    if (likely.length){
-      addFinding(`Likely watermark layers:`);
-      likely.forEach(o => addTag(o.name));
-    }
-    if (annotCount){
-      addFinding(`Watermark/Stamp annotations detected: ${annotCount}`);
-    }
-    if (!ocgRefs.length && !annotCount){
-      addFinding('Nothing obvious to remove losslessly. If the watermark is baked into images, lossless removal is not possible.');
-    }
+    prog.hidden = false; prog.value = 8;
+    note.textContent = "Scanning layers, annotations, and background hints…";
+    lastReport = await scanPDF(pdfBytes);
+    showReport(lastReport);
     prog.value = 100; setTimeout(()=>prog.hidden=true, 300);
-    note.textContent = "Scan complete. Click “Remove and download”.";
+    note.textContent = "Scan complete. Click Remove and download.";
   } catch(e){
-    console.error(e);
-    prog.hidden = true;
-    note.textContent = "Scan failed: " + (e?.message || e);
+    console.error(e); prog.hidden = true; note.textContent = "Scan failed: " + (e?.message || e);
   }
 };
 
@@ -203,8 +150,7 @@ cleanBtn.onclick = async () => {
   try{
     requirePDF();
     prog.hidden = false; prog.value = 10; note.textContent = "Cleaning (lossless)…";
-
-    const cleaned = await losslessRemoveWatermark(pdfBytes, lastScan);
+    const cleaned = await cleanPDF(pdfBytes);
     const blob = new Blob([cleaned], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
     downloadA.href = url;
@@ -212,206 +158,432 @@ cleanBtn.onclick = async () => {
     prog.value = 100; setTimeout(()=>prog.hidden=true, 300);
     note.textContent = "Done. Download your cleaned PDF.";
   } catch(e){
-    console.error(e);
-    prog.hidden = true;
-    note.textContent = "Cleaning failed: " + (e?.message || e);
+    console.error(e); prog.hidden = true; note.textContent = "Cleaning failed: " + (e?.message || e);
   }
 };
 
-/* Helpers */
-function addFinding(text){ const p=document.createElement('div'); p.className='muted'; p.textContent=text; findingsBox.appendChild(p); }
-function addTag(text){ const s=document.createElement('span'); s.className='tag'; s.textContent=text; findingsBox.appendChild(s); }
+function addTag(text){ const s=document.createElement('span'); s.className='tag'; s.textContent=text; tags.appendChild(s); }
 function requirePDF(){ if (!pdfBytes) throw new Error('Choose a PDF first'); }
 
-/* Core lossless cleaning */
-async function losslessRemoveWatermark(inputBytes, scan){
-  const { PDFDocument, PDFName, PDFDict, PDFArray, PDFRawStream } = PDFLib;
-  const doc = await PDFDocument.load(inputBytes, { updateMetadata:false, ignoreEncryption:false });
+function showReport(rep){
+  tags.innerHTML = '';
+  addTag(`OC layers: ${rep.ocgTotal}`);
+  addTag(`Likely WM layers: ${rep.ocgLikely}`);
+  addTag(`WM/Stamp annotations: ${rep.annotCount}`);
+  addTag(`Artifact backgrounds: ${rep.artifactBg}`);
+  addTag(`Low-opacity blocks: ${rep.lowAlphaBlocks}`);
+  addTag(`Large watermark text blocks: ${rep.watermarkTextBlocks}`);
+}
+
+/* ---------- SCAN + CLEAN (lossless edits) ---------- */
+async function scanPDF(bytes){
+  const { PDFDocument, PDFName, PDFArray, PDFDict, PDFRawStream } = PDFLib;
+  const doc = await PDFDocument.load(bytes, { updateMetadata:false, ignoreEncryption:false });
   const ctx = doc.context;
   const cat = doc.catalog.dict;
 
-  // 1) Remove Watermark/Stamp annotations
-  let removedAnnots = 0;
-  for (const page of doc.getPages()){
-    const annotsRef = page.node.get(PDFName.of('Annots'));
-    if (!annotsRef) continue;
-    const arr = ctx.lookup(annotsRef, PDFArray);
-    const kept = [];
-    for (let i=0;i<arr.size();i++){
-      const aref = arr.get(i);
-      const adict = ctx.lookup(aref, PDFDict);
-      const subtype = adict.get(PDFName.of('Subtype'));
-      const nm = adict.get(PDFName.of('NM')) || adict.get(PDFName.of('Name')) || adict.get(PDFName.of('T'));
-      const label = nm ? String(nm.toString()).toLowerCase() : '';
-      const kind = subtype ? String(subtype.toString()) : '';
-      const looksWM = (kind === '/Watermark') || (kind === '/Stamp') || NAME_HINTS.some(h=>label.includes(h));
-      if (looksWM){ removedAnnots++; continue; }
-      kept.push(aref);
-    }
-    if (kept.length !== arr.size()){
-      const newArr = PDFArray.withContext(ctx);
-      kept.forEach(r => newArr.push(r));
-      page.node.set(PDFName.of('Annots'), newArr);
-    }
-  }
+  const NAME_HINTS = getHints();
+  let ocgTotal=0, ocgLikely=0, annotCount=0, artifactBg=0, lowAlphaBlocks=0, watermarkTextBlocks=0;
 
-  // 2) Gather OCG layer names we plan to remove/hide
-  let ocPropsRef = cat.get(PDFName.of('OCProperties'));
-  const toRemoveNames = new Set();
+  // OCGs
+  const ocPropsRef = cat.get(PDFName.of('OCProperties'));
   if (ocPropsRef){
     const ocProps = ctx.lookup(ocPropsRef, PDFDict);
     const ocgsArr = ctx.lookup(ocProps.get(PDFName.of('OCGs')), PDFArray);
-    for (let i=0;i<ocgsArr.size();i++){
-      const ref = ocgsArr.get(i);
-      const odict = ctx.lookup(ref, PDFDict);
-      const nm = odict.get(PDFName.of('Name'));
-      const name = nm ? String(nm.decodeText ? nm.decodeText() : nm.toString()).replace(/^\/?/,'') : '';
-      if (NAME_HINTS.some(h=>name.toLowerCase().includes(h))) toRemoveNames.add(name);
-    }
-
-    // Also update default config to turn off these layers
-    const D = ocProps.get(PDFName.of('D'));
-    if (D){
-      const dDict = ctx.lookup(D, PDFDict);
-      const offArr = dDict.get(PDFName.of('OFF')) ? ctx.lookup(dDict.get(PDFName.of('OFF')), PDFArray) : PDFArray.withContext(ctx);
-      // push all matching OCG refs into OFF
+    ocgTotal = ocgsArr ? ocgsArr.size() : 0;
+    if (ocgsArr){
       for (let i=0;i<ocgsArr.size();i++){
         const ref = ocgsArr.get(i);
-        const odict = ctx.lookup(ref, PDFDict);
-        const nm = odict.get(PDFName.of('Name'));
-        const name = nm ? String(nm.decodeText ? nm.decodeText() : nm.toString()).replace(/^\/?/,'') : '';
-        if (toRemoveNames.has(name)) offArr.push(ref);
+        const od = ctx.lookup(ref, PDFDict);
+        const nm = od.get(PDFName.of('Name'));
+        const name = nm ? String(nm.toString()).replace(/^\/?/,'').toLowerCase() : '';
+        if (NAME_HINTS.some(h => name.includes(h))) ocgLikely++;
       }
-      dDict.set(PDFName.of('OFF'), offArr);
-      ocProps.set(PDFName.of('D'), dDict);
-      cat.set(PDFName.of('OCProperties'), ocProps);
     }
   }
 
-  // 3) Remove marked-content blocks tagged /OC that reference these OCG names
-  if (toRemoveNames.size){
-    for (const page of doc.getPages()){
-      const contentsRef = page.node.get(PDFName.of('Contents'));
-      if (!contentsRef) continue;
-
-      // Normalize to array
-      const contentRefs = contentsRef instanceof PDFArray ? contentsRef : (() => { const a=PDFArray.withContext(ctx); a.push(contentsRef); return a; })();
-
-      const newStreams = PDFArray.withContext(ctx);
-
-      for (let ci=0; ci<contentRefs.size(); ci++){
-        const sref = contentRefs.get(ci);
-        const stream = ctx.lookup(sref, PDFRawStream);
-        const dict = stream.dict;
-        const filter = dict.get(PDFName.of('Filter'));
-        const raw = stream.getContents();
-
-        // Inflate if FlateDecode
-        let bytes = raw;
-        const fName = filter && String(filter.toString());
-        if (fName === '/FlateDecode'){
-          bytes = pako.inflate(raw);
-        }
-
-        // Decode to string
-        const srcStr = new TextDecoder('latin1').decode(bytes);
-
-        // Remove any /OC … BDC … EMC blocks that reference a targeted OCG name in Properties map
-        // Strategy:
-        //  - Find Properties (Resources/Properties) mapping like /OC1 << /Type /OCG /Name (WATERMARK) >>
-        //  - Build map of property name -> OCG name
-        //  - Strip content between "/OC /OC1 BDC" ... "EMC" when mapped OCG name is targeted
-
-        // Build property map from page Resources/Properties where available
-        let propMap = {};
-        const resRef = page.node.get(PDFName.of('Resources'));
-        if (resRef){
-          const res = ctx.lookup(resRef, PDFDict);
-          const propsRef = res.get(PDFName.of('Properties'));
-          if (propsRef){
-            const props = ctx.lookup(propsRef, PDFDict);
-            props.keys().forEach(k => {
-              const key = String(k);
-              const pRef = props.get(k);
-              const pDict = ctx.lookup(pRef, PDFDict);
-              const maybeType = pDict.get(PDFName.of('Type'));
-              const isOCG = maybeType && String(maybeType.toString()) === '/OCG';
-              const nm = pDict.get(PDFName.of('Name'));
-              const nmStr = nm ? String(nm.decodeText ? nm.decodeText() : nm.toString()).replace(/^\/?/,'') : '';
-              if (isOCG && nmStr) propMap[key] = nmStr;
-            });
-          }
-        }
-
-        // Parser to remove targeted BDC/EMC blocks
-        const stripped = stripOCBlocks(srcStr, propMap, toRemoveNames);
-
-        // Re-encode and (re)compress if needed
-        let outBytes = new TextEncoder().encode(stripped);
-        let outFilter = filter;
-        if (fName === '/FlateDecode'){
-          outBytes = pako.deflate(outBytes);
-          outFilter = PDFName.of('FlateDecode');
-        }
-
-        // Create new stream
-        const newDict = dict.clone(ctx);
-        newDict.set(PDFName.of('Length'), ctx.obj(outBytes.length));
-        if (outFilter) newDict.set(PDFName.of('Filter'), outFilter);
-        else newDict.delete(PDFName.of('Filter'));
-        const newStream = ctx.flateStream ? ctx.flateStream(outBytes, newDict) : ctx.register(new PDFRawStream(newDict, outBytes));
-        newStreams.push(newStream);
+  for (const p of doc.getPages()){
+    // Annotations
+    const annRef = p.node.get(PDFName.of('Annots'));
+    if (annRef){
+      const arr = ctx.lookup(annRef, PDFArray);
+      for (let i=0;i<arr.size();i++){
+        const aref = arr.get(i);
+        const ad = ctx.lookup(aref, PDFDict);
+        const subtype = String(ad.get(PDFName.of('Subtype')) || '');
+        const nm = String(ad.get(PDFName.of('NM')) || ad.get(PDFName.of('Name')) || ad.get(PDFName.of('T')) || '').toLowerCase();
+        if (subtype==='/Watermark' || subtype==='/Stamp' || NAME_HINTS.some(h=>nm.includes(h))) annotCount++;
       }
+    }
 
-      // Replace contents
-      page.node.set(PDFName.of('Contents'), newStreams);
+    // Content streams scan for Artifact/Background and low-alpha big blocks
+    const contentRefs = normalizeContents(ctx, p);
+    const res = getResources(ctx, p);
+    const lowAlpha = getLowAlphaExtGStates(res, getAlphaThreshold());
+    for (let ci=0; ci<contentRefs.size(); ci++){
+      const sref = contentRefs.get(ci);
+      const stream = ctx.lookup(sref, PDFRawStream);
+      const bytes = maybeInflate(stream);
+      const srcStr = new TextDecoder('latin1').decode(bytes);
+      // Artifact backgrounds
+      if (/\b\/Artifact\b\s+BMC[\s\S]*?EMC/gm.test(srcStr)) artifactBg++;
+      // Low alpha blocks (heuristic)
+      lowAlphaBlocks += countLowAlphaBlocks(srcStr, lowAlpha, res, p);
+      // Watermark words in large text
+      watermarkTextBlocks += countWatermarkText(srcStr, NAME_HINTS);
     }
   }
 
-  // Save unchanged quality
-  return await doc.save({ useObjectStreams: true, addDefaultPage: false, updateFieldAppearances: false });
+  return { ocgTotal, ocgLikely, annotCount, artifactBg, lowAlphaBlocks, watermarkTextBlocks };
 }
 
-/* Strip /OC ... BDC ... EMC for targeted OCGs */
-function stripOCBlocks(src, propMap, toRemoveNames){
-  // Recognize forms:
-  //   /OC /OC1 BDC .... EMC
-  //   /OC << /OCGs [..] /Name /Watermark ... >> BDC ... EMC  (rare)
-  // We use a conservative parser scanning tokens; remove only when property name resolves to targeted OCG.
-  const tokens = src.split(/(\s+)/); // keep whitespace as tokens to preserve spacing
+async function cleanPDF(bytes){
+  const { PDFDocument, PDFName, PDFArray, PDFDict, PDFRawStream } = PDFLib;
+  const doc = await PDFDocument.load(bytes, { updateMetadata:false, ignoreEncryption:false });
+  const ctx = doc.context;
+  const cat = doc.catalog.dict;
+  const NAME_HINTS = getHints();
+
+  // 1) Remove watermark/stamp annotations
+  for (const page of doc.getPages()){
+    const annRef = page.node.get(PDFName.of('Annots'));
+    if (!annRef) continue;
+    const arr = ctx.lookup(annRef, PDFArray);
+    const kept = [];
+    for (let i=0;i<arr.size();i++){
+      const aref = arr.get(i);
+      const ad = ctx.lookup(aref, PDFDict);
+      const subtype = String(ad.get(PDFName.of('Subtype')) || '');
+      const nm = String(ad.get(PDFName.of('NM')) || ad.get(PDFName.of('Name')) || ad.get(PDFName.of('T')) || '').toLowerCase();
+      const looks = subtype==='/Watermark' || subtype==='/Stamp' || NAME_HINTS.some(h=>nm.includes(h));
+      if (!looks) kept.push(aref);
+    }
+    if (kept.length !== arr.size()){
+      const a = PDFArray.withContext(ctx); kept.forEach(r=>a.push(r)); page.node.set(PDFName.of('Annots'), a);
+    }
+  }
+
+  // 2) Turn off likely OCG layers and strip OC-marked content blocks referencing them
+  const toOffRefs = [];
+  const ocPropsRef = cat.get(PDFName.of('OCProperties'));
+  if (ocPropsRef){
+    const ocProps = ctx.lookup(ocPropsRef, PDFDict);
+    const ocgsArr = ctx.lookup(ocProps.get(PDFName.of('OCGs')), PDFArray);
+    if (ocgsArr){
+      for (let i=0;i<ocgsArr.size();i++){
+        const ref = ocgsArr.get(i);
+        const od = ctx.lookup(ref, PDFDict);
+        const nm = od.get(PDFName.of('Name'));
+        const name = nm ? String(nm.toString()).replace(/^\/?/,'').toLowerCase() : '';
+        if (NAME_HINTS.some(h=>name.includes(h))) toOffRefs.push(ref);
+      }
+      const D = ctx.lookup(ocProps.get(PDFName.of('D')), PDFDict);
+      if (D){
+        const OFF = D.get(PDFName.of('OFF')) ? ctx.lookup(D.get(PDFName.of('OFF')), PDFArray) : PDFArray.withContext(ctx);
+        toOffRefs.forEach(r => OFF.push(r));
+        D.set(PDFName.of('OFF'), OFF);
+        ocProps.set(PDFName.of('D'), D);
+        cat.set(PDFName.of('OCProperties'), ocProps);
+      }
+    }
+  }
+
+  // 3) Page content: remove Artifact backgrounds, OC-marked content for off layers, low-alpha big blocks, and watermark words
+  for (const page of doc.getPages()){
+    const contentRefs = normalizeContents(ctx, page);
+    const res = getResources(ctx, page);
+    const lowAlpha = getLowAlphaExtGStates(res, getAlphaThreshold());
+    const pageSize = getPageSizePoints(page);
+
+    const newStreams = PDFArray.withContext(ctx);
+    for (let ci=0; ci<contentRefs.size(); ci++){
+      const sref = contentRefs.get(ci);
+      const strm = ctx.lookup(sref, PDFRawStream);
+      const filter = strm.dict.get(PDFName.of('Filter'));
+      const inflated = maybeInflate(strm);
+      let srcStr = new TextDecoder('latin1').decode(inflated);
+
+      // Remove /Artifact BMC ... EMC
+      srcStr = stripArtifacts(srcStr);
+
+      // Remove OC-marked blocks that reference off layers via Properties map
+      srcStr = stripOCByName(srcStr, res, getHintsSet(NAME_HINTS));
+
+      // Remove low-alpha big images/fills “behind text”
+      srcStr = stripLowAlphaBlocks(srcStr, lowAlpha, res, pageSize);
+
+      // Remove big rotated watermark words
+      srcStr = stripWatermarkText(srcStr, NAME_HINTS);
+
+      let outBytes = new TextEncoder().encode(srcStr);
+      let outFilter = filter;
+      if (String(filter||'') === '/FlateDecode'){
+        outBytes = pako.deflate(outBytes);
+        outFilter = PDFName.of('FlateDecode');
+      }
+      const newDict = strm.dict.clone(ctx);
+      newDict.set(PDFName.of('Length'), ctx.obj(outBytes.length));
+      if (outFilter) newDict.set(PDFName.of('Filter'), outFilter); else newDict.delete(PDFName.of('Filter'));
+      const newStream = ctx.register(new PDFRawStream(newDict, outBytes));
+      newStreams.push(newStream);
+    }
+    page.node.set(PDFName.of('Contents'), newStreams);
+  }
+
+  return await doc.save({ useObjectStreams:true, addDefaultPage:false, updateFieldAppearances:false });
+}
+
+/* ---------- Helpers and heuristics ---------- */
+function getHints(){
+  const raw = (wordsInput.value||'').toLowerCase();
+  return raw.split(',').map(s=>s.trim()).filter(Boolean);
+}
+function getHintsSet(arr){ const s=new Set(); arr.forEach(x=>s.add(x)); return s; }
+function getAlphaThreshold(){ return Math.max(0, Math.min(1, parseFloat(alphaInput.value||'0.4'))); }
+function getCoverageThreshold(){ return Math.max(10, Math.min(100, parseInt(coverInput.value||'50',10))); }
+
+function normalizeContents(ctx, page){
+  const { PDFName, PDFArray } = PDFLib;
+  const cRef = page.node.get(PDFName.of('Contents'));
+  if (!cRef) return PDFArray.withContext(ctx);
+  if (cRef instanceof PDFArray) return cRef;
+  const a = PDFArray.withContext(ctx); a.push(cRef); return a;
+}
+
+function getResources(ctx, page){
+  const { PDFName, PDFDict } = PDFLib;
+  const resRef = page.node.get(PDFName.of('Resources'));
+  if (!resRef) return {};
+  const res = ctx.lookup(resRef, PDFDict);
+  const out = { props:{}, extg:{}, xobj:{} };
+  const propsRef = res.get(PDFName.of('Properties'));
+  if (propsRef){
+    const props = ctx.lookup(propsRef, PDFDict);
+    props.keys().forEach(k=>{
+      out.props[String(k)] = props.get(k);
+    });
+  }
+  const extRef = res.get(PDFName.of('ExtGState'));
+  if (extRef){
+    const ext = ctx.lookup(extRef, PDFDict);
+    ext.keys().forEach(k=>{
+      out.extg[String(k)] = ctx.lookup(ext.get(k), PDFDict);
+    });
+  }
+  const xoRef = res.get(PDFName.of('XObject'));
+  if (xoRef){
+    const xo = ctx.lookup(xoRef, PDFDict);
+    xo.keys().forEach(k=>{
+      out.xobj[String(k)] = ctx.lookup(xo.get(k));
+    });
+  }
+  return out;
+}
+
+function getLowAlphaExtGStates(res, thr){
+  const low = new Set();
+  for (const name in res.extg){
+    const d = res.extg[name];
+    const ca = Number(d.get(PDFLib.PDFName.of('ca'))||1);  // non-stroking
+    const CA = Number(d.get(PDFLib.PDFName.of('CA'))||1);  // stroking
+    if ((isFinite(ca)&&ca<=thr) || (isFinite(CA)&&CA<=thr)){
+      low.add(name);
+    }
+  }
+  return low;
+}
+
+function maybeInflate(stream){
+  const filter = stream.dict.get(PDFLib.PDFName.of('Filter'));
+  if (String(filter||'') === '/FlateDecode'){
+    return pako.inflate(stream.getContents());
+  }
+  return stream.getContents();
+}
+
+/* Remove /Artifact ... EMC blocks (common background marks) */
+function stripArtifacts(s){
+  return s.replace(/\b\/Artifact\b\s+BMC[\s\S]*?EMC/gm, '');
+}
+
+/* Build Properties map: /OCn -> OCG Name, then remove matching /OC /OCn BDC ... EMC */
+function stripOCByName(src, res, namesSet){
+  const props = {};
+  for (const key in res.props){
+    const dict = PDFLib.PDFDict.from(res.props[key]);
+    const nm = dict.get(PDFLib.PDFName.of('Name'));
+    const type = dict.get(PDFLib.PDFName.of('Type'));
+    if (String(type||'') === '/OCG' && nm){
+      const name = String(nm.toString()).replace(/^\/?/,'');
+      props['/'+key] = name;
+    }
+  }
+  if (!Object.keys(props).length) return src;
+
+  const tokens = src.split(/(\s+)/);
   const out = [];
   let i=0;
-  while (i<tokens.length){
-    // look for "/OC", ws, "/OCkey", ws, "BDC"
-    if (tokens[i] === '/OC'){
-      // peek ahead for property name then BDC
-      const j = i+2; // skip optional whitespace handled by split keeping spaces
-      const maybeName = tokens[i+2] || '';
-      const maybeBDC = tokens[i+4] || '';
-      if (maybeName.startsWith('/') && maybeBDC.trim() === 'BDC'){
-        const propName = maybeName; // e.g. /OC1
-        const ocgName = propMap[propName];
-        if (ocgName && toRemoveNames.has(ocgName)){
-          // skip until matching EMC (balanced nested BDC/EMC)
-          let depth = 0;
-          i += 5; // move past BDC
-          while (i<tokens.length){
-            const tk = tokens[i].trim();
-            if (tk === 'BDC') depth++;
-            if (tk === 'EMC'){
-              if (depth===0){ i++; break; }
-              depth--;
-            }
-            i++;
-          }
-          continue; // removed block
+  while(i<tokens.length){
+    if (tokens[i] === '/OC' && tokens[i+2] && tokens[i+4] && tokens[i+4].trim()==='BDC'){
+      const prop = tokens[i+2]; // like /OC1
+      const ocgName = props[prop];
+      if (ocgName && namesSet.has(ocgName.toLowerCase())){
+        // skip until matching EMC (handle nested BDC/EMC)
+        i += 5; let depth=0;
+        while(i<tokens.length){
+          const tk = tokens[i].trim();
+          if (tk==='BDC') depth++;
+          if (tk==='EMC'){ if (depth===0){ i++; break; } depth--; }
+          i++;
+        }
+        continue;
+      }
+    }
+    out.push(tokens[i]); i++;
+  }
+  return out.join('');
+}
+
+/* Count low-alpha blocks for reporting */
+function countLowAlphaBlocks(src, lowAlphaSet, res, page){
+  const stripped = stripLowAlphaBlocks(src, lowAlphaSet, res, getPageSizePoints(page), true);
+  return stripped._removed || 0;
+}
+
+/* Remove low-alpha, large-coverage blocks: detects q ... Q groups that set /GSx gs with low alpha and either:
+   - draw XObject image (Do) scaled to cover big area, or
+   - draw large rectangle re/f or re/f* covering big area. */
+function stripLowAlphaBlocks(src, lowAlphaSet, res, pageSize, countOnly=false){
+  if (!lowAlphaSet.size) return countOnly ? { _removed:0 } : src;
+
+  const tokens = src.split(/(\s+)/);
+  const out = [];
+  let i=0, removed=0;
+  const W = pageSize.w, H = pageSize.h;
+  const minCover = getCoverageThreshold()/100; // e.g., 0.5
+
+  // helper to peek back for cm transform in current group
+  function getLocalScale(j){
+    // search last 'cm' before j limited window
+    for (let k=j-1; k>=Math.max(0,j-60); k--){
+      if (tokens[k].trim()==='cm'){
+        const a=parseFloat(tokens[k-12]), b=parseFloat(tokens[k-10]), c=parseFloat(tokens[k-8]),
+              d=parseFloat(tokens[k-6]),  e=parseFloat(tokens[k-4]),  f=parseFloat(tokens[k-2]);
+        if ([a,b,c,d,e,f].every(x=>Number.isFinite(x))){
+          // area scale = |ad - bc|
+          const m = Math.abs(a*d - b*c);
+          // translation not used for coverage
+          return { m, a,b,c,d,e,f };
         }
       }
     }
-    out.push(tokens[i]);
-    i++;
+    return { m:1, a:1,b:0,c:0,d:1,e:0,f:0 };
   }
+
+  while(i<tokens.length){
+    if (tokens[i].trim()==='q'){
+      // start group
+      const start = i; i++;
+      let sawLowAlpha = false, groupEnd = -1, coverBig = false;
+
+      // scan ahead until matching Q
+      let depth=1, j=i;
+      while(j<tokens.length && depth>0){
+        const tk = tokens[j].trim();
+        if (tk==='q') depth++;
+        if (tk==='Q'){ depth--; if (depth===0){ groupEnd=j; break; } }
+
+        // detect gs with low alpha: "/GSx gs"
+        if (/^\/[A-Za-z0-9]+$/.test(tokens[j]) && tokens[j+2] && tokens[j+2].trim()==='gs'){
+          const name = tokens[j];
+          if (lowAlphaSet.has(name)) sawLowAlpha = true;
+        }
+
+        // detect XObject image draw: "/Im0 Do"
+        if (/^\/[A-Za-z0-9]+$/.test(tokens[j]) && tokens[j+2] && tokens[j+2].trim()==='Do'){
+          const xoName = tokens[j];
+          const xobj = res.xobj[xoName.slice(1)];
+          if (xobj && String(xobj.dict?.get?.(PDFLib.PDFName.of('Subtype'))||'') === '/Image'){
+            const w = Number(xobj.dict.get(PDFLib.PDFName.of('Width'))||0);
+            const h = Number(xobj.dict.get(PDFLib.PDFName.of('Height'))||0);
+            const sc = getLocalScale(j);
+            if (w>0 && h>0){
+              const area = w*h*sc.m;
+              const pageArea = W*H;
+              if (pageArea>0 && area/pageArea >= minCover) coverBig = true;
+            }
+          }
+        }
+
+        // detect large rectangle fill: "x y w h re" then "f" or "f*"
+        if (tokens[j+8] && tokens[j+8].trim()==='re'){
+          const x=parseFloat(tokens[j]), y=parseFloat(tokens[j+2]), w=parseFloat(tokens[j+4]), h=parseFloat(tokens[j+6]);
+          if ([x,y,w,h].every(Number.isFinite)){
+            // followed later by f/f*
+            for (let k=j+9; k<j+30 && k<tokens.length; k++){
+              const op = tokens[k].trim();
+              if (op==='f' || op==='f*'){
+                const sc = getLocalScale(j);
+                const area = Math.abs(w*h)*sc.m;
+                const pageArea = W*H;
+                if (pageArea>0 && area/pageArea >= minCover) coverBig = true;
+                break;
+              }
+              if (op==='re' || op==='Q' || op==='S' || op==='n') break;
+            }
+          }
+        }
+        j++;
+      }
+
+      if (groupEnd>start && sawLowAlpha && coverBig){
+        removed++;
+        i = groupEnd+1; // drop the whole group
+        continue;
+      }
+      // keep the group as-is
+      for (let k=start; k<=groupEnd && groupEnd>start; k++) out.push(tokens[k]);
+      i = (groupEnd>start) ? groupEnd+1 : i;
+      continue;
+    }
+
+    out.push(tokens[i]); i++;
+  }
+
+  if (countOnly) return { _removed: removed };
   return out.join('');
+}
+
+/* Big rotated watermark text with hint words inside BT … ET */
+function countWatermarkText(src, hints){
+  const m = src.match(/BT[\s\S]*?ET/gm);
+  if (!m) return 0;
+  let c=0;
+  for (const blk of m){
+    if (looksWatermarkTextBlock(blk, hints)) c++;
+  }
+  return c;
+}
+function stripWatermarkText(src, hints){
+  return src.replace(/BT[\s\S]*?ET/gm, (blk)=>{
+    return looksWatermarkTextBlock(blk, hints) ? '' : blk;
+  });
+}
+function looksWatermarkTextBlock(blk, hints){
+  const text = (blk.match(/\((?:\\\)|\\\(|\\.|[^()])*\)/g) || []).join(' ').toLowerCase();
+  if (!hints.some(h=>text.includes(h))) return false;
+  // look for big font sizes or transforms and low alpha gs within block
+  const bigFont = /\s(\d{2,})\s+Tf/.test(blk) && Number(RegExp.$1) >= 36;
+  const rotated = /\-?\d+(\.\d+)?\s+-?\d+(\.\d+)?\s+-?\d+(\.\d+)?\s+-?\d+(\.\d+)?\s+\-?\d+(\.\d+)?\s+\-?\d+(\.\d+)?\s+Tm/.test(blk);
+  return bigFont || rotated;
+}
+
+/* Page size in points */
+function getPageSizePoints(page){
+  const mediabox = page.node.MediaBox();
+  const w = mediabox.get(2).asNumber() - mediabox.get(0).asNumber();
+  const h = mediabox.get(3).asNumber() - mediabox.get(1).asNumber();
+  return { w, h };
 }
 </script>
 </body>
