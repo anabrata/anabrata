@@ -1,409 +1,214 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>World of PDFs • Color Replace (Lossless) • Made by ANABRATA</title>
-<meta name="color-scheme" content="light dark" />
-<style>
-  :root{
-    --green:#10b981; --blue:#3b82f6; --yellow:#fde047; --pink:#f9a8d4;
-    --card:#ffffffee; --text:#0b1020; --muted:#4b5563; --ring:rgba(0,0,0,.12);
-    --grad: linear-gradient(135deg, var(--green), var(--blue), var(--yellow));
-  }
-  /* Soft animated background */
-  body{
-    margin:0; font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif; color:var(--text);
-    background:
-      radial-gradient(1200px 800px at 10% 10%, rgba(16,185,129,.22), transparent 60%),
-      radial-gradient(1200px 800px at 90% 20%, rgba(59,130,246,.22), transparent 60%),
-      radial-gradient(1200px 800px at 50% 100%, rgba(253,224,71,.22), transparent 60%),
-      linear-gradient(120deg, #e8fdf6, #eef4ff 40%, #fffbe6 80%, #ffffff);
-    background-size:140% 140%; animation:bgShift 18s ease-in-out infinite alternate;
-  }
-  @keyframes bgShift{0%{background-position:0% 0%, 100% 0%, 50% 100%, 0% 0%}100%{background-position:50% 30%, 50% 20%, 60% 70%, 100% 100%}}
+# 3D Human Cell - schematic Plotly visualization
+# Requires: pip install plotly numpy
 
-  .wrap{ width:min(980px,94%); margin:0 auto }
-  header.hero{ min-height:24vh; display:grid; place-items:center; text-align:center; padding: clamp(1.2rem,5vw,2.2rem) 0 1rem; }
-  .welcome{
-    font-weight:900; letter-spacing:.05em; line-height:1.1;
-    background:linear-gradient(90deg, var(--green), var(--blue), var(--yellow), var(--pink), var(--green));
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-    background-size:220% 100%; animation:hue 14s linear infinite, fadeInOut 8s ease-in-out infinite;
-    font-size: clamp(1.1rem, 4.2vw, 2.2rem);
-  }
-  @keyframes hue{0%{background-position:0% 50%}100%{background-position:220% 50%}}
-  @keyframes fadeInOut{0%{opacity:0}18%{opacity:1}82%{opacity:1}100%{opacity:0}}
-  .byline{ margin-top:.5rem; font-weight:800; color:#0b1020; display:inline-block; padding:.35rem .7rem; border-radius:.7rem;
-           background:linear-gradient(90deg, rgba(16,185,129,.18), rgba(59,130,246,.18), rgba(253,224,71,.18));
-           box-shadow:0 6px 22px rgba(16,185,129,.14), 0 4px 16px rgba(59,130,246,.12) }
+import numpy as np
+import plotly.graph_objects as go
 
-  .panel{ background:var(--card); border:1px solid var(--ring); border-radius:14px; padding:1rem; box-shadow:0 10px 28px rgba(0,0,0,.08); margin-top:1rem }
-  .row{ display:flex; gap:.9rem; align-items:center; flex-wrap:wrap; justify-content:center }
-  .btn{ background:var(--grad); color:#073b2b; border:0; padding:.9rem 1.2rem; border-radius:1rem; font-weight:900; cursor:pointer;
-        box-shadow:0 8px 22px rgba(16,185,129,.22), 0 4px 14px rgba(59,130,246,.14); font-size:1.02rem }
-  .btn.ghost{ background:linear-gradient(135deg, rgba(16,185,129,.12), rgba(59,130,246,.12)); color:#0b1020; border:1px solid var(--ring) }
-  .field{ display:flex; align-items:center; gap:.55rem; background:#f8fafc; border:1px solid #e5e7eb; border-radius:.9rem; padding:.55rem .75rem }
-  .field input, .field label{ font:inherit }
-  .muted{ color:#4b5563 }
-  progress{ width:100% }
-  .tags{ display:flex; flex-wrap:wrap; gap:.35rem; justify-content:center; margin-top:.4rem }
-  .tag{ padding:.25rem .55rem; border-radius:.7rem; background:#fff; border:1px solid #e5e7eb; font-size:.9rem }
-  .info{ text-align:center; color:#111827; opacity:.9; margin:1.2rem 0 2.2rem }
-  .swatch{ width:28px; height:28px; border-radius:6px; border:1px solid #d1d5db }
-  .hex{ width:100px }
-</style>
-</head>
-<body>
-  <header class="hero">
-    <div class="wrap">
-      <div class="welcome">WELCOME TO THE WORLD OF PDFs</div>
-      <div class="byline">Made by ANABRATA</div>
-    </div>
-  </header>
+# -------------- geometry helpers --------------
 
-  <main class="wrap">
-    <section class="panel">
-      <div style="font-weight:900; font-size:1.15rem">Replace one color with another (lossless)</div>
-      <div class="muted" style="margin-top:.15rem">No rasterization. We rewrite only color-set commands. Pages stay vector/text.</div>
+def ellipsoid(center, radii, nu=50, nv=30):
+    """
+    Create parametric mesh grids for an ellipsoid surface.
+    center: (cx, cy, cz)
+    radii: (rx, ry, rz)
+    returns: X, Y, Z arrays of shape (nu, nv)
+    """
+    u = np.linspace(0, 2*np.pi, nu)
+    v = np.linspace(0, np.pi, nv)
+    cu, su = np.cos(u), np.sin(u)
+    sv, cv = np.sin(v), np.cos(v)
+    X = radii[0] * np.outer(cu, sv) + center[0]
+    Y = radii[1] * np.outer(su, sv) + center[1]
+    Z = radii[2] * np.outer(np.ones_like(u), cv) + center[2]
+    return X, Y, Z
 
-      <div class="row" style="margin-top:.8rem">
-        <button class="btn" id="pick">Choose PDF</button>
-        <button class="btn ghost" id="run" disabled>Replace color → Download</button>
-        <a id="download" class="btn ghost" download="color_replaced.pdf" href="#" aria-disabled="true">Download</a>
-      </div>
+def surface_trace(X, Y, Z, color="#cccccc", opacity=1.0, name="", showscale=False):
+    # Use a flat colorscale to simulate a solid color
+    # surfacecolor just needs to be same-shape array
+    C = np.zeros_like(X)
+    return go.Surface(
+        x=X, y=Y, z=Z,
+        surfacecolor=C,
+        colorscale=[[0, color], [1, color]],
+        showscale=showscale,
+        opacity=opacity,
+        name=name,
+        hoverinfo="name",
+        lighting=dict(ambient=0.5, diffuse=0.5, specular=0.2, roughness=0.9),
+    )
 
-      <div class="row" style="margin-top:.8rem">
-        <div class="field">
-          <label>From</label>
-          <input id="fromPicker" type="color" value="#e6e6e6" class="swatch">
-          <input id="fromHex" class="hex" type="text" value="#e6e6e6">
-        </div>
-        <div class="field">
-          <label>To</label>
-          <input id="toPicker" type="color" value="#ffffff" class="swatch">
-          <input id="toHex" class="hex" type="text" value="#ffffff">
-        </div>
-        <div class="field">
-          <label>Tolerance (0–255)</label>
-          <input id="tol" type="number" min="0" max="60" step="1" value="12">
-        </div>
-        <div class="field">
-          <label><input id="fills" type="checkbox" checked> Fills</label>
-          <label><input id="strokes" type="checkbox" checked> Strokes</label>
-          <label><input id="scOps" type="checkbox" checked> sc/SC</label>
-        </div>
-      </div>
+def random_points_in_shell(n, inner_r, outer_r, avoid_center=None, avoid_radius=None, seed=0):
+    """
+    Uniform random points inside a spherical shell between inner_r and outer_r.
+    If avoid_center and avoid_radius provided, reject points that fall inside that sphere.
+    """
+    rng = np.random.default_rng(seed)
+    pts = []
+    attempts = 0
+    while len(pts) < n and attempts < 10000:
+        # sample radius with r^3 distribution for uniform volume
+        u = rng.random()
+        r = ((outer_r**3 - inner_r**3)*u + inner_r**3) ** (1/3)
+        # random direction
+        z = rng.uniform(-1, 1)
+        t = rng.uniform(0, 2*np.pi)
+        s = np.sqrt(1 - z*z)
+        x = r * s * np.cos(t)
+        y = r * s * np.sin(t)
+        zc = r * z
+        if avoid_center is not None and avoid_radius is not None:
+            if np.linalg.norm(np.array([x, y, zc]) - np.array(avoid_center)) < avoid_radius:
+                attempts += 1
+                continue
+        pts.append((x, y, zc))
+        attempts += 1
+    return np.array(pts)
 
-      <div class="panel">
-        <progress id="prog" value="0" max="100" hidden></progress>
-        <div id="note" class="muted" style="margin-top:.35rem; min-height:1.2em"></div>
-        <div id="tags" class="tags"></div>
-      </div>
-    </section>
+def polyline3d(curve_fn, t0, t1, steps):
+    t = np.linspace(t0, t1, steps)
+    xyz = np.array([curve_fn(tt) for tt in t])
+    return xyz[:,0], xyz[:,1], xyz[:,2]
 
-    <section class="panel">
-      <div style="font-weight:800; margin-bottom:.4rem">What gets changed</div>
-      <div class="muted">
-        - RGB: “r g b rg” (fill) and “R G B RG” (stroke)<br>
-        - Gray: “g” (fill) and “G” (stroke)<br>
-        - CMYK: “c m y k k” (fill) and “K” (stroke)<br>
-        - sc / SC with 1, 3, or 4 operands (Gray / RGB / CMYK)<br>
-        We match near your “From” color by tolerance and rewrite to the “To” color in the same family.
-      </div>
-    </section>
+# -------------- scene constants --------------
 
-    <div class="info">© <span id="year"></span> Made by ANABRATA</div>
-  </main>
+# Overall cell size (arbitrary units)
+CELL_R = 10.0
+NUCLEUS_R = 3.5
+NUCLEOLUS_R = 1.2
 
-  <!-- pdf-lib and pako (inflate/deflate) -->
-  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+# -------------- build organelles --------------
 
-<script>
-document.getElementById('year').textContent = new Date().getFullYear();
+traces = []
 
-const pickBtn = document.getElementById('pick');
-const runBtn = document.getElementById('run');
-const downloadA = document.getElementById('download');
-const note = document.getElementById('note');
-const prog = document.getElementById('prog');
-const tags = document.getElementById('tags');
+# Cell membrane (semi-transparent sphere)
+Xm, Ym, Zm = ellipsoid(center=(0,0,0), radii=(CELL_R, CELL_R*0.95, CELL_R*0.9), nu=80, nv=40)
+traces.append(surface_trace(Xm, Ym, Zm, color="#8ecae6", opacity=0.18, name="Cell membrane"))
 
-const fromPicker = document.getElementById('fromPicker');
-const fromHex = document.getElementById('fromHex');
-const toPicker = document.getElementById('toPicker');
-const toHex = document.getElementById('toHex');
-const tolInput = document.getElementById('tol');
-const fillsChk = document.getElementById('fills');
-const strokesChk = document.getElementById('strokes');
-const scOpsChk = document.getElementById('scOps');
+# Nucleus
+Xn, Yn, Zn = ellipsoid(center=(1.0, 0.5, 0.0), radii=(NUCLEUS_R*1.05, NUCLEUS_R, NUCLEUS_R*0.9), nu=60, nv=36)
+traces.append(surface_trace(Xn, Yn, Zn, color="#bdb2ff", opacity=0.45, name="Nucleus"))
 
-const fileIn = document.createElement('input');
-fileIn.type = 'file';
-fileIn.accept = 'application/pdf';
+# Nucleolus
+Xnu, Ynu, Znu = ellipsoid(center=(1.4, 0.8, 0.2), radii=(NUCLEOLUS_R, NUCLEOLUS_R, NUCLEOLUS_R*0.9), nu=50, nv=30)
+traces.append(surface_trace(Xnu, Ynu, Znu, color="#ffadad", opacity=0.85, name="Nucleolus"))
 
-let pdfBytes = null;
+# Mitochondria (multiple small ellipsoids distributed in cytoplasm, avoiding nucleus)
+mito_centers = random_points_in_shell(
+    n=14,
+    inner_r=NUCLEUS_R + 2.0,
+    outer_r=CELL_R - 2.0,
+    avoid_center=(1.0, 0.5, 0.0),
+    avoid_radius=NUCLEUS_R + 1.0,
+    seed=42
+)
 
-// Sync color inputs
-fromPicker.addEventListener('input', ()=> fromHex.value = fromPicker.value);
-fromHex.addEventListener('input', ()=> { if (validHex(fromHex.value)) fromPicker.value = normHex(fromHex.value); });
-toPicker.addEventListener('input', ()=> toHex.value = toPicker.value);
-toHex.addEventListener('input', ()=> { if (validHex(toHex.value)) toPicker.value = normHex(toHex.value); });
+for (mx, my, mz) in mito_centers:
+    rx, ry, rz = 0.8, 0.45, 0.45
+    Xmi, Ymi, Zmi = ellipsoid(center=(mx, my, mz), radii=(rx, ry, rz), nu=28, nv=18)
+    traces.append(surface_trace(Xmi, Ymi, Zmi, color="#fb8500", opacity=0.9, name="Mitochondrion"))
 
-pickBtn.onclick = () => fileIn.click();
-fileIn.onchange = async () => {
-  if (!fileIn.files || !fileIn.files[0]) return;
-  pdfBytes = new Uint8Array(await fileIn.files[0].arrayBuffer());
-  runBtn.disabled = false;
-  downloadA.removeAttribute('href'); downloadA.setAttribute('aria-disabled','true');
-  tags.innerHTML = '';
-  note.textContent = `Selected: ${fileIn.files[0].name}`;
-};
+# Golgi apparatus (stack of flattened ellipsoids near nucleus)
+golgi_center = (3.2, -0.8, 0.4)
+for i, shrink in enumerate([1.0, 0.9, 0.8, 0.7, 0.6]):
+    Xg, Yg, Zg = ellipsoid(
+        center=(golgi_center[0] + 0.15*i, golgi_center[1] + 0.05*i, golgi_center[2]),
+        radii=(1.8*shrink, 0.8*shrink, 0.25*shrink),
+        nu=40, nv=20
+    )
+    traces.append(surface_trace(Xg, Yg, Zg, color="#ffd166", opacity=0.95, name="Golgi stack"))
 
-runBtn.onclick = async () => {
-  if (!pdfBytes){ note.textContent = "Choose a PDF first."; return; }
+# Endoplasmic reticulum (meandering polylines near nucleus)
+def make_er_curve(cx, cy, cz, amp=1.1, rad=4.5, twist=2.2, phase=0.0):
+    def curve(t):
+        # toroidal-ish meander around nucleus offset
+        x = cx + (rad + amp*np.sin(t*twist + phase)) * np.cos(t)
+        y = cy + (rad + amp*np.cos(t*twist + phase)) * np.sin(t)
+        z = cz + 0.5*np.sin(1.5*t + phase)
+        return np.array([x, y, z])
+    return curve
 
-  const from = parseHex(fromHex.value);
-  const to = parseHex(toHex.value);
-  if (!from || !to){ note.textContent = "Enter valid hex like #e6e6e6"; return; }
+er_colors = ["#2a9d8f", "#2a9d8f", "#2a9d8f"]
+cent = (1.0, 0.5, 0.0)
+for idx, ph in enumerate([0.0, 0.9, 1.8]):
+    cx = cent[0] - 0.8 + 0.4*idx
+    cy = cent[1] + 0.2*idx
+    cz = cent[2]
+    curve_fn = make_er_curve(cx, cy, cz, amp=1.0, rad=4.0-0.4*idx, twist=2.0, phase=ph)
+    Xc, Yc, Zc = polyline3d(curve_fn, 0, 2*np.pi, steps=400)
+    traces.append(go.Scatter3d(
+        x=Xc, y=Yc, z=Zc,
+        mode="lines",
+        line=dict(color=er_colors[idx], width=5),
+        name="Endoplasmic reticulum",
+        hoverinfo="name",
+        opacity=0.9
+    ))
 
-  const tol = Math.max(0, Math.min(255, parseInt(tolInput.value||'12',10)));
-  const src = { r: from.r/255, g: from.g/255, b: from.b/255, gray: rgbToGray(from) };
-  const dst = { r: to.r/255, g: to.g/255, b: to.b/255, gray: rgbToGray(to) };
-  const tolF = tol/255;
+# Ribosomes (small points, enriched near ER and cytosol)
+ribos = random_points_in_shell(
+    n=450,
+    inner_r=NUCLEUS_R + 1.2,
+    outer_r=CELL_R - 1.5,
+    avoid_center=(1.0, 0.5, 0.0),
+    avoid_radius=NUCLEUS_R + 0.6,
+    seed=7
+)
+traces.append(go.Scatter3d(
+    x=ribos[:,0], y=ribos[:,1], z=ribos[:,2],
+    mode="markers",
+    marker=dict(size=2, color="#264653", opacity=0.8),
+    name="Ribosomes",
+    hoverinfo="name"
+))
 
-  try{
-    prog.hidden = false; prog.value = 8; note.textContent = "Loading PDF…";
+# Lysosomes / vesicles (small spheres)
+ves_centers = random_points_in_shell(
+    n=18,
+    inner_r=NUCLEUS_R + 1.5,
+    outer_r=CELL_R - 2.0,
+    avoid_center=(1.0, 0.5, 0.0),
+    avoid_radius=NUCLEUS_R + 0.8,
+    seed=21
+)
+for (vx, vy, vz) in ves_centers:
+    Xv, Yv, Zv = ellipsoid(center=(vx, vy, vz), radii=(0.35, 0.35, 0.35), nu=20, nv=14)
+    traces.append(surface_trace(Xv, Yv, Zv, color="#90be6d", opacity=0.65, name="Vesicle"))
 
-    const { PDFDocument, PDFName, PDFArray, PDFDict, PDFRawStream } = PDFLib;
-    const doc = await PDFDocument.load(pdfBytes, { updateMetadata:false, ignoreEncryption:false });
-    const ctx = doc.context;
+# Centrosome (two short orthogonal microtubule bundles near nucleus)
+c0 = np.array([ -1.5, -2.0, 0.0 ])
+axis1 = np.array([0.8, 0.0, 0.2])
+axis2 = np.array([0.0, 0.8, -0.2])
 
-    let totalStreams=0, editedStreams=0, hits = { rgb:0, gray:0, cmyk:0, sc1:0, sc3:0, sc4:0, RG:0, rg:0, G:0, g:0, K:0, k:0, SC:0, sc:0 };
+def segment_trace(p0, p1, color, name):
+    return go.Scatter3d(
+        x=[p0[0], p1[0]], y=[p0[1], p1[1]], z=[p0[2], p1[2]],
+        mode="lines",
+        line=dict(color=color, width=6),
+        name=name,
+        hoverinfo="name"
+    )
 
-    for (const page of doc.getPages()){
-      const cRef = page.node.get(PDFName.of('Contents'));
-      if (!cRef) continue;
+traces.append(segment_trace(c0 - axis1, c0 + axis1, "#6a4c93", "Centrosome"))
+traces.append(segment_trace(c0 - axis2, c0 + axis2, "#6a4c93", "Centrosome"))
 
-      const arr = (cRef instanceof PDFArray) ? cRef : (()=>{const a=PDFArray.withContext(ctx); a.push(cRef); return a;})();
-      const outArr = PDFArray.withContext(ctx);
+# -------------- assemble scene --------------
 
-      for (let i=0;i<arr.size();i++){
-        totalStreams++;
-        const sref = arr.get(i);
-        const stream = ctx.lookup(sref, PDFRawStream);
-        const filter = stream.dict.get(PDFName.of('Filter'));
-        const hadFlate = hasFlate(filter);
-        const raw = stream.getContents();
-        const infl = hadFlate ? pako.inflate(raw) : raw;
+fig = go.Figure(data=traces)
 
-        let srcStr = new TextDecoder('latin1').decode(infl);
-        const before = srcStr;
+fig.update_scenes(
+    xaxis=dict(visible=False),
+    yaxis=dict(visible=False),
+    zaxis=dict(visible=False),
+    aspectmode="data",
+    camera=dict(eye=dict(x=1.6, y=1.8, z=1.1)),
+)
 
-        const res = replaceColorsInStream(srcStr, src, dst, tolF, {
-          fills: fillsChk.checked,
-          strokes: strokesChk.checked,
-          scOps: scOpsChk.checked
-        });
+fig.update_layout(
+    title="Schematic 3D Human (Animal) Cell",
+    showlegend=True,
+    legend=dict(orientation="h", yanchor="bottom", y=0.02, xanchor="center", x=0.5),
+    margin=dict(l=0, r=0, t=40, b=0),
+    paper_bgcolor="white",
+)
 
-        srcStr = res.text;
-        Object.keys(hits).forEach(k => hits[k]+= (res.hits[k]||0));
-
-        if (srcStr !== before) editedStreams++;
-
-        let outBytes = new TextEncoder().encode(srcStr);
-        let outFilter = filter;
-        if (hadFlate){
-          outBytes = pako.deflate(outBytes);
-          outFilter = ensureFlate(filter);
-        } else {
-          // keep whatever filter (usually none)
-          outFilter = filter;
-        }
-
-        const newDict = stream.dict.clone(ctx);
-        newDict.set(PDFName.of('Length'), ctx.obj(outBytes.length));
-        if (outFilter) newDict.set(PDFName.of('Filter'), outFilter); else newDict.delete(PDFName.of('Filter'));
-        const newStream = ctx.register(new PDFRawStream(newDict, outBytes));
-        outArr.push(newStream);
-      }
-      page.node.set(PDFName.of('Contents'), outArr);
-    }
-
-    const out = await doc.save({ useObjectStreams:true, addDefaultPage:false, updateFieldAppearances:false });
-    const blob = new Blob([out], { type:'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    downloadA.href = url;
-    downloadA.setAttribute('aria-disabled','false');
-
-    tags.innerHTML = '';
-    addTag(`Streams edited: ${editedStreams}/${totalStreams}`);
-    addTag(`RGB (rg/RG): ${hits.rgb}`);
-    addTag(`Gray (g/G): ${hits.gray}`);
-    addTag(`CMYK (k/K): ${hits.cmyk}`);
-    addTag(`sc(1): ${hits.sc1} • sc(3): ${hits.sc3} • sc(4): ${hits.sc4}`);
-
-    prog.value = 100; setTimeout(()=>prog.hidden=true, 300);
-    note.textContent = "Done. Download your color‑replaced PDF.";
-  } catch(e){
-    console.error(e);
-    prog.hidden = true;
-    note.textContent = "Failed: " + (e?.message || e);
-  }
-};
-
-/* ---------- Replace logic ---------- */
-const NUM = '([+\\-]?(?:\\d*\\.\\d+|\\d+)(?:[Ee][+\\-]?\\d+)?)';
-const WS  = '\\s+';
-
-function replaceColorsInStream(text, src, dst, tol, opts){
-  const hits = { rgb:0, gray:0, cmyk:0, sc1:0, sc3:0, sc4:0, RG:0, rg:0, G:0, g:0, K:0, k:0, SC:0, sc:0 };
-  const dec = n => Math.max(0, Math.min(1, +n));
-  const fmt = v => (Math.round(v*1000)/1000).toString();  // up to 3 decimals
-
-  // RGB rg (fill) and RG (stroke)
-  if (opts.fills){
-    const re_rg = new RegExp(`${NUM}${WS}${NUM}${WS}${NUM}${WS}(rg)\\b`, 'g');
-    text = text.replace(re_rg, (m, r,g,b,op) => {
-      const R=dec(r), G=dec(g), B=dec(b);
-      if (isCloseRGB(R,G,B, src, tol)){ hits.rgb++; hits.rg++; return `${fmt(dst.r)} ${fmt(dst.g)} ${fmt(dst.b)} ${op}`; }
-      return m;
-    });
-  }
-  if (opts.strokes){
-    const re_RG = new RegExp(`${NUM}${WS}${NUM}${WS}${NUM}${WS}(RG)\\b`, 'g');
-    text = text.replace(re_RG, (m, r,g,b,op) => {
-      const R=dec(r), G=dec(g), B=dec(b);
-      if (isCloseRGB(R,G,B, src, tol)){ hits.rgb++; hits.RG++; return `${fmt(dst.r)} ${fmt(dst.g)} ${fmt(dst.b)} ${op}`; }
-      return m;
-    });
-  }
-
-  // Gray g/G (single operand 0..1) — match src gray, set to dst gray
-  if (opts.fills){
-    const re_g = new RegExp(`${NUM}${WS}(g)\\b`, 'g');
-    text = text.replace(re_g, (m, val, op) => {
-      const V = dec(val);
-      if (Math.abs(V - src.gray) <= tol){ hits.gray++; hits.g++; return `${fmt(dst.gray)} ${op}`; }
-      return m;
-    });
-  }
-  if (opts.strokes){
-    const re_G = new RegExp(`${NUM}${WS}(G)\\b`, 'g');
-    text = text.replace(re_G, (m, val, op) => {
-      const V = dec(val);
-      if (Math.abs(V - src.gray) <= tol){ hits.gray++; hits.G++; return `${fmt(dst.gray)} ${op}`; }
-      return m;
-    });
-  }
-
-  // CMYK k/K (four operands 0..1) — compare to src RGB via conversion; set to dst CMYK
-  const dstCMYK = rgbToCmyk(dst.r, dst.g, dst.b);
-  if (opts.fills){
-    const re_k = new RegExp(`${NUM}${WS}${NUM}${WS}${NUM}${WS}${NUM}${WS}(k)\\b`, 'g');
-    text = text.replace(re_k, (m, c,mv,y,k,op) => {
-      const C=dec(c), M=dec(mv), Y=dec(y), K=dec(k);
-      const rgb = cmykToRgb(C,M,Y,K);
-      if (isCloseRGB(rgb.r,rgb.g,rgb.b, src, tol)){ hits.cmyk++; hits.k++; return `${fmt(dstCMYK.c)} ${fmt(dstCMYK.m)} ${fmt(dstCMYK.y)} ${fmt(dstCMYK.k)} ${op}`; }
-      return m;
-    });
-  }
-  if (opts.strokes){
-    const re_K = new RegExp(`${NUM}${WS}${NUM}${WS}${NUM}${WS}${NUM}${WS}(K)\\b`, 'g');
-    text = text.replace(re_K, (m, c,mv,y,k,op) => {
-      const C=dec(c), M=dec(mv), Y=dec(y), K=dec(k);
-      const rgb = cmykToRgb(C,M,Y,K);
-      if (isCloseRGB(rgb.r,rgb.g,rgb.b, src, tol)){ hits.cmyk++; hits.K++; return `${fmt(dstCMYK.c)} ${fmt(dstCMYK.m)} ${fmt(dstCMYK.y)} ${fmt(dstCMYK.k)} ${op}`; }
-      return m;
-    });
-  }
-
-  // sc/SC — handle 1, 3, or 4 operand variants
-  if (opts.scOps){
-    // 3-operand (RGB-like)
-    const re_sc3 = new RegExp(`${NUM}${WS}${NUM}${WS}${NUM}${WS}(sc|SC)\\b`, 'g');
-    text = text.replace(re_sc3, (m, r,g,b,op) => {
-      const R=dec(r), G=dec(g), B=dec(b);
-      if (isCloseRGB(R,G,B, src, tol)){ hits.sc3++; hits[(op==='SC'?'SC':'sc')] = (hits[(op==='SC'?'SC':'sc')]||0)+1; return `${fmt(dst.r)} ${fmt(dst.g)} ${fmt(dst.b)} ${op}`; }
-      return m;
-    });
-    // 1-operand (Gray)
-    const re_sc1 = new RegExp(`${NUM}${WS}(sc|SC)\\b`, 'g');
-    text = text.replace(re_sc1, (m, v,op) => {
-      const V=dec(v);
-      if (Math.abs(V - src.gray) <= tol){ hits.sc1++; hits[(op==='SC'?'SC':'sc')] = (hits[(op==='SC'?'SC':'sc')]||0)+1; return `${fmt(dst.gray)} ${op}`; }
-      return m;
-    });
-    // 4-operand (CMYK)
-    const re_sc4 = new RegExp(`${NUM}${WS}${NUM}${WS}${NUM}${WS}${NUM}${WS}(sc|SC)\\b`, 'g');
-    text = text.replace(re_sc4, (m, c,mv,y,k,op) => {
-      const C=dec(c), M=dec(mv), Y=dec(y), K=dec(k);
-      const rgb = cmykToRgb(C,M,Y,K);
-      if (isCloseRGB(rgb.r,rgb.g,rgb.b, src, tol)){ hits.sc4++; hits[(op==='SC'?'SC':'sc')] = (hits[(op==='SC'?'SC':'sc')]||0)+1; return `${fmt(dstCMYK.c)} ${fmt(dstCMYK.m)} ${fmt(dstCMYK.y)} ${fmt(dstCMYK.k)} ${op}`; }
-      return m;
-    });
-  }
-
-  return { text, hits };
-}
-
-function isCloseRGB(R,G,B, src, tol){
-  const dr=R - src.r, dg=G - src.g, db=B - src.b;
-  const dist = Math.sqrt(dr*dr + dg*dg + db*db);
-  return dist <= Math.sqrt(3)*tol;
-}
-
-/* ---------- Filters handling ---------- */
-function hasFlate(filter){
-  if (!filter) return false;
-  const s = String(filter);
-  if (s === '/FlateDecode') return true;
-  if (filter instanceof PDFLib.PDFArray){
-    for (let i=0;i<filter.size();i++){
-      const f = filter.get(i);
-      if (String(f) === '/FlateDecode') return true;
-    }
-  }
-  return false;
-}
-function ensureFlate(filter){
-  // Keep original Filter object; if it already was FlateDecode (or included), return as-is.
-  // Otherwise, set to /FlateDecode to reflect compression we apply.
-  if (!filter) return PDFLib.PDFName.of('FlateDecode');
-  if (hasFlate(filter)) return filter;
-  return PDFLib.PDFName.of('FlateDecode');
-}
-
-/* ---------- Color helpers ---------- */
-function validHex(h){ return /^#?[0-9a-f]{6}$/i.test(h.trim()); }
-function normHex(h){ const s=h.trim().replace(/^#/,''); return '#'+s.toLowerCase(); }
-function parseHex(h){
-  const m = /^#?([0-9a-f]{6})$/i.exec(h.trim());
-  if (!m) return null;
-  const n = parseInt(m[1],16);
-  return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 };
-}
-function rgbToGray(rgb){ return (0.2126*rgb.r + 0.7152*rgb.g + 0.0722*rgb.b)/255; }
-function rgbToCmyk(r,g,b){
-  // r,g,b in 0..1
-  const K = 1 - Math.max(r,g,b);
-  if (K>=0.999) return { c:0, m:0, y:0, k:1 };
-  const C = (1 - r - K)/(1 - K);
-  const M = (1 - g - K)/(1 - K);
-  const Y = (1 - b - K)/(1 - K);
-  return { c:clamp01(C), m:clamp01(M), y:clamp01(Y), k:clamp01(K) };
-}
-function cmykToRgb(C,M,Y,K){
-  const r = 1 - Math.min(1, C + K);
-  const g = 1 - Math.min(1, M + K);
-  const b = 1 - Math.min(1, Y + K);
-  return { r, g, b };
-}
-function clamp01(v){ return v<0?0:(v>1?1:v); }
-
-/* ---------- UI helpers ---------- */
-function addTag(text){ const s=document.createElement('span'); s.className='tag'; s.textContent=text; tags.appendChild(s); }
-</script>
-</body>
-</html>
+fig.show()
