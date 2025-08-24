@@ -1,39 +1,287 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>ULTRA Lightweight 3D Human Cell</title>
-  <script src="https://cdn.plot.ly/plotly-2.34.0.min.js"></script>
-  <style>
-    html, body {
-      margin: 0; padding: 0; height: 100%; overflow: hidden;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: #1b1e3c;
-      color: #eee;
-      user-select: none;
-    }
-    #plot {
-      width: 100vw; height: 100vh;
-    }
-    #status {
-      position: absolute; left: 12px; bottom: 12px; 
-      background: rgba(0,0,0,0.7);
-      padding: 8px 12px;
-      border-radius: 10px;
-      font-size: 14px;
-      color: #fff;
-      z-index: 99;
-      user-select: none;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Minimal Fast 3D Human Cell</title>
+<script src="https://cdn.plot.ly/plotly-2.34.0.min.js"></script>
+<style>
+  html, body {
+    margin: 0; padding: 0; height: 100%; overflow: hidden;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background: #1b1e3c;
+    color: #eee;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  #plot {
+    width: 100vw; height: 100vh;
+  }
+  #status {
+    position: absolute; left: 12px; bottom: 12px;
+    background: rgba(0,0,0,0.8);
+    padding: 8px 14px;
+    border-radius: 12px;
+    font-size: 14px;
+    color: #fff;
+    z-index: 100;
+    user-select: none;
+  }
+  .panel {
+    position: absolute;
+    right: 10px; top: 50px;
+    width: min(350px, 90vw);
+    max-height: 70vh;
+    overflow-y: auto;
+    background: rgba(40,40,60,0.9);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 14px;
+    padding: 16px 20px;
+    z-index: 101;
+    color: #ccddee;
+    font-size: 14px;
+    line-height: 1.4;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.4s ease;
+  }
+  .panel.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .panel h3 {
+    margin: 0 0 12px 0;
+    font-weight: 700;
+    font-size: 22px;
+  }
+  .panel p {
+    margin: 0 0 14px 0;
+  }
+  .panel .close {
+    position: absolute;
+    top: 10px; right: 12px;
+    background: none; border: none;
+    color: #bbb;
+    font-size: 24px;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+  }
+  .panel .close:hover {
+    opacity: 1;
+  }
+</style>
 </head>
 <body>
-  <div id="status">Loading...</div>
-  <div id="plot" role="img" aria-label="Lightweight 3D human cell model"></div>
+  <div id="status">Loading 3D cell model...</div>
+  <div id="plot" role="img" aria-label="Minimal 3D human cell model"></div>
+
+  <div id="panel" class="panel" role="region" aria-live="polite" aria-labelledby="orgTitle" tabindex="0">
+    <button class="close" id="closePanel" title="Close info panel" aria-label="Close panel">×</button>
+    <h3 id="orgTitle">Click an organelle</h3>
+    <p id="orgIntro">Tap or click an organelle in the 3D model to see details here.</p>
+  </div>
 
   <script>
-    (function(){
+  (function() {
+    const statusEl = document.getElementById('status');
+    const plotEl = document.getElementById('plot');
+    const panel = document.getElementById('panel');
+    const titleEl = document.getElementById('orgTitle');
+    const introEl = document.getElementById('orgIntro');
+    const closeBtn = document.getElementById('closePanel');
+
+    closeBtn.addEventListener('click', () => { panel.classList.remove('show'); });
+
+    // Basics
+    function linspace(a,b,n) {
+      if (n<2) return [a];
+      let s=(b - a)/(n -1);
+      let arr= new Array(n);
+      for(let i=0; i<n; i++) arr[i] = a + s*i;
+      return arr;
+    }
+    function zerosLike2D(M){
+      return M.map(row => row.map(_=>0));
+    }
+    function ellipsoid(center, radii, nu=10, nv=8) {
+      const [cx,cy,cz] = center;
+      const [rx,ry,rz] = radii;
+      const u = linspace(0, 2*Math.PI, nu);
+      const v = linspace(0, Math.PI, nv);
+      const X = [], Y = [], Z = [];
+      for(let i=0; i<nu; i++) {
+        const Xrow = [], Yrow = [], Zrow = [];
+        const cu = Math.cos(u[i]), su = Math.sin(u[i]);
+        for(let j=0; j<nv; j++) {
+          const sv = Math.sin(v[j]), cv = Math.cos(v[j]);
+          Xrow.push(rx*cu*sv + cx);
+          Yrow.push(ry*su*sv + cy);
+          Zrow.push(rz*cv + cz);
+        }
+        X.push(Xrow); Y.push(Yrow); Z.push(Zrow);
+      }
+      return {X, Y, Z};
+    }
+    function surface(X,Y,Z,color,opacity,name) {
+      return {
+        type: 'surface', x: X, y: Y, z: Z,
+        surfacecolor: zerosLike2D(X),
+        colorscale: [[0,color],[1,color]],
+        showscale: false, opacity: opacity, name: name, hoverinfo: 'name',
+        lighting: {ambient: 1, diffuse: 0.5, specular: 0.2, roughness: 0.8},
+        contours: {x:{show:false}, y:{show:false}, z:{show:false}}
+      };
+    }
+    function lineTrace(xs, ys, zs, color, width, name) {
+      return {type: 'scatter3d', mode: 'lines',
+              x: xs, y: ys, z: zs,
+              line: {color: color, width: width},
+              name: name, hoverinfo: 'name', opacity: 0.5};
+    }
+    function polyline3d(fn, t0, t1, steps=60) {
+      const t = linspace(t0, t1, steps);
+      const X = [], Y = [], Z = [];
+      for(let i=0; i<steps; i++) {
+        const p = fn(t[i]);
+        X.push(p[0]); Y.push(p[1]); Z.push(p[2]);
+      }
+      return {X, Y, Z};
+    }
+
+    function randomPoints(n, inner, outer, avoidC=null, avoidR=0, seed=123) {
+      Math.seedrandom(seed);
+      const points=[];
+      let count=0;
+      while(points.length < n && count < 20000) {
+        let u= Math.random();
+        let r= Math.pow((Math.pow(outer,3)-Math.pow(inner,3))*u + Math.pow(inner,3), 1/3);
+        let z= 2*Math.random()-1;
+        let angle= 2*Math.PI*Math.random();
+        let s= Math.sqrt(1 - z*z);
+        let x= r*s*Math.cos(angle);
+        let y= r*s*Math.sin(angle);
+        let dist = avoidC ? Math.sqrt( (x - avoidC[0])**2 + (y - avoidC[1])**2 + (z - avoidC[2])**2 ) : 9999;
+        if(dist > avoidR) points.push([x,y,z]);
+        count++;
+      }
+      // restore normal random
+      Math.random = () => crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296;
+      return points;
+    }
+
+    // Info text
+    const INFO = {
+      'Cell membrane': 'Phospholipid bilayer surrounding the cell.',
+      'Nucleus': 'Cell control center containing DNA.',
+      'Mitochondrion': 'Produces energy for the cell.',
+      'Golgi apparatus': 'Packages and ships proteins.',
+      'Rough ER': 'Protein synthesis site with ribosomes.',
+      'Smooth ER': 'Lipid synthesis and detoxification.',
+      'Ribosome': 'Protein assembly machines.',
+      'DNA Helix': 'Genetic information molecule.'
+    };
+
+    function openInfo(name) {
+      titleEl.textContent = name;
+      introEl.textContent = INFO[name] || 'No detailed info available.';
+      panel.classList.add('show');
+    }
+
+    // Build core cell parts with minimal polygons and counts
+    const CELL_R = 10;
+    const NUCLEUS_R = 3.5;
+
+    const traces = [];
+    traces.push(surface(...Object.values(ellipsoid([0,0,0],[CELL_R,CELL_R*0.95,CELL_R*0.90])), '#779977', 0.3, 'Cell membrane'));
+
+    traces.push(surface(...Object.values(ellipsoid([1,0,0],[NUCLEUS_R*1.1,NUCLEUS_R,NUCLEUS_R*0.9])), '#aa88cc', 0.5, 'Nucleus'));
+
+    // Mitochondria 5 units
+    const mitoCenters = randomPoints(5, NUCLEUS_R+2, CELL_R-2, [1,0,0], NUCLEUS_R+1, 456);
+    mitoCenters.forEach(c => traces.push(surface(...Object.values(ellipsoid(c,[1.1,0.6,0.6])), '#d2691e', 0.8, 'Mitochondrion')));
+
+    // Golgi apparatus 3 stacks
+    for(let i=0; i<3; i++){
+      let pos = [3 + 0.15*i, -1 + 0.05*i, 0.5];
+      traces.push(surface(...Object.values(ellipsoid(pos,[1.3,0.7,0.22])), '#deb887', 0.9, 'Golgi apparatus'));
+    }
+
+    // Rough ER 2 branches
+    const roughERParams = [[-0.7,0.3,0,0.8,2.9,2,0],[0.2,0.6,0,0.7,2.5,2,1]];
+    roughERParams.forEach(params => {
+      const [cx,cy,cz,amp,rad,twist,phase] = params;
+      let pl = polyline3d(t => [
+        cx+(rad+amp*Math.sin(t*twist+phase))*Math.cos(t),
+        cy+(rad+amp*Math.cos(t*twist+phase))*Math.sin(t),
+        cz+0.4*Math.sin(1.4*t+phase)
+      ], 0, 2*Math.PI, 140);
+      traces.push(lineTrace(pl.X, pl.Y, pl.Z, '#6d8a42', 5, 'Rough ER'));
+    });
+
+    // Smooth ER 1 branch
+    const smoothERCurve = polyline3d(t => [
+      1.0+(2.8)*Math.cos(t*1.7+0.8),
+      0.1 + 0.25*Math.sin(t*1.7+0.8),
+      0.4*Math.sin(1.4*t+0.8)
+    ], 0, 2*Math.PI, 120);
+    traces.push(lineTrace(smoothERCurve.X, smoothERCurve.Y, smoothERCurve.Z, '#497230', 4, 'Smooth ER'));
+
+    // Ribosomes 20 units small spheres
+    const ribCenters = randomPoints(20, NUCLEUS_R+1.3, CELL_R-1.8, [1,0,0], NUCLEUS_R+0.7, 789);
+    ribCenters.forEach(c => traces.push(surface(...Object.values(ellipsoid(c,[0.35,0.35,0.3])), '#4a6f4a', 0.8, 'Ribosome')));
+
+    // DNA Helix (line)
+    const dnaHelix = polyline3d(t => {
+      let r = 0.3;
+      return [
+        r*Math.cos(5*t + Math.PI/2),
+        r*Math.sin(5*t + Math.PI/2),
+        0.05*t - 3
+      ];
+    }, 0, 10*Math.PI, 100);
+    traces.push(lineTrace(dnaHelix.X, dnaHelix.Y, dnaHelix.Z, 'rgb(190,110,50)', 2.5, 'DNA Helix'));
+
+    const layout = {
+      scene: {
+        xaxis: {visible:false}, yaxis:{visible:false}, zaxis:{visible:false},
+        aspectmode: 'data', camera: {eye: {x:1.7,y:2,z:1.2}},
+        bgcolor: 'rgba(0,0,0,0)'
+      },
+      margin: {l:0,r:0,t:0,b:0},
+      paper_bgcolor: 'rgba(0,0,0,0)',
+      showlegend: true,
+      legend: {orientation:'h', yanchor:'bottom', y:0.02, xanchor:'center', x:0.5, font:{color:'#eee', size:12}}
+    };
+
+    const config = {
+      responsive: true,
+      displayModeBar: false,
+      scrollZoom: true,
+      scrollZoomSpeed: 0.15,
+      doubleClick: 'reset',
+      staticPlot: true
+    };
+
+    Plotly.newPlot(plotEl, traces, layout, config).then(() => {
+      statusEl.textContent = 'Fast 3D Cell loaded • Tap organelles for info';
+      statusEl.style.opacity = '0';
+      config.staticPlot = false; // enable interaction after initial load
+    }).catch(e => {
+      statusEl.classList.add('error');
+      statusEl.textContent = 'Render error: ' + e.message;
+    });
+
+    plotEl.on('plotly_click', function(ev) {
+      if(!ev || !ev.points || !ev.points.length) return;
+      openInfo(ev.points[0].fullData.name || 'Cell structure');
+    });
+
+    window.addEventListener('resize', () => Plotly.Plots.resize(plotEl));
+  })();
+  </script>
+</body>
+</html>
       const statusEl = document.getElementById('status');
       const plotEl = document.getElementById('plot');
       
