@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>Candle Timer — V2.0</title>
+<title>Candle Timer — V10</title>
 <style>
   :root{
     /* Sizes */
@@ -139,6 +138,7 @@
   #todoList li{ counter-increment:tdn; position:relative; padding-left:28px; margin:4px 0; min-height:20px; outline:none; transition: opacity .18s, transform .18s; }
   #todoList li:before{ content: counter(tdn) "."; position:absolute; left:0; top:0; width:22px; text-align:right; padding-right:6px; font-weight:900; opacity:.9; }
   #todoList li.vanish{ opacity:0; transform:translateY(-3px); }
+
   .todoItem{ display:flex; align-items:center; gap:8px; }
   .todoChk{ appearance:none; width:16px; height:16px; border:2px solid rgba(255,255,255,.75); border-radius:4px; background:transparent; cursor:pointer; }
   .todoChk:checked{ background:#22c55e; border-color:#22c55e; }
@@ -171,7 +171,7 @@
   @keyframes bottomFlip{ 0%{transform:rotateX(90deg)} 100%{transform:rotateX(0)} }
   .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.3); flex:0 0 auto; }
 
-  /* Transparent mode for flip cards */
+  /* Transparent mode for flip cards (kept but not exposed in UI) */
   .clock-transparent .digit{
     background: transparent !important;
     border-color: rgba(255,255,255,.28) !important;
@@ -310,7 +310,7 @@
 </style>
 </head>
 <body>
-  <div class="brand">MADE BY ANABRATA — V2.0</div>
+  <div class="brand">MADE BY ANABRATA — V10</div>
 
   <div class="main" id="main">
     <!-- Timer -->
@@ -380,12 +380,12 @@
         </div>
       </div>
       <div class="row">
-        <label><input type="checkbox" id="todoGlass"> To‑do transparency effect</label>
+        <label><input type="checkbox" id="todoGlass" checked> To‑do transparency effect</label>
       </div>
     </div>
 
     <div class="card">
-      <label class="small">Media & background</label>
+      <label class="small">Media &amp; background</label>
       <div class="row" style="gap:8px; align-items:center">
         <button id="addMusicBtn" class="btn alt small">Add music</button>
         <input id="musicFiles" type="file" accept="audio/*" multiple style="display:none" />
@@ -414,9 +414,7 @@
         <div style="flex:1"><label for="textColor">Digit color</label><input id="textColor" type="color" value="#000000"></div>
         <div style="flex:1"><label for="colonColor">Colon color</label><input id="colonColor" type="color" value="#ffffff"></div>
       </div>
-      <div class="row">
-        <label><input type="checkbox" id="clockTransparent"> Transparent flip cards</label>
-      </div>
+      <!-- Transparent flip cards option removed intentionally -->
       <div class="row">
         <div style="flex:1"><label for="simpleColor">Simple timer color</label><input id="simpleColor" type="color" value="#ffffff"></div>
       </div>
@@ -442,7 +440,7 @@
   <div id="congrats" aria-modal="true" role="dialog">
     <div id="cgCard">
       <h2 id="cgTitle">Congratulations!</h2>
-      <p id="cgMsg">Timer complete YOU DONE IT🥰</p>
+      <p id="cgMsg">Timer complete — great focus! 🎉</p>
       <button id="cgClose">Close</button>
     </div>
     <!-- Balloons -->
@@ -792,7 +790,7 @@
   new ResizeObserver(()=> requestAnimationFrame(()=>positionFlame())).observe(area);
   new MutationObserver(()=> requestAnimationFrame(()=>positionFlame())).observe(document.body,{attributes:true,attributeFilter:["class"]});
   waxEl.addEventListener("transitionend", ()=> requestAnimationFrame(()=>positionFlame()));
-  window.addEventListener("resize", ()=> requestAnimationFrame(()=>positionFlame()));
+  window.addEventListener("resize", () => requestAnimationFrame(() => positionFlame()));
 
   /* ---------- Congrats overlay ---------- */
   const congrats = $("#congrats");
@@ -812,7 +810,6 @@
 
   /* ---------- To‑do logic ---------- */
   const todoList = $("#todoList");
-
   function makeTodoItem(text = ""){
     const li = document.createElement("li");
     const label = document.createElement("label"); label.className = "todoItem";
@@ -843,20 +840,20 @@
   function pausePlaylist(){ audio.pause(); if (musicPlayBtn) musicPlayBtn.textContent="▶"; }
   function nextTrack(){ if(playlist.length) playTrack(trackIndex+1); }
   function prevTrack(){ if(playlist.length) playTrack(trackIndex-1); }
-  audio.addEventListener("ended", ()=> nextTrack());
-  audio.addEventListener("play", ()=> { if (musicPlayBtn) musicPlayBtn.textContent="⏸"; });
-  audio.addEventListener("pause", ()=> { if (musicPlayBtn) musicPlayBtn.textContent="▶"; });
-  $("#addMusicBtn")?.addEventListener("click", ()=> musicFiles?.click());
+  audio.addEventListener("ended", () => nextTrack());
+  audio.addEventListener("play", () => { if (musicPlayBtn) musicPlayBtn.textContent="⏸"; });
+  audio.addEventListener("pause", () => { if (musicPlayBtn) musicPlayBtn.textContent="▶"; });
+  $("#addMusicBtn")?.addEventListener("click", () => musicFiles?.click());
   musicFiles?.addEventListener("change", (e)=> loadPlaylist(e.target.files));
-  $("#musicPlay")?.addEventListener("click", ()=> audio.paused ? startPlaylist() : pausePlaylist());
+  $("#musicPlay")?.addEventListener("click", () => audio.paused ? startPlaylist() : pausePlaylist());
   $("#musicNext")?.addEventListener("click", nextTrack);
   $("#musicPrev")?.addEventListener("click", prevTrack);
   $("#musicLoop")?.addEventListener("change", (e)=> audio.loop = !!e.target.checked);
-  window.addEventListener("unload", ()=> objectUrls.forEach(u=>URL.revokeObjectURL(u)));
+  window.addEventListener("unload", () => objectUrls.forEach(u=>URL.revokeObjectURL(u)));
 
   /* ---------- Custom background image ---------- */
   const bgImageBtn = $("#bgImageBtn"), bgImageFile = $("#bgImageFile"), bgImageClear = $("#bgImageClear"), bgImageName = $("#bgImageName");
-  bgImageBtn?.addEventListener("click", ()=> bgImageFile?.click());
+  bgImageBtn?.addEventListener("click", () => bgImageFile?.click());
   bgImageFile?.addEventListener("change", (e)=>{
     const f = e.target.files?.[0]; if (!f) return;
     if (bgObjectUrl){ URL.revokeObjectURL(bgObjectUrl); bgObjectUrl=null; }
@@ -902,18 +899,19 @@
   $("#showHours").addEventListener("change", previewLayout);
   $("#showSeconds").addEventListener("change", previewLayout);
 
-  $("#hideCandle").addEventListener("change", ()=> applyLayoutFlags());
-  $("#centerClock").addEventListener("change", ()=> applyLayoutFlags());
+  $("#hideCandle").addEventListener("change", () => applyLayoutFlags());
+  $("#centerClock").addEventListener("change", () => applyLayoutFlags());
   $("#onlyCandle").addEventListener("change", e=>{ ensureCandleVisibleWhenOnlyCandle(e.target.checked); applyLayoutFlags(); });
-  $("#showTodo").addEventListener("change", ()=> applyLayoutFlags());
-  $("#clockTransparent").addEventListener("change", (e)=> document.body.classList.toggle("clock-transparent", e.target.checked));
+  $("#showTodo").addEventListener("change", () => applyLayoutFlags());
 
   ["bgAngle","bgC1","bgC2","bgC3"].forEach(id=> document.getElementById(id)?.addEventListener("input", applyGradient));
   ["clockC1","clockC2","clockC3","textColor","colonColor","simpleColor"].forEach(id=> document.getElementById(id)?.addEventListener("input", restyleClockPanels));
 
-  $("#todoApply").addEventListener("click", ()=>{ setTodoBg($("#todoColor").value); $("#todo-panel").classList.remove("todo-clear"); });
-  $("#todoClear").addEventListener("click", ()=>{ setTodoBg("transparent"); $("#todo-panel").classList.add("todo-clear"); });
+  $("#todoApply").addEventListener("click", () =>{ setTodoBg($("#todoColor").value); $("#todo-panel").classList.remove("todo-clear"); });
+  $("#todoClear").addEventListener("click", () =>{ setTodoBg("transparent"); $("#todo-panel").classList.add("todo-clear"); });
   $("#todoGlass").addEventListener("change", (e)=> $("#todo-panel").classList.toggle("todo-glass", e.target.checked));
+
+  /* Transparent flip cards option removed: no event listener for #clockTransparent */
 
   /* ---------- Init ---------- */
   (function boot(){
@@ -921,6 +919,9 @@
 
     // Force to‑do visible on load if toggle checked
     if ($("#showTodo")?.checked) document.body.classList.add("todo-on");
+
+    // Apply To‑do transparency if default-checked
+    if ($("#todoGlass")?.checked) $("#todo-panel").classList.add("todo-glass");
 
     applyLayoutFlags();
     safeBuildClock();
