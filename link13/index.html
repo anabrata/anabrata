@@ -42,7 +42,7 @@
     /* Layout tweak */
     --candle-offset: 18px;
 
-    /* To‑do list pane (default transparent) */
+    /* To‑do list color var (default fully transparent) */
     --todo-bg: transparent;
   }
 
@@ -63,7 +63,7 @@
   .main{
     flex:1; display:flex; align-items:center; justify-content:space-between;
     gap:min(6vw,56px); padding:22px min(5vw,48px);
-    position:relative; /* overlay/center anchors */
+    position:relative;
   }
 
   /* Center only the clock overlay; keep candle at right */
@@ -72,11 +72,7 @@
   .center-clock #timer-container{
     position:absolute; left:50%; top:50%;
     transform:translate(-50%,-50%);
-    z-index:5;
-    flex:0 0 auto;
-    min-width:0; width:auto;
-    justify-content:center;
-    pointer-events:auto;
+    z-index:5; flex:0 0 auto; min-width:0; width:auto; justify-content:center;
   }
 
   /* Hide candle option */
@@ -91,25 +87,19 @@
   #todo-panel{ display:none; }
   .todo-on #todo-panel{ display:block; }
 
-  /* Default: BETWEEN clock and candle as a normal flex child (prevents overlap when Show hours widens the clock) */
+  /* Default: BETWEEN clock and candle (flex child, no overlay) */
   #todo-panel{
-    position: relative;
-    left:auto; top:auto; transform:none;
-    z-index:4;
-
-    /* compact sizing */
+    position: relative; left:auto; top:auto; transform:none; z-index:4;
     flex: 0 1 clamp(220px, 26vw, 420px);
     max-width: clamp(220px, 26vw, 420px);
     max-height: 60vh;
     margin-inline: clamp(6px, 1.6vw, 12px);
     font-size: 13px;
-
-    /* visuals */
     overflow:auto;
     padding:10px 12px;
     border-radius:12px;
     border:1px solid rgba(255,255,255,.18);
-    background: var(--todo-bg);
+    background: var(--todo-bg, transparent); /* stays transparent unless user sets a color */
     box-shadow: 0 6px 18px rgba(0,0,0,.16), 0 2px 5px rgba(0,0,0,.1);
     color:#fff;
   }
@@ -290,8 +280,9 @@
   .btn.alt{ background:linear-gradient(135deg,#a5b4fc,#6366f1); color:#0d0d15; }
   .btn.warn{ background:linear-gradient(135deg,#fca5a5,#ef4444); color:#0d0d15; }
   .btn.small{ padding:8px 10px; border-radius:10px; font-weight:900; }
+  .btn.ghost{ background:rgba(255,255,255,.12); color:#fff; }
 
-  /* Real-time overlay */
+  /* Real-time overlay etc. */
   #rtcOverlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:90; }
   #rtcOverlay.show{ display:flex; }
   #rtcTimer{ display:flex; align-items:center; gap:12px; }
@@ -339,7 +330,7 @@
       <div id="simpleTimer">00:00</div>
     </section>
 
-    <!-- To‑do panel (small, compact) -->
+    <!-- To‑do panel (compact, transparent by default) -->
     <section id="todo-panel" aria-label="To‑do list">
       <h4 id="todoTitle">To‑do</h4>
       <ol id="todoList"></ol>
@@ -413,14 +404,24 @@
         <div style="flex:1"><label for="bgC3">Color 3</label><input id="bgC3" type="color" value="#ffaf7b"></div>
       </div>
       <div class="row">
-        <div style="flex:1"><label for="todoColor">To‑do list color</label><input id="todoColor" type="color" value="#ffffff"></div>
+        <div style="flex:1; display:flex; gap:8px; align-items:center">
+          <div style="flex:1">
+            <label for="todoColor">To‑do list color</label>
+            <input id="todoColor" type="color" value="#ffffff">
+          </div>
+          <button id="todoApply" class="btn small">Apply</button>
+          <button id="todoClear" class="btn small ghost" title="Transparent">Clear</button>
+        </div>
       </div>
     </div>
 
     <div class="card" id="simpleColorCard" style="display:none">
       <label class="small">Simple timer color</label>
       <div class="row">
-        <div style="flex:1"><label for="simpleTextColor">Text color</label><input id="simpleTextColor" type="color" value="#000000"></div>
+        <div style="flex:1">
+          <label for="simpleTextColor">Text color</label>
+          <input id="simpleTextColor" type="color" value="#000000">
+        </div>
       </div>
     </div>
 
@@ -469,15 +470,10 @@
 <script>
   const $ = s => document.querySelector(s);
 
-  /* =======================
-     Gradient + global colors
-     ======================= */
+  /* Background + colors */
   const gradientStr = (a,c1,c2,c3)=>`linear-gradient(${a}deg, ${c1}, ${c2}, ${c3})`;
-  function applyGradient(){
-    const ang = parseInt($('#bgAngle').value||'135',10);
-    document.body.style.backgroundImage = gradientStr(ang,$('#bgC1').value,$('#bgC2').value,$('#bgC3').value);
-  }
-  function applyTodoBg(){ const v = $('#todoColor').value; if (v) document.documentElement.style.setProperty('--todo-bg', v); }
+  function applyGradient(){ const ang = parseInt($('#bgAngle').value||'135',10); document.body.style.backgroundImage = gradientStr(ang,$('#bgC1').value,$('#bgC2').value,$('#bgC3').value); }
+  function setTodoBg(val){ document.documentElement.style.setProperty('--todo-bg', val); }
   function applyWax(){ document.documentElement.style.setProperty('--wax',$('#waxColor').value); }
   function restyleClockPanels(){
     document.documentElement.style.setProperty('--clock-c1',$('#clockC1').value);
@@ -488,9 +484,7 @@
   }
   function applySimpleTextColor(){ document.documentElement.style.setProperty('--simple-text', $('#simpleTextColor').value); }
 
-  /* ==================
-     Flip clock building
-     ================== */
+  /* Flip clock core */
   function createDigit(initial="0"){
     const d = document.createElement('div'); d.className='digit'; d.dataset.value=initial;
     const top = document.createElement('div'); top.className='top'; const t=document.createElement('span'); t.className='value'; t.textContent=initial; top.appendChild(t);
@@ -523,15 +517,12 @@
     const arr=timeArray(sec,showH,showS); digits.forEach((d,i)=> flipTo(d, arr[i] || '0'));
   }
 
-  /* =========
-     Countdown
-     ========= */
+  /* Countdown */
   const timerFlip = $('#timer'), timerSimple = $('#simpleTimer'), primaryBtn = $('#primaryBtn');
-  let flipDigits=[], showH=false, showS=true, useFlip=true;
+  let flipDigits=[], useFlip=true, showH=false, showS=true;
   let totalSec=0, endAtMs=0, rafId=null, lastWhole=-1, running=false, paused=false, pauseRemainMs=0;
 
   function safeBuildClock(){
-    // Always (re)create a visible timer view to avoid “disappear” bugs
     useFlip = $('#useFlip').checked;
     if (useFlip){
       timerFlip.style.display='flex'; timerSimple.style.display='none';
@@ -539,11 +530,10 @@
       tickFlip(flipDigits, 0, $('#showHours').checked, $('#showSeconds').checked);
     }else{
       timerFlip.style.display='none'; timerSimple.style.display='block';
-      timerSimple.textContent = '00:00';
+      timerSimple.textContent='00:00';
     }
+    $('#simpleColorCard').style.display = useFlip ? 'none' : '';
   }
-
-  function refreshMode(){ safeBuildClock(); $('#simpleColorCard').style.display = $('#useFlip').checked ? 'none' : ''; }
 
   function renderSimple(sec){
     const sH = $('#showHours').checked, sS = $('#showSeconds').checked;
@@ -558,7 +548,6 @@
     const h=+$('#hoursInput').value||0, m=+$('#minInput').value||0, s=Math.max(0,Math.min(59,+$('#secInput').value||0));
     totalSec=h*3600+m*60+s;
 
-    // Reset candle/flame and align
     candleWrap.classList.remove('vanish');
     stubEl.style.display = 'none';
     flameEl.classList.remove('off');
@@ -594,46 +583,40 @@
     rafId=requestAnimationFrame(loop);
   }
 
-  let preRAF = null;
+  let preRAF=null;
   function startWithFadeCountdown(){
     if (running || paused) return;
-    const overlay = $('#preOverlay'); const label = $('#preNum');
-    document.body.classList.add('pre-on'); overlay.hidden = false;
-    const D = 3000; const endAt = performance.now() + D;
+    const overlay=$('#preOverlay'), label=$('#preNum');
+    document.body.classList.add('pre-on'); overlay.hidden=false;
+    const D=3000, endAt=performance.now()+D;
     function step(ts){
-      const remain = Math.max(0, endAt - ts);
-      const n = Math.ceil(remain/1000); const text = n > 0 ? String(n) : 'Go';
-      if (label.textContent !== text){ label.textContent = text; label.classList.remove('step'); void label.offsetWidth; label.classList.add('step'); }
-      if (remain <= 0){ overlay.hidden = true; document.body.classList.remove('pre-on'); startCountdown(); return; }
-      preRAF = requestAnimationFrame(step);
+      const remain=Math.max(0,endAt-ts), n=Math.ceil(remain/1000), text=n>0?String(n):'Go';
+      if (label.textContent!==text){ label.textContent=text; label.classList.remove('step'); void label.offsetWidth; label.classList.add('step'); }
+      if (remain<=0){ overlay.hidden=true; document.body.classList.remove('pre-on'); startCountdown(); return; }
+      preRAF=requestAnimationFrame(step);
     }
-    preRAF = requestAnimationFrame(step);
+    preRAF=requestAnimationFrame(step);
   }
 
   function togglePrimary(){
     if (!running && !paused){ startWithFadeCountdown(); return; }
     if (running){
       cancelAnimationFrame(rafId);
-      pauseRemainMs = Math.max(0, endAtMs - performance.now());
-      paused=true; running=false;
-      primaryBtn.textContent='Resume'; return;
+      pauseRemainMs=Math.max(0,endAtMs-performance.now());
+      paused=true; running=false; primaryBtn.textContent='Resume'; return;
     }
     if (paused){
-      endAtMs = performance.now()+pauseRemainMs;
-      lastWhole = Math.floor(pauseRemainMs/1000);
-      paused=false; running=true;
-      primaryBtn.textContent='Stop';
+      endAtMs=performance.now()+pauseRemainMs;
+      lastWhole=Math.floor(pauseRemainMs/1000);
+      paused=false; running=true; primaryBtn.textContent='Stop';
       rafId=requestAnimationFrame(loop);
     }
   }
 
   function snapResetCandle(){
     candleWrap.classList.add('no-transitions'); waxEl.classList.add('no-transitions');
-    candleWrap.classList.remove('vanish');
-    stubEl.style.display = 'none';
-    flameEl.classList.remove('off');
-    setWaxHeightByProgress(1);
-    void candleWrap.offsetHeight; positionFlame();
+    candleWrap.classList.remove('vanish'); stubEl.style.display='none'; flameEl.classList.remove('off');
+    setWaxHeightByProgress(1); void candleWrap.offsetHeight; positionFlame();
     requestAnimationFrame(()=>{ candleWrap.classList.remove('no-transitions'); waxEl.classList.remove('no-transitions'); });
   }
 
@@ -654,14 +637,11 @@
     primaryBtn.textContent='Start';
   }
 
-  /* =========
-     Candle + flame
-     ========= */
-  const area = $('#candle-area'), waxEl=$('#wax'), wickEl=$('#wick'), flameEl=$('#flame'), stubEl=$('#stub'), smokeEl=$('#smoke'), candleWrap=$('#candleWrap');
-  const baseWaxHeight=380, minStub=58;
-  const FLAME_OFFSET = 10;
+  /* Candle + flame */
+  const area=$('#candle-area'), waxEl=$('#wax'), wickEl=$('#wick'), flameEl=$('#flame'), stubEl=$('#stub'), candleWrap=$('#candleWrap');
+  const baseWaxHeight=380, minStub=58, FLAME_OFFSET=10;
 
-  function candleVisible(){ return getComputedStyle(area).display !== 'none'; }
+  function candleVisible(){ return getComputedStyle(area).display!=='none'; }
   function positionFlame(){
     if (!candleVisible()) return;
     const a=area.getBoundingClientRect(), w=wickEl.getBoundingClientRect();
@@ -674,167 +654,66 @@
     const usable=baseWaxHeight-minStub, h=minStub+Math.max(0, usable*progress);
     waxEl.style.height=`${h}px`;
   }
-  function extinguish(){
-    flameEl.classList.add('off');
-    stubEl.style.display='block';
-  }
-  function relight(){
-    stubEl.style.display='none';
-    flameEl.classList.remove('off');
-  }
+  function extinguish(){ flameEl.classList.add('off'); stubEl.style.display='block'; }
+  function relight(){ stubEl.style.display='none'; flameEl.classList.remove('off'); }
   waxEl.addEventListener('transitionend', ()=> afterNextPaint(positionFlame));
 
-  /* =====
-     Congrats
-     ===== */
-  const congrats = $('#congrats'); $('#cgClose').addEventListener('click', ()=> congrats.classList.remove('show'));
+  /* Congrats */
+  const congrats=$('#congrats'); $('#cgClose').addEventListener('click', ()=> congrats.classList.remove('show'));
   function showCongrats(){ congrats.classList.add('show'); }
   function hideCongrats(){ congrats.classList.remove('show'); }
 
-  /* ==========
-     Fullscreen
-     ========== */
-  async function goFullscreen(){
-    try{
-      if (!document.fullscreenElement){ await document.documentElement.requestFullscreen(); }
-      document.body.classList.add('fullscreen-on');
-    }catch(e){}
-  }
-  function exitFullscreen(){
-    document.exitFullscreen?.();
-    document.body.classList.remove('fullscreen-on');
-  }
+  /* Fullscreen */
+  async function goFullscreen(){ try{ if(!document.fullscreenElement){ await document.documentElement.requestFullscreen(); } document.body.classList.add('fullscreen-on'); }catch(e){} }
+  function exitFullscreen(){ document.exitFullscreen?.(); document.body.classList.remove('fullscreen-on'); }
   $('#fsBtn').addEventListener('click', goFullscreen);
   $('#exitFs').addEventListener('click', exitFullscreen);
-  document.addEventListener('fullscreenchange', ()=>{
-    if (!document.fullscreenElement){ document.body.classList.remove('fullscreen-on'); }
-  });
+  document.addEventListener('fullscreenchange', ()=>{ if(!document.fullscreenElement){ document.body.classList.remove('fullscreen-on'); } });
 
-  /* =========
-     Real-time
-     ========= */
+  /* Real-time */
   const rtcOverlay=$('#rtcOverlay'), rtcFlipContainer=$('#rtcTimer'), rtcSimple=$('#simpleRTC'), rtcBack=$('#rtcBack');
   let rtcDigits=[], rtcOn=false, rtcId=null, rtcLastSec=-1;
-
-  function refreshRTCMode(){
-    const useFlip=$('#useFlip').checked;
-    rtcFlipContainer.style.display = useFlip ? 'flex' : 'none';
-    rtcSimple.style.display = useFlip ? 'none' : 'block';
-  }
-  function openRTC(){
-    document.body.classList.add('rtc-only'); rtcOverlay.classList.add('show');
-    cancelAnimationFrame(rafId); running=false; paused=false; primaryBtn.textContent='Start';
-    rtcOn=true; rtcLastSec=-1;
-    if ($('#useFlip').checked){ rtcDigits = buildFlip(rtcFlipContainer, true, true); }
-    drawRTC();
-  }
-  function closeRTC(){
-    document.body.classList.remove('rtc-only'); rtcOverlay.classList.remove('show');
-    rtcOn=false; cancelAnimationFrame(rtcId);
-    $('#rtcMode').checked = false;
-  }
-  function drawRTC(){
-    if (!rtcOn) return;
-    const secOfDay = Math.floor(Date.now()/1000)%86400;
-    if (secOfDay !== rtcLastSec){
-      if ($('#useFlip').checked){ tickFlip(rtcDigits, secOfDay, true, true); }
-      else{ rtcSimple.textContent = new Date().toLocaleTimeString(); }
-      rtcLastSec = secOfDay;
-    }
-    rtcId = requestAnimationFrame(drawRTC);
-  }
+  function refreshRTCMode(){ const uf=$('#useFlip').checked; rtcFlipContainer.style.display=uf?'flex':'none'; rtcSimple.style.display=uf?'none':'block'; }
+  function openRTC(){ document.body.classList.add('rtc-only'); rtcOverlay.classList.add('show'); cancelAnimationFrame(rafId); running=false; paused=false; primaryBtn.textContent='Start'; rtcOn=true; rtcLastSec=-1; if($('#useFlip').checked){ rtcDigits=buildFlip(rtcFlipContainer,true,true); } drawRTC(); }
+  function closeRTC(){ document.body.classList.remove('rtc-only'); rtcOverlay.classList.remove('show'); rtcOn=false; cancelAnimationFrame(rtcId); $('#rtcMode').checked=false; }
+  function drawRTC(){ if(!rtcOn) return; const secOfDay=Math.floor(Date.now()/1000)%86400; if(secOfDay!==rtcLastSec){ if($('#useFlip').checked){ tickFlip(rtcDigits,secOfDay,true,true); } else { rtcSimple.textContent=new Date().toLocaleTimeString(); } rtcLastSec=secOfDay; } rtcId=requestAnimationFrame(drawRTC); }
   rtcBack.addEventListener('click', closeRTC);
 
-  /* ==========
-     To‑do logic (checkbox + auto-remove)
-     ========== */
-  const todoList = $('#todoList');
+  /* To‑do logic (checkbox + auto-remove) */
+  const todoList=$('#todoList');
+  function makeTodoItem(text=""){ const li=document.createElement('li'); const label=document.createElement('label'); label.className='todoItem'; const chk=document.createElement('input'); chk.type='checkbox'; chk.className='todoChk'; const span=document.createElement('span'); span.className='todoText'; span.contentEditable='true'; span.spellcheck=false; span.textContent=text; label.appendChild(chk); label.appendChild(span); li.appendChild(label); return li; }
+  function addEmptyIfNeeded(){ if(!todoList.firstElementChild){ const li=makeTodoItem(""); todoList.appendChild(li); placeCaretAtEnd(li.querySelector('.todoText')); } }
+  function placeCaretAtEnd(el){ el.focus(); const r=document.createRange(); r.selectNodeContents(el); r.collapse(false); const s=window.getSelection(); s.removeAllRanges(); s.addRange(r); }
 
-  function makeTodoItem(text=""){
-    const li=document.createElement('li');
-    const label=document.createElement('label'); label.className='todoItem';
-    const chk=document.createElement('input'); chk.type='checkbox'; chk.className='todoChk';
-    const span=document.createElement('span'); span.className='todoText'; span.contentEditable='true'; span.spellcheck=false; span.textContent=text;
-    label.appendChild(chk); label.appendChild(span); li.appendChild(label);
-    return li;
-  }
-  function addEmptyIfNeeded(){
-    if (!todoList.firstElementChild){
-      const li=makeTodoItem(""); todoList.appendChild(li);
-      placeCaretAtEnd(li.querySelector('.todoText'));
-    }
-  }
-  function placeCaretAtEnd(el){
-    el.focus();
-    const r=document.createRange(); r.selectNodeContents(el); r.collapse(false);
-    const s=window.getSelection(); s.removeAllRanges(); s.addRange(r);
-  }
-
-  todoList.addEventListener('keydown', (e)=>{
-    const isText = e.target.classList?.contains('todoText');
-    if (!isText) return;
-    if (e.key === 'Enter'){
-      if (e.shiftKey) return;
-      e.preventDefault();
-      const li=e.target.closest('li');
-      const newLi=makeTodoItem("");
-      li.after(newLi);
-      placeCaretAtEnd(newLi.querySelector('.todoText'));
-    }
-    if (e.key==='Backspace' && e.target.textContent.trim()===''){
-      const li=e.target.closest('li');
-      const prev=li.previousElementSibling?.querySelector('.todoText');
-      if (prev){ e.preventDefault(); li.remove(); placeCaretAtEnd(prev); }
-      addEmptyIfNeeded();
-    }
+  todoList.addEventListener('keydown',(e)=>{
+    if(!e.target.classList?.contains('todoText')) return;
+    if(e.key==='Enter'){ if(e.shiftKey) return; e.preventDefault(); const li=e.target.closest('li'); const n=makeTodoItem(""); li.after(n); placeCaretAtEnd(n.querySelector('.todoText')); }
+    if(e.key==='Backspace' && e.target.textContent.trim()===''){ const li=e.target.closest('li'); const prev=li.previousElementSibling?.querySelector('.todoText'); if(prev){ e.preventDefault(); li.remove(); placeCaretAtEnd(prev);} addEmptyIfNeeded(); }
   });
-  todoList.addEventListener('change', (e)=>{
-    if (!e.target.classList?.contains('todoChk')) return;
-    const li=e.target.closest('li');
-    li.classList.add('vanish');
-    setTimeout(()=>{ li.remove(); addEmptyIfNeeded(); }, 160);
-  });
+  todoList.addEventListener('change',(e)=>{ if(!e.target.classList?.contains('todoChk')) return; const li=e.target.closest('li'); li.classList.add('vanish'); setTimeout(()=>{ li.remove(); addEmptyIfNeeded(); },160); });
 
-  /* ==========
-     Music playlist (loop)
-     ========== */
-  const musicFiles = $('#musicFiles');
-  const musicNow = $('#musicNow');
-  const musicPlayBtn = $('#musicPlay');
-  const audio = new Audio(); audio.preload = 'metadata';
-
-  let playlist = []; let trackIndex = 0; const objectUrls = new Set();
-  function updateNow(){ musicNow.textContent = playlist.length ? `${trackIndex+1}/${playlist.length} • ${playlist[trackIndex].name}` : ''; }
-  function loadPlaylist(files){
-    objectUrls.forEach(u=>URL.revokeObjectURL(u)); objectUrls.clear();
-    playlist=[]; trackIndex=0;
-    for (const f of files){ const url = URL.createObjectURL(f); objectUrls.add(url); playlist.push({name:f.name,url}); }
-    updateNow(); if (playlist.length){ audio.src = playlist[trackIndex].url; } else { audio.removeAttribute('src'); }
-  }
-  function playTrack(i){ if (!playlist.length) return; trackIndex=(i+playlist.length)%playlist.length; audio.src=playlist[trackIndex].url; audio.play().catch(()=>{}); updateNow(); musicPlayBtn.textContent='⏸'; }
-  function startPlaylist(){ if (!playlist.length) return; if (!audio.src) audio.src=playlist[trackIndex].url; audio.play().then(()=> musicPlayBtn.textContent='⏸').catch(()=>{}); updateNow(); }
+  /* Music playlist (loop) */
+  const musicFiles=$('#musicFiles'), musicNow=$('#musicNow'), musicPlayBtn=$('#musicPlay'); const audio=new Audio(); audio.preload='metadata';
+  let playlist=[], trackIndex=0; const objectUrls=new Set();
+  function updateNow(){ musicNow.textContent=playlist.length?`${trackIndex+1}/${playlist.length} • ${playlist[trackIndex].name}`:''; }
+  function loadPlaylist(files){ objectUrls.forEach(u=>URL.revokeObjectURL(u)); objectUrls.clear(); playlist=[]; trackIndex=0; for(const f of files){ const url=URL.createObjectURL(f); objectUrls.add(url); playlist.push({name:f.name,url}); } updateNow(); if(playlist.length){ audio.src=playlist[trackIndex].url; } else { audio.removeAttribute('src'); } }
+  function playTrack(i){ if(!playlist.length) return; trackIndex=(i+playlist.length)%playlist.length; audio.src=playlist[trackIndex].url; audio.play().catch(()=>{}); updateNow(); musicPlayBtn.textContent='⏸'; }
+  function startPlaylist(){ if(!playlist.length) return; if(!audio.src) audio.src=playlist[trackIndex].url; audio.play().then(()=> musicPlayBtn.textContent='⏸').catch(()=>{}); updateNow(); }
   function pausePlaylist(){ audio.pause(); musicPlayBtn.textContent='▶'; }
-  function nextTrack(){ if (playlist.length) playTrack(trackIndex+1); }
-  function prevTrack(){ if (playlist.length) playTrack(trackIndex-1); }
+  function nextTrack(){ if(playlist.length) playTrack(trackIndex+1); }
+  function prevTrack(){ if(playlist.length) playTrack(trackIndex-1); }
   audio.addEventListener('ended', ()=> nextTrack());
   audio.addEventListener('play', ()=> musicPlayBtn.textContent='⏸');
   audio.addEventListener('pause', ()=> musicPlayBtn.textContent='▶');
   $('#addMusicBtn').addEventListener('click', ()=> musicFiles.click());
-  musicFiles.addEventListener('change', (e)=> loadPlaylist(e.target.files));
+  musicFiles.addEventListener('change', e=> loadPlaylist(e.target.files));
   $('#musicPlay').addEventListener('click', ()=> audio.paused ? startPlaylist() : pausePlaylist());
   $('#musicNext').addEventListener('click', nextTrack);
   $('#musicPrev').addEventListener('click', prevTrack);
   window.addEventListener('unload', ()=> objectUrls.forEach(u=>URL.revokeObjectURL(u)));
 
-  /* ======================
-     Layout toggles/handlers
-     ====================== */
-  function ensureCandleVisibleWhenOnlyCandle(on){
-    if (on){
-      const hc = $('#hideCandle');
-      if (hc.checked){ hc.checked=false; document.body.classList.remove('candle-off'); }
-    }
-  }
+  /* Layout & inputs */
+  function ensureCandleVisibleWhenOnlyCandle(on){ if(on){ const hc=$('#hideCandle'); if(hc.checked){ hc.checked=false; document.body.classList.remove('candle-off'); } } }
   function applyLayoutFlags(){
     document.body.classList.toggle('candle-off', $('#hideCandle').checked);
     document.body.classList.toggle('center-clock', $('#centerClock').checked);
@@ -843,55 +722,43 @@
     if (!$('#onlyCandle').checked){ safeBuildClock(); }
     afterNextPaint(positionFlame);
   }
-
   function previewLayout(){
-    const sH = $('#showHours').checked, sS = $('#showSeconds').checked, useF = $('#useFlip').checked;
-    if (useF){
-      flipDigits = buildFlip(timerFlip, sH, sS);
-      tickFlip(flipDigits, 0, sH, sS);
-    }else{
-      renderSimple(0);
-    }
+    const sH=$('#showHours').checked, sS=$('#showSeconds').checked, uf=$('#useFlip').checked;
+    if(uf){ flipDigits=buildFlip(timerFlip,sH,sS); tickFlip(flipDigits,0,sH,sS); } else { renderSimple(0); }
     afterNextPaint(positionFlame);
   }
 
-  // UI events
   $('#primaryBtn').addEventListener('click', togglePrimary);
   $('#resetBtn').addEventListener('click', resetCountdown);
-
-  $('#useFlip').addEventListener('change', ()=>{ refreshMode(); refreshRTCMode(); previewLayout(); });
+  $('#useFlip').addEventListener('change', ()=>{ safeBuildClock(); refreshRTCMode(); previewLayout(); });
   $('#rtcMode').addEventListener('change', e=> e.target.checked ? openRTC() : closeRTC());
   $('#showHours').addEventListener('change', previewLayout);
   $('#showSeconds').addEventListener('change', previewLayout);
 
   $('#hideCandle').addEventListener('change', ()=> applyLayoutFlags());
   $('#centerClock').addEventListener('change', ()=> applyLayoutFlags());
-  $('#onlyCandle').addEventListener('change', (e)=>{ ensureCandleVisibleWhenOnlyCandle(e.target.checked); applyLayoutFlags(); });
-  $('#showTodo').addEventListener('change', ()=>{ applyLayoutFlags(); });
+  $('#onlyCandle').addEventListener('change', e=>{ ensureCandleVisibleWhenOnlyCandle(e.target.checked); applyLayoutFlags(); });
+  $('#showTodo').addEventListener('change', ()=> applyLayoutFlags());
 
   ['bgAngle','bgC1','bgC2','bgC3'].forEach(id=> document.getElementById(id).addEventListener('input', applyGradient));
   ['clockC1','clockC2','clockC3','textColor','colonColor'].forEach(id=> document.getElementById(id).addEventListener('input', restyleClockPanels));
   $('#waxColor').addEventListener('input', applyWax);
   $('#simpleTextColor').addEventListener('input', applySimpleTextColor);
-  $('#todoColor').addEventListener('input', applyTodoBg);
+
+  // To‑do color: apply only when asked; default remains transparent
+  $('#todoApply').addEventListener('click', ()=> setTodoBg($('#todoColor').value));
+  $('#todoClear').addEventListener('click', ()=> setTodoBg('transparent'));
 
   window.addEventListener('resize', ()=> afterNextPaint(positionFlame));
 
-  /* ====== Initial boot (prevents disappearing UI) ====== */
+  /* Init */
   (function boot(){
-    applyGradient(); restyleClockPanels(); applyWax(); applySimpleTextColor(); applyTodoBg();
+    applyGradient(); restyleClockPanels(); applyWax(); applySimpleTextColor();
     document.body.classList.add('todo-on'); // show To‑do by default
-    safeBuildClock();
-    refreshRTCMode();
-    previewLayout();
-    setWaxHeightByProgress(1); relight();
-    afterNextPaint(positionFlame);
+    safeBuildClock(); refreshRTCMode(); previewLayout();
+    setWaxHeightByProgress(1); relight(); afterNextPaint(positionFlame);
     // Seed one empty task
-    const li=document.createElement('li');
-    const label=document.createElement('label'); label.className='todoItem';
-    const chk=document.createElement('input'); chk.type='checkbox'; chk.className='todoChk';
-    const span=document.createElement('span'); span.className='todoText'; span.contentEditable='true'; span.spellcheck=false;
-    label.appendChild(chk); label.appendChild(span); $('#todoList').appendChild(label.parentElement||label.parentNode);
+    const li=makeTodoItem(""); todoList.appendChild(li);
   })();
 </script>
 </body>
