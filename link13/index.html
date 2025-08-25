@@ -71,16 +71,17 @@
   #todo-panel     { grid-column:2; justify-self:center; align-self:center; }
   #candle-area    { grid-column:3; }
 
-  /* Center‑clock overlays the middle; To‑do goes LEFT */
-  .center-clock .main{ grid-template-columns: 1fr 0 1fr; }
+  /* Center‑clock places the timer centered; To‑do goes LEFT (in grid, not overlay) */
+  .center-clock .main{
+    grid-template-columns: max-content 1fr max-content;
+  }
   .center-clock #timer-container{
     position:absolute; left:50%; top:50%;
     transform:translate(-50%,-50%); z-index:5; min-width:0; width:auto;
   }
   .center-clock #todo-panel{
-    position:absolute; left:min(48px,5vw); top:50%;
-    transform:translateY(-50%); justify-self:start;
-    z-index:6; /* keep todo above centered clock edges */
+    position:static; grid-column:1; justify-self:start; align-self:center;
+    margin-left:min(48px,5vw); z-index:6;
   }
 
   /* Hide candle → To‑do occupies RIGHT always (replaces candle) */
@@ -90,24 +91,22 @@
     position:static !important; left:auto !important; top:auto !important; transform:none !important; justify-self:end !important;
   }
   /* Center‑clock + candle‑off → keep To‑do LEFT */
+  .center-clock.candle-off .main{
+    grid-template-columns: max-content 1fr;
+  }
   .center-clock.candle-off #todo-panel{
-    position:absolute !important; left:min(48px,5vw) !important; top:50% !important;
-    transform:translateY(-50%) !important; justify-self:start !important;
-    z-index:6 !important;
+    position:static !important; grid-column:1 !important; justify-self:start !important; margin-left:min(48px,5vw) !important; z-index:6 !important;
   }
 
-  /* Only candle → center candle, hide clock, To‑do LEFT */
+  /* Only candle → center candle, hide clock; To‑do LEFT (in grid) */
   .only-candle #timer-container{ display:none !important; }
-  .only-candle .main{ grid-template-columns: auto max-content; }
+  .only-candle .main{ grid-template-columns: max-content 1fr; }
   .only-candle #todo-panel{
-    position:absolute; left:min(48px,5vw); top:50%;
-    transform:translateY(-50%); justify-self:start;
+    position:static; grid-column:1; justify-self:start; align-self:center; margin-left:min(48px,5vw);
     z-index:6;
   }
-  /* Ensure candle is explicitly centered in the second column in only-candle mode */
   .only-candle #candle-area{
-    grid-column: 2;
-    justify-self: center;
+    grid-column: 2; justify-self: center;
   }
 
   /* ===== To‑do panel ===== */
@@ -686,19 +685,18 @@
   function showCongrats(){ if (congrats) congrats.style.display = "flex"; }
   function hideCongrats(){ if (congrats) congrats.style.display = "none"; }
 
-  /* ---------- Fullscreen: show ONLY #main ---------- */
+  /* ---------- Fullscreen on the whole page (keep same background/layout) ---------- */
   async function enterFullscreen(){
     try{
-      const target = document.getElementById("main") || document.documentElement;
       if (!document.fullscreenElement){
-        await target.requestFullscreen?.();
+        await document.documentElement.requestFullscreen?.();
       }else{
         await document.exitFullscreen?.();
       }
     }catch(e){}
   }
   $("#fsBtn").addEventListener("click", enterFullscreen);
-  document.addEventListener("fullscreenchange", () => { /* element fullscreen isolates #main */ });
+  document.addEventListener("fullscreenchange", () => { /* fullscreen mirrors normal page */ });
 
   /* ---------- To‑do logic ---------- */
   const todoList = $("#todoList");
