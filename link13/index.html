@@ -172,14 +172,15 @@
   .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.3); flex:0 0 auto; }
 
   /* Transparent mode for flip cards */
+/* Glassy, no-animation flip cards with clear numbers */
 :root{
-  --glass-bg: rgba(255,255,255,0.18);
+  --glass-bg: rgba(255,255,255,0.18);   /* subtle blur tint */
   --glass-border: rgba(255,255,255,0.35);
   --glass-blur: 16px;
   --glass-radius: 12px;
 }
 
-/* Card */
+/* Card base */
 .clock-transparent .digit{
   position: relative;
   width: clamp(56px, 7.8vw, 92px);
@@ -194,74 +195,62 @@
   backdrop-filter: blur(var(--glass-blur)) saturate(140%) contrast(105%) !important;
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%) contrast(105%) !important;
 
-  /* Kill any flip/animation from libraries */
-  contain: unset !important;          /* keep backdrop-filter working */
-  will-change: auto !important;
+  /* kill any library flips/animations */
+  contain: unset !important;  /* lets blur render */
   transform: none !important;
   transition: none !important;
   animation: none !important;
+  will-change: auto !important;
 }
 
-/* Halves (stay glassy; no transforms) */
+/* Full-height faces so text isn't clipped, divider provided separately */
 .clock-transparent .digit .top,
 .clock-transparent .digit .bottom{
   position: absolute;
-  left: 0; right: 0;
-  height: 50%;
+  inset: 0;              /* full card area */
   background: var(--glass-bg) !important;
   backdrop-filter: inherit !important;
   -webkit-backdrop-filter: inherit !important;
-  overflow: hidden;
-
-  /* Disable any flip transforms/animations on faces */
+  border: 0 !important;
+  overflow: visible;     /* do not clip text */
   transform: none !important;
   transition: none !important;
   animation: none !important;
 }
 
-.clock-transparent .digit .top{
-  top: 0;
-  border-bottom: 1px solid rgba(255,255,255,0.25);
-}
-.clock-transparent .digit .bottom{
-  bottom: 0;
-  border-top: 1px solid rgba(255,255,255,0.22);
-}
-
-/* Numbers (centered, readable, no animation) */
-.clock-transparent .digit .value{
+/* show only one number (on .bottom), centered */
+.clock-transparent .digit .top .value{ display: none !important; }
+.clock-transparent .digit .bottom .value{
   position: absolute;
-  left: 0; right: 0;
+  inset: 0;
+  display: grid;
+  place-items: center;
   font: 700 clamp(48px, 7vw, 112px)/1 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans";
-  text-align: center;
-  color: #000;
+  color: #000;                 /* visible on bright glass */
   text-shadow: 0 1px 2px rgba(0,0,0,0.6);
   transform: none !important;
   transition: none !important;
   animation: none !important;
 }
 
-/* Vertical alignment for halves */
-.clock-transparent .digit .top .value{ top: 50%; transform: translateY(-60%) !important; }
-.clock-transparent .digit .bottom .value{ top: -10%; transform: none !important; }
+/* Mid divider line (purely decorative) */
+.clock-transparent .digit::after{
+  content: "";
+  position: absolute;
+  left: 10px; right: 10px;
+  top: 50%;
+  height: 1px;
+  background: rgba(255,255,255,0.24);
+  pointer-events: none;
+  border-radius: 1px;
+}
 
-/* Remove any solid fills or gradients from external styles */
+/* Remove any solid fills/gradients imposed by external styles */
 .clock-transparent .digit,
 .clock-transparent .digit *{
   background-image: none !important;
 }
 
-/* Optional: colon between groups */
-.clock-transparent .sep{
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: clamp(12px, 2vw, 18px);
-  font-weight: 700;
-  font-size: clamp(28px, 4.2vw, 52px);
-  color: rgba(255,255,255,0.9);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.25);
-}
   /* ===== Simple clock ===== */
   #simpleTimer{
     display:none; font-weight:900; letter-spacing:.04em; font-size:min(12vw,160px);
