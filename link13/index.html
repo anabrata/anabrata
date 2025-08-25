@@ -3,55 +3,92 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Luxury Analog Watch (Canvas, fixed)</title>
+<title>Photo‑based Analog Watch (Canvas)</title>
 <style>
   :root{
     --bg1:#0d1117; --bg2:#1b2533;
-    --marker:#e8eefc; --tick:#cbd5e190; --tickBold:#e5e7ebd0;
-    --hand:#f8fafc; --sec:#e11d48;
-    --size:min(90vmin,560px);
+    --hand:#f8fafc; --sec:#e11d48; --marker:#e8eefc;
+    --size:min(92vmin,720px);
   }
   html,body{height:100%} *{box-sizing:border-box}
-  body{margin:0; display:grid; place-items:center; background:radial-gradient(120% 120% at 20% 10%, #182234 0%, var(--bg2) 40%, var(--bg1) 100%); color:#e5e7eb; font:400 16px system-ui, -apple-system, Segoe UI, Roboto, Arial}
+  body{
+    margin:0; display:grid; place-items:center;
+    font:400 15px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    background: radial-gradient(120% 120% at 20% 10%, #182234 0%, var(--bg2) 40%, var(--bg1) 100%);
+    color:#e5e7eb;
+  }
   .wrap{display:grid; gap:14px; place-items:center; padding:16px}
   .watch{ width:var(--size); height:var(--size); position:relative }
   canvas{width:100%; height:100%; display:block; background:transparent}
-  .bezel{ position:absolute; inset:0; border-radius:50%; pointer-events:none;
+  .overlay{
+    position:absolute; inset:0; pointer-events:none;
+    border-radius:50%;
+    box-shadow: inset 0 2px 6px #0008, inset 0 -2px 10px #000a, 0 0 0 1px #0009;
     background: radial-gradient(closest-side, #ffffff20 0 96%, transparent 96% 100%),
                 conic-gradient(from 90deg at 50% 50%, #2a3344, #1d2737, #2a3344);
-    box-shadow: inset 0 2px 6px #0008, inset 0 -2px 10px #000a, 0 0 0 1px #0009;
   }
-  .controls{display:flex; gap:10px; align-items:center; justify-content:center; font-size:14px}
-  .lcd{font-variant-numeric:tabular-nums; padding:.3rem .55rem; border:1px solid #2c3a55; border-radius:8px; background:#0b1222a0}
+  .controls{
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center;
+    background:#0f172a80; border:1px solid #334155; border-radius:12px; padding:10px 12px; backdrop-filter: blur(6px);
+  }
+  .controls label{display:flex; gap:6px; align-items:center}
+  .lcd{font-variant-numeric:tabular-nums; padding:.32rem .55rem; border:1px solid #2c3a55; border-radius:8px; background:#0b1222a0}
+  .row{display:flex; gap:8px; align-items:center}
+  input[type="range"]{width:160px}
+  .badge{opacity:.9; font-size:12px; border:1px solid #334155; padding:.2rem .45rem; border-radius:6px; background:#0b1222a0}
+  .hint{font-size:12px; opacity:.8}
 </style>
 </head>
 <body>
   <div class="wrap">
-    <div style="font-weight:600">Luxury analog watch (Rolex‑inspired, no branding)</div>
+    <div style="font-weight:600">Photo‑based analog watch (no branding)</div>
     <div class="watch">
       <canvas id="clock"></canvas>
-      <div class="bezel" aria-hidden="true"></div>
+      <div class="overlay" aria-hidden="true"></div>
     </div>
     <div class="controls">
-      <label><input type="checkbox" id="beat8"> 8‑beat sweep</label>
-      <span class="lcd" id="lcd">--:--:--</span>
+      <div class="row">
+        <label><input type="file" id="imgFile" accept="image/*"> Load dial image</label>
+        <span class="badge" id="ver">Version: loading…</span>
+      </div>
+      <div class="row">
+        <label>Radius <input type="range" id="rad" min="50" max="400" value="180"></label>
+        <label>Rotate° <input type="range" id="rot" min="-30" max="30" value="0"></label>
+        <label><input type="checkbox" id="drag"> Drag center</label>
+      </div>
+      <div class="row">
+        <label><input type="checkbox" id="beat8"> 8‑beat sweep</label>
+        <span class="lcd" id="lcd">--:--:--</span>
+      </div>
     </div>
+    <div class="hint">Tip: check “Drag center,” then click‑drag the crosshair to align with the dial’s axle; use Rotate° if the photo isn’t perfectly level.</div>
   </div>
 
 <script>
 (function(){
+  // Visible version string so updates are obvious
+  const VERSION = 'v1.2.0 • 2025‑08‑25T07:16'; 
+  document.getElementById('ver').textContent = 'Version: ' + VERSION;
+
   const canvas = document.getElementById('clock');
-  const ctx = canvas.getContext('2d', {alpha:true, desynchronized:false});
+  const ctx = canvas.getContext('2d', {alpha:true});
+  const fileInput = document.getElementById('imgFile');
   const lcd = document.getElementById('lcd');
   const beat8 = document.getElementById('beat8');
+  const dragToggle = document.getElementById('drag');
+  const radSlider = document.getElementById('rad');
+  const rotSlider = document.getElementById('rot');
 
-  let dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 3));
-  let animating = false;
+  let dpr = Math.max(1, Math.min(window.devicePixelRatio||1, 3));
+  let img = null, imgURL=null;
 
-  // Size canvas buffer to CSS box with DPR
-  function sizeToCSS(){
+  // Dial geometry (CSS pixels)
+  let cx = 0, cy = 0, R = 180, rotDeg = 0;
+
+  // Keep canvas buffer matched to element size (sharp on HiDPI)
+  function resizeToBox(){
     const rect = canvas.getBoundingClientRect();
-    dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 3));
+    dpr = Math.max(1, Math.min(window.devicePixelRatio||1, 3));
     const w = Math.max(1, Math.round(rect.width * dpr));
     const h = Math.max(1, Math.round(rect.height * dpr));
     if (canvas.width !== w || canvas.height !== h){
@@ -59,76 +96,96 @@
     }
     ctx.setTransform(1,0,0,1,0,0);
     ctx.scale(dpr, dpr);
+    if (cx===0 && cy===0){ cx = rect.width/2; cy = rect.height/2; }
+  }
+  new ResizeObserver(resizeToBox).observe(canvas);
+
+  // Load image via blob URL
+  fileInput.addEventListener('change', async (e)=>{
+    const f = e.target.files && e.target.files;
+    if(!f) return;
+    if (imgURL) URL.revokeObjectURL(imgURL);
+    imgURL = URL.createObjectURL(f);
+    img = new Image();
+    img.onload = ()=>{ URL.revokeObjectURL(imgURL); imgURL=null; draw(); };
+    img.onerror = ()=>{ console.warn('Image failed'); };
+    img.src = imgURL;
+  });
+
+  // Drag center
+  let dragging = false;
+  canvas.addEventListener('pointerdown', (ev)=>{
+    if(!dragToggle.checked) return;
+    dragging = true;
+    canvas.setPointerCapture(ev.pointerId);
+  });
+  canvas.addEventListener('pointermove', (ev)=>{
+    if(!dragging) return;
+    const rect = canvas.getBoundingClientRect();
+    cx = ev.clientX - rect.left;
+    cy = ev.clientY - rect.top;
+  });
+  canvas.addEventListener('pointerup', ()=> dragging=false);
+  canvas.addEventListener('pointercancel', ()=> dragging=false);
+
+  // Sliders
+  radSlider.addEventListener('input', ()=>{ R = +radSlider.value; });
+  rotSlider.addEventListener('input', ()=>{ rotDeg = +rotSlider.value; });
+
+  // Draw background image letterboxed (contain)
+  function drawImageContain(image, x, y, w, h){
+    const iw = image.naturalWidth || image.width;
+    const ih = image.naturalHeight || image.height;
+    if(!iw || !ih) return;
+    const ir = iw/ih;
+    const r = w/h;
+    let dw, dh, dx, dy;
+    if (ir > r){ // image wider
+      dw = w; dh = w/ir; dx = x; dy = y + (h - dh)/2;
+    } else {
+      dh = h; dw = h*ir; dx = x + (w - dw)/2; dy = y;
+    }
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(image, dx, dy, dw, dh);
   }
 
-  // Observe size changes robustly
-  const ro = new ResizeObserver(sizeToCSS);
-  ro.observe(canvas);
-
-  // Drawing helpers
-  function drawFace(cx, cy, R){
-    // Base dial
-    const g = ctx.createRadialGradient(cx, cy, 2, cx, cy, R*0.95);
-    g.addColorStop(0, '#0f1b2d');
-    g.addColorStop(0.7, '#0a121e');
-    g.addColorStop(1, '#05080e');
-    ctx.fillStyle = g;
-    ctx.beginPath(); ctx.arc(cx, cy, R*0.92, 0, Math.PI*2); ctx.fill();
-
-    // Minute ticks
-    for(let i=0;i<60;i++){
-      const a = i * Math.PI/30;
-      const inner = R*0.80 - (i%5===0? 6: 0);
-      const outer = R*0.86;
-      ctx.strokeStyle = i%5===0 ? getComputedStyle(document.documentElement).getPropertyValue('--tickBold').trim()
-                                : getComputedStyle(document.documentElement).getPropertyValue('--tick').trim();
-      ctx.lineWidth = i%5===0 ? 3.2 : 1.6;
-      ctx.beginPath();
-      ctx.moveTo(cx + Math.sin(a)*inner, cy - Math.cos(a)*inner);
-      ctx.lineTo(cx + Math.sin(a)*outer, cy - Math.cos(a)*outer);
-      ctx.stroke();
-    }
-
-    // Hour batons
-    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--marker').trim();
-    for(let i=0;i<12;i++){
-      const a = i * Math.PI/6, w = 6, h = 18, r = R*0.70;
-      const x = cx + Math.sin(a)*r, y = cy - Math.cos(a)*r;
-      ctx.save(); ctx.translate(x,y); ctx.rotate(a);
-      ctx.fillRect(-w/2, -h/2, w, h);
-      ctx.restore();
-    }
-  }
-
-  function hand(length, width, color, angle, cx, cy){
+  // Hand painter
+  function hand(len, width, color, angleRad){
     ctx.save();
     ctx.translate(cx, cy);
-    ctx.rotate(angle);
+    ctx.rotate(angleRad + rotDeg*Math.PI/180);
     ctx.strokeStyle = color;
     ctx.lineWidth = width;
     ctx.lineCap = 'round';
     ctx.beginPath();
     ctx.moveTo(0, 10);
-    ctx.lineTo(0, -length);
+    ctx.lineTo(0, -len);
     ctx.stroke();
     ctx.restore();
   }
 
+  // Main draw
   function draw(){
-    // Use CSS pixels for math; scale already applied
-    const w = canvas.width / dpr;
-    const h = canvas.height / dpr;
-    const cx = w/2, cy = h/2, R = Math.min(w,h)/2;
-
+    const rect = canvas.getBoundingClientRect();
+    const w = rect.width, h = rect.height;
     ctx.clearRect(0,0,w,h);
 
-    drawFace(cx, cy, R);
+    if (img) drawImageContain(img, 0, 0, w, h);
 
+    // fallback dial if no image loaded
+    if(!img){
+      const g = ctx.createRadialGradient(w/2,h/2,2,w/2,h/2,Math.min(w,h)/2*0.95);
+      g.addColorStop(0,'#0f1b2d'); g.addColorStop(0.7,'#0a121e'); g.addColorStop(1,'#05080e');
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(w/2,h/2,Math.min(w,h)/2*0.92,0,Math.PI*2); ctx.fill();
+    }
+
+    // Time
     const now = new Date();
     const ms = now.getMilliseconds();
     const s = now.getSeconds();
     const m = now.getMinutes();
-    const h12 = now.getHours() % 12;
+    const h12 = now.getHours()%12;
 
     const stepped = beat8.checked || matchMedia('(prefers-reduced-motion: reduce)').matches;
     const sFrac = stepped ? s + Math.floor(ms/125)/8 : s + ms/1000;
@@ -137,28 +194,29 @@
     const aM = (m + (s + ms/1000)/60) * Math.PI/30;
     const aH = (h12 + (m + s/60 + ms/60000)/60) * Math.PI/6;
 
-    hand(R*0.68, 6.0, getComputedStyle(document.documentElement).getPropertyValue('--hand').trim(), aH, cx, cy);
-    hand(R*0.86, 4.0, getComputedStyle(document.documentElement).getPropertyValue('--hand').trim(), aM, cx, cy);
-    hand(R*0.90, 2.2, getComputedStyle(document.documentElement).getPropertyValue('--sec').trim(),  aS, cx, cy);
+    // Hands (lengths relative to slider radius)
+    hand(R*0.68, 6, getComputedStyle(document.documentElement).getPropertyValue('--hand').trim(), aH);
+    hand(R*0.86, 4, getComputedStyle(document.documentElement).getPropertyValue('--hand').trim(), aM);
+    hand(R*0.90, 2.2, getComputedStyle(document.documentElement).getPropertyValue('--sec').trim(),  aS);
 
-    // Center cap
-    ctx.fillStyle = '#0f172a'; ctx.strokeStyle = '#e5e7eb'; ctx.lineWidth = 2;
+    // Center cap + crosshair
+    ctx.fillStyle='#0f172a'; ctx.strokeStyle='#e5e7eb'; ctx.lineWidth=2;
     ctx.beginPath(); ctx.arc(cx, cy, 6.5, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    if (dragToggle.checked){
+      ctx.strokeStyle='#22d3ee'; ctx.lineWidth=1.2;
+      ctx.beginPath(); ctx.moveTo(cx-12,cy); ctx.lineTo(cx+12,cy); ctx.moveTo(cx,cy-12); ctx.lineTo(cx,cy+12); ctx.stroke();
+    }
 
     // LCD
-    const pad = n => String(n).padStart(2,'0');
+    const pad=n=>String(n).padStart(2,'0');
     lcd.textContent = `${pad(now.getHours())}:${pad(m)}:${pad(s)}`;
   }
 
-  function loop(){
-    draw();
-    if (animating) requestAnimationFrame(loop);
-  }
-
-  // Start once
-  sizeToCSS();
-  if (!animating){ animating = true; requestAnimationFrame(loop); }
-
+  // Animation loop (single)
+  let running = false;
+  function loop(){ draw(); if(running) requestAnimationFrame(loop); }
+  resizeToBox();
+  if(!running){ running=true; requestAnimationFrame(loop); }
 })();
 </script>
 </body>
