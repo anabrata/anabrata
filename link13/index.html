@@ -67,7 +67,7 @@
     align-items:center;
     column-gap: var(--gap);
     padding:22px min(5vw,48px);
-    position:relative;
+    position:relative; /* anchor if needed */
     min-height: 60vh;
   }
   .main > section{ min-width:0; min-height:0; }
@@ -76,26 +76,40 @@
   #todo-panel     { grid-column:2; justify-self:center; align-self:center; }
   #candle-area    { grid-column:3; }
 
-  /* Center clock: pure grid placement (no absolute) */
-  .center-clock .main{ grid-template-columns: 1fr max-content 1fr; }
-  .center-clock #timer-container{ grid-column:2; justify-self:center; }
-  .center-clock #todo-panel{ grid-column:1; justify-self:start; margin-left:min(48px,5vw); }
-  .center-clock #candle-area{ grid-column:3; justify-self:end; }
+  /* Center Clock: keep To‑do LEFT, candle RIGHT; timer centered in viewport */
+  .center-clock .main{ grid-template-columns: max-content 1fr max-content; }
+  .center-clock #timer-container{
+    position:fixed; left:50%; top:50%;
+    transform:translate(-50%,-50%); z-index:15; min-width:0; width:auto;
+  }
+  .center-clock #todo-panel{
+    position:static; grid-column:1; justify-self:start; align-self:center;
+    margin-left:min(48px,5vw); z-index:16;
+  }
+  .center-clock #candle-area{ transform: translateY(0) !important; } /* prevent drop in center mode */
 
-  /* Hide candle → two columns, To‑do at right by default */
+  /* Hide candle → To‑do occupies RIGHT */
   .candle-off #candle-area{ display:none !important; }
   .candle-off .main{ grid-template-columns: max-content max-content; }
-  .candle-off #todo-panel{ grid-column:2; justify-self:end; margin-left:0; }
+  .candle-off #todo-panel{
+    position:static !important; left:auto !important; top:auto !important; transform:none !important; justify-self:end !important;
+  }
 
   /* Center‑clock + candle‑off → keep To‑do LEFT */
   .center-clock.candle-off .main{ grid-template-columns: max-content 1fr; }
-  .center-clock.candle-off #todo-panel{ grid-column:1; justify-self:start; margin-left:min(48px,5vw); }
+  .center-clock.candle-off #todo-panel{
+    position:static !important; grid-column:1 !important; justify-self:start !important;
+    margin-left:min(48px,5vw) !important; z-index:16 !important;
+  }
 
   /* Only candle → center candle, hide clock; To‑do LEFT */
   .only-candle #timer-container{ display:none !important; }
-  .only-candle .main{ grid-template-columns: 1fr max-content 1fr; }
-  .only-candle #todo-panel{ grid-column:1; justify-self:start; margin-left:min(48px,5vw); }
-  .only-candle #candle-area{ grid-column:2; justify-self:center; }
+  .only-candle .main{ grid-template-columns: max-content 1fr; }
+  .only-candle #todo-panel{
+    position:static; grid-column:1; justify-self:start; align-self:center; margin-left:min(48px,5vw);
+    z-index:6;
+  }
+  .only-candle #candle-area{ grid-column: 2; justify-self: center; }
 
   /* To‑do visibility via .todo-on */
   #todo-panel{ display:none; }
@@ -164,9 +178,8 @@
 
   /* ===== Candle ===== */
   #candle-area{
-    display:flex; align-items:flex-end; justify-content:flex-end;
-    height:max(380px,42vh); position:relative; transform: translateY(var(--candle-offset));
-    overflow:visible; z-index:3;
+    display:flex; align-items:flex-end; justify-content:flex-end; height:max(380px,42vh);
+    position:relative; transform: translateY(var(--candle-offset)); overflow:visible; z-index:3;
   }
   .candle-clip{ position:relative; width:180px; height:380px; overflow:hidden; display:flex; align-items:flex-end; justify-content:center; }
   .candle-wrap{ position:absolute; inset:auto 0 0 0; margin:auto; width:180px; height:380px; display:flex; align-items:flex-end; justify-content:center; transition: transform .5s ease, opacity .5s ease; }
@@ -197,14 +210,16 @@
   #controls{
     position:relative; display:grid; grid-auto-flow:column; grid-auto-columns:minmax(260px,1fr); gap:14px; padding:16px;
     background:rgba(0,0,0,.22); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
-    overflow-x:auto; border-top-left-radius:16px; border-top-right-radius:16px; z-index:10; min-height:200px;
+    overflow-x:auto; border-top-left-radius:16px; border-top-right-radius:16px; z-index:20; min-height:200px;
   }
   .card{
     background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:12px; min-height:164px;
     display:flex; flex-direction:column; gap:8px; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
   }
+  /* Ensure the Start/Reset/Fullscreen row fits; scrolls horizontally if needed */
+  .timer-card{ min-width: 500px; }
   .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-  .row-actions{ flex-wrap:nowrap; }
+  .row.row-actions{ flex-wrap:nowrap; }
   label{ font-size:12px; color:#fff; opacity:.95 }
   input[type="number"],input[type="color"],input[type="file"]{
     width:100%; padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.35); color:#fff; outline:none;
@@ -321,7 +336,7 @@
 
   <!-- Controls -->
   <div id="controls">
-    <div class="card">
+    <div class="card timer-card">
       <label class="small">Timer</label>
       <div class="row">
         <div style="flex:1"><label for="hoursInput">Hours</label><input id="hoursInput" type="number" min="0" value="0"></div>
@@ -466,8 +481,7 @@
   }
 
   function applyWax(){
-    const waxPicker = document.getElementById("waxColor");
-    document.documentElement.style.setProperty("--wax", waxPicker ? waxPicker.value : "#f2e4c7");
+    document.documentElement.style.setProperty("--wax", $("#waxColor")?.value || "#f2e4c7");
   }
 
   function restyleClockPanels(){
