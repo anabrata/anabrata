@@ -1,11 +1,9 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>Candle Timer — V2.0</title>
+<title>Candle Timer — V10</title>
 <style>
   :root{
     /* Sizes */
@@ -145,9 +143,7 @@
   .todoChk:checked{ background:#22c55e; border-color:#22c55e; }
   .todoChk:checked::after{ content:""; position:absolute; inset:0; background:linear-gradient(45deg,transparent 47%,#fff 47% 53%,transparent 53%),linear-gradient(-45deg,transparent 47%,#fff 47% 53%,transparent 53%); transform:scale(.48); }
   .todoText{ display:inline-block; min-width:36px; min-height:20px; padding:1px 5px; border-radius:6px; outline:none; color:#fff; caret-color:#fff; }
-  .todoText:empty:before{ content:"New task"; opacity:.45; }
-
-  /* ===== Flip clock (glassy) ===== */
+  .todoText:empty:before{ content:"New task"; opacity:.45; }... /* ===== Flip clock (glassy) ===== */
   #timer{ display:flex; align-items:center; gap:12px; user-select:none; }
   .digit{
     position:relative; width:var(--digit-w); height:var(--digit-h); perspective:1200px; border-radius:var(--digit-radius); overflow:hidden;
@@ -201,9 +197,7 @@
     animation: flickerSoft .6s ease-in-out infinite;
   }
   @keyframes flickerSoft{ 0%{ transform:scale(1) rotate(-0.8deg); opacity:.95 } 50%{ transform:scale(1.06) rotate(0.6deg); opacity:.82 } 100%{ transform:scale(1) rotate(-0.8deg); opacity:.95 } }
-  .flame.off .flame-core{ opacity:0 !important; animation-play-state: paused !important; }
-
-  .stub{ display:none; position:absolute; bottom:0; width:150px; height:58px; background:linear-gradient(180deg,#9a9a9a,#6f6f6f); border-radius:0 0 22px 22px; z-index:1; }
+  .flame.off .flame-core{ opacity:0 !important; animation-play-state: paused !important; }... .stub{ display:none; position:absolute; bottom:0; width:150px; height:58px; background:linear-gradient(180deg,#9a9a9a,#6f6f6f); border-radius:0 0 22px 22px; z-index:1; }
 
   /* ===== Controls (glass) ===== */
   #controls{
@@ -300,7 +294,7 @@
 </style>
 </head>
 <body>
-  <div class="brand">MADE BY ANABRATA — V2.0</div>
+  <div class="brand">MADE BY ANABRATA — V10</div>
 
   <div class="main" id="main">
     <!-- Timer -->
@@ -328,9 +322,7 @@
       </div>
       <div class="flame" id="flame"><div class="flame-core"></div></div>
     </section>
-  </div>
-
-  <!-- Controls -->
+  </div>... <!-- Controls -->
   <div id="controls">
     <div class="card">
       <label class="small">Timer</label>
@@ -370,12 +362,12 @@
         </div>
       </div>
       <div class="row">
-        <label><input type="checkbox" id="todoGlass"> To‑do transparency effect</label>
+        <label><input type="checkbox" id="todoGlass" checked> To‑do transparency effect</label>
       </div>
     </div>
 
     <div class="card">
-      <label class="small">Media & background</label>
+      <label class="small">Media &amp; background</label>
       <div class="row" style="gap:8px; align-items:center">
         <button id="addMusicBtn" class="btn alt small">Add music</button>
         <input id="musicFiles" type="file" accept="audio/*" multiple style="display:none" />
@@ -405,8 +397,6 @@
         <div style="flex:1"><label for="colonColor">Colon color</label><input id="colonColor" type="color" value="#ffffff"></div>
       </div>
       <div class="row">
-      </div>
-      <div class="row">
         <div style="flex:1"><label for="simpleColor">Simple timer color</label><input id="simpleColor" type="color" value="#ffffff"></div>
       </div>
     </div>
@@ -425,13 +415,11 @@
   <!-- 3-2-1 overlay -->
   <div id="countOverlay" aria-hidden="true">
     <div id="countInner" class="pop">3</div>
-  </div>
-
-  <!-- Congrats overlay with balloons -->
+  </div>... <!-- Congrats overlay with balloons -->
   <div id="congrats" aria-modal="true" role="dialog">
     <div id="cgCard">
       <h2 id="cgTitle">Congratulations!</h2>
-      <p id="cgMsg">Timer complete YOU DONE IT🥰</p>
+      <p id="cgMsg">Timer complete — great focus! 🎉</p>
       <button id="cgClose">Close</button>
     </div>
     <!-- Balloons -->
@@ -614,9 +602,7 @@
   let running = false;
   let paused = false;
   let pauseRemainMs = 0;
-  let countInActive = false;
-
-  function safeBuildClock(){
+  let countInActive = false;... function safeBuildClock(){
     useFlip = $("#useFlip")?.checked ?? true;
     if (useFlip){
       timerFlip.style.display = "flex";
@@ -781,7 +767,7 @@
   new ResizeObserver(()=> requestAnimationFrame(()=>positionFlame())).observe(area);
   new MutationObserver(()=> requestAnimationFrame(()=>positionFlame())).observe(document.body,{attributes:true,attributeFilter:["class"]});
   waxEl.addEventListener("transitionend", ()=> requestAnimationFrame(()=>positionFlame()));
-  window.addEventListener("resize", ()=> requestAnimationFrame(()=>positionFlame()));
+  window.addEventListener("resize", () => requestAnimationFrame(() => positionFlame()));
 
   /* ---------- Congrats overlay ---------- */
   const congrats = $("#congrats");
@@ -800,9 +786,7 @@
   document.addEventListener("fullscreenchange", () => { document.body.classList.toggle("is-fs", !!document.fullscreenElement); });
 
   /* ---------- To‑do logic ---------- */
-  const todoList = $("#todoList");
-
-  function makeTodoItem(text = ""){
+  const todoList = $("#todoList");... function makeTodoItem(text = ""){
     const li = document.createElement("li");
     const label = document.createElement("label"); label.className = "todoItem";
     const chk = document.createElement("input"); chk.type = "checkbox"; chk.className = "todoChk";
@@ -832,22 +816,22 @@
   function pausePlaylist(){ audio.pause(); if (musicPlayBtn) musicPlayBtn.textContent="▶"; }
   function nextTrack(){ if(playlist.length) playTrack(trackIndex+1); }
   function prevTrack(){ if(playlist.length) playTrack(trackIndex-1); }
-  audio.addEventListener("ended", ()=> nextTrack());
-  audio.addEventListener("play", ()=> { if (musicPlayBtn) musicPlayBtn.textContent="⏸"; });
-  audio.addEventListener("pause", ()=> { if (musicPlayBtn) musicPlayBtn.textContent="▶"; });
-  $("#addMusicBtn")?.addEventListener("click", ()=> musicFiles?.click());
+  audio.addEventListener("ended", () => nextTrack());
+  audio.addEventListener("play", () => { if (musicPlayBtn) musicPlayBtn.textContent="⏸"; });
+  audio.addEventListener("pause", () => { if (musicPlayBtn) musicPlayBtn.textContent="▶"; });
+  $("#addMusicBtn")?.addEventListener("click", () => musicFiles?.click());
   musicFiles?.addEventListener("change", (e)=> loadPlaylist(e.target.files));
-  $("#musicPlay")?.addEventListener("click", ()=> audio.paused ? startPlaylist() : pausePlaylist());
+  $("#musicPlay")?.addEventListener("click", () => audio.paused ? startPlaylist() : pausePlaylist());
   $("#musicNext")?.addEventListener("click", nextTrack);
   $("#musicPrev")?.addEventListener("click", prevTrack);
   $("#musicLoop")?.addEventListener("change", (e)=> audio.loop = !!e.target.checked);
-  window.addEventListener("unload", ()=> objectUrls.forEach(u=>URL.revokeObjectURL(u)));
+  window.addEventListener("unload", () => objectUrls.forEach(u=>URL.revokeObjectURL(u)));
 
   /* ---------- Custom background image ---------- */
   const bgImageBtn = $("#bgImageBtn"), bgImageFile = $("#bgImageFile"), bgImageClear = $("#bgImageClear"), bgImageName = $("#bgImageName");
-  bgImageBtn?.addEventListener("click", ()=> bgImageFile?.click());
+  bgImageBtn?.addEventListener("click", () => bgImageFile?.click());
   bgImageFile?.addEventListener("change", (e)=>{
-    const f = e.target.files?.[0]; if (!f) return;
+    const f = e.target.files?.; if (!f) return;
     if (bgObjectUrl){ URL.revokeObjectURL(bgObjectUrl); bgObjectUrl=null; }
     bgObjectUrl = URL.createObjectURL(f);
     document.body.style.backgroundImage = `url("${bgObjectUrl}")`;
@@ -891,17 +875,16 @@
   $("#showHours").addEventListener("change", previewLayout);
   $("#showSeconds").addEventListener("change", previewLayout);
 
-  $("#hideCandle").addEventListener("change", ()=> applyLayoutFlags());
-  $("#centerClock").addEventListener("change", ()=> applyLayoutFlags());
+  $("#hideCandle").addEventListener("change", () => applyLayoutFlags());
+  $("#centerClock").addEventListener("change", () => applyLayoutFlags());
   $("#onlyCandle").addEventListener("change", e=>{ ensureCandleVisibleWhenOnlyCandle(e.target.checked); applyLayoutFlags(); });
-  $("#showTodo").addEventListener("change", ()=> applyLayoutFlags());
-  $("#clockTransparent").addEventListener("change", (e)=> document.body.classList.toggle("clock-transparent", e.target.checked));
+  $("#showTodo").addEventListener("change", () => applyLayoutFlags());
 
   ["bgAngle","bgC1","bgC2","bgC3"].forEach(id=> document.getElementById(id)?.addEventListener("input", applyGradient));
   ["clockC1","clockC2","clockC3","textColor","colonColor","simpleColor"].forEach(id=> document.getElementById(id)?.addEventListener("input", restyleClockPanels));
 
-  $("#todoApply").addEventListener("click", ()=>{ setTodoBg($("#todoColor").value); $("#todo-panel").classList.remove("todo-clear"); });
-  $("#todoClear").addEventListener("click", ()=>{ setTodoBg("transparent"); $("#todo-panel").classList.add("todo-clear"); });
+  $("#todoApply").addEventListener("click", () =>{ setTodoBg($("#todoColor").value); $("#todo-panel").classList.remove("todo-clear"); });
+  $("#todoClear").addEventListener("click", () =>{ setTodoBg("transparent"); $("#todo-panel").classList.add("todo-clear"); });
   $("#todoGlass").addEventListener("change", (e)=> $("#todo-panel").classList.toggle("todo-glass", e.target.checked));
 
   /* ---------- Init ---------- */
