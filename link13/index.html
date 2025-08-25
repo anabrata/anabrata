@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>Candle Timer — Final</title>
+<title>Candle Timer — Vision 2.2</title>
 <style>
   :root{
     /* Flip sizes */
@@ -174,9 +174,42 @@
   .balloon:after{ content:""; position:absolute; bottom:-16px; left:50%; width:2px; height:18px; background:#fff8; transform:translateX(-50%); }
   @keyframes floatUp{ 0%{ transform: translateY(0) translateX(0) scale(1); opacity:.95 } 100%{ transform: translateY(-120vh) translateX(var(--drift,40px)) scale(1.05); opacity:1 } }
 
-  /* FS */
-  .fullscreen-on .brand,.fullscreen-on #controls{ display:none }
-  .fullscreen-on #exitFs{ display:block }
+  /* Fullscreen: only timer + candle visible */
+  .fullscreen-on .brand,
+  .fullscreen-on #controls,
+  .fullscreen-on #rtcOverlay,
+  .fullscreen-on #congrats,
+  .fullscreen-on #exitFs{ display:none !important }
+
+  /* 3s pre-start overlay (fade animation) */
+  #preOverlay{
+    position:fixed; inset:0; z-index:100;
+    display:none; align-items:center; justify-content:center;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(2px);
+  }
+  #preOverlay:not([hidden]){ display:flex }
+  #preNum{
+    font-family:"Comic Sans MS", system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    font-size:min(22vw, 220px); font-weight:900; color:#fff;
+    text-shadow:0 10px 40px rgba(0,0,0,.6);
+    opacity:0; transform:scale(.9);
+  }
+  /* fading step per number */
+  .step{ animation: fadeStep 1s ease both }
+  @keyframes fadeStep{
+    0%  { opacity:0; transform:scale(.9) }
+    20% { opacity:1; transform:scale(1) }
+    80% { opacity:1; transform:scale(1) }
+    100%{ opacity:0; transform:scale(1.06) }
+  }
+
+  /* Hide everything but overlay while pre-start is active */
+  .pre-on .brand,
+  .pre-on #controls,
+  .pre-on #exitFs,
+  .pre-on #rtcOverlay,
+  .pre-on #congrats{ display:none !important }
 
   @media (max-width:980px){ :root{ --digit-w:100px; --digit-h:140px; } }
   @media (max-width:720px){ :root{ --digit-w:86px; --digit-h:120px; } }
@@ -223,6 +256,11 @@
       <div class="cg-sub">The timer is complete. Great focus!</div>
       <button id="cgClose" class="btn alt">Close</button>
     </div>
+  </div>
+
+  <!-- 3-second pre-start overlay -->
+  <div id="preOverlay" hidden>
+    <div id="preNum">3</div>
   </div>
 
   <!-- Controls -->
@@ -378,9 +416,40 @@
     rafId=requestAnimationFrame(loop);
   }
 
+  /* 3‑second fade pre‑start */
+  let preRAF = null;
+  function startWithFadeCountdown(){
+    if (running || paused) return;
+    const overlay = $('#preOverlay');
+    const label = $('#preNum');
+    document.body.classList.add('pre-on');
+    overlay.hidden = false;
+
+    const D = 3000; // 3 seconds
+    const endAt = performance.now() + D;
+
+    function step(ts){
+      const remain = Math.max(0, endAt - ts);
+      const n = Math.ceil(remain/1000);
+      const text = n > 0 ? String(n) : 'Go';
+      if (label.textContent !== text){
+        label.textContent = text;
+        label.classList.remove('step'); void label.offsetWidth; label.classList.add('step'); // restart fade
+      }
+      if (remain <= 0){
+        overlay.hidden = true;
+        document.body.classList.remove('pre-on');
+        startCountdown();
+        return;
+      }
+      preRAF = requestAnimationFrame(step);
+    }
+    preRAF = requestAnimationFrame(step);
+  }
+
   function togglePrimary(){
     if (!running && !paused){
-      startCountdown();
+      startWithFadeCountdown(); // fade-in pre-start
       return;
     }
     if (running){
@@ -401,6 +470,7 @@
 
   function resetCountdown(){
     cancelAnimationFrame(rafId); running=false; paused=false;
+    if (preRAF){ cancelAnimationFrame(preRAF); preRAF=null; $('#preOverlay').hidden=true; document.body.classList.remove('pre-on'); }
     primaryBtn.textContent='Start';
     // rebuild display per current toggles
     showH = $('#showHours').checked; showS = $('#showSeconds').checked;
@@ -476,11 +546,21 @@
   }
 
   /* Fullscreen */
-  async function goFullscreen(){ try{ if (!document.fullscreenElement){ await document.documentElement.requestFullscreen(); } $('#exitFs').style.display='block'; }catch(e){} }
-  function exitFullscreen(){ document.exitFullscreen?.(); $('#exitFs').style.display='none'; }
+  async function goFullscreen(){
+    try{
+      if (!document.fullscreenElement){ await document.documentElement.requestFullscreen(); }
+      document.body.classList.add('fullscreen-on'); // hide everything except timer + candle
+    }catch(e){}
+  }
+  function exitFullscreen(){
+    document.exitFullscreen?.();
+    document.body.classList.remove('fullscreen-on');
+  }
   $('#fsBtn').addEventListener('click', goFullscreen);
   $('#exitFs').addEventListener('click', exitFullscreen);
-  document.addEventListener('fullscreenchange', ()=>{ if (!document.fullscreenElement){ $('#exitFs').style.display='none'; } });
+  document.addEventListener('fullscreenchange', ()=>{
+    if (!document.fullscreenElement){ document.body.classList.remove('fullscreen-on'); }
+  });
 
   /* Real-time overlay (uses current flip/simple setting) */
   const rtcOverlay=$('#rtcOverlay'), rtcFlipContainer=$('#rtcTimer'), rtcSimple=$('#simpleRTC'), rtcBack=$('#rtcBack');
@@ -495,26 +575,20 @@
     document.body.classList.add('rtc-only'); rtcOverlay.classList.add('show');
     cancelAnimationFrame(rafId); running=false; paused=false; primaryBtn.textContent='Start';
     rtcOn=true; rtcLastSec=-1;
-    if ($('#useFlip').checked){
-      rtcDigits = buildFlip(rtcFlipContainer, true, true);
-    }
+    if ($('#useFlip').checked){ rtcDigits = buildFlip(rtcFlipContainer, true, true); }
     drawRTC();
   }
   function closeRTC(){
     document.body.classList.remove('rtc-only'); rtcOverlay.classList.remove('show');
     rtcOn=false; cancelAnimationFrame(rtcId);
-    // ensure checkbox unticks after return
-    $('#rtcMode').checked = false;
+    $('#rtcMode').checked = false; // untick when coming back
   }
   function drawRTC(){
     if (!rtcOn) return;
     const secOfDay = Math.floor(Date.now()/1000)%86400; // 1Hz updates
     if (secOfDay !== rtcLastSec){
-      if ($('#useFlip').checked){
-        tickFlip(rtcDigits, secOfDay, true, true);
-      }else{
-        rtcSimple.textContent = new Date().toLocaleTimeString();
-      }
+      if ($('#useFlip').checked){ tickFlip(rtcDigits, secOfDay, true, true); }
+      else{ rtcSimple.textContent = new Date().toLocaleTimeString(); }
       rtcLastSec = secOfDay;
     }
     rtcId = requestAnimationFrame(drawRTC);
