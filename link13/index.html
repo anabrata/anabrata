@@ -63,9 +63,7 @@
   #exitFs{ position:fixed; right:8px; top:6px; z-index:70; width:24px; height:24px; line-height:24px; text-align:center; font-weight:900; color:#fff; background:rgba(0,0,0,.25); border-radius:50%; cursor:pointer; opacity:.35; display:none; }
   #exitFs:hover{ opacity:.65 }
 
-  /* ================= Main row: Clock | To‑do | Candle =================
-     Grid guarantees equal gap on both sides of the to‑do panel and
-     prevents the clock from shrinking when hours are shown. */
+  /* ================= Main row: Clock | To‑do | Candle ================= */
   .main{
     flex:1;
     display:grid;
@@ -80,7 +78,7 @@
   #candle-area    { grid-column:3; }
 
   /* Center clock mode: clock overlays middle; to‑do pins left, clear of overlay */
-  .center-clock .main{ grid-template-columns: 1fr 0 1fr; } /* middle col collapses; we pin explicitly */
+  .center-clock .main{ grid-template-columns: 1fr 0 1fr; }
   .center-clock #timer-container{
     position:absolute; left:50%; top:50%;
     transform:translate(-50%,-50%);
@@ -111,7 +109,6 @@
   #todo-panel{ display:none; }
   .todo-on #todo-panel{ display:block; }
 
-  /* Compact and transparent by default (no border/shadow when clear) */
   #todo-panel{
     position: static;
     flex: 0 1 auto;
@@ -246,6 +243,7 @@
     border-radius:50% 50% 38% 38%;
     box-shadow:0 0 18px 6px rgba(255,170,40,.55), 0 0 36px 14px rgba(255,140,0,.40), 0 -20px 28px rgba(255,220,170,.40);
     animation: flickerSoft .6s ease-in-out infinite;
+    left:0; top:0; will-change:left,top;
   }
   @keyframes flickerSoft{
     0%{ transform:scale(1) rotate(-0.8deg); opacity:.95 }
@@ -256,13 +254,17 @@
 
   .stub{ display:none; position:absolute; bottom:0; width:150px; height:58px; background:linear-gradient(180deg,#9a9a9a,#6f6f6f); border-radius:0 0 22px 22px; z-index:1; }
 
-  /* ================= Real-time overlay (Back hidden by default) ================= */
-  #rtcOverlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:90; }
+  /* ================= Real-time only FULL PAGE ================= */
+  #rtcOverlay{
+    position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:90;
+    background-image: linear-gradient(var(--bg-angle), var(--bg-c1), var(--bg-c2), var(--bg-c3));
+  }
   #rtcOverlay.show{ display:flex; }
   #rtcTimer{ display:flex; align-items:center; gap:12px; }
   #simpleRTC{ display:none; font-weight:900; letter-spacing:.5px; color:var(--simple-text); text-shadow:0 6px 24px rgba(0,0,0,.25); font-size:min(12vw, 120px); }
   #rtcBack{ position:fixed; top:8px; left:10px; opacity:.45; background:rgba(0,0,0,.25); color:#fff; border-radius:10px; padding:6px 10px; font-weight:800; border:none; cursor:pointer; z-index:95; }
   #rtcOverlay:not(.show) #rtcBack{ display:none !important; }
+  .rtc-only .brand, .rtc-only #main, .rtc-only #controls, .rtc-only #exitFs{ display:none !important; }
 
   /* ================= Controls rail ================= */
   #controls{
@@ -499,7 +501,7 @@
     const arr=timeArray(sec,showH,showS); digits.forEach((d,i)=> flipTo(d, arr[i] || '0'));
   }
 
-  /* Countdown */
+  /* Countdown (robust state) */
   const timerFlip = $('#timer'), timerSimple = $('#simpleTimer'), primaryBtn = $('#primaryBtn');
   let flipDigits=[], useFlip=true;
   let totalSec=0, endAtMs=0, rafId=null, lastWhole=-1, running=false, paused=false, pauseRemainMs=0;
@@ -530,6 +532,7 @@
     const h=+$('#hoursInput').value||0, m=+$('#minInput').value||0, s=Math.max(0,Math.min(59,+$('#secInput').value||0));
     totalSec=h*3600+m*60+s;
 
+    // Reset candle and align flame every start
     candleWrap.classList.remove('vanish');
     stubEl.style.display = 'none';
     flameEl.classList.remove('off');
@@ -586,14 +589,14 @@
       cancelAnimationFrame(rafId);
       pauseRemainMs=Math.max(0,endAtMs-performance.now());
       paused=true; running=false; primaryBtn.textContent='Resume';
-      afterNextPaint(positionFlame); /* keep aligned on pause */
+      afterNextPaint(positionFlame);
       return;
     }
     if (paused){
       endAtMs=performance.now()+pauseRemainMs;
       lastWhole=Math.floor(pauseRemainMs/1000);
       paused=false; running=true; primaryBtn.textContent='Stop';
-      afterNextPaint(positionFlame); /* make sure flame snaps back on resume */
+      afterNextPaint(positionFlame);
       rafId=requestAnimationFrame(loop);
     }
   }
@@ -622,7 +625,7 @@
     primaryBtn.textContent='Start';
   }
 
-  /* Candle + flame positioning */
+  /* Candle + flame positioning (never stuck) */
   const area=$('#candle-area'), waxEl=$('#wax'), wickEl=$('#wick'), flameEl=$('#flame'), candleWrap=$('#candleWrap'), stubEl=$('#stub');
   const baseWaxHeight=380, minStub=58, FLAME_OFFSET=10;
 
@@ -640,6 +643,13 @@
     waxEl.style.height=`${h}px`;
   }
 
+  // Extra safety: keep flame aligned on any size/layout changes
+  const ro = new ResizeObserver(()=> afterNextPaint(positionFlame));
+  ro.observe(area); ro.observe(waxEl); ro.observe(wickEl);
+  new MutationObserver(()=> afterNextPaint(positionFlame)).observe(document.body,{attributes:true,attributeFilter:['class']});
+  waxEl.addEventListener('transitionend', ()=> afterNextPaint(positionFlame));
+  window.addEventListener('resize', ()=> afterNextPaint(positionFlame));
+
   /* Congrats */
   const congrats=$('#congrats'); $('#cgClose').addEventListener('click', ()=> congrats.style.display='none');
   function showCongrats(){ congrats.style.display='flex'; }
@@ -652,14 +662,42 @@
   $('#exitFs').addEventListener('click', exitFullscreen);
   document.addEventListener('fullscreenchange', ()=>{ if(!document.fullscreenElement){ document.body.classList.remove('fullscreen-on'); } });
 
-  /* Real-time */
+  /* Real-time — true full page */
   const rtcOverlay=$('#rtcOverlay'), rtcFlipContainer=$('#rtcTimer'), rtcSimple=$('#simpleRTC'), rtcBack=$('#rtcBack');
   let rtcDigits=[], rtcOn=false, rtcId=null, rtcLastSec=-1;
-  function refreshRTCMode(){ const uf=$('#useFlip').checked; rtcFlipContainer.style.display=uf?'flex':'none'; rtcSimple.style.display=uf?'none':'block'; }
-  function openRTC(){ document.body.classList.add('rtc-only'); rtcOverlay.classList.add('show'); cancelAnimationFrame(rafId); rtcOn=true; rtcLastSec=-1; if($('#useFlip').checked){ rtcDigits=buildFlip(rtcFlipContainer,true,true); } drawRTC(); }
-  function closeRTC(){ document.body.classList.remove('rtc-only'); rtcOverlay.classList.remove('show'); rtcOn=false; cancelAnimationFrame(rtcId); $('#rtcMode').checked=false; }
-  function drawRTC(){ if(!rtcOn) return; const secOfDay=Math.floor(Date.now()/1000)%86400; if(secOfDay!==rtcLastSec){ if($('#useFlip').checked){ tickFlip(rtcDigits,secOfDay,true,true); } else { rtcSimple.textContent=new Date().toLocaleTimeString(); } rtcLastSec=secOfDay; } rtcId=requestAnimationFrame(drawRTC); }
+
+  function refreshRTCMode(){
+    const uf=$('#useFlip').checked;
+    rtcFlipContainer.style.display = uf ? 'flex' : 'none';
+    rtcSimple.style.display = uf ? 'none' : 'block';
+  }
+  function openRTC(){
+    document.body.classList.add('rtc-only');
+    rtcOverlay.classList.add('show');
+    cancelAnimationFrame(rafId); running=false; paused=false; primaryBtn.textContent='Start';
+    rtcOn=true; rtcLastSec=-1;
+    rtcFlipContainer.innerHTML='';
+    if ($('#useFlip').checked){ rtcDigits = buildFlip(rtcFlipContainer, true, true); } else { rtcDigits = []; }
+    drawRTC();
+  }
+  function closeRTC(){
+    document.body.classList.remove('rtc-only');
+    rtcOverlay.classList.remove('show');
+    rtcOn=false; cancelAnimationFrame(rtcId);
+    $('#rtcMode').checked = false;
+  }
+  function drawRTC(){
+    if (!rtcOn) return;
+    const secOfDay = Math.floor(Date.now()/1000)%86400;
+    if (secOfDay !== rtcLastSec){
+      if ($('#useFlip').checked){ tickFlip(rtcDigits, secOfDay, true, true); }
+      else{ rtcSimple.textContent = new Date().toLocaleTimeString(); }
+      rtcLastSec = secOfDay;
+    }
+    rtcId = requestAnimationFrame(drawRTC);
+  }
   rtcBack.addEventListener('click', closeRTC);
+  $('#rtcMode').addEventListener('change', e=> e.target.checked ? openRTC() : closeRTC());
 
   /* To‑do logic (checkbox + auto-remove) */
   const todoList=$('#todoList');
@@ -713,7 +751,6 @@
   $('#primaryBtn').addEventListener('click', togglePrimary);
   $('#resetBtn').addEventListener('click', resetCountdown);
   $('#useFlip').addEventListener('change', ()=>{ safeBuildClock(); refreshRTCMode(); previewLayout(); });
-  $('#rtcMode').addEventListener('change', e=> e.target.checked ? openRTC() : closeRTC());
   $('#showHours').addEventListener('change', previewLayout);
   $('#showSeconds').addEventListener('change', previewLayout);
 
@@ -737,12 +774,10 @@
     $('#todo-panel').classList.add('todo-clear');
   });
 
-  window.addEventListener('resize', ()=> afterNextPaint(positionFlame));
-
   /* Init */
   (function boot(){
     applyGradient(); restyleClockPanels(); applyWax(); applySimpleTextColor();
-    document.body.classList.add('todo-on'); // show To‑do by default
+    document.body.classList.add('todo-on');
     safeBuildClock(); refreshRTCMode(); previewLayout();
     setWaxHeightByProgress(1);
     afterNextPaint(positionFlame);
