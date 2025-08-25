@@ -18,12 +18,15 @@
     --bg-c2: #d76d77;
     --bg-c3: #ffaf7b;
 
-    /* Default flip clock colors (requested) */
-    --clock-c1: #ffffff;    /* white card top-left */
-    --clock-c2: #ffffff;    /* white card center */
-    --clock-c3: #ffffff;    /* white card bottom-right */
-    --clock-text: #000000;  /* black numbers */
-    --colon-color: #ffffff; /* white colon/dots */
+    /* Flip clock defaults */
+    --clock-c1: #ffffff;
+    --clock-c2: #ffffff;
+    --clock-c3: #ffffff;
+    --clock-text: #000000;
+    --colon-color: #ffffff;
+
+    /* NEW: simple (non‑flip) digit color default */
+    --simple-text: #000000;
 
     /* Buttons */
     --btn-font: "Comic Sans MS", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
@@ -47,7 +50,6 @@
     background-attachment: fixed; background-size: cover;
   }
 
-  /* Credit on left */
   .brand{ position:fixed; left:12px; top:10px; z-index:40; color:#fff; font-weight:700; font-size:13px; text-shadow:0 1px 2px rgba(0,0,0,.35); user-select:none; }
 
   #exitFs{ position:fixed; right:8px; top:6px; z-index:70; width:24px; height:24px; line-height:24px; text-align:center; font-weight:900; color:#fff; background:rgba(0,0,0,.25); border-radius:50%; cursor:pointer; opacity:.35; display:none; }
@@ -58,7 +60,7 @@
   /* Flip clock */
   #timer-container{ flex:1; display:flex; align-items:center; justify-content:flex-start; min-width:340px; gap:12px; }
   #timer{ display:flex; align-items:center; gap:12px; user-select:none; }
-  #simpleTimer{ display:none; font-weight:900; letter-spacing:.5px; color:#000; text-shadow:0 6px 24px rgba(0,0,0,.25); font-size:min(12vw, 120px); }
+  #simpleTimer{ display:none; font-weight:900; letter-spacing:.5px; color:var(--simple-text); text-shadow:0 6px 24px rgba(0,0,0,.25); font-size:min(12vw, 120px); }
 
   .digit{
     position:relative; width:var(--digit-w); height:var(--digit-h); perspective:1200px;
@@ -76,7 +78,6 @@
     font-weight:900; color:var(--clock-text);
     font-size: calc(var(--digit-h)*.70); line-height:var(--digit-h);
   }
-  /* precise half clipping */
   .top .value,.top-flip .value{ clip-path: inset(0 0 50% 0); transform: translateY(0); }
   .bottom .value,.bottom-flip .value{ clip-path: inset(50% 0 0 0); transform: translateY(-50%); }
 
@@ -88,7 +89,7 @@
 
   .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.25); }
 
-  /* Candle (down a bit) */
+  /* Candle */
   #candle-area{ flex:1; display:flex; align-items:flex-end; justify-content:flex-end; min-width:340px; height:max(380px,42vh); position:relative; transform: translateY(var(--candle-offset)); }
   .candle-clip{ position:relative; width:180px; height:380px; overflow:hidden; display:flex; align-items:flex-end; justify-content:center; }
   .candle-wrap{ position:absolute; inset:auto 0 0 0; margin:auto; width:180px; height:380px; display:flex; align-items:flex-end; justify-content:center; transition: transform .5s ease, opacity .5s ease; }
@@ -104,8 +105,6 @@
       linear-gradient(180deg,var(--wax), #e6d9bb);
     transition: height .22s linear;
   }
-  /* waxTop removed */
-
   .wax:after{
     content:""; position:absolute; top:30px; left:24px; width:12px; height:64px; border-radius:10px;
     background: linear-gradient(180deg,#fff6,#0000 60%), var(--wax);
@@ -154,7 +153,7 @@
   #rtcOverlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:90; }
   #rtcOverlay.show{ display:flex; }
   #rtcTimer{ display:flex; align-items:center; gap:12px; }
-  #simpleRTC{ display:none; font-weight:900; letter-spacing:.5px; color:#000; text-shadow:0 6px 24px rgba(0,0,0,.25); font-size:min(12vw, 120px); }
+  #simpleRTC{ display:none; font-weight:900; letter-spacing:.5px; color:var(--simple-text); text-shadow:0 6px 24px rgba(0,0,0,.25); font-size:min(12vw, 120px); }
   #rtcBack{ position:fixed; top:8px; left:10px; opacity:.45; background:rgba(0,0,0,.25); color:#fff; border-radius:10px; padding:6px 10px; font-weight:800; border:none; cursor:pointer; z-index:95; }
   #rtcBack:hover{ opacity:.75 }
   .rtc-only .brand, .rtc-only #controls, .rtc-only #main, .rtc-only #exitFs { display:none !important; }
@@ -169,7 +168,7 @@
   .balloon:after{ content:""; position:absolute; bottom:-16px; left:50%; width:2px; height:18px; background:#fff8; transform:translateX(-50%); }
   @keyframes floatUp{ 0%{ transform: translateY(0) translateX(0) scale(1); opacity:.95 } 100%{ transform: translateY(-120vh) translateX(var(--drift,40px)) scale(1.05); opacity:1 } }
 
-  /* Fullscreen: only timer + candle visible */
+  /* Fullscreen limits */
   .fullscreen-on .brand,
   .fullscreen-on #controls,
   .fullscreen-on #rtcOverlay,
@@ -190,7 +189,6 @@
     text-shadow:0 10px 40px rgba(0,0,0,.6);
     opacity:0; transform:scale(.9);
   }
-  /* fading step per number */
   .step{ animation: fadeStep 1s ease both }
   @keyframes fadeStep{
     0%  { opacity:0; transform:scale(.9) }
@@ -199,7 +197,6 @@
     100%{ opacity:0; transform:scale(1.06) }
   }
 
-  /* Hide everything but overlay while pre-start is active */
   .pre-on .brand,
   .pre-on #controls,
   .pre-on #exitFs,
@@ -215,18 +212,15 @@
   <div id="exitFs" title="Exit fullscreen">×</div>
 
   <div class="main" id="main">
-    <!-- Timer -->
     <section id="timer-container" aria-label="Timer">
       <div id="timer"></div>
       <div id="simpleTimer">00:00</div>
     </section>
 
-    <!-- Candle -->
     <section id="candle-area" aria-label="Candle">
       <div class="candle-clip">
         <div class="candle-wrap" id="candleWrap">
           <div class="wax" id="wax">
-            <!-- waxTop removed -->
             <div class="wick" id="wick"></div>
           </div>
           <div class="stub" id="stub"></div>
@@ -237,14 +231,12 @@
     </section>
   </div>
 
-  <!-- Real-time only clock -->
   <div id="rtcOverlay">
     <button id="rtcBack" title="Back">Back</button>
     <div id="rtcTimer"></div>
     <div id="simpleRTC">00:00:00</div>
   </div>
 
-  <!-- Congrats -->
   <div id="congrats">
     <div class="cg-card">
       <div class="cg-title">Congratulations!</div>
@@ -253,12 +245,10 @@
     </div>
   </div>
 
-  <!-- 3-second pre-start overlay -->
   <div id="preOverlay" hidden>
     <div id="preNum">3</div>
   </div>
 
-  <!-- Controls -->
   <div id="controls">
     <div class="card">
       <label class="small" style="color:#fff">Timer</label>
@@ -300,6 +290,14 @@
       <div class="row">
         <div style="flex:1"><label for="textColor">Digit color</label><input id="textColor" type="color" value="#000000"></div>
         <div style="flex:1"><label for="colonColor">Colon color</label><input id="colonColor" type="color" value="#ffffff"></div>
+      </div>
+    </div>
+
+    <!-- NEW: simple (non‑flip) color -->
+    <div class="card">
+      <label class="small" style="color:#fff">Simple clock color</label>
+      <div class="row">
+        <div style="flex:1"><label for="simpleTextColor">Digits</label><input id="simpleTextColor" type="color" value="#000000"></div>
       </div>
     </div>
 
@@ -379,7 +377,8 @@
     candleWrap.style.opacity = '';
     candleWrap.style.transform = '';
     stubEl.style.display = 'none';
-    flameEl.classList.remove('off');
+
+    relight();                 // restart flame reliably
     setWaxHeightByProgress(1);
     positionFlame();
 
@@ -420,7 +419,7 @@
     document.body.classList.add('pre-on');
     overlay.hidden = false;
 
-    const D = 3000; // 3 seconds
+    const D = 3000;
     const endAt = performance.now() + D;
 
     function step(ts){
@@ -429,7 +428,7 @@
       const text = n > 0 ? String(n) : 'Go';
       if (label.textContent !== text){
         label.textContent = text;
-        label.classList.remove('step'); void label.offsetWidth; label.classList.add('step'); // restart fade
+        label.classList.remove('step'); void label.offsetWidth; label.classList.add('step');
       }
       if (remain <= 0){
         overlay.hidden = true;
@@ -444,191 +443,11 @@
 
   function togglePrimary(){
     if (!running && !paused){
-      startWithFadeCountdown(); // fade-in pre-start
+      startWithFadeCountdown();
       return;
     }
     if (running){
       cancelAnimationFrame(rafId);
       pauseRemainMs = Math.max(0, endAtMs - performance.now());
       paused=true; running=false;
-      primaryBtn.textContent='Resume';
-      return;
-    }
-    if (paused){
-      endAtMs = performance.now()+pauseRemainMs;
-      lastWhole = Math.floor(pauseRemainMs/1000);
-      paused=false; running=true;
-      primaryBtn.textContent='Stop';
-      rafId=requestAnimationFrame(loop);
-    }
-  }
-
-  function resetCountdown(){
-    cancelAnimationFrame(rafId); running=false; paused=false;
-    if (preRAF){ cancelAnimationFrame(preRAF); preRAF=null; $('#preOverlay').hidden=true; document.body.classList.remove('pre-on'); }
-    primaryBtn.textContent='Start';
-    // rebuild display per current toggles
-    showH = $('#showHours').checked; showS = $('#showSeconds').checked;
-    if (useFlip){
-      flipDigits = buildFlip(timerFlip, showH, showS);
-      tickFlip(flipDigits, 0, showH, showS);
-    }else{
-      renderSimple(0);
-    }
-    // Fully restore candle (fix for restart)
-    candleWrap.classList.remove('vanish');
-    candleWrap.style.opacity = '';
-    candleWrap.style.transform = '';
-    stubEl.style.display = 'none';
-    flameEl.classList.remove('off');
-    setWaxHeightByProgress(1);
-    positionFlame();
-    hideCongrats();
-  }
-
-  /* Finish behavior */
-  function finishNow(){
-    cancelAnimationFrame(rafId); running=false; paused=false;
-    extinguish();
-    candleWrap.classList.add('vanish');
-    showCongrats();
-    primaryBtn.textContent='Start';
-  }
-
-  /* Candle coupling */
-  const area = $('#candle-area'), waxEl=$('#wax'), wickEl=$('#wick'), flameEl=$('#flame'), stubEl=$('#stub'), smokeEl=$('#smoke'), candleWrap=$('#candleWrap']);
-  const baseWaxHeight=380, minStub=58;
-
-  function positionFlame(){
-    const w=wickEl.getBoundingClientRect(), a=area.getBoundingClientRect();
-    const x=w.left+w.width/2-a.left-flameEl.offsetWidth/2, y=w.top-a.top-flameEl.offsetHeight+20;
-    flameEl.style.left=`${x}px`; flameEl.style.top=`${y}px`;
-    smokeEl.style.left=`${x + flameEl.offsetWidth/2 - 5}px`; smokeEl.style.top=`${y - 2}px`;
-  }
-  function setWaxHeightByProgress(progress){
-    const usable=baseWaxHeight-minStub, h=minStub+Math.max(0, usable*progress);
-    waxEl.style.height=`${h}px`;
-  }
-  function extinguish(){
-    flameEl.classList.add('off');
-    smokeEl.classList.remove('show'); void smokeEl.offsetWidth; smokeEl.classList.add('show');
-    stubEl.style.display='block';
-  }
-  function relight(){
-    stubEl.style.display='none';
-    flameEl.classList.remove('off');
-  }
-
-  /* Congrats */
-  const congrats = $('#congrats');
-  $('#cgClose').addEventListener('click', hideCongrats);
-  function showCongrats(){
-    congrats.classList.add('show');
-    launchBalloons(16);
-  }
-  function hideCongrats(){ congrats.classList.remove('show'); }
-  function launchBalloons(count=16){
-    const colors = ['#f87171','#60a5fa','#34d399','#fbbf24','#a78bfa','#fb7185','#22d3ee'];
-    for (let i=0;i<count;i++){
-      const b=document.createElement('div'); b.className='balloon';
-      b.style.left=`calc(${Math.random()*100}vw)`;
-      b.style.setProperty('--bcol', colors[Math.floor(Math.random()*colors.length)]);
-      b.style.setProperty('--dur', (5 + Math.random()*4).toFixed(2) + 's');
-      b.style.setProperty('--drift', ((Math.random()*120 - 60)|0) + 'px');
-      document.body.appendChild(b);
-      b.addEventListener('animationend', ()=> b.remove());
-    }
-  }
-
-  /* Fullscreen */
-  async function goFullscreen(){
-    try{
-      if (!document.fullscreenElement){ await document.documentElement.requestFullscreen(); }
-      document.body.classList.add('fullscreen-on'); // hide everything except timer + candle
-    }catch(e){}
-  }
-  function exitFullscreen(){
-    document.exitFullscreen?.();
-    document.body.classList.remove('fullscreen-on');
-  }
-  $('#fsBtn').addEventListener('click', goFullscreen);
-  $('#exitFs').addEventListener('click', exitFullscreen);
-  document.addEventListener('fullscreenchange', ()=>{
-    if (!document.fullscreenElement){ document.body.classList.remove('fullscreen-on'); }
-  });
-
-  /* Real-time overlay (uses current flip/simple setting) */
-  const rtcOverlay=$('#rtcOverlay'), rtcFlipContainer=$('#rtcTimer'), rtcSimple=$('#simpleRTC'), rtcBack=$('#rtcBack');
-  let rtcDigits=[], rtcOn=false, rtcId=null, rtcLastSec=-1;
-
-  function refreshRTCMode(){
-    const useFlip=$('#useFlip').checked;
-    rtcFlipContainer.style.display = useFlip ? 'flex' : 'none';
-    rtcSimple.style.display = useFlip ? 'none' : 'block';
-  }
-  function openRTC(){
-    document.body.classList.add('rtc-only'); rtcOverlay.classList.add('show');
-    cancelAnimationFrame(rafId); running=false; paused=false; primaryBtn.textContent='Start';
-    rtcOn=true; rtcLastSec=-1;
-    if ($('#useFlip').checked){ rtcDigits = buildFlip(rtcFlipContainer, true, true); }
-    drawRTC();
-  }
-  function closeRTC(){
-    document.body.classList.remove('rtc-only'); rtcOverlay.classList.remove('show');
-    rtcOn=false; cancelAnimationFrame(rtcId);
-    $('#rtcMode').checked = false; // untick when coming back
-  }
-  function drawRTC(){
-    if (!rtcOn) return;
-    const secOfDay = Math.floor(Date.now()/1000)%86400; // 1Hz updates
-    if (secOfDay !== rtcLastSec){
-      if ($('#useFlip').checked){ tickFlip(rtcDigits, secOfDay, true, true); }
-      else{ rtcSimple.textContent = new Date().toLocaleTimeString(); }
-      rtcLastSec = secOfDay;
-    }
-    rtcId = requestAnimationFrame(drawRTC);
-  }
-  rtcBack.addEventListener('click', closeRTC);
-
-  /* Colors & bindings */
-  function restyleClockPanels(){
-    document.documentElement.style.setProperty('--clock-c1',$('#clockC1').value);
-    document.documentElement.style.setProperty('--clock-c2',$('#clockC2').value);
-    document.documentElement.style.setProperty('--clock-c3',$('#clockC3').value);
-    document.documentElement.style.setProperty('--clock-text',$('#textColor').value);
-    document.documentElement.style.setProperty('--colon-color',$('#colonColor').value);
-  }
-  function applyWax(){ document.documentElement.style.setProperty('--wax',$('#waxColor').value); }
-
-  /* Preview when toggling hours/seconds so Show hours works immediately */
-  function previewLayout(){
-    showH = $('#showHours').checked; showS = $('#showSeconds').checked;
-    useFlip = $('#useFlip').checked;
-    if (useFlip){
-      flipDigits = buildFlip(timerFlip, showH, showS);
-      tickFlip(flipDigits, 0, showH, showS);
-    }else{
-      renderSimple(0);
-    }
-  }
-
-  // UI events
-  $('#primaryBtn').addEventListener('click', togglePrimary);
-  $('#resetBtn').addEventListener('click', resetCountdown);
-  $('#useFlip').addEventListener('change', ()=>{ refreshMode(); refreshRTCMode(); previewLayout(); });
-  $('#rtcMode').addEventListener('change', e=> e.target.checked ? openRTC() : closeRTC());
-  $('#showHours').addEventListener('change', previewLayout);
-  $('#showSeconds').addEventListener('change', previewLayout);
-
-  ['bgAngle','bgC1','bgC2','bgC3'].forEach(id=> document.getElementById(id).addEventListener('input', applyGradient));
-  ['clockC1','clockC2','clockC3','textColor','colonColor'].forEach(id=> document.getElementById(id).addEventListener('input', restyleClockPanels));
-  $('#waxColor').addEventListener('input', applyWax);
-  window.addEventListener('resize', positionFlame);
-
-  // Init defaults
-  applyGradient(); restyleClockPanels(); applyWax();
-  refreshMode(); refreshRTCMode(); previewLayout();
-  setWaxHeightByProgress(1); relight(); positionFlame();
-</script>
-</body>
-</html>
+      primaryBtn.textContent='Resume
