@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>Candle Timer — V8</title>
+<title>Candle Timer — V9</title>
 <style>
   :root{
     --digit-w: 120px;
@@ -66,7 +66,7 @@
   #todo-panel     { grid-column:2; justify-self:center; align-self:center; }
   #candle-area    { grid-column:3; }
 
-  /* Center Clock: timer centered; To‑do stays LEFT (grid, not absolute) */
+  /* Center Clock: timer centered; To‑do stays LEFT (grid) */
   .center-clock .main{ grid-template-columns: max-content 1fr max-content; }
   .center-clock #timer-container{
     position:absolute; left:50%; top:50%;
@@ -159,6 +159,17 @@
   @keyframes bottomFlip{ 0%{transform:rotateX(90deg)} 100%{transform:rotateX(0)} }
   .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.3); flex:0 0 auto; }
 
+  /* Transparent mode for flip cards */
+  .clock-transparent .digit{
+    background: transparent !important;
+    border-color: rgba(255,255,255,.28) !important;
+    box-shadow: 0 10px 28px rgba(0,0,0,.22) !important;
+    backdrop-filter: none !important;
+  }
+  .clock-transparent .digit:before{ background: transparent !important; }
+  .clock-transparent .digit .top{ border-bottom:1px solid rgba(255,255,255,.25); }
+  .clock-transparent .digit .bottom{ border-top:1px solid rgba(255,255,255,.25); }
+
   /* ===== Simple clock ===== */
   #simpleTimer{ display:none; font-weight:900; letter-spacing:.04em; font-size:min(12vw,160px); color:var(--simple-color); text-shadow:0 0 10px rgba(0,0,0,.25), 0 12px 32px rgba(0,0,0,.25); }
 
@@ -168,11 +179,11 @@
   .candle-wrap{ position:absolute; inset:auto 0 0 0; margin:auto; width:180px; height:380px; display:flex; align-items:flex-end; justify-content:center; transition: transform .5s ease, opacity .5s ease; }
   .candle-wrap.vanish{ transform: scale(.85) translateY(12px); opacity: 0; pointer-events:none; }
   .wax{ position:absolute; bottom:0; width:150px; height:100%; z-index:1; border-radius:22px; background: radial-gradient(120px 26px at 75px 6px, rgba(255,255,255,.70), transparent 62%), linear-gradient(180deg, rgba(255,255,255,.18), rgba(0,0,0,0) 24%), linear-gradient(180deg,#ffffff33,#00000022 40%,#00000028 100%), linear-gradient(180deg,var(--wax), #e6d9bb); transition: height .22s linear; }
-  .waxTop{ position:absolute; top:-22px; left:50%; transform:translateX(-50%); width:150px; height:44px; pointer-events:none; z-index:3; background: conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,.33) 0deg, rgba(255,255,255,.10) 70deg, rgba(0,0,0,.08) 180deg, rgba(255,255,255,.20) 300deg, rgba(255,255,255,.33) 360deg), radial-gradient(65% 55% at 50% 62%, rgba(255,255,255,.52), rgba(255,255,255,.12) 60%, rgba(0,0,0,.10) 100%); border-radius:50%/62% 62% 38% 38%; }
+  .waxTop{ position:absolute; top:-22px; left:50%; transform:translateX(-50%); width:150px; height:44px; pointer-events:none; z-index:3; background: conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,.33) 0deg, rgba(255,255,255,.10) 70deg, rgba(0,0,0,.08) 180deg, rgba(255,255,255,.20) 300deg, rgba(255,255,255,.33) 360deg), radial-gradient(65% 55% at 50% 62%, rgba(255,255,255,.52), rgba(255,255,255,.12) 60%, rgba(0,0,0,.10) 100%); }
   .wax:after{ content:""; position:absolute; top:30px; left:24px; width:12px; height:64px; border-radius:10px; background: linear-gradient(180deg,#fff6,#0000 60%), var(--wax); box-shadow: 44px 8px 0 -3px var(--wax), 44px 8px 0 -3px #fff6, 92px 12px 0 -6px var(--wax), 92px 12px 0 -6px #fff6; opacity:.85; }
   .wick{ position:absolute; width:6px; height:30px; background:linear-gradient(180deg,#444,var(--wick)); border-radius:4px; top:-12px; left:50%; transform:translateX(-50%); z-index:4; }
 
-  /* Flame container is anchored to wick center (uses translate) */
+  /* Flame anchored to wick center */
   .flame{
     position:absolute; width:52px; height:110px; z-index:6; pointer-events:none;
     left:0; top:0; transform: translate(-50%,-100%) translateY(10px);
@@ -284,7 +295,7 @@
 </style>
 </head>
 <body>
-  <div class="brand">MADE BY ANABRATA — V8</div>
+  <div class="brand">MADE BY ANABRATA — V9</div>
 
   <div class="main" id="main">
     <!-- Timer -->
@@ -310,7 +321,6 @@
           <div class="stub" id="stub"></div>
         </div>
       </div>
-      <!-- Flame container with animated core -->
       <div class="flame" id="flame"><div class="flame-core"></div></div>
     </section>
   </div>
@@ -360,6 +370,25 @@
     </div>
 
     <div class="card">
+      <label class="small">Media & background</label>
+      <div class="row" style="gap:8px; align-items:center">
+        <button id="addMusicBtn" class="btn alt small">Add music</button>
+        <input id="musicFiles" type="file" accept="audio/*" multiple style="display:none" />
+        <button id="musicPrev" class="btn small" title="Previous">⏮</button>
+        <button id="musicPlay" class="btn small" title="Play/Pause">▶</button>
+        <button id="musicNext" class="btn small" title="Next">⏭</button>
+        <label style="margin-left:4px"><input type="checkbox" id="musicLoop" checked> Loop</label>
+        <span id="musicNow" style="color:#fff; font-size:12px; opacity:.95; max-width:220px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis"></span>
+      </div>
+      <div class="row" style="gap:8px; align-items:center; margin-top:6px">
+        <button id="bgImageBtn" class="btn small">Custom image</button>
+        <input id="bgImageFile" type="file" accept="image/*" style="display:none" />
+        <button id="bgImageClear" class="btn small">Clear image</button>
+        <span id="bgImageName" style="color:#fff; font-size:12px; opacity:.95; max-width:240px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis"></span>
+      </div>
+    </div>
+
+    <div class="card">
       <label class="small">Flip clock colors</label>
       <div class="row">
         <div style="flex:1"><label for="clockC1">Panel 1</label><input id="clockC1" type="color" value="#ffffff"></div>
@@ -369,6 +398,9 @@
       <div class="row">
         <div style="flex:1"><label for="textColor">Digit color</label><input id="textColor" type="color" value="#000000"></div>
         <div style="flex:1"><label for="colonColor">Colon color</label><input id="colonColor" type="color" value="#ffffff"></div>
+      </div>
+      <div class="row">
+        <label><input type="checkbox" id="clockTransparent"> Transparent flip cards</label>
       </div>
     </div>
 
@@ -395,6 +427,7 @@
       <p id="cgMsg">Timer complete — great focus! 🎉</p>
       <button id="cgClose">Close</button>
     </div>
+    <!-- Balloons -->
     <div class="balloon" style="left:6%;  --bcol:#ff6b6b; --dur:9s;  --drift:12px"></div>
     <div class="balloon" style="left:14%; --bcol:#ffd166; --dur:8.5s;--drift:-10px"></div>
     <div class="balloon" style="left:22%; --bcol:#06d6a0; --dur:10s; --drift:8px"></div>
@@ -721,7 +754,7 @@
     const cx = w.left + w.width / 2 - a.left;
     const topAnchor = w.top - a.top;
     flameEl.style.left = `${cx}px`;
-    flameEl.style.top = `${topAnchor + 6}px`; /* tiny offset so flame base meets wick */
+    flameEl.style.top = `${topAnchor + 6}px`;
   }
 
   function setWaxHeightByProgress(progress){
@@ -748,7 +781,7 @@
   function showCongrats(){ if (congrats) congrats.style.display = "flex"; }
   function hideCongrats(){ if (congrats) congrats.style.display = "none"; }
 
-  /* ---------- Fullscreen: whole page; hide brand & menu only ---------- */
+  /* ---------- Fullscreen ---------- */
   async function enterFullscreen(){
     try{
       if (!document.fullscreenElement){ await document.documentElement.requestFullscreen?.(); }
@@ -777,7 +810,7 @@
   });
   todoList.addEventListener("change",(e)=>{ if(!e.target.classList?.contains("todoChk")) return; const li=e.target.closest("li"); li.classList.add("vanish"); setTimeout(()=>{ li.remove(); addEmptyIfNeeded(); },160); });
 
-  /* ---------- Music (optional) ---------- */
+  /* ---------- Music ---------- */
   const musicFiles = $("#musicFiles");
   const musicNow = $("#musicNow");
   const musicPlayBtn = $("#musicPlay");
@@ -799,6 +832,7 @@
   $("#musicPlay")?.addEventListener("click", ()=> audio.paused ? startPlaylist() : pausePlaylist());
   $("#musicNext")?.addEventListener("click", nextTrack);
   $("#musicPrev")?.addEventListener("click", prevTrack);
+  $("#musicLoop")?.addEventListener("change", (e)=> audio.loop = !!e.target.checked);
   window.addEventListener("unload", ()=> objectUrls.forEach(u=>URL.revokeObjectURL(u)));
 
   /* ---------- Custom background image ---------- */
@@ -853,33 +887,7 @@
   $("#centerClock").addEventListener("change", ()=> applyLayoutFlags());
   $("#onlyCandle").addEventListener("change", e=>{ ensureCandleVisibleWhenOnlyCandle(e.target.checked); applyLayoutFlags(); });
   $("#showTodo").addEventListener("change", ()=> applyLayoutFlags());
+  $("#clockTransparent").addEventListener("change", (e)=> document.body.classList.toggle("clock-transparent", e.target.checked));
 
   ["bgAngle","bgC1","bgC2","bgC3"].forEach(id=> document.getElementById(id)?.addEventListener("input", applyGradient));
-  ["clockC1","clockC2","clockC3","textColor","colonColor"].forEach(id=> document.getElementById(id)?.addEventListener("input", restyleClockPanels));
-
-  $("#todoApply").addEventListener("click", ()=>{ setTodoBg($("#todoColor").value); $("#todo-panel").classList.remove("todo-clear"); });
-  $("#todoClear").addEventListener("click", ()=>{ setTodoBg("transparent"); $("#todo-panel").classList.add("todo-clear"); });
-  $("#todoGlass").addEventListener("change", (e)=> $("#todo-panel").classList.toggle("todo-glass", e.target.checked));
-
-  /* ---------- Init ---------- */
-  (function boot(){
-    applyGradient(); restyleClockPanels(); applyWax();
-
-    // Ensure initial layout matches toggles and content is visible
-    document.body.classList.add("todo-on"); // default show
-    applyLayoutFlags();
-    safeBuildClock();
-    previewLayout();
-
-    // Position flame after first paints
-    afterNextPaint(positionFlame);
-    setTimeout(positionFlame, 150);
-
-    setWaxHeightByProgress(1);
-
-    // Seed one empty to‑do
-    const li=makeTodoItem(""); $("#todoList").appendChild(li);
-  })();
-</script>
-</body>
-</html>
+  ["clockC1","clockC2","clockC3","textColor
