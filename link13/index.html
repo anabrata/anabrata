@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Candle Timer — v2.2</title>
+<title>Candle Timer — v2.3</title>
 <style>
   :root{
     --digit-w: 120px;
@@ -20,13 +20,13 @@
     --clock-c2: #242631;
     --clock-c3: #3b3e4b;
     --clock-text: #ffffff;
-    --colon-color: #ffffff;
+    --colon-color: #ffd166;
 
     --btn-font: "Comic Sans MS", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
     --btn-grad: linear-gradient(135deg,#ffd166,#ff9a00);
     --btn-grad-hover: linear-gradient(135deg,#ffe08a,#ffb347);
 
-    --wax: #efe0c2;
+    --wax: #f2e4c7;
     --wick: #1b1b1b;
 
     --candle-offset: 18px;
@@ -38,16 +38,9 @@
     margin:0; display:flex; flex-direction:column; color:#f5f5f5;
     font-family:"Comic Sans MS", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
     overflow-x:hidden;
-  }
-
-  /* Dedicated background layer (gradient or image) */
-  #bgLayer{
-    position:fixed; inset:0; z-index:-1;
     background-image: linear-gradient(var(--bg-angle), var(--bg-c1), var(--bg-c2), var(--bg-c3));
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
     background-attachment: fixed;
+    background-size: cover;
   }
 
   .brand{ position:fixed; left:12px; top:10px; z-index:40; font-weight:700; font-size:13px; opacity:.9; text-shadow:0 1px 2px rgba(0,0,0,.35); user-select:none; }
@@ -58,7 +51,7 @@
   .main{ flex:1; display:flex; align-items:center; justify-content:space-between; gap:min(6vw,56px); padding:22px min(5vw,48px); }
 
   /* Flip clock */
-  #timer-container{ flex:1; display:flex; align-items:center; justify-content:flex-start; min-width:340px; }
+  #timer-container{ flex:1; display:flex; align-items:center; justify-content:flex-start; min-width:340px; gap:12px; }
   #timer{ display:flex; align-items:center; gap:12px; user-select:none; }
   #simpleTimer{ display:none; font-weight:900; letter-spacing:.5px; color:var(--clock-text); text-shadow:0 6px 24px rgba(0,0,0,.45); font-size:min(12vw, 120px); }
 
@@ -89,7 +82,7 @@
 
   .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.6); }
 
-  /* Candle — lowered, refined top, no outer shadow */
+  /* Candle — lowered, refined top, no exterior shadow */
   #candle-area{ flex:1; display:flex; align-items:flex-end; justify-content:flex-end; min-width:340px; height:max(380px,42vh); position:relative; transform: translateY(var(--candle-offset)); }
   .candle-clip{ position:relative; width:180px; height:380px; overflow:hidden; display:flex; align-items:flex-end; justify-content:center; }
   .candle-wrap{ position:absolute; inset:auto 0 0 0; margin:auto; width:180px; height:380px; display:flex; align-items:flex-end; justify-content:center; }
@@ -98,53 +91,56 @@
     position:absolute; bottom:0; width:150px; height:100%; z-index:1;
     border-radius:22px;
     background:
-      radial-gradient(120px 26px at 75px 6px, rgba(255,255,255,.75), transparent 60%),
+      radial-gradient(120px 26px at 75px 6px, rgba(255,255,255,.70), transparent 62%),
       linear-gradient(180deg, rgba(255,255,255,.18), rgba(0,0,0,0) 24%),
-      linear-gradient(180deg,#ffffff40,#00000022 40%,#00000030 100%),
+      linear-gradient(180deg,#ffffff33,#00000022 40%,#00000028 100%),
       linear-gradient(180deg,var(--wax), #e6d9bb);
-    box-shadow: inset 0 6px 18px rgba(0,0,0,.18), inset 0 -10px 18px rgba(0,0,0,.22);
     transition: height .22s linear;
   }
   .waxTop{
     position:absolute; top:-22px; left:50%; transform:translateX(-50%); width:150px; height:44px; pointer-events:none; z-index:3;
     background:
-      conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,.35) 0deg, rgba(255,255,255,.08) 60deg, rgba(0,0,0,.10) 180deg, rgba(255,255,255,.22) 300deg, rgba(255,255,255,.35) 360deg),
-      radial-gradient(65% 55% at 50% 62%, rgba(255,255,255,.55), rgba(255,255,255,.10) 60%, rgba(0,0,0,.12) 100%);
+      conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,.33) 0deg, rgba(255,255,255,.10) 70deg, rgba(0,0,0,.08) 180deg, rgba(255,255,255,.20) 300deg, rgba(255,255,255,.33) 360deg),
+      radial-gradient(65% 55% at 50% 62%, rgba(255,255,255,.52), rgba(255,255,255,.12) 60%, rgba(0,0,0,.10) 100%);
     border-radius:50%/62% 62% 38% 38%;
-    mix-blend-mode: screen;
   }
   .wax:after{
     content:""; position:absolute; top:30px; left:24px; width:12px; height:64px; border-radius:10px;
     background: linear-gradient(180deg,#fff6,#0000 60%), var(--wax);
-    box-shadow: 44px 8px 0 -3px var(--wax), 44px 8px 0 -3px #fff6, 92px 12px 0 -6px var(--wax), 92px 12px 0 -6px #fff6; opacity:.8;
+    box-shadow: 44px 8px 0 -3px var(--wax), 44px 8px 0 -3px #fff6, 92px 12px 0 -6px var(--wax), 92px 12px 0 -6px #fff6; opacity:.85;
   }
-  .wick{ position:absolute; width:6px; height:30px; background:linear-gradient(180deg,#444,var(--wick)); border-radius:4px; top:-12px; left:50%; transform:translateX(-50%); z-index:4; box-shadow:0 -1px 2px #fff8; }
+  .wick{ position:absolute; width:6px; height:30px; background:linear-gradient(180deg,#444,var(--wick)); border-radius:4px; top:-12px; left:50%; transform:translateX(-50%); z-index:4; }
 
   .flame{
     position:absolute; width:52px; height:110px; z-index:6;
     background:
-      radial-gradient(ellipse at 50% 20%, #fff9cc 0%, #ffe08a 35%, #ffac30 55%, #ff7a00 75%, transparent 76%),
-      radial-gradient(ellipse at 50% 40%, #ffffff 0%, transparent 60%);
-    border-radius:50% 50% 38% 38%; filter: blur(.6px);
-    box-shadow:0 0 22px 8px rgba(255,170,40,.6), 0 0 44px 16px rgba(255,140,0,.45), 0 -22px 30px rgba(255,220,170,.42);
-    animation:flicker .12s infinite;
-    transition:opacity .35s ease;
+      radial-gradient(ellipse at 50% 22%, #fff7c0 0%, #ffe08a 38%, #ffb347 58%, #ff7a00 78%, transparent 80%),
+      radial-gradient(ellipse at 50% 45%, #ffffff 0%, transparent 65%);
+    border-radius:50% 50% 38% 38%;
+    box-shadow:0 0 18px 6px rgba(255,170,40,.55), 0 0 36px 14px rgba(255,140,0,.40), 0 -20px 28px rgba(255,220,170,.40);
+    animation: flickerSoft .6s ease-in-out infinite;
+    transition: opacity .35s ease;
     pointer-events:none;
   }
+  /* Softer, fade-like flicker */
+  @keyframes flickerSoft{
+    0%{ transform:scale(1) rotate(-0.8deg); opacity:.95 }
+    50%{ transform:scale(1.06) rotate(0.6deg); opacity:.82 }
+    100%{ transform:scale(1) rotate(-0.8deg); opacity:.95 }
+  }
   .flame.off{ opacity:0 !important; animation-play-state: paused !important; }
-  @keyframes flicker{ 0%{ transform:scale(1) rotate(-1.4deg); opacity:1 } 50%{ transform:scale(1.12) rotate(1.1deg); opacity:.82 } 100%{ transform:scale(1) rotate(-1.2deg); opacity:1 } }
 
-  .stub{ display:none; position:absolute; bottom:0; width:150px; height:58px; background:linear-gradient(180deg,#8a8a8a,#6b6b6b); border-radius:0 0 22px 22px; box-shadow: inset 0 3px 8px rgba(0,0,0,.25); z-index:1; }
+  .stub{ display:none; position:absolute; bottom:0; width:150px; height:58px; background:linear-gradient(180deg,#9a9a9a,#6f6f6f); border-radius:0 0 22px 22px; z-index:1; }
   .smoke{ position:absolute; width:10px; height:10px; left:0; top:0; border-radius:50%; background:radial-gradient(#bbb, transparent 64%); opacity:0; pointer-events:none; z-index:7; }
-  .smoke.show{ animation:puff 1.6s ease-out forwards; }
-  @keyframes puff{ 0%{ transform:translate(0,0) scale(1); opacity:.8; filter:blur(.5px) } 100%{ transform:translate(0,-130px) scale(2.2); opacity:0; filter:blur(3px) } }
+  .smoke.show{ animation:puff 1.4s ease-out forwards; }
+  @keyframes puff{ 0%{ transform:translate(0,0) scale(1); opacity:.8; filter:blur(.4px) } 100%{ transform:translate(0,-120px) scale(2.1); opacity:0; filter:blur(3px) } }
 
   /* Controls */
   #controls{ position:relative; display:grid; grid-auto-flow:column; grid-auto-columns:minmax(240px,1fr); gap:14px; padding:16px; background:rgba(0,0,0,.22); backdrop-filter:blur(8px); scroll-snap-type:x mandatory; overflow-x:auto; border-top-left-radius:16px; border-top-right-radius:16px; z-index:10; }
   .card{ position:relative; scroll-snap-align:start; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:12px; min-height:84px; display:flex; flex-direction:column; gap:8px; }
   .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
   label{ font-size:12px; opacity:.95 }
-  input[type="number"],input[type="color"],input[type="file"],select{ width:100%; padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.35); color:#fff; outline:none; }
+  input[type="number"],input[type="color"],select{ width:100%; padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.35); color:#fff; outline:none; }
   input[type="checkbox"]{ transform:scale(1.2) }
 
   .btn{ position:relative; padding:12px 18px; border-radius:12px; border:none; font-weight:800; cursor:pointer; font-family: var(--btn-font); background:var(--btn-grad); color:#1b1b1b; box-shadow:0 6px 16px rgba(0,0,0,.18); transition:transform .12s, box-shadow .2s, background .2s; }
@@ -153,11 +149,16 @@
   .btn.alt{ background:linear-gradient(135deg,#a5b4fc,#6366f1); color:#0d0d15; }
   .btn.warn{ background:linear-gradient(135deg,#fca5a5,#ef4444); color:#0d0d15; }
 
-  /* Real-time overlay (flip or simple) and only-clock mode */
+  /* Real-time overlay */
   #rtcOverlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:90; }
   #rtcOverlay.show{ display:flex; }
   #rtcTimer{ display:flex; align-items:center; gap:12px; }
   #simpleRTC{ display:none; font-weight:900; letter-spacing:.5px; color:var(--clock-text); text-shadow:0 6px 24px rgba(0,0,0,.45); font-size:min(12vw, 120px); }
+
+  /* Back button always visible in RTC */
+  #rtcBack{ position:fixed; top:8px; left:10px; opacity:.45; background:rgba(0,0,0,.25); color:#fff; border-radius:10px; padding:6px 10px; font-weight:800; border:none; cursor:pointer; z-index:95; }
+  #rtcBack:hover{ opacity:.75 }
+
   .rtc-only .brand, .rtc-only #controls, .rtc-only #main, .rtc-only #exitFs { display:none !important; }
 
   @media (max-width:980px){ :root{ --digit-w:100px; --digit-h:140px; } }
@@ -165,8 +166,6 @@
 </style>
 </head>
 <body>
-  <div id="bgLayer" aria-hidden="true"></div>
-
   <div class="brand">MADE BY ANABRATA</div>
   <div id="exitFs" title="Exit fullscreen">×</div>
 
@@ -192,6 +191,7 @@
   </div>
 
   <div id="rtcOverlay">
+    <button id="rtcBack" title="Back">Back</button>
     <div id="rtcTimer"></div>
     <div id="simpleRTC">00:00:00</div>
   </div>
@@ -211,26 +211,20 @@
         <label><input type="checkbox" id="rtcMode"> Real‑time only clock</label>
       </div>
       <div class="row">
-        <button id="startBtn" class="btn">Start</button>
-        <button id="toggleBtn" class="btn alt" title="Stop/Resume">Stop</button>
+        <button id="primaryBtn" class="btn">Start</button>
         <button id="resetBtn" class="btn alt">Reset</button>
         <button id="fsBtn" class="btn warn">Fullscreen</button>
       </div>
     </div>
 
     <div class="card">
-      <label class="small">Background</label>
+      <label class="small">Background gradient</label>
       <div class="row">
         <div style="flex:1"><label for="bgAngle">Angle</label><input id="bgAngle" type="number" min="0" max="360" value="135"></div>
         <div style="flex:1"><label for="bgC1">Color 1</label><input id="bgC1" type="color" value="#3a1c71"></div>
         <div style="flex:1"><label for="bgC2">Color 2</label><input id="bgC2" type="color" value="#d76d77"></div>
         <div style="flex:1"><label for="bgC3">Color 3</label><input id="bgC3" type="color" value="#ffaf7b"></div>
       </div>
-      <div class="row">
-        <div style="flex:2"><label for="bgImageInput">Personal image</label><input id="bgImageInput" type="file" accept="image/*"></div>
-        <div style="flex:1"><button id="clearBgBtn" class="btn alt" type="button">Clear image</button></div>
-      </div>
-      <span class="small">Upload a photo or use the gradient above.</span>
     </div>
 
     <div class="card">
@@ -242,14 +236,14 @@
       </div>
       <div class="row">
         <div style="flex:1"><label for="textColor">Digit color</label><input id="textColor" type="color" value="#ffffff"></div>
-        <div style="flex:1"><label for="colonColor">Colon color</label><input id="colonColor" type="color" value="#ffffff"></div>
+        <div style="flex:1"><label for="colonColor">Colon color</label><input id="colonColor" type="color" value="#ffd166"></div>
       </div>
     </div>
 
     <div class="card">
       <label class="small">Candle</label>
       <div class="row">
-        <div style="flex:1"><label for="waxColor">Wax color</label><input id="waxColor" type="color" value="#efe0c2"></div>
+        <div style="flex:1"><label for="waxColor">Wax color</label><input id="waxColor" type="color" value="#f2e4c7"></div>
       </div>
       <span class="small">Flame burns during countdown and fully turns off at 0.</span>
     </div>
@@ -258,31 +252,14 @@
 <script>
   const $ = s => document.querySelector(s);
 
-  /* Background handling */
-  const bgLayer = $('#bgLayer');
-  const gradientStr = (a,c1,c2,c3)=>`linear-gradient(${a}deg, ${c1}, ${c2}${c3 ? ', '+c3 : ''})`;
+  /* Gradient */
+  const gradientStr = (a,c1,c2,c3)=>`linear-gradient(${a}deg, ${c1}, ${c2}, ${c3})`;
   function applyGradient(){
     const ang = parseInt($('#bgAngle').value||'135',10);
-    bgLayer.style.backgroundImage = gradientStr(ang,$('#bgC1').value,$('#bgC2').value,$('#bgC3').value);
-    bgLayer.dataset.img='';
+    document.body.style.backgroundImage = gradientStr(ang,$('#bgC1').value,$('#bgC2').value,$('#bgC3').value);
   }
-  $('#bgImageInput').addEventListener('change', e=>{
-    const f = e.target.files && e.target.files; if (!f) return;
-    const r = new FileReader();
-    r.onload = ()=>{
-      // Replace gradient entirely with the image (auto-fit cover/center)
-      bgLayer.style.backgroundImage = `url('${r.result}')`;
-      bgLayer.style.backgroundSize = 'cover';
-      bgLayer.style.backgroundPosition = 'center';
-      bgLayer.style.backgroundRepeat = 'no-repeat';
-      bgLayer.style.backgroundAttachment = 'fixed';
-      bgLayer.dataset.img='1';
-    };
-    r.readAsDataURL(f);
-  });
-  $('#clearBgBtn').addEventListener('click', ()=>{ bgLayer.dataset.img=''; applyGradient(); });
 
-  /* Flip clock core (reusable) */
+  /* Flip clock core */
   function createDigit(initial="0"){
     const d = document.createElement('div'); d.className='digit'; d.dataset.value=initial;
     const top = document.createElement('div'); top.className='top'; const t=document.createElement('span'); t.className='value'; t.textContent=initial; top.appendChild(t);
@@ -313,13 +290,14 @@
     const arr=timeArray(sec,showH,showS); digits.forEach((d,i)=> flipTo(d, arr[i] || '0'));
   }
 
-  /* Countdown (flip or simple) */
-  const timerFlip = $('#timer'); const timerSimple = $('#simpleTimer');
-  let flipDigits=[], showH=false, showS=true;
+  /* Countdown */
+  const timerFlip = $('#timer'), timerSimple = $('#simpleTimer'), primaryBtn = $('#primaryBtn');
+  let flipDigits=[], showH=false, showS=true, useFlip=true;
+
   let totalSec=0, endAtMs=0, rafId=null, lastWhole=-1, running=false, paused=false, pauseRemainMs=0;
 
   function refreshMode(){
-    const useFlip = $('#useFlip').checked;
+    useFlip = $('#useFlip').checked;
     timerFlip.style.display = useFlip ? 'flex' : 'none';
     timerSimple.style.display = useFlip ? 'none' : 'block';
   }
@@ -329,12 +307,12 @@
     timerSimple.textContent = str;
   }
 
-  function start(){
+  function startCountdown(){
     showH = $('#showHours').checked; showS = $('#showSeconds').checked;
     const h=+$('#hoursInput').value||0, m=+$('#minInput').value||0, s=Math.max(0,Math.min(59,+$('#secInput').value||0));
     totalSec=h*3600+m*60+s;
 
-    if ($('#useFlip').checked){
+    if (useFlip){
       flipDigits = buildFlip(timerFlip, showH, showS);
       tickFlip(flipDigits,totalSec,showH,showS);
     }else{
@@ -343,9 +321,10 @@
 
     relight(); setWaxHeightByProgress(1); positionFlame();
 
-    cancelAnimationFrame(rafId); paused=false; $('#toggleBtn').textContent='Stop';
-    if (totalSec<=0){ setWaxHeightByProgress(0); extinguish(); running=false; return; }
+    cancelAnimationFrame(rafId); paused=false; running=false;
+    if (totalSec<=0){ setWaxHeightByProgress(0); extinguish(); primaryBtn.textContent='Start'; return; }
     endAtMs = performance.now()+totalSec*1000; lastWhole=Math.ceil(totalSec); running=true;
+    primaryBtn.textContent='Stop';
     rafId = requestAnimationFrame(loop);
   }
 
@@ -353,38 +332,54 @@
     if (!running) return;
     const remainMs=Math.max(0,endAtMs-now), secWhole=Math.floor(remainMs/1000);
     if (secWhole!==lastWhole){
-      if ($('#useFlip').checked) tickFlip(flipDigits,secWhole,showH,showS); else renderSimple(secWhole);
+      if (useFlip) tickFlip(flipDigits,secWhole,showH,showS); else renderSimple(secWhole);
       lastWhole=secWhole;
     }
     const p = totalSec>0 ? remainMs/(totalSec*1000) : 0;
     setWaxHeightByProgress(p); positionFlame();
 
     if (remainMs<=0){
-      // Ensure flame fully off (pause animation + hide)
       extinguish();
       running=false;
+      primaryBtn.textContent='Start';
       return;
     }
     rafId=requestAnimationFrame(loop);
   }
 
-  function toggleStop(){
-    if (!running && !paused) return;
-    if (!paused){
+  function togglePrimary(){
+    if (!running && !paused){
+      startCountdown();
+      return;
+    }
+    if (running){
       cancelAnimationFrame(rafId);
       pauseRemainMs = Math.max(0, endAtMs - performance.now());
-      paused=true; running=false; $('#toggleBtn').textContent='Resume';
-    }else{
+      paused=true; running=false;
+      primaryBtn.textContent='Resume';
+      return;
+    }
+    if (paused){
       endAtMs = performance.now()+pauseRemainMs;
       lastWhole = Math.floor(pauseRemainMs/1000);
-      paused=false; running=true; $('#toggleBtn').textContent='Stop';
+      paused=false; running=true;
+      primaryBtn.textContent='Stop';
       rafId=requestAnimationFrame(loop);
     }
   }
 
-  function reset(){
-    cancelAnimationFrame(rafId); running=false; paused=false; $('#toggleBtn').textContent='Stop';
-    start(); cancelAnimationFrame(rafId); running=false; paused=false;
+  function resetCountdown(){
+    cancelAnimationFrame(rafId); running=false; paused=false;
+    primaryBtn.textContent='Start';
+    // Re-render to current inputs but not running
+    showH = $('#showHours').checked; showS = $('#showSeconds').checked;
+    if (useFlip){
+      flipDigits = buildFlip(timerFlip, showH, showS);
+      tickFlip(flipDigits, 0, showH, showS);
+    }else{
+      renderSimple(0);
+    }
+    setWaxHeightByProgress(1); relight(); positionFlame();
   }
 
   /* Candle coupling */
@@ -418,8 +413,8 @@
   $('#exitFs').addEventListener('click', exitFullscreen);
   document.addEventListener('fullscreenchange', ()=>{ if (!document.fullscreenElement){ $('#exitFs').style.display='none'; } });
 
-  /* Real-time overlay (flip or simple) with throttled updates */
-  const rtcOverlay=$('#rtcOverlay'), rtcFlipContainer=$('#rtcTimer'), rtcSimple=$('#simpleRTC');
+  /* Real-time overlay (flip or simple), with visible Back */
+  const rtcOverlay=$('#rtcOverlay'), rtcFlipContainer=$('#rtcTimer'), rtcSimple=$('#simpleRTC'), rtcBack=$('#rtcBack');
   let rtcDigits=[], rtcShowH=true, rtcShowS=true, rtcOn=false, rtcId=null, rtcLastSec=-1;
 
   function refreshRTCMode(){
@@ -430,7 +425,7 @@
 
   function openRTC(){
     document.body.classList.add('rtc-only'); rtcOverlay.classList.add('show');
-    cancelAnimationFrame(rafId); running=false; paused=false;
+    cancelAnimationFrame(rafId); running=false; paused=false; primaryBtn.textContent='Start';
     rtcOn=true; rtcLastSec=-1;
     rtcShowH=true; rtcShowS=true;
     if ($('#useFlip').checked){
@@ -442,10 +437,9 @@
     document.body.classList.remove('rtc-only'); rtcOverlay.classList.remove('show');
     rtcOn=false; cancelAnimationFrame(rtcId);
   }
-  function drawRTC(nowTs){
+  function drawRTC(){
     if (!rtcOn) return;
-    // Throttle to once per second to avoid over-flipping
-    const secOfDay = Math.floor(Date.now()/1000)%86400;
+    const secOfDay = Math.floor(Date.now()/1000)%86400; // throttle to 1Hz
     if (secOfDay !== rtcLastSec){
       if ($('#useFlip').checked){
         tickFlip(rtcDigits, secOfDay, rtcShowH, rtcShowS);
@@ -456,8 +450,9 @@
     }
     rtcId = requestAnimationFrame(drawRTC);
   }
+  $('#rtcBack').addEventListener('click', closeRTC);
 
-  /* Color bindings + background inputs */
+  /* Colors */
   function restyleClockPanels(){
     document.documentElement.style.setProperty('--clock-c1',$('#clockC1').value);
     document.documentElement.style.setProperty('--clock-c2',$('#clockC2').value);
@@ -467,13 +462,11 @@
   }
   function applyWax(){ document.documentElement.style.setProperty('--wax',$('#waxColor').value); }
 
-  // UI wiring
-  $('#startBtn').addEventListener('click', start);
-  $('#toggleBtn').addEventListener('click', toggleStop);
-  $('#resetBtn').addEventListener('click', reset);
+  // UI events
+  primaryBtn.addEventListener('click', togglePrimary);
+  $('#resetBtn').addEventListener('click', resetCountdown);
   $('#useFlip').addEventListener('change', ()=>{ refreshMode(); refreshRTCMode(); });
   $('#rtcMode').addEventListener('change', e=> e.target.checked ? openRTC() : closeRTC());
-
   ['bgAngle','bgC1','bgC2','bgC3'].forEach(id=> document.getElementById(id).addEventListener('input', applyGradient));
   ['clockC1','clockC2','clockC3','textColor','colonColor'].forEach(id=> document.getElementById(id).addEventListener('input', restyleClockPanels));
   $('#waxColor').addEventListener('input', applyWax);
@@ -482,7 +475,8 @@
   // Init
   applyGradient(); restyleClockPanels(); applyWax();
   refreshMode(); refreshRTCMode();
-  const defaultSec=60; flipDigits = buildFlip($('#timer'),false,true); tickFlip(flipDigits,defaultSec,false,true);
+  flipDigits = buildFlip($('#timer'), false, true); // default MM:SS
+  tickFlip(flipDigits,60,false,true);
   setWaxHeightByProgress(1); relight(); positionFlame();
 </script>
 </body>
