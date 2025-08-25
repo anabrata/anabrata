@@ -40,6 +40,9 @@
 
     /* Layout tweak */
     --candle-offset: 18px;
+
+    /* To‑do list */
+    --todo-bg: transparent;   /* default transparent */
   }
 
   *{box-sizing:border-box}
@@ -59,7 +62,7 @@
   .main{
     flex:1; display:flex; align-items:center; justify-content:space-between;
     gap:min(6vw,56px); padding:22px min(5vw,48px);
-    position:relative; /* overlay centering anchor */
+    position:relative; /* overlay/center anchors */
   }
 
   /* Center only the clock overlay; keep candle at right */
@@ -82,6 +85,73 @@
   .only-candle #timer-container{ display:none !important; }
   .only-candle .main{ justify-content:center; }
   .only-candle #candle-area{ justify-content:center; }
+
+  /* To‑do panel (hidden until enabled) */
+  #todo-panel{ display:none; }
+  .todo-on #todo-panel{ display:block; }
+
+  /* To‑do default position: between clock and candle (center) */
+  #todo-panel{
+    position:absolute; left:50%; top:50%;
+    transform:translate(-50%,-50%);
+    z-index:4;
+    max-width:min(34vw,560px);
+    min-width:260px;
+    max-height:72vh; /* grows but stays on-screen */
+    overflow:auto;
+    padding:12px 14px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.18);
+    background: var(--todo-bg);
+    box-shadow: 0 8px 24px rgba(0,0,0,.18), 0 2px 6px rgba(0,0,0,.12);
+    color:#fff;
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+  }
+
+  /* When clock or candle is centered, move To‑do to viewer's left side */
+  .center-clock #todo-panel,
+  .only-candle  #todo-panel{
+    left: min(48px,5vw);
+    top:50%;
+    transform: translateY(-50%);
+  }
+
+  /* To‑do list styles */
+  #todoTitle{
+    margin:0 0 6px 0; font-size:14px; font-weight:900; letter-spacing:.4px; opacity:.95;
+  }
+  #todoList{
+    margin:0; padding:6px 6px 6px 10px;
+    list-style:none;
+    counter-reset: tdn;             /* CSS counter numbering */
+    font-family:"Comic Sans MS", system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  }
+  #todoList li{
+    counter-increment: tdn;
+    position:relative;
+    padding-left:28px;
+    margin:6px 0;
+    min-height:22px;
+    outline:none;
+  }
+  #todoList li:before{
+    content: counter(tdn) ".";
+    position:absolute; left:0; top:0;
+    width:24px; text-align:right; padding-right:6px;
+    font-weight:900; opacity:.9;
+  }
+  #todoList li:empty:before{
+    /* keep number visible even when empty line just created */
+    content: counter(tdn) ".";
+  }
+  #todoList li:empty{
+    min-height:22px;
+  }
+  #todoList.placeholder:empty:after{
+    content:"Type and press Enter";
+    color:#fff; opacity:.55; font-style:italic;
+  }
 
   /* Flip clock */
   #timer-container{ flex:1; display:flex; align-items:center; justify-content:flex-start; min-width:340px; gap:12px; }
@@ -170,14 +240,14 @@
   .smoke.show{ animation:puff 1.4s ease-out forwards; }
   @keyframes puff{ 0%{ transform:translate(0,0) scale(1); opacity:.8; filter:blur(.4px) } 100%{ transform:translate(0,-120px) scale(2.1); opacity:0; filter:blur(3px) } }
 
-  /* Controls rail (kept) */
+  /* Controls rail (transparent) */
   #controls{
     position:relative; display:grid; grid-auto-flow:column; grid-auto-columns:minmax(240px,1fr); gap:14px; padding:16px;
     background:rgba(0,0,0,.22); backdrop-filter:blur(8px); scroll-snap-type:x mandatory; overflow-x:auto;
     border-top-left-radius:16px; border-top-right-radius:16px; z-index:10;
   }
 
-  /* TRANSPARENT CARDS (same style as past) */
+  /* Transparent cards */
   .card{
     position:relative; scroll-snap-align:start;
     background:rgba(255,255,255,.06);
@@ -260,8 +330,14 @@
 
   .no-transitions{ transition: none !important; }
 
-  @media (max-width:980px){ :root{ --digit-w:100px; --digit-h:140px; } }
-  @media (max-width:720px){ :root{ --digit-w:86px; --digit-h:120px; } }
+  @media (max-width:980px){
+    :root{ --digit-w:100px; --digit-h:140px; }
+    #todo-panel{ max-width:70vw; }
+  }
+  @media (max-width:720px){
+    :root{ --digit-w:86px; --digit-h:120px; }
+    #todo-panel{ max-width:78vw; }
+  }
 </style>
 </head>
 <body>
@@ -273,6 +349,14 @@
     <section id="timer-container" aria-label="Timer">
       <div id="timer"></div>
       <div id="simpleTimer">00:00</div>
+    </section>
+
+    <!-- To‑do panel (between clock and candle or at left when centered modes) -->
+    <section id="todo-panel" aria-label="To‑do list">
+      <h4 id="todoTitle">To‑do</h4>
+      <ol id="todoList" contenteditable="true">
+        <li></li>
+      </ol>
     </section>
 
     <!-- Candle -->
@@ -342,6 +426,10 @@
         <div style="flex:1"><label for="bgC2">Color 2</label><input id="bgC2" type="color" value="#d76d77"></div>
         <div style="flex:1"><label for="bgC3">Color 3</label><input id="bgC3" type="color" value="#ffaf7b"></div>
       </div>
+      <div class="row">
+        <!-- New: To‑do list color (background of the to‑do panel). Default remains transparent until changed. -->
+        <div style="flex:1"><label for="todoColor">To‑do list color</label><input id="todoColor" type="color" value="#ffffff"></div>
+      </div>
     </div>
 
     <!-- Simple timer color (appears only when flip style is OFF) -->
@@ -362,6 +450,7 @@
         <label><input type="checkbox" id="hideCandle"> Hide candle</label>
         <label><input type="checkbox" id="centerClock"> Center clock</label>
         <label><input type="checkbox" id="onlyCandle"> Only candle mode</label>
+        <label><input type="checkbox" id="showTodo"> Show to‑do list</label>
       </div>
     </div>
 
@@ -487,7 +576,7 @@
     rafId=requestAnimationFrame(loop);
   }
 
-  /* 3‑second fade pre‑start */
+  /* 3‑second pre‑start */
   let preRAF = null;
   function startWithFadeCountdown(){
     if (running || paused) return;
@@ -699,72 +788,10 @@
   function applySimpleTextColor(){
     document.documentElement.style.setProperty('--simple-text', $('#simpleTextColor').value);
   }
+  function applyTodoBg(){
+    const val = $('#todoColor').value;
+    document.documentElement.style.setProperty('--todo-bg', val);
+  }
 
   function refreshSimpleColorCardVisibility(){
-    const show = !$('#useFlip').checked;
-    $('#simpleColorCard').style.display = show ? '' : 'none';
-  }
-
-  function previewLayout(){
-    showH = $('#showHours').checked; showS = $('#showSeconds').checked;
-    useFlip = $('#useFlip').checked;
-    if (useFlip){
-      flipDigits = buildFlip(timerFlip, showH, showS);
-      tickFlip(flipDigits, 0, showH, showS);
-    }else{
-      renderSimple(0);
-    }
-  }
-
-  // UI events
-  $('#primaryBtn').addEventListener('click', togglePrimary);
-  $('#resetBtn').addEventListener('click', resetCountdown);
-
-  $('#useFlip').addEventListener('change', ()=>{
-    refreshMode();
-    refreshRTCMode();
-    previewLayout();
-  });
-
-  // Layout toggles
-  $('#hideCandle').addEventListener('change', (e)=>{
-    if (document.body.classList.contains('only-candle') && e.target.checked){
-      e.target.checked = false;
-      return;
-    }
-    document.body.classList.toggle('candle-off', e.target.checked);
-    if (!e.target.checked){ positionFlame(); }
-  });
-  $('#centerClock').addEventListener('change', (e)=>{
-    document.body.classList.toggle('center-clock', e.target.checked);
-    positionFlame();
-  });
-  $('#onlyCandle').addEventListener('change', (e)=>{
-    const on = e.target.checked;
-    document.body.classList.toggle('only-candle', on);
-    if (on){
-      const hc = $('#hideCandle');
-      if (hc.checked){ hc.checked = false; document.body.classList.remove('candle-off'); }
-    }
-    positionFlame();
-  });
-
-  $('#rtcMode').addEventListener('change', e=> e.target.checked ? openRTC() : closeRTC());
-  $('#showHours').addEventListener('change', previewLayout);
-  $('#showSeconds').addEventListener('change', previewLayout);
-
-  ['bgAngle','bgC1','bgC2','bgC3'].forEach(id=> document.getElementById(id).addEventListener('input', applyGradient));
-  ['clockC1','clockC2','clockC3','textColor','colonColor'].forEach(id=> document.getElementById(id).addEventListener('input', restyleClockPanels));
-  $('#waxColor').addEventListener('input', applyWax);
-  $('#simpleTextColor').addEventListener('input', applySimpleTextColor);
-
-  window.addEventListener('resize', positionFlame);
-
-  // Init defaults
-  applyGradient(); restyleClockPanels(); applyWax();
-  applySimpleTextColor();
-  refreshMode(); refreshRTCMode(); previewLayout();
-  setWaxHeightByProgress(1); relight(); positionFlame();
-</script>
-</body>
-</html>
+    const show = !
