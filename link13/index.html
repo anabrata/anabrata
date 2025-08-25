@@ -1,9 +1,11 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>Candle Timer — V10</title>
+<title>Candle Timer — V2.0</title>
 <style>
   :root{
     /* Sizes */
@@ -137,12 +139,13 @@
   #todoList{ margin:0; padding:4px 4px 4px 8px; list-style:none; counter-reset:tdn; font-family:inherit; }
   #todoList li{ counter-increment:tdn; position:relative; padding-left:28px; margin:4px 0; min-height:20px; outline:none; transition: opacity .18s, transform .18s; }
   #todoList li:before{ content: counter(tdn) "."; position:absolute; left:0; top:0; width:22px; text-align:right; padding-right:6px; font-weight:900; opacity:.9; }
+  #todoList li.vanish{ opacity:0; transform:translateY(-3px); }
   .todoItem{ display:flex; align-items:center; gap:8px; }
   .todoChk{ appearance:none; width:16px; height:16px; border:2px solid rgba(255,255,255,.75); border-radius:4px; background:transparent; cursor:pointer; }
   .todoChk:checked{ background:#22c55e; border-color:#22c55e; }
   .todoChk:checked::after{ content:""; position:absolute; inset:0; background:linear-gradient(45deg,transparent 47%,#fff 47% 53%,transparent 53%),linear-gradient(-45deg,transparent 47%,#fff 47% 53%,transparent 53%); transform:scale(.48); }
   .todoText{ display:inline-block; min-width:36px; min-height:20px; padding:1px 5px; border-radius:6px; outline:none; color:#fff; caret-color:#fff; }
-  .todoText:empty:before{ content:"New task"; opacity:.45; } 
+  .todoText:empty:before{ content:"New task"; opacity:.45; }
 
   /* ===== Flip clock (glassy) ===== */
   #timer{ display:flex; align-items:center; gap:12px; user-select:none; }
@@ -171,6 +174,10 @@
 
   /* Transparent mode for flip cards */
   .clock-transparent .digit{
+      transform-style: preserve-3d;
+  contain: paint;
+  will-change: transform, opacity;
+  transform: translateZ(0);
     background: transparent !important;
     border-color: rgba(255,255,255,.28) !important;
     box-shadow: 0 10px 28px rgba(0,0,0,.22) !important;
@@ -308,7 +315,7 @@
 </style>
 </head>
 <body>
-  <div class="brand">MADE BY ANABRATA — V10</div>
+  <div class="brand">MADE BY ANABRATA — V2.0</div>
 
   <div class="main" id="main">
     <!-- Timer -->
@@ -440,7 +447,7 @@
   <div id="congrats" aria-modal="true" role="dialog">
     <div id="cgCard">
       <h2 id="cgTitle">Congratulations!</h2>
-      <p id="cgMsg">Timer complete — great focus! 🎉</p>
+      <p id="cgMsg">Timer complete YOU DONE IT🥰</p>
       <button id="cgClose">Close</button>
     </div>
     <!-- Balloons -->
@@ -526,7 +533,7 @@
     return d;
   }
 
-  function flipTo(digitEl, newVal) {
+  function flipTo(digitEl, newVal){
     const cur = digitEl.dataset.value || "0";
     if (cur === newVal) return;
 
@@ -540,9 +547,6 @@
     t.textContent = cur;
     topFlip.appendChild(t);
 
-    // Clear existing flips to prevent overlap causing latency
-    [...digitEl.querySelectorAll('.top-flip, .bottom-flip')].forEach(el => el.remove());
-
     topVal.textContent = cur;
     botVal.textContent = cur;
     digitEl.appendChild(topFlip);
@@ -550,16 +554,13 @@
     topFlip.addEventListener("animationend", () => {
       topVal.textContent = newVal;
       topFlip.remove();
-
       const bottomFlip = document.createElement("div");
       bottomFlip.className = "bottom-flip";
       const b = document.createElement("span");
       b.className = "value";
       b.textContent = newVal;
       bottomFlip.appendChild(b);
-
       digitEl.appendChild(bottomFlip);
-
       bottomFlip.addEventListener("animationend", () => {
         botVal.textContent = newVal;
         digitEl.dataset.value = newVal;
@@ -847,20 +848,20 @@
   function pausePlaylist(){ audio.pause(); if (musicPlayBtn) musicPlayBtn.textContent="▶"; }
   function nextTrack(){ if(playlist.length) playTrack(trackIndex+1); }
   function prevTrack(){ if(playlist.length) playTrack(trackIndex-1); }
-  audio.addEventListener("ended", () => nextTrack());
-  audio.addEventListener("play", () => { if (musicPlayBtn) musicPlayBtn.textContent="⏸"; });
-  audio.addEventListener("pause", () => { if (musicPlayBtn) musicPlayBtn.textContent="▶"; });
-  $("#addMusicBtn")?.addEventListener("click", () => musicFiles?.click());
-  musicFiles?.addEventListener("change", (e) => loadPlaylist(e.target.files));
-  $("#musicPlay")?.addEventListener("click", () => audio.paused ? startPlaylist() : pausePlaylist());
+  audio.addEventListener("ended", ()=> nextTrack());
+  audio.addEventListener("play", ()=> { if (musicPlayBtn) musicPlayBtn.textContent="⏸"; });
+  audio.addEventListener("pause", ()=> { if (musicPlayBtn) musicPlayBtn.textContent="▶"; });
+  $("#addMusicBtn")?.addEventListener("click", ()=> musicFiles?.click());
+  musicFiles?.addEventListener("change", (e)=> loadPlaylist(e.target.files));
+  $("#musicPlay")?.addEventListener("click", ()=> audio.paused ? startPlaylist() : pausePlaylist());
   $("#musicNext")?.addEventListener("click", nextTrack);
   $("#musicPrev")?.addEventListener("click", prevTrack);
-  $("#musicLoop")?.addEventListener("change", (e) => audio.loop = !!e.target.checked);
-  window.addEventListener("unload", () => objectUrls.forEach(u=>URL.revokeObjectURL(u)));
+  $("#musicLoop")?.addEventListener("change", (e)=> audio.loop = !!e.target.checked);
+  window.addEventListener("unload", ()=> objectUrls.forEach(u=>URL.revokeObjectURL(u)));
 
   /* ---------- Custom background image ---------- */
   const bgImageBtn = $("#bgImageBtn"), bgImageFile = $("#bgImageFile"), bgImageClear = $("#bgImageClear"), bgImageName = $("#bgImageName");
-  bgImageBtn?.addEventListener("click", () => bgImageFile?.click());
+  bgImageBtn?.addEventListener("click", ()=> bgImageFile?.click());
   bgImageFile?.addEventListener("change", (e)=>{
     const f = e.target.files?.[0]; if (!f) return;
     if (bgObjectUrl){ URL.revokeObjectURL(bgObjectUrl); bgObjectUrl=null; }
@@ -902,22 +903,22 @@
   $("#primaryBtn").addEventListener("click", togglePrimary);
   $("#resetBtn").addEventListener("click", resetCountdown);
 
-  $("#useFlip").addEventListener("change", () => { safeBuildClock(); previewLayout(); });
+  $("#useFlip").addEventListener("change", ()=>{ safeBuildClock(); previewLayout(); });
   $("#showHours").addEventListener("change", previewLayout);
   $("#showSeconds").addEventListener("change", previewLayout);
 
-  $("#hideCandle").addEventListener("change", () => applyLayoutFlags());
-  $("#centerClock").addEventListener("change", () => applyLayoutFlags());
-  $("#onlyCandle").addEventListener("change", e => { ensureCandleVisibleWhenOnlyCandle(e.target.checked); applyLayoutFlags(); });
-  $("#showTodo").addEventListener("change", () => applyLayoutFlags());
-  $("#clockTransparent").addEventListener("change", (e) => document.body.classList.toggle("clock-transparent", e.target.checked));
+  $("#hideCandle").addEventListener("change", ()=> applyLayoutFlags());
+  $("#centerClock").addEventListener("change", ()=> applyLayoutFlags());
+  $("#onlyCandle").addEventListener("change", e=>{ ensureCandleVisibleWhenOnlyCandle(e.target.checked); applyLayoutFlags(); });
+  $("#showTodo").addEventListener("change", ()=> applyLayoutFlags());
+  $("#clockTransparent").addEventListener("change", (e)=> document.body.classList.toggle("clock-transparent", e.target.checked));
 
   ["bgAngle","bgC1","bgC2","bgC3"].forEach(id=> document.getElementById(id)?.addEventListener("input", applyGradient));
   ["clockC1","clockC2","clockC3","textColor","colonColor","simpleColor"].forEach(id=> document.getElementById(id)?.addEventListener("input", restyleClockPanels));
 
-  $("#todoApply").addEventListener("click", () => { setTodoBg($("#todoColor").value); $("#todo-panel").classList.remove("todo-clear"); });
-  $("#todoClear").addEventListener("click", () => { setTodoBg("transparent"); $("#todo-panel").classList.add("todo-clear"); });
-  $("#todoGlass").addEventListener("change", (e) => $("#todo-panel").classList.toggle("todo-glass", e.target.checked));
+  $("#todoApply").addEventListener("click", ()=>{ setTodoBg($("#todoColor").value); $("#todo-panel").classList.remove("todo-clear"); });
+  $("#todoClear").addEventListener("click", ()=>{ setTodoBg("transparent"); $("#todo-panel").classList.add("todo-clear"); });
+  $("#todoGlass").addEventListener("change", (e)=> $("#todo-panel").classList.toggle("todo-glass", e.target.checked));
 
   /* ---------- Init ---------- */
   (function boot(){
