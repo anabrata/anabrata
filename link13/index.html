@@ -188,7 +188,6 @@
     text-shadow:0 10px 40px rgba(0,0,0,.6);
     opacity:0; transform:scale(.9);
   }
-  /* fading step per number */
   .step{ animation: fadeStep 1s ease both }
   @keyframes fadeStep{
     0%  { opacity:0; transform:scale(.9) }
@@ -197,7 +196,6 @@
     100%{ opacity:0; transform:scale(1.06) }
   }
 
-  /* Hide everything but overlay while pre-start is active */
   .pre-on .brand,
   .pre-on #controls,
   .pre-on #exitFs,
@@ -224,7 +222,7 @@
       <div class="candle-clip">
         <div class="candle-wrap" id="candleWrap">
           <div class="wax" id="wax">
-            <!-- waxTop removed on request -->
+            <!-- waxTop removed to eliminate white circle -->
             <div class="wick" id="wick"></div>
           </div>
           <div class="stub" id="stub"></div>
@@ -427,7 +425,7 @@
       const text = n > 0 ? String(n) : 'Go';
       if (label.textContent !== text){
         label.textContent = text;
-        label.classList.remove('step'); void label.offsetWidth; label.classList.add('step'); // restart fade
+        label.classList.remove('step'); void label.offsetWidth; label.classList.add('step');
       }
       if (remain <= 0){
         overlay.hidden = true;
@@ -442,7 +440,7 @@
 
   function togglePrimary(){
     if (!running && !paused){
-      startWithFadeCountdown(); // fade-in pre-start
+      startWithFadeCountdown();
       return;
     }
     if (running){
@@ -465,7 +463,6 @@
     cancelAnimationFrame(rafId); running=false; paused=false;
     if (preRAF){ cancelAnimationFrame(preRAF); preRAF=null; $('#preOverlay').hidden=true; document.body.classList.remove('pre-on'); }
     primaryBtn.textContent='Start';
-    // rebuild display per current toggles
     showH = $('#showHours').checked; showS = $('#showSeconds').checked;
     if (useFlip){
       flipDigits = buildFlip(timerFlip, showH, showS);
@@ -473,7 +470,6 @@
     }else{
       renderSimple(0);
     }
-    // Fully restore candle
     candleWrap.classList.remove('vanish');
     candleWrap.style.opacity = '';
     candleWrap.style.transform = '';
@@ -542,7 +538,7 @@
   async function goFullscreen(){
     try{
       if (!document.fullscreenElement){ await document.documentElement.requestFullscreen(); }
-      document.body.classList.add('fullscreen-on'); // only timer + candle
+      document.body.classList.add('fullscreen-on');
     }catch(e){}
   }
   function exitFullscreen(){
@@ -598,7 +594,6 @@
   }
   function applyWax(){ document.documentElement.style.setProperty('--wax',$('#waxColor').value); }
 
-  /* Preview when toggling hours/seconds */
   function previewLayout(){
     showH = $('#showHours').checked; showS = $('#showSeconds').checked;
     useFlip = $('#useFlip').checked;
