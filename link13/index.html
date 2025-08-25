@@ -1,131 +1,584 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Normal Workable Watch</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOLAR SYSTEM — WELCOME TO THE WORLD OF SOLAR SYSTEM</title>
 <style>
-  :root{ --size:min(92vmin,560px); --hand:#f8fafc; --sec:#e11d48; --tick:#cbd5e190; --tickBold:#e5e7ebd0; --marker:#e8eefc; }
-  html,body{height:100%} *{box-sizing:border-box}
+  :root{
+    --bg1:#050914; --bg2:#0a1430; --bg3:#101b3b;
+    --star1:#ffffff; --star2:#a5c7ff; --star3:#ffd59e;
+    --orbit:#3b4a6a; --orbitFaint:#2a3551;
+    --label:#e8eefc; --accent:#22d3ee; --warn:#f43f5e;
+    --sun:#ffdd55; --mercury:#b6b6b6; --venus:#cfb68a; --earth:#6fb1ff; --mars:#ff6b5a;
+    --jupiter:#d9b38c; --saturn:#f1e0a8; --uranus:#8ae0e6; --neptune:#7ea8ff; --moon:#eeeeee;
+    --panel:#0b1222f2; --panelBorder:#2b3a5a; --ring:#e9d9a6;
+    --banner:#e2e8f0;
+    --size:min(96vmin,1000px);
+  }
+  html,body{height:100%}
+  *{box-sizing:border-box}
   body{
-    margin:0; display:grid; place-items:center;
-    background: radial-gradient(120% 120% at 20% 10%, #182234 0%, #1b2533 40%, #0d1117 100%);
-    color:#e5e7eb; font:400 15px system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    margin:0; display:grid; grid-template-rows:auto 1fr auto; gap:12px;
+    background: radial-gradient(120% 140% at 20% 10%, var(--bg2) 0%, var(--bg3) 45%, var(--bg1) 100%);
+    color:#e5e7eb; font:400 14px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
   }
-  .wrap{display:grid; gap:10px; place-items:center; padding:12px}
-  .watch{ width:var(--size); height:var(--size); position:relative }
-  canvas{width:100%; height:100%; display:block; background:transparent}
-  .bezel{ position:absolute; inset:0; border-radius:50%; pointer-events:none;
-    background: radial-gradient(closest-side, #ffffff20 0 96%, transparent 96% 100%),
-                conic-gradient(from 90deg at 50% 50%, #2a3344, #1d2737, #2a3344);
-    box-shadow: inset 0 2px 6px #0008, inset 0 -2px 10px #000a, 0 0 0 1px #0009;
+  header{
+    padding:12px 16px; text-align:center; position:relative; overflow:hidden;
   }
-  .version{font-size:12px; opacity:.9; border:1px solid #334155; border-radius:6px; padding:.2rem .45rem; background:#0b1222a0}
+  .banner{
+    display:inline-block; font-weight:800; letter-spacing:1px; font-size:20px; color:var(--banner);
+    animation: fadeSlide 2200ms ease-out 1 forwards;
+    text-shadow: 0 3px 16px #0008;
+  }
+  @keyframes fadeSlide{ from{ opacity:0; transform:translateY(12px); } to{ opacity:1; transform:translateY(0);} }
+  .stage{
+    display:grid; place-items:center; padding:6px 12px;
+  }
+  .board{
+    width:var(--size); height:var(--size); position:relative;
+  }
+  canvas{ width:100%; height:100%; display:block; border-radius:16px; box-shadow:0 20px 60px #0008, inset 0 0 80px #0006; }
+  .hud{
+    position:absolute; inset:auto 12px 12px 12px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:center;
+    background:#0f172acc; border:1px solid var(--panelBorder); border-radius:12px; padding:8px 10px; backdrop-filter: blur(6px);
+  }
+  .hud label{display:flex; gap:6px; align-items:center; font-size:13px}
+  .hud input[type="range"]{ width:160px }
+  .lcd{font-variant-numeric: tabular-nums; padding:.25rem .5rem; border:1px solid #2c3a55; border-radius:8px; background:#0b1222a0}
+  .badge{font-size:12px; opacity:.9; border:1px solid #334155; border-radius:6px; padding:.2rem .45rem; background:#0b1222a0}
+  footer{
+    text-align:center; padding:8px 12px; color:#cbd5e1; font-weight:600;
+  }
+  .panel{
+    position:absolute; left:50%; top:6%; transform:translateX(-50%); width:min(640px,92vw);
+    background:var(--panel); border:1px solid var(--panelBorder); border-radius:12px; padding:12px 14px; display:none;
+    box-shadow:0 18px 40px #000a;
+  }
+  .panel.open{display:block}
+  .panel h3{margin:0 0 6px; font-size:18px}
+  .panel .grid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .panel .close{position:absolute; top:8px; right:10px; cursor:pointer; color:#cbd5e1}
+  .tag{display:inline-block; padding:.15rem .4rem; border-radius:6px; border:1px solid #2b3a5a; background:#0b1222; margin-right:6px; font-size:12px}
+  .legend{position:absolute; top:10px; left:10px; display:flex; gap:8px; flex-wrap:wrap; font-size:12px}
+  .legend span{display:inline-flex; gap:6px; align-items:center}
+  .dot{width:10px; height:10px; border-radius:50%}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <div style="font-weight:600">Normal workable watch</div>
-    <div class="watch">
-      <canvas id="clock"></canvas>
-      <div class="bezel" aria-hidden="true"></div>
+  <header>
+    <div class="banner">WELCOME TO THE WORLD OF SOLAR SYSTEM</div>
+  </header>
+
+  <main class="stage">
+    <div class="board">
+      <canvas id="sky"></canvas>
+
+      <div class="legend">
+        <span><span class="dot" style="background:var(--sun)"></span>Sun</span>
+        <span><span class="dot" style="background:var(--earth)"></span>Planets</span>
+        <span><span class="dot" style="background:var(--moon)"></span>Moons</span>
+      </div>
+
+      <div class="hud">
+        <label><input type="checkbox" id="realtime" checked> Real‑time</label>
+        <label>Speed × <input type="range" id="speed" min="0.1" max="200" step="0.1" value="1"></label>
+        <label><input type="checkbox" id="trails"> Trails</label>
+        <label><input type="checkbox" id="labels" checked> Labels</label>
+        <span class="lcd" id="clock">--:--:--</span>
+        <span class="badge" id="version">Version: v1.0.0</span>
+      </div>
+
+      <div class="panel" id="panel">
+        <div class="close" id="close">✕</div>
+        <h3 id="pTitle">Planet</h3>
+        <div class="grid">
+          <div id="pLeft"></div>
+          <div id="pRight"></div>
+        </div>
+      </div>
     </div>
-    <div class="version" id="ver">Version: v1.0.0</div>
-  </div>
+  </main>
+
+  <footer>Made by ANABRATA</footer>
 
 <script>
-(function(){
-  const VERSION = 'v1.0.0'; // bump this to confirm new deploys
-  document.getElementById('ver').textContent = 'Version: ' + VERSION;
+/* ===== Constants and utilities ===== */
+const VERSION = 'v1.0.0';
+document.getElementById('version').textContent = 'Version: ' + VERSION;
 
-  const canvas = document.getElementById('clock');
-  const ctx = canvas.getContext('2d', {alpha:true});
-  let dpr = Math.max(1, Math.min(window.devicePixelRatio||1, 3));
+// Canvas setup with DPR scaling + ResizeObserver for crisp rendering
+const canvas = document.getElementById('sky');
+const ctx = canvas.getContext('2d', {alpha:true});
+let DPR = 1;
+function fitCanvas(){
+  const r = canvas.getBoundingClientRect();
+  DPR = Math.max(1, Math.min(window.devicePixelRatio||1, 3));
+  canvas.width = Math.round(r.width * DPR);
+  canvas.height = Math.round(r.height * DPR);
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.scale(DPR, DPR);
+}
+new ResizeObserver(fitCanvas).observe(canvas); fitCanvas();
 
-  function resizeToBox(){
-    const rect = canvas.getBoundingClientRect();
-    dpr = Math.max(1, Math.min(window.devicePixelRatio||1, 3));
-    const w = Math.max(1, Math.round(rect.width * dpr));
-    const h = Math.max(1, Math.round(rect.height * dpr));
-    if (canvas.width !== w || canvas.height !== h){ canvas.width = w; canvas.height = h; }
-    ctx.setTransform(1,0,0,1,0,0);
-    ctx.scale(dpr, dpr);
+// Time control
+const realtime = document.getElementById('realtime');
+const speed = document.getElementById('speed');
+const trails = document.getElementById('trails');
+const labels = document.getElementById('labels');
+const clockLcd = document.getElementById('clock');
+
+// Colors
+const color = {
+  Sun: getCss('--sun'), Mercury:getCss('--mercury'), Venus:getCss('--venus'),
+  Earth:getCss('--earth'), Mars:getCss('--mars'), Jupiter:getCss('--jupiter'),
+  Saturn:getCss('--saturn'), Uranus:getCss('--uranus'), Neptune:getCss('--neptune'),
+  Moon:getCss('--moon')
+};
+function getCss(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+
+// Star field (cached)
+let stars = [];
+function buildStars(){
+  const w = canvas.getBoundingClientRect().width;
+  const h = canvas.getBoundingClientRect().height;
+  const N = 600;
+  stars = [];
+  for(let i=0;i<N;i++){
+    stars.push({
+      x: Math.random()*w, y: Math.random()*h,
+      r: Math.random()*1.4+0.2,
+      c: Math.random()<0.6? getCss('--star1') : (Math.random()<0.5? getCss('--star2'):getCss('--star3')),
+      a: Math.random()*0.6+0.2,
+    });
   }
-  new ResizeObserver(resizeToBox).observe(canvas);
-  resizeToBox();
+}
+buildStars();
+addEventListener('resize', buildStars, {passive:true});
 
-  function drawFace(cx, cy, R){
-    const g = ctx.createRadialGradient(cx, cy, 2, cx, cy, R*0.95);
-    g.addColorStop(0, '#0f1b2d'); g.addColorStop(0.7, '#0a121e'); g.addColorStop(1, '#05080e');
-    ctx.fillStyle = g;
-    ctx.beginPath(); ctx.arc(cx, cy, R*0.92, 0, Math.PI*2); ctx.fill();
+/* ===== Astronomical helpers (Schlyter) =====
+   Units: angles in radians internally; days for time; AU for distances.
+   Source: Paul Schlyter’s planetary position tutorial and element tables. */
 
-    // minute ticks
-    for(let i=0;i<60;i++){
-      const a = i * Math.PI/30;
-      const inner = R*0.80 - (i%5===0? 6: 0);
-      const outer = R*0.86;
-      ctx.strokeStyle = i%5===0 ? getComputedStyle(document.documentElement).getPropertyValue('--tickBold').trim()
-                                : getComputedStyle(document.documentElement).getPropertyValue('--tick').trim();
-      ctx.lineWidth = i%5===0 ? 3.2 : 1.6;
+// Degree/radian helpers
+const PI = Math.PI, TAU = Math.PI*2, RAD = PI/180, DEG = 180/PI;
+const sind = x=>Math.sin(x*RAD), cosd = x=>Math.cos(x*RAD), atand = x=>Math.atan(x)*DEG, atan2d = (y,x)=>Math.atan2(y,x)*DEG;
+const rev = x => x - Math.floor(x/360)*360;
+
+// Julian date (UTC)
+function julian(now){
+  // Gregorian algorithm (works for all modern dates, JD at noon base)
+  // Derivation: Wikipedia "Julian day"
+  const y = now.getUTCFullYear();
+  const m = now.getUTCMonth()+1;
+  const D = now.getUTCDate();
+  const hr = now.getUTCHours();
+  const mn = now.getUTCMinutes();
+  const sc = now.getUTCSeconds() + now.getUTCMilliseconds()/1000;
+  const A = Math.floor((14 - m)/12);
+  const Y = y + 4800 - A;
+  const M = m + 12*A - 3;
+  const JDN = Math.floor((1461*Y)/4) + Math.floor((367*M)/12) - Math.floor((3*Math.floor((Y+100)/100))/4) + D - 32075;
+  const JD = JDN + (hr - 12)/24 + mn/1440 + sc/86400;
+  return JD;
+}
+
+// Day number d from 2000-01-00 00:00 UT
+function dayNumber(now){
+  const JD = julian(now);
+  return JD - 2451543.5; // Schlyter’s epoch offset
+}
+
+// Ecliptic obliquity (degrees) if needed; here we stay in ecliptic plane top-down.
+// function obliquity(d){ return 23.4393 - 3.563E-7 * d; }
+
+// Solve Kepler for elliptical orbit (angles in degrees)
+function keplerEllipse(Mdeg, e){
+  // Use first-order + one iteration for robustness
+  let E = Mdeg + (180/Math.PI)*e * Math.sin(Mdeg*RAD) * (1 + e*Math.cos(Mdeg*RAD));
+  for(let k=0;k<2;k++){
+    const Ed = E*RAD;
+    const dE = (E - (180/Math.PI)*e*Math.sin(Ed) - Mdeg) / (1 - e*Math.cos(Ed));
+    E -= dE;
+    if(Math.abs(dE)<1e-6) break;
+  }
+  const Ed = E*RAD;
+  const xv = Math.cos(Ed) - e;
+  const yv = Math.sqrt(1 - e*e) * Math.sin(Ed);
+  const v = atan2d(yv, xv);
+  const r = Math.sqrt(xv*xv + yv*yv); // in units of a
+  return {v, r};
+}
+
+// Orbital elements for planets (Schlyter), each as functions of day number d
+const elements = {
+  Mercury: d => ({
+    N: 48.3313 + 3.24587e-5*d,
+    i: 7.0047 + 5.0e-8*d,
+    w: 29.1241 + 1.01444e-5*d,
+    a: 0.387098,
+    e: 0.205635 + 5.59e-10*d,
+    M: 168.6562 + 4.0923344368*d
+  }),
+  Venus: d => ({
+    N: 76.6799 + 2.46590e-5*d,
+    i: 3.3946 + 2.75e-8*d,
+    w: 54.8910 + 1.38374e-5*d,
+    a: 0.723330,
+    e: 0.006773 - 1.302e-9*d,
+    M: 48.0052 + 1.6021302244*d
+  }),
+  Earth: d => ({ // Using the Sun/Earth barycentric ellipse for Earth’s heliocentric position
+    N: 0, i: 0,
+    w: 282.9404 + 4.70935e-5*d,
+    a: 1.000000,
+    e: 0.016709 - 1.151e-9*d,
+    M: 356.0470 + 0.9856002585*d
+  }),
+  Mars: d => ({
+    N: 49.5574 + 2.11081e-5*d,
+    i: 1.8497 - 1.78e-8*d,
+    w: 286.5016 + 2.92961e-5*d,
+    a: 1.523688,
+    e: 0.093405 + 2.516e-9*d,
+    M: 18.6021 + 0.5240207766*d
+  }),
+  Jupiter: d => ({
+    N: 100.4542 + 2.76854e-5*d,
+    i: 1.3030 - 1.557e-7*d,
+    w: 273.8777 + 1.64505e-5*d,
+    a: 5.20256,
+    e: 0.048498 + 4.469e-9*d,
+    M: 19.8950 + 0.0830853001*d
+  }),
+  Saturn: d => ({
+    N: 113.6634 + 2.38980e-5*d,
+    i: 2.4886 - 1.081e-7*d,
+    w: 339.3939 + 2.97661e-5*d,
+    a: 9.55475,
+    e: 0.055546 - 9.499e-9*d,
+    M: 316.9670 + 0.0334442282*d
+  }),
+  Uranus: d => ({
+    N: 74.0005 + 1.3978e-5*d,
+    i: 0.7733 + 1.9e-8*d,
+    w: 96.6612 + 3.0565e-5*d,
+    a: 19.18171 - 1.55e-8*d,
+    e: 0.047318 + 7.45e-9*d,
+    M: 142.5905 + 0.011725806*d
+  }),
+  Neptune: d => ({
+    N: 131.7806 + 3.0173e-5*d,
+    i: 1.7700 - 2.55e-7*d,
+    w: 272.8461 - 6.027e-6*d,
+    a: 30.05826 + 3.313e-8*d,
+    e: 0.008606 + 2.15e-9*d,
+    M: 260.2471 + 0.005995147*d
+  }),
+};
+
+// Convert orbital elements -> heliocentric ecliptic rectangular coords (AU)
+function planetHelio(name, d){
+  const el = elements[name](d);
+  const {v, r} = keplerEllipse(rev(el.M), el.e); // r in units of a
+  const R = r * el.a; // AU
+  const vw = (v + el.w)*RAD, N = el.N*RAD, i = el.i*RAD;
+  const xh = R*(Math.cos(N)*Math.cos(vw) - Math.sin(N)*Math.sin(vw)*Math.cos(i));
+  const yh = R*(Math.sin(N)*Math.cos(vw) + Math.cos(N)*Math.sin(vw)*Math.cos(i));
+  const zh = R*(Math.sin(vw)*Math.sin(i));
+  return {x:xh,y:yh,z:zh,R,el};
+}
+
+// Moon (geocentric) from Schlyter simplified lunar model with main perturbations
+function earthMoon(d){
+  // Elements for Moon
+  const N = 125.1228 - 0.0529538083*d;
+  const i = 5.1454;
+  const w = 318.0634 + 0.1643573223*d;
+  const a = 60.2666; // Earth radii
+  const e = 0.054900;
+  const M = 115.3654 + 13.0649929509*d;
+  // Solve ellipse
+  const km = keplerEllipse(rev(M), e);
+  const v = km.v, r = km.r*a; // r in Earth radii
+  // Perturbations need Sun Moon angles
+  // Sun mean long
+  const sunM = elements.Earth(d).M;
+  const sunw = elements.Earth(d).w;
+  const Ls = rev(sunM + sunw);
+  const Lm = rev(N + w + M);
+  const D = rev(Lm - Ls);
+  const F = rev(Lm - N);
+  // Longitude perturbations (deg)
+  const lon_corr =
+      -1.274*Math.sin((M - 2*D)*RAD)
+    + 0.658*Math.sin((2*D)*RAD)
+    - 0.186*Math.sin(sunM*RAD)
+    - 0.059*Math.sin((2*M - 2*D)*RAD)
+    - 0.057*Math.sin((M - 2*D + sunM)*RAD)
+    + 0.053*Math.sin((M + 2*D)*RAD)
+    + 0.046*Math.sin((2*D - sunM)*RAD)
+    + 0.041*Math.sin((M - sunM)*RAD)
+    - 0.035*Math.sin(D*RAD)
+    - 0.031*Math.sin((M + sunM)*RAD)
+    - 0.015*Math.sin((2*F - 2*D)*RAD)
+    + 0.011*Math.sin((M - 4*D)*RAD);
+  const lat_corr =
+      -0.173*Math.sin((F - 2*D)*RAD)
+      -0.055*Math.sin((M - F - 2*D)*RAD)
+      -0.046*Math.sin((M + F - 2*D)*RAD)
+      +0.033*Math.sin((F + 2*D)*RAD)
+      +0.017*Math.sin((2*M + F)*RAD);
+  const dist_corr =
+      -0.58*Math.cos((M - 2*D)*RAD)
+      -0.46*Math.cos((2*D)*RAD);
+  const lon = rev(v + w + lon_corr);
+  const lat = (lat_corr);
+  const rr = r + dist_corr; // Earth radii
+  const Nrad = N*RAD, irad = i*RAD, lrad = lon*RAD, brad = lat*RAD;
+  const xeclip = rr*Math.cos(lrad)*Math.cos(brad);
+  const yeclip = rr*Math.sin(lrad)*Math.cos(brad);
+  const zeclip = rr*Math.sin(brad);
+  // Convert to AU: Earth equatorial radius ~ 6378.14 km; 1 AU = 149597870.7 km
+  const AU = 149597870.7; const ER = 6378.14;
+  return {x:xeclip*ER/AU, y:yeclip*ER/AU, z:zeclip*ER/AU, rr};
+}
+
+// Simple moon models for Jupiter (Galileans): circular, in ecliptic plane, with real periods and semimajor axes
+const Galilean = [
+  {name:'Io',       a_km:421800,  P_d:1.769138, col:'#ffd27d'},
+  {name:'Europa',   a_km:671100,  P_d:3.551181, col:'#d6e6ff'},
+  {name:'Ganymede', a_km:1070400, P_d:7.154553, col:'#e6dcc9'},
+  {name:'Callisto', a_km:1882700, P_d:16.689,   col:'#c9b9a1'},
+];
+// AU conversion
+const AU_KM = 149597870.7;
+function jovianMoons(d, jx, jy){
+  // phase reference: M=0 at J2000
+  return Galilean.map((m,i)=>{
+    const ang = TAU*((d)/m.P_d + i*0.25); // staggered phase
+    const r = (m.a_km/AU_KM);
+    return {name:m.name, x: jx + r*Math.cos(ang), y: jy + r*Math.sin(ang), col:m.col};
+  });
+}
+
+/* ===== Bodies and facts (NASA fact sheets) ===== */
+const facts = {
+  Mercury:{ type:'Terrestrial', radius_km:2439.7, a_AU:0.387, period_d:87.97, moons:0, ref:'NASA Fact Sheet' },
+  Venus:{ type:'Terrestrial', radius_km:6051.8, a_AU:0.723, period_d:224.7, moons:0, ref:'NASA Fact Sheet' },
+  Earth:{ type:'Terrestrial', radius_km:6371.0, a_AU:1.000, period_d:365.256, moons:1, ref:'NASA Fact Sheet' },
+  Mars:{ type:'Terrestrial', radius_km:3389.5, a_AU:1.524, period_d:686.98, moons:2, ref:'NASA Fact Sheet' },
+  Jupiter:{ type:'Gas giant', radius_km:69911, a_AU:5.204, period_d:4332.59, moons:95, ref:'NASA Fact Sheet' },
+  Saturn:{ type:'Gas giant', radius_km:58232, a_AU:9.537, period_d:10759, moons:274, ref:'NASA Fact Sheet' },
+  Uranus:{ type:'Ice giant', radius_km:25362, a_AU:19.191, period_d:30687, moons:28, ref:'NASA Fact Sheet' },
+  Neptune:{ type:'Ice giant', radius_km:24622, a_AU:30.07, period_d:60190, moons:16, ref:'NASA Fact Sheet' },
+  Moon:{ type:'Natural satellite', radius_km:1737.4, a_AU:0.00257, period_d:27.32, moons:0, ref:'NASA Fact Sheet' }
+};
+
+// Drawing scale
+function scaleAU(){ // logarithmic scaling for visibility
+  const min = 0.4, max = 30;
+  const w = canvas.getBoundingClientRect().width;
+  const m = Math.min(w, canvas.getBoundingClientRect().height)*0.45;
+  return v => {
+    const t = (Math.log10(v) - Math.log10(min)) / (Math.log10(max) - Math.log10(min));
+    return 40 + t*m;
+  };
+}
+let mapAU = scaleAU();
+addEventListener('resize', ()=> mapAU = scaleAU());
+
+// For clicking
+let hitlist = [];
+
+// UI panel
+const panel = document.getElementById('panel');
+const pTitle = document.getElementById('pTitle');
+const pLeft = document.getElementById('pLeft');
+const pRight = document.getElementById('pRight');
+document.getElementById('close').onclick = ()=> panel.classList.remove('open');
+canvas.addEventListener('click',(ev)=>{
+  const rect = canvas.getBoundingClientRect();
+  const x = (ev.clientX - rect.left);
+  const y = (ev.clientY - rect.top);
+  // find nearest hit within radius
+  let best = null, bd = 9999;
+  for(const h of hitlist){
+    const d2 = (h.sx-x)*(h.sx-x)+(h.sy-y)*(h.sy-y);
+    if(d2 < h.r*h.r && d2 < bd){ best = h; bd = d2; }
+  }
+  if(best){
+    showPanel(best);
+  }
+});
+
+function showPanel(h){
+  const f = facts[h.name] || {type:'—',radius_km:'—',a_AU:'—',period_d:'—',moons:'—'};
+  pTitle.textContent = h.name;
+  pLeft.innerHTML = `
+    <div class="tag">Type: ${f.type}</div>
+    <div class="tag">Radius: ${f.radius_km} km</div>
+    <div class="tag">Mean orbit: ${f.a_AU} AU</div>
+    <div class="tag">Sidereal period: ${f.period_d} d</div>
+    <div class="tag">Moons: ${f.moons}</div>
+  `;
+  pRight.innerHTML = `
+    <div class="tag">Distance from Sun now: ${h.sunDistAU.toFixed(3)} AU</div>
+    ${h.earthDistAU? `<div class="tag">Distance from Earth now: ${h.earthDistAU.toFixed(3)} AU</div>`:''}
+    <div style="margin-top:6px; line-height:1.4">Beautiful, realistic rendering with live ephemerides; values update as time changes.</div>
+  `;
+  panel.classList.add('open');
+}
+
+// Orbit trails
+const trailMap = new Map();
+
+// Animation state
+let t0 = performance.now();
+let simDate = new Date();
+function step(now){
+  const dt = (now - t0)/1000; t0 = now;
+  const speedMul = parseFloat(speed.value);
+  if(realtime.checked){
+    simDate = new Date(); // wall clock
+  }else{
+    simDate = new Date(simDate.getTime() + dt*1000*speedMul);
+  }
+  draw(simDate);
+  requestAnimationFrame(step);
+}
+requestAnimationFrame(step);
+
+// Main draw
+function draw(now){
+  const rect = canvas.getBoundingClientRect();
+  const W = rect.width, H = rect.height;
+  // background
+  ctx.clearRect(0,0,W,H);
+  // starfield
+  for(const s of stars){ ctx.globalAlpha=s.a; ctx.fillStyle=s.c; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,TAU); ctx.fill(); }
+  ctx.globalAlpha=1;
+
+  // center
+  const cx = W/2, cy = H/2;
+
+  // Time display
+  clockLcd.textContent = now.toLocaleTimeString('en-GB',{hour12:false})+' UTC';
+
+  // Compute day number
+  const d = dayNumber(now);
+
+  // Sun at center
+  drawBody(cx, cy, 10, color.Sun, 'Sun');
+
+  // Planets
+  // First compute Earth for distances and Moon positioning
+  const earth = planetHelio('Earth', d);
+  // Moon geocentric, then add to Earth's heliocentric position
+  const moonGeo = earthMoon(d);
+  const moon = { x: earth.x + moonGeo.x, y: earth.y + moonGeo.y };
+
+  hitlist = []; // clear
+  const names = ['Mercury','Venus','Earth','Mars','Jupiter','Saturn','Uranus','Neptune'];
+  const positions = {};
+
+  // Orbits and planets
+  for(const name of names){
+    const p = planetHelio(name, d);
+    positions[name] = p;
+    const rAU = Math.hypot(p.x, p.y);
+    const sx = cx + (p.x/rAU) * mapAU(rAU);
+    const sy = cy + (p.y/rAU) * mapAU(rAU);
+
+    // orbit path
+    drawOrbit(cx, cy, mapAU(p.el.a), name==='Saturn'? true:false);
+
+    // planet disk size
+    const Rpix = planetRadiusPx(name);
+    drawBody(sx, sy, Rpix, color[name], name, labels.checked);
+
+    // maintain hit info
+    const earthDistAU = Math.hypot(p.x - earth.x, p.y - earth.y);
+    hitlist.push({name, sx, sy, r:Math.max(12,Rpix+6), sunDistAU:rAU, earthDistAU});
+
+    if(trails.checked){
+      const key = name;
+      if(!trailMap.has(key)) trailMap.set(key, []);
+      const arr = trailMap.get(key);
+      arr.push([sx, sy]); if(arr.length>220) arr.shift();
+      ctx.strokeStyle = 'rgba(255,255,255,0.25)';
       ctx.beginPath();
-      ctx.moveTo(cx + Math.sin(a)*inner, cy - Math.cos(a)*inner);
-      ctx.lineTo(cx + Math.sin(a)*outer, cy - Math.cos(a)*outer);
+      for(let i=0;i<arr.length;i++){ const a=arr[i]; if(i===0) ctx.moveTo(a,a[33]); else ctx.lineTo(a,a[33]); }
       ctx.stroke();
+    }else{
+      trailMap.delete(name);
     }
-    // hour batons (12)
-    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--marker').trim();
-    for(let i=0;i<12;i++){
-      const a = i * Math.PI/6, w = 6, h = 18, r = R*0.70;
-      const x = cx + Math.sin(a)*r, y = cy - Math.cos(a)*r;
-      ctx.save(); ctx.translate(x,y); ctx.rotate(a);
-      ctx.fillRect(-w/2, -h/2, w, h);
+
+    // Saturn ring visual
+    if(name==='Saturn'){
+      ctx.save(); ctx.strokeStyle = getCss('--ring'); ctx.globalAlpha=0.6;
+      ctx.beginPath(); ctx.ellipse(sx, sy, Rpix*2.4, Rpix*1.2, 0, 0, TAU); ctx.stroke();
       ctx.restore();
     }
   }
 
-  function hand(len, width, color, angle, cx, cy){
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(angle);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = width;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(0, 10);   // a small tail
-    ctx.lineTo(0, -len); // the hand
-    ctx.stroke();
-    ctx.restore();
+  // Earth label & Moon
+  const eR = Math.hypot(earth.x, earth.y);
+  const eSX = cx + (earth.x/eR)*mapAU(eR);
+  const eSY = cy + (earth.y/eR)*mapAU(eR);
+  const mR = Math.hypot(moon.x, moon.y);
+  const mSX = cx + (moon.x/mR)*mapAU(mR);
+  const mSY = cy + (moon.y/mR)*mapAU(mR);
+  drawBody(mSX, mSY, 4, color.Moon, 'Moon', labels.checked);
+  hitlist.push({name:'Moon', sx:mSX, sy:mSY, r:12, sunDistAU: mR, earthDistAU: Math.hypot(moon.x-earth.x, moon.y-earth.y)});
+
+  // Jupiter moons
+  const j = positions['Jupiter'];
+  const moons = jovianMoons(d, j.x, j.y);
+  for(const mm of moons){
+    const r = Math.hypot(mm.x, mm.y);
+    const sx = cx + (mm.x/r)*mapAU(r);
+    const sy = cy + (mm.y/r)*mapAU(r);
+    drawBody(sx, sy, 3, mm.col, mm.name, false);
+    hitlist.push({name: mm.name, sx, sy, r:10, sunDistAU:r, earthDistAU: Math.hypot(mm.x-earth.x, mm.y-earth.y)});
   }
+}
 
-  function draw(){
-    const rect = canvas.getBoundingClientRect();
-    const w = rect.width, h = rect.height;
-    const cx = w/2, cy = h/2, R = Math.min(w,h)/2;
-
-    ctx.clearRect(0,0,w,h);
-    drawFace(cx, cy, R);
-
-    const now = new Date();
-    const ms = now.getMilliseconds(), s = now.getSeconds(), m = now.getMinutes(), h12 = now.getHours()%12;
-
-    // angles (radians)
-    const aS = (s + ms/1000) * Math.PI/30;
-    const aM = (m + (s + ms/1000)/60) * Math.PI/30;
-    const aH = (h12 + (m + s/60 + ms/60000)/60) * Math.PI/6;
-
-    hand(R*0.65, 6, getComputedStyle(document.documentElement).getPropertyValue('--hand').trim(), aH, cx, cy);
-    hand(R*0.82, 4, getComputedStyle(document.documentElement).getPropertyValue('--hand').trim(), aM, cx, cy);
-    hand(R*0.88, 2.2, getComputedStyle(document.documentElement).getPropertyValue('--sec').trim(),  aS, cx, cy);
-
-    // center cap
-    ctx.fillStyle='#0f172a'; ctx.strokeStyle='#e5e7eb'; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.arc(cx, cy, 6.5, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+// Drawing helpers
+function drawOrbit(cx, cy, radius, faint=false){
+  ctx.save();
+  ctx.strokeStyle = faint? getCss('--orbitFaint'):getCss('--orbit');
+  ctx.globalAlpha = faint? 0.35:0.55;
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, TAU);
+  ctx.stroke();
+  ctx.restore();
+}
+function drawBody(x, y, r, fill, name, showLabel=false){
+  const g = ctx.createRadialGradient(x-r*0.5, y-r*0.5, r*0.2, x, y, r);
+  g.addColorStop(0, '#ffffff');
+  g.addColorStop(0.12, fill);
+  g.addColorStop(1, '#000000');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x,y,r,0,TAU); ctx.fill();
+  if(showLabel){
+    ctx.fillStyle = getCss('--label'); ctx.font='12px system-ui, Arial'; ctx.textAlign='center';
+    ctx.fillText(name, x, y - r - 6);
   }
-
-  function loop(){ draw(); requestAnimationFrame(loop); }
-  requestAnimationFrame(loop);
-})();
+}
+// Planet render size (for visibility)
+function planetRadiusPx(name){
+  switch(name){
+    case 'Mercury': return 4;
+    case 'Venus': return 6.5;
+    case 'Earth': return 7;
+    case 'Mars': return 5.5;
+    case 'Jupiter': return 12;
+    case 'Saturn': return 10;
+    case 'Uranus': return 8;
+    case 'Neptune': return 8;
+    default: return 6;
+  }
+}
 </script>
 </body>
 </html>
