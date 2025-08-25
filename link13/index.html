@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>Candle Timer — Vision 5</title>
+<title>Candle Timer — Version 5</title>
 <style>
   :root{
     /* Flip sizes */
@@ -41,8 +41,8 @@
     /* Layout tweak */
     --candle-offset: 18px;
 
-    /* To‑do list */
-    --todo-bg: transparent;   /* default transparent */
+    /* To‑do list background (default transparent) */
+    --todo-bg: transparent;
   }
 
   *{box-sizing:border-box}
@@ -90,14 +90,14 @@
   #todo-panel{ display:none; }
   .todo-on #todo-panel{ display:block; }
 
-  /* To‑do default position: between clock and candle (center) */
+  /* Default: between clock and candle (center overlay) */
   #todo-panel{
     position:absolute; left:50%; top:50%;
     transform:translate(-50%,-50%);
     z-index:4;
     max-width:min(34vw,560px);
     min-width:260px;
-    max-height:72vh; /* grows but stays on-screen */
+    max-height:72vh; /* grows when needed */
     overflow:auto;
     padding:12px 14px;
     border-radius:14px;
@@ -105,11 +105,8 @@
     background: var(--todo-bg);
     box-shadow: 0 8px 24px rgba(0,0,0,.18), 0 2px 6px rgba(0,0,0,.12);
     color:#fff;
-    backdrop-filter:none;
-    -webkit-backdrop-filter:none;
   }
-
-  /* When clock or candle is centered, move To‑do to viewer's left side */
+  /* When either clock or candle is centered, move To‑do to the left side */
   .center-clock #todo-panel,
   .only-candle  #todo-panel{
     left: min(48px,5vw);
@@ -117,14 +114,12 @@
     transform: translateY(-50%);
   }
 
-  /* To‑do list styles */
-  #todoTitle{
-    margin:0 0 6px 0; font-size:14px; font-weight:900; letter-spacing:.4px; opacity:.95;
-  }
+  /* To‑do look and numbering (Comic Sans MS) */
+  #todoTitle{ margin:0 0 6px 0; font-size:14px; font-weight:900; letter-spacing:.4px; opacity:.95; }
   #todoList{
     margin:0; padding:6px 6px 6px 10px;
-    list-style:none;
-    counter-reset: tdn;             /* CSS counter numbering */
+    list-style: none;             /* numbers via CSS counter */
+    counter-reset: tdn;
     font-family:"Comic Sans MS", system-ui, -apple-system, Segoe UI, Roboto, Arial;
   }
   #todoList li{
@@ -141,17 +136,7 @@
     width:24px; text-align:right; padding-right:6px;
     font-weight:900; opacity:.9;
   }
-  #todoList li:empty:before{
-    /* keep number visible even when empty line just created */
-    content: counter(tdn) ".";
-  }
-  #todoList li:empty{
-    min-height:22px;
-  }
-  #todoList.placeholder:empty:after{
-    content:"Type and press Enter";
-    color:#fff; opacity:.55; font-style:italic;
-  }
+  #todoList li.done{ opacity:.6; text-decoration: line-through; }
 
   /* Flip clock */
   #timer-container{ flex:1; display:flex; align-items:center; justify-content:flex-start; min-width:340px; gap:12px; }
@@ -247,7 +232,7 @@
     border-top-left-radius:16px; border-top-right-radius:16px; z-index:10;
   }
 
-  /* Transparent cards */
+  /* Transparent cards (like past) */
   .card{
     position:relative; scroll-snap-align:start;
     background:rgba(255,255,255,.06);
@@ -283,22 +268,12 @@
   #rtcBack:hover{ opacity:.75 }
   .rtc-only .brand, .rtc-only #controls, .rtc-only #main, .rtc-only #exitFs { display:none !important; }
 
-  /* Congrats */
+  /* Congrats overlay */
   #congrats{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; flex-direction:column; background:rgba(0,0,0,.35); z-index:95; backdrop-filter:blur(2px); }
   #congrats.show{ display:flex; }
   .cg-card{ background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); padding:22px 26px; border-radius:16px; text-align:center; color:#fff; box-shadow:0 14px 40px rgba(0,0,0,.4); }
   .cg-title{ font-size:28px; font-weight:900; margin-bottom:6px; }
   .cg-sub{ font-size:14px; opacity:.95; margin-bottom:12px; }
-  .balloon{ position:fixed; bottom:-120px; width:28px; height:36px; border-radius:50% 50% 45% 45%; background: radial-gradient(circle at 30% 30%, #ffffff88, #ffffff00 40%), var(--bcol, #f87171); box-shadow: inset -6px -12px 16px rgba(0,0,0,.12); z-index:96; animation: floatUp var(--dur, 6s) linear forwards; }
-  .balloon:after{ content:""; position:absolute; bottom:-16px; left:50%; width:2px; height:18px; background:#fff8; transform:translateX(-50%); }
-  @keyframes floatUp{ 0%{ transform: translateY(0) translateX(0) scale(1); opacity:.95 } 100%{ transform: translateY(-120vh) translateX(var(--drift,40px)) scale(1.05); opacity:1 } }
-
-  /* Fullscreen hide controls etc. */
-  .fullscreen-on .brand,
-  .fullscreen-on #controls,
-  .fullscreen-on #rtcOverlay,
-  .fullscreen-on #congrats,
-  .fullscreen-on #exitFs{ display:none !important }
 
   /* Pre-start overlay */
   #preOverlay{
@@ -351,11 +326,11 @@
       <div id="simpleTimer">00:00</div>
     </section>
 
-    <!-- To‑do panel (between clock and candle or at left when centered modes) -->
+    <!-- To‑do panel -->
     <section id="todo-panel" aria-label="To‑do list">
       <h4 id="todoTitle">To‑do</h4>
-      <ol id="todoList" contenteditable="true">
-        <li></li>
+      <ol id="todoList">
+        <li contenteditable="true"></li>
       </ol>
     </section>
 
@@ -427,7 +402,6 @@
         <div style="flex:1"><label for="bgC3">Color 3</label><input id="bgC3" type="color" value="#ffaf7b"></div>
       </div>
       <div class="row">
-        <!-- New: To‑do list color (background of the to‑do panel). Default remains transparent until changed. -->
         <div style="flex:1"><label for="todoColor">To‑do list color</label><input id="todoColor" type="color" value="#ffffff"></div>
       </div>
     </div>
@@ -478,14 +452,34 @@
 <script>
   const $ = s => document.querySelector(s);
 
-  /* Background */
+  /* =======================
+     Gradient + global colors
+     ======================= */
   const gradientStr = (a,c1,c2,c3)=>`linear-gradient(${a}deg, ${c1}, ${c2}, ${c3})`;
   function applyGradient(){
     const ang = parseInt($('#bgAngle').value||'135',10);
     document.body.style.backgroundImage = gradientStr(ang,$('#bgC1').value,$('#bgC2').value,$('#bgC3').value);
   }
+  function applyTodoBg(){
+    const v = $('#todoColor').value;
+    // If user selects a color, apply it; otherwise keep default transparent
+    if (v) document.documentElement.style.setProperty('--todo-bg', v);
+  }
+  function applyWax(){ document.documentElement.style.setProperty('--wax',$('#waxColor').value); }
+  function restyleClockPanels(){
+    document.documentElement.style.setProperty('--clock-c1',$('#clockC1').value);
+    document.documentElement.style.setProperty('--clock-c2',$('#clockC2').value);
+    document.documentElement.style.setProperty('--clock-c3',$('#clockC3').value);
+    document.documentElement.style.setProperty('--clock-text',$('#textColor').value);
+    document.documentElement.style.setProperty('--colon-color',$('#colonColor').value);
+  }
+  function applySimpleTextColor(){
+    document.documentElement.style.setProperty('--simple-text', $('#simpleTextColor').value);
+  }
 
-  /* Flip clock core */
+  /* ==================
+     Flip clock building
+     ================== */
   function createDigit(initial="0"){
     const d = document.createElement('div'); d.className='digit'; d.dataset.value=initial;
     const top = document.createElement('div'); top.className='top'; const t=document.createElement('span'); t.className='value'; t.textContent=initial; top.appendChild(t);
@@ -505,8 +499,10 @@
     });
   }
   function buildFlip(container, showH=true, showS=true){
-    container.innerHTML=''; const digits=[]; const addDigit=()=>{ const d=createDigit("0"); container.appendChild(d); digits.push(d); }; const addColon=()=>{ const c=document.createElement('div'); c.className='colon'; c.textContent=':'; container.appendChild(c); };
-    if (showH){ addDigit(); addDigit(); addColon(); } addDigit(); addDigit(); if (showS){ addColon(); addDigit(); addDigit(); } return digits;
+    container.innerHTML=''; const digits=[]; const addDigit=()=>{ const d=createDigit("0"); container.appendChild(d); digits.push(d); };
+    const addColon=()=>{ const c=document.createElement('div'); c.className='colon'; c.textContent=':'; container.appendChild(c); };
+    if (showH){ addDigit(); addDigit(); addColon(); } addDigit(); addDigit(); if (showS){ addColon(); addDigit(); addDigit(); }
+    return digits;
   }
   function timeArray(sec, showH, showS){
     let h=Math.floor(sec/3600), m=Math.floor((sec%3600)/60), s=sec%60; h=Math.min(h,99);
@@ -516,22 +512,32 @@
     const arr=timeArray(sec,showH,showS); digits.forEach((d,i)=> flipTo(d, arr[i] || '0'));
   }
 
-  /* Countdown */
+  /* =========
+     Countdown
+     ========= */
   const timerFlip = $('#timer'), timerSimple = $('#simpleTimer'), primaryBtn = $('#primaryBtn');
   let flipDigits=[], showH=false, showS=true, useFlip=true;
-
   let totalSec=0, endAtMs=0, rafId=null, lastWhole=-1, running=false, paused=false, pauseRemainMs=0;
 
   function refreshMode(){
     useFlip = $('#useFlip').checked;
     timerFlip.style.display = useFlip ? 'flex' : 'none';
     timerSimple.style.display = useFlip ? 'none' : 'block';
-    refreshSimpleColorCardVisibility();
+    $('#simpleColorCard').style.display = useFlip ? 'none' : '';
+    // Rebuild a fresh display (prevents disappearing clock)
+    if (useFlip){
+      flipDigits = buildFlip(timerFlip, $('#showHours').checked, $('#showSeconds').checked);
+      tickFlip(flipDigits, 0, $('#showHours').checked, $('#showSeconds').checked);
+    }else{
+      renderSimple(0);
+    }
   }
-
   function renderSimple(sec){
-    const str = showH ? `${String(Math.floor(sec/3600)).padStart(2,'0')}:${String(Math.floor((sec%3600)/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}` : `${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
-    timerSimple.textContent = str;
+    const sH = $('#showHours').checked, sS = $('#showSeconds').checked;
+    const out = sH
+      ? `${String(Math.floor(sec/3600)).padStart(2,'0')}:${String(Math.floor((sec%3600)/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`
+      : `${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
+    timerSimple.textContent = out;
   }
 
   function startCountdown(){
@@ -539,14 +545,12 @@
     const h=+$('#hoursInput').value||0, m=+$('#minInput').value||0, s=Math.max(0,Math.min(59,+$('#secInput').value||0));
     totalSec=h*3600+m*60+s;
 
-    /* Ensure candle is visible when (re)starting) */
+    // Ensure candle visible and aligned
     candleWrap.classList.remove('vanish');
-    candleWrap.style.opacity = '';
-    candleWrap.style.transform = '';
     stubEl.style.display = 'none';
     flameEl.classList.remove('off');
     setWaxHeightByProgress(1);
-    positionFlame();
+    requestLayoutAlign();
 
     if (useFlip){
       flipDigits = buildFlip(timerFlip, showH, showS);
@@ -566,58 +570,40 @@
     if (!running) return;
     const remainMs=Math.max(0,endAtMs-now), secWhole=Math.floor(remainMs/1000);
     if (secWhole!==lastWhole){
-      if (useFlip) tickFlip(flipDigits,secWhole,showH,showS); else renderSimple(secWhole);
+      if (useFlip) tickFlip(flipDigits,secWhole,$('#showHours').checked,$('#showSeconds').checked);
+      else renderSimple(secWhole);
       lastWhole=secWhole;
     }
     const p = totalSec>0 ? remainMs/(totalSec*1000) : 0;
-    setWaxHeightByProgress(p); positionFlame();
-
+    setWaxHeightByProgress(p);
+    positionFlame(); // keep aligned as wax shrinks
     if (remainMs<=0){ finishNow(); return; }
     rafId=requestAnimationFrame(loop);
   }
 
-  /* 3‑second pre‑start */
   let preRAF = null;
   function startWithFadeCountdown(){
     if (running || paused) return;
-    const overlay = $('#preOverlay');
-    const label = $('#preNum');
-    document.body.classList.add('pre-on');
-    overlay.hidden = false;
-
-    const D = 3000;
-    const endAt = performance.now() + D;
-
+    const overlay = $('#preOverlay'); const label = $('#preNum');
+    document.body.classList.add('pre-on'); overlay.hidden = false;
+    const D = 3000; const endAt = performance.now() + D;
     function step(ts){
       const remain = Math.max(0, endAt - ts);
-      const n = Math.ceil(remain/1000);
-      const text = n > 0 ? String(n) : 'Go';
-      if (label.textContent !== text){
-        label.textContent = text;
-        label.classList.remove('step'); void label.offsetWidth; label.classList.add('step');
-      }
-      if (remain <= 0){
-        overlay.hidden = true;
-        document.body.classList.remove('pre-on');
-        startCountdown();
-        return;
-      }
+      const n = Math.ceil(remain/1000); const text = n > 0 ? String(n) : 'Go';
+      if (label.textContent !== text){ label.textContent = text; label.classList.remove('step'); void label.offsetWidth; label.classList.add('step'); }
+      if (remain <= 0){ overlay.hidden = true; document.body.classList.remove('pre-on'); startCountdown(); return; }
       preRAF = requestAnimationFrame(step);
     }
     preRAF = requestAnimationFrame(step);
   }
 
   function togglePrimary(){
-    if (!running && !paused){
-      startWithFadeCountdown();
-      return;
-    }
+    if (!running && !paused){ startWithFadeCountdown(); return; }
     if (running){
       cancelAnimationFrame(rafId);
       pauseRemainMs = Math.max(0, endAtMs - performance.now());
       paused=true; running=false;
-      primaryBtn.textContent='Resume';
-      return;
+      primaryBtn.textContent='Resume'; return;
     }
     if (paused){
       endAtMs = performance.now()+pauseRemainMs;
@@ -628,46 +614,26 @@
     }
   }
 
-  /* Snap-reset candle + flame */
   function snapResetCandle(){
-    candleWrap.classList.add('no-transitions');
-    waxEl.classList.add('no-transitions');
-
+    candleWrap.classList.add('no-transitions'); waxEl.classList.add('no-transitions');
     candleWrap.classList.remove('vanish');
-    candleWrap.style.opacity = '';
-    candleWrap.style.transform = '';
     stubEl.style.display = 'none';
     flameEl.classList.remove('off');
-    smokeEl.classList.remove('show');
-
     setWaxHeightByProgress(1);
-    void candleWrap.offsetHeight; // force reflow
+    void candleWrap.offsetHeight; // reflow
     positionFlame();
-
-    requestAnimationFrame(()=>{
-      candleWrap.classList.remove('no-transitions');
-      waxEl.classList.remove('no-transitions');
-    });
+    requestAnimationFrame(()=>{ candleWrap.classList.remove('no-transitions'); waxEl.classList.remove('no-transitions'); });
   }
 
   function resetCountdown(){
     cancelAnimationFrame(rafId); running=false; paused=false;
     if (preRAF){ cancelAnimationFrame(preRAF); preRAF=null; $('#preOverlay').hidden=true; document.body.classList.remove('pre-on'); }
     primaryBtn.textContent='Start';
-
-    showH = $('#showHours').checked; showS = $('#showSeconds').checked;
-    if (useFlip){
-      flipDigits = buildFlip(timerFlip, showH, showS);
-      tickFlip(flipDigits, 0, showH, showS);
-    }else{
-      renderSimple(0);
-    }
-
+    refreshMode(); // rebuild display to avoid disappearance
     snapResetCandle();
     hideCongrats();
   }
 
-  /* Finish behavior */
   function finishNow(){
     cancelAnimationFrame(rafId); running=false; paused=false;
     extinguish();
@@ -676,21 +642,24 @@
     primaryBtn.textContent='Start';
   }
 
-  /* Candle coupling */
+  /* =========
+     Candle + flame
+     ========= */
   const area = $('#candle-area'), waxEl=$('#wax'), wickEl=$('#wick'), flameEl=$('#flame'), stubEl=$('#stub'), smokeEl=$('#smoke'), candleWrap=$('#candleWrap');
   const baseWaxHeight=380, minStub=58;
+  const FLAME_OFFSET = 10; // vertical fine-tune so the flame sits on the wick
 
-  function candleVisible(){
-    return getComputedStyle(area).display !== 'none';
-  }
+  function candleVisible(){ return getComputedStyle(area).display !== 'none'; }
 
   function positionFlame(){
     if (!candleVisible()) return;
     const w=wickEl.getBoundingClientRect(), a=area.getBoundingClientRect();
-    const x=w.left+w.width/2-a.left-flameEl.offsetWidth/2, y=w.top-a.top-flameEl.offsetHeight+20;
+    const x=w.left + w.width/2 - a.left - flameEl.offsetWidth/2;
+    const y=w.top - a.top - flameEl.offsetHeight + FLAME_OFFSET;
     flameEl.style.left=`${x}px`; flameEl.style.top=`${y}px`;
     smokeEl.style.left=`${x + flameEl.offsetWidth/2 - 5}px`; smokeEl.style.top=`${y - 2}px`;
   }
+  function requestLayoutAlign(){ requestAnimationFrame(positionFlame); }
   function setWaxHeightByProgress(progress){
     const usable=baseWaxHeight-minStub, h=minStub+Math.max(0, usable*progress);
     waxEl.style.height=`${h}px`;
@@ -705,28 +674,17 @@
     flameEl.classList.remove('off');
   }
 
-  /* Congrats */
+  /* =====
+     Congrats
+     ===== */
   const congrats = $('#congrats');
-  $('#cgClose').addEventListener('click', hideCongrats);
-  function showCongrats(){
-    congrats.classList.add('show');
-    launchBalloons(16);
-  }
+  $('#cgClose').addEventListener('click', ()=> congrats.classList.remove('show'));
+  function showCongrats(){ congrats.classList.add('show'); }
   function hideCongrats(){ congrats.classList.remove('show'); }
-  function launchBalloons(count=16){
-    const colors = ['#f87171','#60a5fa','#34d399','#fbbf24','#a78bfa','#fb7185','#22d3ee'];
-    for (let i=0;i<count;i++){
-      const b=document.createElement('div'); b.className='balloon';
-      b.style.left=`calc(${Math.random()*100}vw)`;
-      b.style.setProperty('--bcol', colors[Math.floor(Math.random()*colors.length)]);
-      b.style.setProperty('--dur', (5 + Math.random()*4).toFixed(2) + 's');
-      b.style.setProperty('--drift', ((Math.random()*120 - 60)|0) + 'px');
-      document.body.appendChild(b);
-      b.addEventListener('animationend', ()=> b.remove());
-    }
-  }
 
-  /* Fullscreen */
+  /* ==========
+     Fullscreen
+     ========== */
   async function goFullscreen(){
     try{
       if (!document.fullscreenElement){ await document.documentElement.requestFullscreen(); }
@@ -743,7 +701,9 @@
     if (!document.fullscreenElement){ document.body.classList.remove('fullscreen-on'); }
   });
 
-  /* Real-time overlay */
+  /* =========
+     Real-time
+     ========= */
   const rtcOverlay=$('#rtcOverlay'), rtcFlipContainer=$('#rtcTimer'), rtcSimple=$('#simpleRTC'), rtcBack=$('#rtcBack');
   let rtcDigits=[], rtcOn=false, rtcId=null, rtcLastSec=-1;
 
@@ -776,22 +736,122 @@
   }
   rtcBack.addEventListener('click', closeRTC);
 
-  /* Colors & bindings */
-  function restyleClockPanels(){
-    document.documentElement.style.setProperty('--clock-c1',$('#clockC1').value);
-    document.documentElement.style.setProperty('--clock-c2',$('#clockC2').value);
-    document.documentElement.style.setProperty('--clock-c3',$('#clockC3').value);
-    document.documentElement.style.setProperty('--clock-text',$('#textColor').value);
-    document.documentElement.style.setProperty('--colon-color',$('#colonColor').value);
-  }
-  function applyWax(){ document.documentElement.style.setProperty('--wax',$('#waxColor').value); }
-  function applySimpleTextColor(){
-    document.documentElement.style.setProperty('--simple-text', $('#simpleTextColor').value);
-  }
-  function applyTodoBg(){
-    const val = $('#todoColor').value;
-    document.documentElement.style.setProperty('--todo-bg', val);
+  /* ==========
+     To‑do logic
+     ========== */
+  const todoPanel = $('#todo-panel');
+  const todoList = $('#todoList');
+
+  // Pressing Enter creates a new numbered item; Shift+Enter makes a line break
+  todoList.addEventListener('keydown', (e)=>{
+    if (e.key === 'Enter'){
+      if (e.shiftKey) return; // line break inside item
+      e.preventDefault();
+      const sel = document.getSelection();
+      let li = sel?.anchorNode;
+      while(li && li.nodeType === 3){ li = li.parentElement; }
+      while(li && li.tagName !== 'LI'){ li = li.parentElement; }
+      if (!li){
+        const last = todoList.lastElementChild || todoList.appendChild(document.createElement('li'));
+        last.setAttribute('contenteditable','true');
+        placeCaretAtEnd(last);
+        return;
+      }
+      const newLi = document.createElement('li');
+      newLi.setAttribute('contenteditable','true');
+      li.after(newLi);
+      placeCaretAtEnd(newLi);
+    }
+  });
+
+  // Click with Ctrl/Cmd/Alt to toggle done
+  todoList.addEventListener('click', (e)=>{
+    const li = e.target.closest('li');
+    if (!li) return;
+    if (e.altKey || e.metaKey || e.ctrlKey){ li.classList.toggle('done'); }
+  });
+
+  function placeCaretAtEnd(el){
+    el.focus();
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
   }
 
-  function refreshSimpleColorCardVisibility(){
-    const show = !
+  /* ======================
+     Layout toggles/handlers
+     ====================== */
+  function ensureCandleVisibleWhenOnlyCandle(on){
+    if (on){
+      const hc = $('#hideCandle');
+      if (hc.checked){ hc.checked=false; document.body.classList.remove('candle-off'); }
+    }
+  }
+  function applyLayoutFlags(){
+    document.body.classList.toggle('candle-off', $('#hideCandle').checked);
+    document.body.classList.toggle('center-clock', $('#centerClock').checked);
+    document.body.classList.toggle('only-candle', $('#onlyCandle').checked);
+    document.body.classList.toggle('todo-on', $('#showTodo').checked);
+    if (!$('#onlyCandle').checked){ refreshMode(); } // keep clock present
+    requestLayoutAlign();
+  }
+
+  /* =================
+     Preview & updates
+     ================= */
+  function previewLayout(){
+    showH = $('#showHours').checked; showS = $('#showSeconds').checked; useFlip = $('#useFlip').checked;
+    if (useFlip){
+      flipDigits = buildFlip(timerFlip, showH, showS);
+      tickFlip(flipDigits, 0, showH, showS);
+    }else{
+      renderSimple(0);
+    }
+    requestLayoutAlign();
+  }
+
+  // UI events
+  $('#primaryBtn').addEventListener('click', togglePrimary);
+  $('#resetBtn').addEventListener('click', resetCountdown);
+
+  $('#useFlip').addEventListener('change', ()=>{ refreshMode(); refreshRTCMode(); previewLayout(); });
+  $('#rtcMode').addEventListener('change', e=> e.target.checked ? openRTC() : closeRTC());
+  $('#showHours').addEventListener('change', previewLayout);
+  $('#showSeconds').addEventListener('change', previewLayout);
+
+  // Layout toggles
+  $('#hideCandle').addEventListener('change', ()=>{ applyLayoutFlags(); });
+  $('#centerClock').addEventListener('change', ()=>{ applyLayoutFlags(); });
+  $('#onlyCandle').addEventListener('change', (e)=>{ ensureCandleVisibleWhenOnlyCandle(e.target.checked); applyLayoutFlags(); });
+  $('#showTodo').addEventListener('change', (e)=>{
+    applyLayoutFlags();
+    if (e.target.checked && !todoList.firstElementChild){
+      const li = document.createElement('li'); li.setAttribute('contenteditable','true'); todoList.appendChild(li);
+    }
+  });
+
+  // Colors & inputs
+  ['bgAngle','bgC1','bgC2','bgC3'].forEach(id=> document.getElementById(id).addEventListener('input', applyGradient));
+  ['clockC1','clockC2','clockC3','textColor','colonColor'].forEach(id=> document.getElementById(id).addEventListener('input', restyleClockPanels));
+  $('#waxColor').addEventListener('input', applyWax);
+  $('#simpleTextColor').addEventListener('input', applySimpleTextColor);
+  $('#todoColor').addEventListener('input', applyTodoBg);
+
+  // Resize aligns flame and keeps To‑do centered/at left as needed
+  window.addEventListener('resize', requestLayoutAlign);
+
+  // Init defaults
+  applyGradient(); restyleClockPanels(); applyWax(); applySimpleTextColor();
+  refreshMode(); refreshRTCMode(); previewLayout();
+  setWaxHeightByProgress(1); relight(); requestLayoutAlign();
+
+  // Safety: ensure at least one li exists (prevents blank OL quirks)
+  if (!todoList.firstElementChild){
+    const li = document.createElement('li'); li.setAttribute('contenteditable','true'); todoList.appendChild(li);
+  }
+</script>
+</body>
+</html>
