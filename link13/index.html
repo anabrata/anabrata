@@ -1,253 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WELCOME TO THE WORLD OF SOLAR SYSTEM</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3a 50%, #2d1b69 100%);
-            color: white;
-            font-family: Arial, sans-serif;
-            height: 100vh;
-            overflow: hidden;
-            perspective: 2000px;
-        }
-        
-        .banner {
-            text-align: center;
-            padding: 15px;
-            font-size: 24px;
-            font-weight: bold;
-            animation: fadeIn 2s ease-in;
-            text-shadow: 0 0 10px #22d3ee;
-            position: relative;
-            z-index: 100;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .solar-system-container {
-            position: relative;
-            width: 100%;
-            height: calc(100vh - 150px);
-            overflow: hidden;
-            cursor: grab;
-        }
-        
-        .solar-system-container:active {
-            cursor: grabbing;
-        }
-        
-        .solar-system {
-            position: absolute;
-            width: 3000px;
-            height: 3000px;
-            left: 50%;
-            top: 50%;
-            transform-origin: center center;
-            transform: translate(-50%, -50%) rotateX(15deg) rotateY(0deg) scale(0.3);
-            transition: transform 0.3s ease;
-            transform-style: preserve-3d;
-        }
-        
-        .stars {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                radial-gradient(2px 2px at 20px 30px, #eee, transparent),
-                radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
-                radial-gradient(1px 1px at 90px 40px, #fff, transparent),
-                radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.6), transparent),
-                radial-gradient(2px 2px at 160px 30px, #ddd, transparent);
-            background-repeat: repeat;
-            background-size: 200px 100px;
-            animation: twinkle 4s ease-in-out infinite alternate;
-            opacity: 0.7;
-        }
-        
-        @keyframes twinkle {
-            0% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
-        
-        .orbit {
-            position: absolute;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-        
-        /* True 3D Sun with multiple layers for depth */
-        .sun {
-            position: absolute;
-            width: 80px;
-            height: 80px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            transform-style: preserve-3d;
-            z-index: 10;
-        }
-        
-        .sun-sphere {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #FFD700, #FFA500, #FF4500);
-            box-shadow: 
-                0 0 40px #FFD700,
-                0 0 80px #FFA500,
-                inset -10px -10px 20px rgba(255,69,0,0.3),
-                inset 5px 5px 15px rgba(255,255,0,0.2);
-            animation: sunRotate 30s linear infinite;
-        }
-        
-        .sun-corona {
-            position: absolute;
-            width: 120%;
-            height: 120%;
-            top: -10%;
-            left: -10%;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,215,0,0.2) 0%, transparent 70%);
-            animation: coronaRotate 45s linear infinite reverse;
-        }
-        
-        @keyframes sunRotate {
-            from { transform: rotateY(0deg); }
-            to { transform: rotateY(360deg); }
-        }
-        
-        @keyframes coronaRotate {
-            from { transform: rotateZ(0deg); }
-            to { transform: rotateZ(360deg); }
-        }
-        
-        /* 3D Planet spheres */
-        .planet {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform-style: preserve-3d;
-            cursor: pointer;
-        }
-        
-        .planet-sphere {
-            border-radius: 50%;
-            transform-style: preserve-3d;
-            animation: planetRotate 20s linear infinite;
-            box-shadow: inset -5px -5px 15px rgba(0,0,0,0.4);
-        }
-        
-        .planet:hover .planet-sphere {
-            transform: scale(1.3);
-            transition: transform 0.3s ease;
-        }
-        
-        @keyframes planetRotate {
-            from { transform: rotateY(0deg); }
-            to { transform: rotateY(360deg); }
-        }
-        
-        /* Mercury - Corrected distance: 58 million km = 0.39 AU */
-        .mercury {
-            transform: translate(-50%, -50%);
-            animation: orbit-mercury 8s linear infinite;
-        }
-        
-        .mercury .planet-sphere {
-            width: 15px;
-            height: 15px;
-            background: radial-gradient(circle at 35% 35%, #C4C4C4, #8C7853, #5C5C5C);
-            margin-left: -120px;
-            margin-top: -7.5px;
-        }
-        
-        /* Venus - Corrected distance: 108 million km = 0.72 AU */
-        .venus {
-            transform: translate(-50%, -50%);
-            animation: orbit-venus 12s linear infinite;
-        }
-        
-        .venus .planet-sphere {
-            width: 22px;
-            height: 22px;
-            background: radial-gradient(circle at 35% 35%, #FFC649, #E6B800, #CC9900);
-            margin-left: -170px;
-            margin-top: -11px;
-        }
-        
-        /* Earth - Corrected distance: 150 million km = 1.00 AU */
-        .earth {
-            transform: translate(-50%, -50%);
-            animation: orbit-earth 16s linear infinite;
-            position: relative;
-        }
-        
-        .earth .planet-sphere {
-            width: 24px;
-            height: 24px;
-            background: radial-gradient(circle at 35% 35%, #6B93D6, #4F70A5, #2E5984);
-            background-image: 
-                radial-gradient(circle at 20% 40%, #228B22, transparent 30%),
-                radial-gradient(circle at 70% 60%, #228B22, transparent 25%);
-            margin-left: -220px;
-            margin-top: -12px;
-        }
-        
-        /* Earth's Moon */
-        .moon {
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            background: radial-gradient(circle at 35% 35%, #F5F5F5, #CCCCCC);
-            border-radius: 50%;
-            top: -20px;
-            left: 50%;
-            transform-origin: 12px 32px;
-            animation: moonOrbit 2s linear infinite;
-        }
-        
-        @keyframes moonOrbit {
-            from { transform: translateX(-50%) rotateZ(0deg) translateX(18px) rotateZ(0deg); }
-            to { transform: translateX(-50%) rotateZ(360deg) translateX(18px) rotateZ(-360deg); }
-        }
-        
-        /* Mars - Corrected distance: 228 million km = 1.52 AU */
-        .mars {
-            transform: translate(-50%, -50%);
-            animation: orbit-mars 20s linear infinite;
-        }
-        
-        .mars .planet-sphere {
-            width: 18px;
-            height: 18px;
-            background: radial-gradient(circle at 35% 35%, #CD5C5C, #C1440E, #8B2500);
-            margin-left: -280px;
-            margin-top: -9px;
-        }
-        
-        /* Jupiter - Corrected distance: 778 million km = 5.20 AU */
-        .jupiter {
-            transform: translate(-50%, -50%);
-            animation: orbit-jupiter 28s linear infinite;
-        }
-        
-        .jupiter .planet-sphere {
-            width: 60px;
-            height: 60px;
-            background: radial-gradient(circle at 35% 35%, #D8CA9D, #B8860B, #8B6914);
-            background-image: 
-                linear-gradient(90deg, transparent 0%, rgba(139,69,19,0.3) 20%, transparent 25%),
-                linear-gradient(90deg, transparent 40%, rgba(160,82,45,0.4) 45%, transparent 50%),
-                linear-gradient(90deg, transparent 70%, rgba(139,69,19,0.2
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WORLD OF SOLAR SYSTEM</title>
+  <style>
+    body { margin:0; overflow:hidden; font-family:Arial,sans-serif; background:#000; color:#fff }
+    #banner { position:absolute;top:10px;width:100%;text-align:center;font-size:24px;font-weight:bold;opacity:0;
+      animation:fadeIn 2s forwards; text-shadow:0 0 10px #0ff }
+    @keyframes fadeIn{to{opacity:1}}
+    #infoPanel { position:absolute; top:60px; right:20px; width:260px; background:rgba(0,0,0,0.7);
+      padding:12px; border-radius:8px; display:none; font-size:14px; }
+    #controls { position:absolute; bottom:20px; left:50%; transform:translateX(-50%);
+      background:rgba(0,0,0,0.7); padding:8px 12px; border-radius:8px; display:flex;gap:8px; align-items:center; }
+    #clock { position:absolute; top:10px; left:20px; font-family:monospace }
+    #selector { position:absolute; top:50px; left:20px; }
+  </style>
+</head>
+<body>
+  <div id="banner">WELCOME TO THE WORLD OF SOLAR SYSTEM</div>
+  <div id="clock"></div>
+  <div id="selector">
+    <select id="planetSelect"><option value="">Fly to…</option></select>
+  </div>
+  <div id="infoPanel"><div id="infoContent"></div></div>
+  <div id="controls">
+    <button id="pauseBtn">⏸️</button>
+    <button id="realTimeBtn">🌍 OFF</button>
+    Speed: <input type="range" id="speed" min="0.1" max="10" step="0.1" value="1">
+  </div>
+  <canvas id="c"></canvas>
+  
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+  <script>
+  (async()=> {
+    const canvas=document.getElementById('c'),
+          renderer=new THREE.WebGLRenderer({canvas,antialias:true,logarithmicDepthBuffer:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    document.body.style.touchAction='none';
+    const scene=new THREE.Scene(),
+          camera=new THREE.PerspectiveCamera(50,1,0.1,1e7);
+    camera.position.set(0,200,700);
+    const controls=new THREE.OrbitControls(camera,canvas);
+    controls.enableDamping=true;controls.dampingFactor=0.05;
+    
+    // Resize
+    const onResize=()=>{const w=innerWidth,h=innerHeight;
+      renderer.setSize(w,h,false);
+      camera.aspect=w/h;camera.updateProjectionMatrix();
+    };
+    window.addEventListener('resize',onResize);onResize();
+    
+    // Light & Sun
+    scene.add(new THREE.AmbientLight(0x222222,0.5));
+    const sunLight=new THREE.PointLight(0xffffff,2,0,2);
+    scene.add(sunLight);
+    const sunGeo=new THREE.SphereGeometry(30,64,32),
+          sunMat=new THREE.MeshBasicMaterial({map:await new THREE.TextureLoader().loadAsync('https://raw.githubusercontent.com/aloisdg/planet-textures/main/textures/sun.jpg')});
+    const sun=new THREE.Mesh(sunGeo,sunMat);
+    scene.add(sun);
+    
+    // Orbital elements (J2000 Schlyter)
+    const RAD=Math.PI/180,TAU=2*Math.PI,
+      rev=x=>x-Math.floor(x/360)*360,
+      kepler=(M,e)=>{let E=M+(180/Math.PI)*e*Math.sin(M*RAD);
+        for(let i=0;i<4;i++){const dE=(E-(180/Math.PI)*e*Math.sin(E*RAD)-M)/(1-e*Math.cos(E*RAD));E-=dE;if(Math.abs(dE)<1e-8)break;}
+        const x=Math.cos(E*RAD)-e,y=Math.sqrt(1-e*e)*Math.sin(E*RAD);
+        return{v:Math.atan2(y,x)/RAD,r:Math.sqrt(x*x+y*y)};},
+      elements={
+        Mercury:d=>({N:48.3313+3.24587e-5*d,i:7.0047,w:29.1241+1.01444e-5*d,a:0.387098,e:0.205635,M:168.6562+4.0923344368*d}),
+        Venus:d=>({N:76.6799+2.46590e-5*d,i:3.3946,w:54.8910+1.38374e-5*d,a:0.723330,e:0.006773,M:48.0052+1.6021302244*d}),
+        Earth:d=>({N:0,i:0,w:282.9404+4.70935e-5*d,a:1.000000,e:0.016709,M:356.0470+0.9856002585*d}),
+        Mars:d=>({N:49.5574+2.11081e-5*d,i:1.8497,w:286.5016+2.92961e-5*d,a:1.523688,e:0.093405,M:18.6021+0.5240207766*d}),
+        Jupiter:d=>({N:100.4542+2.76854e-5*d,i:1.3030,w:273.8777+1.64505e-5*d,a:5.20256,e:0.048498,M:19.8950+0.0830853001*d}),
+        Saturn:d=>({N:113.6634+2.38980e-5*d,i:2.4886,w:339.3939+2.97661e-5*d,a:9.55475,e:0.055546,M:316.9670+0.0334442282*d}),
+        Uranus:d=>({N:74.0005+1.3978e-5*d,i:0.7733,w:96.6612+3.0565e-5*d,a:19.18171,e:0.047318,M:142.5905+0.011725806*d}),
+        Neptune:d=>({N:131.7806+3.0173e-5*d,i:1.7700,w:272.8461,a:30.05826,e:0.008606,M:260.2471+0.005995147*d})
+      },
+      planetInfo={
+        Mercury:{tex:'https://raw.githubusercontent.com/aloisdg/planet-textures/main/textures/mercury.jpg',size:4},
+        Venus:{tex:'https://raw.githubusercontent.com/aloisdg/planet-textures/main/textures/venus.jpg',size:8},
+        Earth:{tex:'https://raw.githubusercontent.com/aloisdg/planet-textures/main/textures/earth.jpg',size:9},
+        Mars:{tex:'https://raw.githubusercontent.com/aloisdg/planet-textures/main/textures/mars.jpg',size:7},
+        Jupiter:{tex:'https://raw.githubusercontent.com/aloisdg/planet-textures/main/textures/jupiter.jpg',size:20},
+        Saturn:{tex:'https://raw.githubusercontent.com/aloisdg/planet-textures/main/textures/saturn.jpg',size:18},
+        Uranus:{tex:'https://raw.githubusercontent.com/aloisdg/planet-textures/main/textures/uranus.jpg',size:12},
+        Neptune:{tex:'https://raw.githubusercontent.com/aloisdg/planet-textures/main/textures/neptune.jpg',size:12}
+      };
+    
+    // Create planet meshes
+    const planets={}, orbitRings={};
+    const mapAU=v=>50+Math.log10(v/0.39)/(Math.log10(30/0.39))*800;
+    for(const name in planetInfo){
+      const {tex,size} = planetInfo[name];
+      const geo=new THREE.SphereGeometry(size,32,32);
+      const mat=new THREE.MeshStandardMaterial({ map: await new THREE.TextureLoader().loadAsync(tex) });
+      const mesh=new THREE.Mesh(geo,mat);
+      scene.add(mesh);
+      planets[name]=mesh;
+      // orbit ring
+      const ring=new THREE.RingGeometry(mapAU(elements[name](0).a)-0.5, mapAU(elements[name](0).a)+0.5, 128);
+      const matR=new THREE.MeshBasicMaterial({ color: 0xffffff, transparent:true, opacity:0.1, side:THREE.DoubleSide });
+      const ringMesh=new THREE.Mesh(ring,matR);
+      ringMesh.rotation.x=Math.PI/2;scene.add(ringMesh);
+      orbitRings[name]=ringMesh;
+    }
+    
+    // UI
+    const clockElem=document.getElementById('clock'),
+          panel=document.getElementById('infoPanel'),
+          content=document.getElementById('infoContent'),
+          select=document.getElementById('planetSelect');
+    for(const name in planetInfo) select.innerHTML+=`<option value="${name}">${name}</option>`;
+    
+    select.onchange=()=>flyTo(select.value);
+    document.getElementById('pauseBtn').onclick=()=>{animation=!animation};
+    document.getElementById('realTimeBtn').onclick=()=>{
+      realTime=!realTime;
+      document.getElementById('realTimeBtn').textContent = realTime?'🌍 ON':'🌍 OFF';
+    };
+    let speed=1, animation=true, realTime=false;
+    document.getElementById('speed').oninput=e=>speed=parseFloat(e.target.value);
+    
+    // Fly to planet
+    function flyTo(name){
+      if(!name)return;
+      const obj=planets[name];
+      if(!obj)return;
+      const box=new THREE.Box3().setFromObject(obj);
+      const center=box.getCenter(new THREE.Vector3());
+      controls.target.copy(center);
+      camera.position.copy(center.clone().add(new THREE.Vector3(200,100,200)));
+    }
+    
+    // Click info
+    canvas.onclick=e=>{
+      const coords=new THREE.Vector2((e.clientX/innerWidth)*2-1,-(e.clientY/innerHeight)*2+1);
+      const raycaster=new THREE.Raycaster();
+      raycaster.setFromCamera(coords,camera);
+      const hits=raycaster.intersectObjects(Object.values(planets));
+      if(hits.length){
+        const n=hits[0].object;
+        const name=Object.keys(planets).find(k=>planets[k]===n);
+        const el=planetInfo[name];
+        content.innerHTML=`<h3>${name}</h3>
+          <p><strong>Orbit:</strong> ${elements[name](dayNumber(new Date())).a.toFixed(2)} AU</p>
+          <p><strong>Real Size:</strong> ${el.size*1000} km radius</p>`;
+        panel.style.display='block';
+      }
+    };
+    
+    document.body.onclick=e=>{if(!panel.contains(e.target)&&e.target.tagName!=='CANVAS')panel.style.display='none'};
+    
+    // Animation loop
+    let last=0, nowDate=new Date();
+    function update(){
+      requestAnimationFrame(update);
+      const t=performance.now();
+      const dt=(t-last)/1000; last=t;
+      if(realTime) nowDate=new Date();
+      else nowDate=new Date(nowDate.getTime()+dt*1000*speed);
+      clockElem.textContent=nowDate.toISOString().slice(11,19)+' UTC';
+      
+      const d=dayNumber(nowDate);
+      for(const name in planets){
+        const p=planetHelio(name,d), R=mapAU(p.R)/p.R;
+        const m=planets[name];
+        m.position.set(p.x*R,p.z*R,p.y*R);
+        orbitRings[name].position.copy(m.position);
+      }
+      if(animation) controls.update();
+      renderer.render(scene,camera);
+    }
+    update();
+    
+  })();
+  </script>
+</body>
+</html>
