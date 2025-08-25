@@ -40,18 +40,6 @@
 
     /* Layout tweak */
     --candle-offset: 18px;
-
-    /* Card theme (solid, no transparency) */
-    --card-bg: #ffffff;
-    --card-border: #e6e8f0;
-    --card-shadow-1: 0 10px 30px rgba(16,24,40,.12);
-    --card-shadow-2: 0 2px 8px rgba(16,24,40,.06);
-
-    /* Field theme */
-    --field-bg: #ffffff;
-    --field-border: #d0d5dd;
-    --field-text: #101828;
-    --label-text: #111827;
   }
 
   *{box-sizing:border-box}
@@ -90,7 +78,7 @@
   /* Hide candle option */
   .candle-off #candle-area{ display:none !important; }
 
-  /* NEW: Only candle mode — hide clock, center candle */
+  /* Only candle mode — hide clock, center candle */
   .only-candle #timer-container{ display:none !important; }
   .only-candle .main{ justify-content:center; }
   .only-candle #candle-area{ justify-content:center; }
@@ -182,36 +170,33 @@
   .smoke.show{ animation:puff 1.4s ease-out forwards; }
   @keyframes puff{ 0%{ transform:translate(0,0) scale(1); opacity:.8; filter:blur(.4px) } 100%{ transform:translate(0,-120px) scale(2.1); opacity:0; filter:blur(3px) } }
 
-  /* Controls rail (kept as-is, mild translucency) */
+  /* Controls rail (kept) */
   #controls{
     position:relative; display:grid; grid-auto-flow:column; grid-auto-columns:minmax(240px,1fr); gap:14px; padding:16px;
     background:rgba(0,0,0,.22); backdrop-filter:blur(8px); scroll-snap-type:x mandatory; overflow-x:auto;
     border-top-left-radius:16px; border-top-right-radius:16px; z-index:10;
   }
 
-  /* PRO card theme: solid, high-contrast, eye-catching, no transparency */
+  /* TRANSPARENT CARDS (same style as past) */
   .card{
     position:relative; scroll-snap-align:start;
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius:16px;
-    padding:14px;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:14px;
+    padding:12px;
     min-height:84px;
-    display:flex; flex-direction:column; gap:10px;
-    box-shadow: var(--card-shadow-1), var(--card-shadow-2);
+    display:flex; flex-direction:column; gap:8px;
   }
-  .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-  label{ font-size:12px; color:var(--label-text); font-weight:600; }
+  .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  label{ font-size:12px; color:#fff; opacity:.95 }
 
-  input[type="number"], input[type="color"], select{
-    width:100%; padding:10px 12px; border-radius:12px;
-    border:1px solid var(--field-border);
-    background:var(--field-bg);
-    color:var(--field-text);
-    outline:none;
-    box-shadow: inset 0 1px 2px rgba(16,24,40,.04);
+  input[type="number"],input[type="color"],select{
+    width:100%; padding:8px 10px; border-radius:10px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(0,0,0,.35);
+    color:#fff; outline:none;
   }
-  input[type="checkbox"]{ transform:scale(1.15) }
+  input[type="checkbox"]{ transform:scale(1.2) }
 
   .btn{ position:relative; padding:12px 18px; border-radius:12px; border:none; font-weight:800; cursor:pointer; font-family: var(--btn-font); background:var(--btn-grad); color:#1b1b1b; box-shadow:0 6px 16px rgba(0,0,0,.18); transition:transform .12s, box-shadow .2s, background .2s; }
   .btn:hover{ background:var(--btn-grad-hover); box-shadow:0 10px 24px rgba(0,0,0,.28); }
@@ -743,33 +728,23 @@
 
   // Layout toggles
   $('#hideCandle').addEventListener('change', (e)=>{
-    // Prevent hiding while Only candle mode is active
     if (document.body.classList.contains('only-candle') && e.target.checked){
       e.target.checked = false;
       return;
     }
     document.body.classList.toggle('candle-off', e.target.checked);
-    if (!e.target.checked){
-      positionFlame();
-    }
+    if (!e.target.checked){ positionFlame(); }
   });
-
   $('#centerClock').addEventListener('change', (e)=>{
     document.body.classList.toggle('center-clock', e.target.checked);
     positionFlame();
   });
-
-  // NEW: Only candle mode
   $('#onlyCandle').addEventListener('change', (e)=>{
     const on = e.target.checked;
     document.body.classList.toggle('only-candle', on);
     if (on){
-      // ensure candle is visible
       const hc = $('#hideCandle');
-      if (hc.checked){
-        hc.checked = false;
-        document.body.classList.remove('candle-off');
-      }
+      if (hc.checked){ hc.checked = false; document.body.classList.remove('candle-off'); }
     }
     positionFlame();
   });
