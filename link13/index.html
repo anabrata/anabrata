@@ -173,54 +173,88 @@
   .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.3); flex:0 0 auto; }
 
   /* Transparent mode for flip cards */
+:root{
+  --glass-bg: rgba(255,255,255,0.18);
+  --glass-border: rgba(255,255,255,0.35);
+  --glass-blur: 16px;
+  --flip-duration: 560ms;   /* top card flip time */
+  --fade-out: 240ms;        /* bottom fade out */
+  --fade-in: 260ms;         /* bottom fade in */
+  --fade-delay: 80ms;       /* wait a beat after flip starts */
+}
+
 .clock-transparent .digit{
-position: relative;
-transform-style: preserve-3d;
-transform: translateZ(0);
-backface-visibility: hidden;
-contain: unset !important; / paint containment can kill blur */
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform, opacity, backdrop-filter;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 
-background: var(--glass-bg) !important;
-backdrop-filter: blur(var(--glass-blur)) saturate(140%) contrast(105%) !important;
--webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%) contrast(105%) !important;
+  /* IMPORTANT: paint containment can kill backdrop blur */
+  contain: unset !important;
 
-border: 1px solid var(--glass-border) !important;
-border-radius: var(--glass-radius);
-box-shadow:
-0 10px 28px rgba(0,0,0,0.22),
-inset 0 1px 0 rgba(255,255,255,0.12),
-inset 0 -1px 0 rgba(0,0,0,0.08);
+  background: var(--glass-bg) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 12px;
+  box-shadow:
+    0 10px 28px rgba(0,0,0,0.22),
+    inset 0 1px 0 rgba(255,255,255,0.12),
+    inset 0 -1px 0 rgba(0,0,0,0.08);
+
+  backdrop-filter: blur(var(--glass-blur)) saturate(140%) contrast(105%) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%) contrast(105%) !important;
 }
 
-/* kill any solid white/gradients the flip library adds */
-.clock-transparent .digit,
-.clock-transparent .digit *{
-background-image: none !important;
-}
-.clock-transparent .digit .front,
-.clock-transparent .digit .back,
-.clock-transparent .digit .face,
-.clock-transparent .digit .card,
-.clock-transparent .digit .shadow{
-background-color: transparent !important;
-}
-
-/* apply the frosted fill to the visible halves so you SEE the blur */
+/* keep halves translucent so the blur shows while moving */
 .clock-transparent .digit .top,
 .clock-transparent .digit .bottom{
-background: var(--glass-bg) !important;
-backdrop-filter: blur(var(--glass-blur)) saturate(140%) contrast(105%) !important;
--webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%) contrast(105%) !important;
+  background: var(--glass-bg) !important;
+  backdrop-filter: inherit !important;
+  -webkit-backdrop-filter: inherit !important;
 }
 
-/* divider lines */
-.clock-transparent .digit .top{ border-bottom: 1px solid rgba(255,255,255,0.25) !important; }
-.clock-transparent .digit .bottom{ border-top: 1px solid rgba(255,255,255,0.22) !important; }
+.clock-transparent .digit .top{
+  border-bottom: 1px solid rgba(255,255,255,0.25);
+  transform-origin: bottom center;
+  z-index: 2;
+}
 
-/* readability */
+.clock-transparent .digit .bottom{
+  border-top: 1px solid rgba(255,255,255,0.22);
+  transform-origin: top center;
+  z-index: 1;
+}
+
+/* readable numbers */
 .clock-transparent .digit .value{
-color: #000;
-text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+  color: #000;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+}
+
+/* remove any solid white/gradients introduced elsewhere */
+.clock-transparent .digit,
+.clock-transparent .digit *{
+  background-image: none !important;
+}
+
+/* Bottom fade animations, triggered via data-flip flag */
+@keyframes bottomFadeOut {
+  0%   { opacity: 1; filter: blur(0);   transform: translateY(0) scale(1); }
+  100% { opacity: 0; filter: blur(3px); transform: translateY(6px) scale(0.985); }
+}
+@keyframes bottomFadeIn {
+  0%   { opacity: 0; filter: blur(3px); transform: translateY(-6px) scale(0.985); }
+  100% { opacity: 1; filter: blur(0);   transform: translateY(0)     scale(1); }
+}
+
+/* while flip is happening (flag = 1): old bottom fades away */
+.clock-transparent .digit[data-flip="1"] .bottom{
+  animation: bottomFadeOut var(--fade-out) ease-out var(--fade-delay) both;
+}
+
+/* after flip completes (flag = 2): new bottom fades in */
+.clock-transparent .digit[data-flip="2"] .bottom{
+  animation: bottomFadeIn var(--fade-in) ease-out both;
 }
   /* ===== Simple clock ===== */
   #simpleTimer{
