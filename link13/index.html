@@ -173,60 +173,60 @@
   .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.3); flex:0 0 auto; }
 
   /* Transparent mode for flip cards */
-  .clock-transparent .digit{
-/ keep your 3D/animation hints */
+ .clock-transparent .digit{
+position: relative;
 transform-style: preserve-3d;
-will-change: transform, opacity, backdrop-filter;
 transform: translateZ(0);
 backface-visibility: hidden;
 
-/* frosted-glass base /
-background: rgba(255,255,255,0.08); / semi-transparent so blur shows */
-border-color: rgba(255,255,255,0.28);
+/* important: no paint containment (it can kill blur) */
+contain: unset !important;
+
+/* frosted base */
+background: rgba(255,255,255,0.12) !important;
+backdrop-filter: blur(16px) saturate(135%) contrast(105%) !important;
+-webkit-backdrop-filter: blur(16px) saturate(135%) contrast(105%) !important;
+
+border-radius: 12px;
+border-color: rgba(255,255,255,0.28) !important;
 box-shadow:
 0 10px 28px rgba(0,0,0,0.22),
 inset 0 1px 0 rgba(255,255,255,0.12),
-inset 0 -1px 0 rgba(0,0,0,0.10);
-
-/* blur the backdrop behind the digit */
-backdrop-filter: blur(12px) saturate(140%) contrast(110%);
--webkit-backdrop-filter: blur(12px) saturate(140%) contrast(110%);
-
-/* optional: soft rounding if you use it elsewhere */
-border-radius: 8px;
+inset 0 -1px 0 rgba(0,0,0,0.08);
 }
 
-/* subtle gloss on the card surface */
+/* apply the same translucent/blurred fill to the flip halves */
+.clock-transparent .digit .top,
+.clock-transparent .digit .bottom{
+background: rgba(255,255,255,0.10) !important;
+backdrop-filter: blur(16px) saturate(135%) contrast(105%) !important;
+-webkit-backdrop-filter: blur(16px) saturate(135%) contrast(105%) !important;
+}
+
+.clock-transparent .digit .top{
+border-bottom: 1px solid rgba(255,255,255,0.25) !important;
+}
+.clock-transparent .digit .bottom{
+border-top: 1px solid rgba(255,255,255,0.22) !important;
+}
+
+/* soft surface gloss */
 .clock-transparent .digit:before{
 content: "";
 position: absolute;
 inset: 0;
 pointer-events: none;
+border-radius: inherit;
 background: linear-gradient(
 to bottom,
-rgba(255,255,255,0.28),
+rgba(255,255,255,0.25),
 rgba(255,255,255,0.06)
 );
-border-radius: inherit;
 }
 
-/* top/bottom halves need a fill so the blur is visible */
-.clock-transparent .digit .top,
-.clock-transparent .digit .bottom{
-background: rgba(255,255,255,0.06);
-}
-
-.clock-transparent .digit .top{
-border-bottom: 1px solid rgba(255,255,255,0.25);
-}
-
-.clock-transparent .digit .bottom{
-border-top: 1px solid rgba(255,255,255,0.22);
-}
-
-/* keep numbers sharp and readable /
+/* keep digits readable */
 .clock-transparent .digit .value{
-color: inherit; / keep your theme color */
+color: #000;
 text-shadow: 0 1px 2px rgba(0,0,0,0.6);
 }
   /* ===== Simple clock ===== */
