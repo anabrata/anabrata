@@ -6,12 +6,12 @@
   <title>Professional Candle Timer</title>
   <style>
     :root {
-      --primary-bg: #1e1e1e;
-      --panel-bg: rgba(255,255,255,0.1);
+      --primary-bg: #121212;
+      --panel-bg: rgba(255,255,255,0.05);
       --accent: #ff9a00;
-      --text-light: #ffffff;
-      --text-dark: #333333;
-      --box-radius: 12px;
+      --text-light: #f0f0f0;
+      --text-dark: #202020;
+      --box-radius: 14px;
       --transition: 0.3s ease;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,16 +22,16 @@
       background: var(--primary-bg);
       font-family: 'Arial', sans-serif;
       color: var(--text-light);
-      overflow: hidden;
+      overflow-x: hidden;
     }
     .main {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 20px;
+      padding: 20px 5%;
     }
-    /* Clock container on left */
+    /* Flip-clock on left */
     #timer-container {
       flex: 1;
       display: flex;
@@ -41,119 +41,145 @@
     #timer {
       display: flex;
       align-items: center;
-      font-family: 'Comic Sans MS', sans-serif;
-    }
-    .flip-card {
-      perspective: 1200px;
+      font-family: 'Courier New', monospace;
+      font-size: 1.5rem;
     }
     .digit {
-      width: 60px; height: 80px; margin: 0 6px;
-      position: relative; overflow: hidden;
-      background: #000; color: var(--text-light);
+      width: 80px;
+      height: 100px;
+      margin: 0 8px;
+      position: relative;
+      background: #000;
+      color: var(--text-light);
       border-radius: var(--box-radius);
-      font-size: 60px; line-height: 80px;
-      text-align: center; font-weight: bold;
-      transition: background var(--transition);
+      overflow: hidden;
+      font-size: 80px;
+      line-height: 100px;
+      text-align: center;
+      font-weight: bold;
+      perspective: 800px;
     }
-    .digit > div {
-      position: absolute; width: 100%; height: 50%;
-      left: 0; backface-visibility: hidden;
+    .digit div {
+      position: absolute;
+      width: 100%;
+      height: 50%;
+      left: 0;
+      backface-visibility: hidden;
     }
     .top { top: 0; transform-origin: bottom; }
     .bottom { bottom: 0; transform-origin: top; }
     .back-top { top: 0; transform: rotateX(180deg); }
     .back-bottom { bottom: 0; }
-    .flip-up {
-      animation: flipUp 0.5s forwards;
-    }
-    .flip-down {
-      animation: flipDown 0.5s forwards;
-    }
-    @keyframes flipUp {
+    @keyframes flipTop {
       0% { transform: rotateX(0deg); }
-      50% { transform: rotateX(-90deg); }
-      100% { transform: rotateX(-180deg); }
+      100% { transform: rotateX(-90deg); }
     }
-    @keyframes flipDown {
-      0% { transform: rotateX(0deg); }
-      50% { transform: rotateX(90deg); }
-      100% { transform: rotateX(180deg); }
+    @keyframes flipBottom {
+      0% { transform: rotateX(90deg); }
+      100% { transform: rotateX(0deg); }
+    }
+    .flipping .top {
+      animation: flipTop 0.3s ease-in forwards;
+    }
+    .flipping .back-bottom {
+      animation: flipBottom 0.3s 0.3s ease-out forwards;
     }
     /* Candle on right */
     #candle-container {
       flex: 1;
       display: flex;
       justify-content: flex-end;
-      align-items: center;
+      align-items: flex-end;
       position: relative;
-      height: 300px;
+      height: 350px;
     }
     #candle, #candle-out {
-      width: 100px; height: 250px;
-      border-radius: 12px;
+      width: 120px;
+      height: 300px;
+      border-radius: 16px;
       transition: background var(--transition), transform 1s ease, opacity 0.5s;
     }
-    #candle { background: #fff; }
+    #candle { background: #faf3e0; box-shadow: inset 0 0 10px rgba(0,0,0,0.2); }
     #flame {
-      position: absolute; width: 40px; height: 80px;
-      background: radial-gradient(circle at 50% 20%, #fffa90, var(--accent) 60%, transparent);
+      position: absolute;
+      top: calc(100% - 330px);
+      left: calc(50% + 10px);
+      width: 40px;
+      height: 90px;
+      background: radial-gradient(circle at 50% 20%, #fff7c2, var(--accent) 55%, transparent);
       border-radius: 50% 50% 30% 30%;
       filter: blur(2px);
-      animation: flicker 0.15s infinite;
+      animation: flicker 0.12s infinite;
       transition: opacity 0.5s;
     }
     @keyframes flicker {
-      0%,100% { transform: translateX(-50%) scale(1); opacity: 1; }
-      50% { transform: translateX(-50%) scale(1.15); opacity: 0.75; }
+      0%,100% { transform: translate(-50%,0) scale(1); opacity: 1; }
+      50% { transform: translate(-50%,0) scale(1.2); opacity: 0.7; }
     }
     #candle-out {
-      background: #555; display: none;
-      transform: rotate(30deg) translateY(-150px);
+      background: #555;
+      display: none;
+      transform: rotate(25deg) translateY(-200px);
       opacity: 0.8;
     }
-    /* Bottom control panel */
+    /* Scroll-linked wave panel */
     #controls {
+      position: relative;
+      backdrop-filter: blur(8px);
       background: var(--panel-bg);
       padding: 15px 20px;
       display: flex;
-      gap: 20px;
+      gap: 18px;
       align-items: center;
-      justify-content: center;
+      justify-content: space-between;
+      overflow-x: auto;
       border-top-left-radius: var(--box-radius);
       border-top-right-radius: var(--box-radius);
+      scroll-snap-type: x mandatory;
     }
     .control-group {
-      display: flex; flex-direction: column;
+      flex: 0 0 auto;
+      scroll-snap-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: start;
       color: var(--text-light);
     }
     .control-group label {
-      font-size: 14px; margin-bottom: 5px;
+      font-size: 13px;
+      margin-bottom: 4px;
     }
-    .control-group input[type="number"],
-    .control-group select,
-    .control-group input[type="color"] {
-      padding: 6px 8px; border: none;
+    .control-group input,
+    .control-group select {
+      padding: 6px 10px;
+      border: none;
       border-radius: var(--box-radius);
       outline: none;
+      font-size: 14px;
     }
     .control-group input[type="checkbox"] {
-      transform: scale(1.2);
-      margin-right: 5px;
+      transform: scale(1.3);
+      margin-right: 6px;
     }
     #startBtn {
+      flex: 0 0 auto;
       background: var(--accent);
       color: var(--text-dark);
-      border: none; padding: 10px 20px;
+      border: none;
+      padding: 12px 24px;
       border-radius: var(--box-radius);
-      font-weight: bold; cursor: pointer;
+      font-weight: bold;
+      cursor: pointer;
       transition: background var(--transition);
+      scroll-snap-align: center;
     }
     #startBtn:hover {
       background: #ff7a00;
     }
     footer {
-      position: absolute; bottom: 10px; width: 100%;
-      text-align: center; font-size: 12px;
+      text-align: center;
+      padding: 8px;
+      font-size: 12px;
       color: var(--text-light);
     }
   </style>
@@ -171,35 +197,37 @@
   </div>
   <div id="controls">
     <div class="control-group">
-      <label>Minutes</label>
-      <input type="number" id="minInput" value="0" min="0" />
+      <label for="minInput">Minutes</label>
+      <input id="minInput" type="number" value="0" min="0" />
     </div>
     <div class="control-group">
-      <label>Seconds</label>
-      <input type="number" id="secInput" value="30" min="0" max="59" />
+      <label for="secInput">Seconds</label>
+      <input id="secInput" type="number" value="30" min="0" max="59" />
     </div>
     <div class="control-group">
-      <label><input type="checkbox" id="toggleSec" checked /> Show Seconds</label>
+      <label>
+        <input id="toggleSec" type="checkbox" checked /> Show Seconds
+      </label>
     </div>
     <div class="control-group">
-      <label>Clock Color</label>
-      <input type="color" id="colorPicker" value="#ffffff" />
+      <label for="colorPicker">Clock Color</label>
+      <input id="colorPicker" type="color" value="#ffffff" />
     </div>
     <div class="control-group">
-      <label>Background</label>
-      <input type="color" id="bgPicker" value="#1e1e1e" />
+      <label for="bgPicker">Background</label>
+      <input id="bgPicker" type="color" value="#121212" />
     </div>
     <div class="control-group">
-      <label>Candle Color</label>
-      <input type="color" id="candleColorPicker" value="#ffffff" />
+      <label for="candleColorPicker">Candle Color</label>
+      <input id="candleColorPicker" type="color" value="#faf3e0" />
     </div>
     <div class="control-group">
-      <label>Font</label>
+      <label for="fontPicker">Font</label>
       <select id="fontPicker">
-        <option value="Comic Sans MS">Comic Sans MS</option>
-        <option value="Arial" selected>Arial</option>
-        <option value="Verdana">Verdana</option>
-        <option value="Courier New">Courier New</option>
+        <option>Comic Sans MS</option>
+        <option selected>Arial</option>
+        <option>Verdana</option>
+        <option>Courier New</option>
       </select>
     </div>
     <button id="startBtn">Start</button>
@@ -210,10 +238,10 @@
     function createDigit() {
       const d = document.createElement('div');
       d.className = 'digit';
-      ['top','back-top','bottom','back-bottom'].forEach(cls => {
-        const part = document.createElement('div');
-        part.className = cls;
-        d.appendChild(part);
+      ['top','back-top','bottom','back-bottom'].forEach(c => {
+        const el = document.createElement('div');
+        el.className = c;
+        d.appendChild(el);
       });
       return d;
     }
@@ -230,7 +258,7 @@
         const colon = document.createElement('span');
         colon.textContent = ':';
         colon.style.color = getComputedStyle(timerEl).color;
-        colon.style.fontSize = '60px';
+        colon.style.fontSize = '80px';
         timerEl.appendChild(colon);
         timerEl.appendChild(createDigit());
         timerEl.appendChild(createDigit());
@@ -246,22 +274,19 @@
       backTop.textContent = oldVal;
       bottom.textContent = newVal;
       backBottom.textContent = newVal;
-      // decide flip direction
-      const anim = parseInt(newVal) < parseInt(oldVal) ? 'flip-down' : 'flip-up';
-      digit.classList.add(anim);
+      digit.classList.add('flipping');
       digit.addEventListener('animationend', () => {
         top.textContent = newVal;
-        digit.classList.remove(anim);
+        digit.classList.remove('flipping');
       }, { once: true });
     }
 
     function updateDisplay(sec) {
-      const mins = Math.floor(sec / 60);
-      const secs = sec % 60;
+      const m = Math.floor(sec/60), s = sec%60;
       const arr = [
-        ...String(mins).padStart(2,'0'),
+        ...String(m).padStart(2,'0'),
         ...(document.getElementById('toggleSec').checked
-          ? String(secs).padStart(2,'0').split('') : [])
+          ? String(s).padStart(2,'0').split('') : [])
       ];
       digits.forEach((d,i) => flipTo(d, arr[i] || '0'));
     }
@@ -272,7 +297,7 @@
         document.getElementById('flame').style.opacity = '0';
         document.getElementById('candle').style.opacity = '0';
         document.getElementById('candle-out').style.display = 'block';
-        document.getElementById('candle-container').style.transform = 'translateY(200px) rotate(30deg)';
+        document.getElementById('candle-container').style.transform = 'translateY(220px) rotate(25deg)';
         return;
       }
       remaining--;
@@ -281,22 +306,29 @@
 
     document.getElementById('startBtn').onclick = () => {
       clearInterval(intervalId);
-      const m = parseInt(document.getElementById('minInput').value)||0;
-      const s = parseInt(document.getElementById('secInput').value)||0;
+      const m = +document.getElementById('minInput').value || 0;
+      const s = +document.getElementById('secInput').value || 0;
       remaining = m*60 + s;
       setupDigits(document.getElementById('toggleSec').checked);
       intervalId = setInterval(tick, 1000);
     };
 
-    document.getElementById('toggleSec').onchange = () => setupDigits(document.getElementById('toggleSec').checked);
-    document.getElementById('colorPicker').oninput = e => {
-      timerEl.querySelectorAll('.digit, span').forEach(el => el.style.color = e.target.value);
-    };
-    document.getElementById('bgPicker').oninput = e => document.body.style.background = e.target.value;
-    document.getElementById('candleColorPicker').oninput = e => document.getElementById('candle').style.background = e.target.value;
-    document.getElementById('fontPicker').onchange = e => document.body.style.fontFamily = `'${e.target.value}', sans-serif`;
+    document.getElementById('toggleSec').onchange = () =>
+      setupDigits(document.getElementById('toggleSec').checked);
 
-    // initial
+    document.getElementById('colorPicker').oninput = e =>
+      timerEl.querySelectorAll('.digit, span').forEach(el => el.style.color = e.target.value);
+
+    document.getElementById('bgPicker').oninput = e =>
+      document.body.style.background = e.target.value;
+
+    document.getElementById('candleColorPicker').oninput = e =>
+      document.getElementById('candle').style.background = e.target.value;
+
+    document.getElementById('fontPicker').onchange = e =>
+      document.body.style.fontFamily = `'${e.target.value}', sans-serif`;
+
+    // Initial
     setupDigits(true);
   </script>
 </body>
