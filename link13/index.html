@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Candle Timer — v2.3</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Candle Timer — v2.4</title>
 <style>
   :root{
     --digit-w: 120px;
@@ -39,8 +39,7 @@
     font-family:"Comic Sans MS", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
     overflow-x:hidden;
     background-image: linear-gradient(var(--bg-angle), var(--bg-c1), var(--bg-c2), var(--bg-c3));
-    background-attachment: fixed;
-    background-size: cover;
+    background-attachment: fixed; background-size: cover;
   }
 
   .brand{ position:fixed; left:12px; top:10px; z-index:40; font-weight:700; font-size:13px; opacity:.9; text-shadow:0 1px 2px rgba(0,0,0,.35); user-select:none; }
@@ -82,10 +81,11 @@
 
   .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.6); }
 
-  /* Candle — lowered, refined top, no exterior shadow */
+  /* Candle — lowered, refined top, vanish on completion */
   #candle-area{ flex:1; display:flex; align-items:flex-end; justify-content:flex-end; min-width:340px; height:max(380px,42vh); position:relative; transform: translateY(var(--candle-offset)); }
   .candle-clip{ position:relative; width:180px; height:380px; overflow:hidden; display:flex; align-items:flex-end; justify-content:center; }
-  .candle-wrap{ position:absolute; inset:auto 0 0 0; margin:auto; width:180px; height:380px; display:flex; align-items:flex-end; justify-content:center; }
+  .candle-wrap{ position:absolute; inset:auto 0 0 0; margin:auto; width:180px; height:380px; display:flex; align-items:flex-end; justify-content:center; transition: transform .5s ease, opacity .5s ease; }
+  .candle-wrap.vanish{ transform: scale(.85) translateY(12px); opacity: 0; pointer-events:none; }
 
   .wax{
     position:absolute; bottom:0; width:150px; height:100%; z-index:1;
@@ -122,7 +122,6 @@
     transition: opacity .35s ease;
     pointer-events:none;
   }
-  /* Softer, fade-like flicker */
   @keyframes flickerSoft{
     0%{ transform:scale(1) rotate(-0.8deg); opacity:.95 }
     50%{ transform:scale(1.06) rotate(0.6deg); opacity:.82 }
@@ -154,12 +153,19 @@
   #rtcOverlay.show{ display:flex; }
   #rtcTimer{ display:flex; align-items:center; gap:12px; }
   #simpleRTC{ display:none; font-weight:900; letter-spacing:.5px; color:var(--clock-text); text-shadow:0 6px 24px rgba(0,0,0,.45); font-size:min(12vw, 120px); }
-
-  /* Back button always visible in RTC */
   #rtcBack{ position:fixed; top:8px; left:10px; opacity:.45; background:rgba(0,0,0,.25); color:#fff; border-radius:10px; padding:6px 10px; font-weight:800; border:none; cursor:pointer; z-index:95; }
   #rtcBack:hover{ opacity:.75 }
-
   .rtc-only .brand, .rtc-only #controls, .rtc-only #main, .rtc-only #exitFs { display:none !important; }
+
+  /* Congrats overlay + balloons */
+  #congrats{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; flex-direction:column; background:rgba(0,0,0,.35); z-index:95; backdrop-filter:blur(2px); }
+  #congrats.show{ display:flex; }
+  .cg-card{ background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); padding:22px 26px; border-radius:16px; text-align:center; color:#fff; box-shadow:0 14px 40px rgba(0,0,0,.4); }
+  .cg-title{ font-size:28px; font-weight:900; margin-bottom:6px; }
+  .cg-sub{ font-size:14px; opacity:.95; margin-bottom:12px; }
+  .balloon{ position:fixed; bottom:-120px; width:28px; height:36px; border-radius:50% 50% 45% 45%; background: radial-gradient(circle at 30% 30%, #ffffff88, #ffffff00 40%), var(--bcol, #f87171); box-shadow: inset -6px -12px 16px rgba(0,0,0,.12); z-index:96; animation: floatUp var(--dur, 6s) linear forwards; }
+  .balloon:after{ content:""; position:absolute; bottom:-16px; left:50%; width:2px; height:18px; background:#fff8; transform:translateX(-50%); }
+  @keyframes floatUp{ 0%{ transform: translateY(0) translateX(0) scale(1); opacity:.95 } 100%{ transform: translateY(-120vh) translateX(var(--drift,40px)) scale(1.05); opacity:1 } }
 
   @media (max-width:980px){ :root{ --digit-w:100px; --digit-h:140px; } }
   @media (max-width:720px){ :root{ --digit-w:86px; --digit-h:120px; } }
@@ -190,10 +196,20 @@
     </section>
   </div>
 
+  <!-- Real-time overlay -->
   <div id="rtcOverlay">
     <button id="rtcBack" title="Back">Back</button>
     <div id="rtcTimer"></div>
     <div id="simpleRTC">00:00:00</div>
+  </div>
+
+  <!-- Congrats -->
+  <div id="congrats">
+    <div class="cg-card">
+      <div class="cg-title">Congratulations!</div>
+      <div class="cg-sub">The timer is complete. Great focus!</div>
+      <button id="cgClose" class="btn alt">Close</button>
+    </div>
   </div>
 
   <div id="controls">
@@ -245,14 +261,14 @@
       <div class="row">
         <div style="flex:1"><label for="waxColor">Wax color</label><input id="waxColor" type="color" value="#f2e4c7"></div>
       </div>
-      <span class="small">Flame burns during countdown and fully turns off at 0.</span>
+      <!-- Note removed per request -->
     </div>
   </div>
 
 <script>
   const $ = s => document.querySelector(s);
 
-  /* Gradient */
+  /* Background gradient */
   const gradientStr = (a,c1,c2,c3)=>`linear-gradient(${a}deg, ${c1}, ${c2}, ${c3})`;
   function applyGradient(){
     const ang = parseInt($('#bgAngle').value||'135',10);
@@ -322,7 +338,7 @@
     relight(); setWaxHeightByProgress(1); positionFlame();
 
     cancelAnimationFrame(rafId); paused=false; running=false;
-    if (totalSec<=0){ setWaxHeightByProgress(0); extinguish(); primaryBtn.textContent='Start'; return; }
+    if (totalSec<=0){ finishNow(); return; }
     endAtMs = performance.now()+totalSec*1000; lastWhole=Math.ceil(totalSec); running=true;
     primaryBtn.textContent='Stop';
     rafId = requestAnimationFrame(loop);
@@ -338,12 +354,7 @@
     const p = totalSec>0 ? remainMs/(totalSec*1000) : 0;
     setWaxHeightByProgress(p); positionFlame();
 
-    if (remainMs<=0){
-      extinguish();
-      running=false;
-      primaryBtn.textContent='Start';
-      return;
-    }
+    if (remainMs<=0){ finishNow(); return; }
     rafId=requestAnimationFrame(loop);
   }
 
@@ -371,7 +382,6 @@
   function resetCountdown(){
     cancelAnimationFrame(rafId); running=false; paused=false;
     primaryBtn.textContent='Start';
-    // Re-render to current inputs but not running
     showH = $('#showHours').checked; showS = $('#showSeconds').checked;
     if (useFlip){
       flipDigits = buildFlip(timerFlip, showH, showS);
@@ -380,10 +390,21 @@
       renderSimple(0);
     }
     setWaxHeightByProgress(1); relight(); positionFlame();
+    candleWrap.classList.remove('vanish');
+    hideCongrats();
+  }
+
+  /* Finish behavior: flame off, candle vanish, congrats */
+  function finishNow(){
+    cancelAnimationFrame(rafId); running=false; paused=false;
+    extinguish();
+    candleWrap.classList.add('vanish');
+    showCongrats();
+    primaryBtn.textContent='Start';
   }
 
   /* Candle coupling */
-  const area = $('#candle-area'), waxEl=$('#wax'), wickEl=$('#wick'), flameEl=$('#flame'), stubEl=$('#stub'), smokeEl=$('#smoke');
+  const area = $('#candle-area'), waxEl=$('#wax'), wickEl=$('#wick'), flameEl=$('#flame'), stubEl=$('#stub'), smokeEl=$('#smoke'), candleWrap=$('#candleWrap');
   const baseWaxHeight=380, minStub=58;
 
   function positionFlame(){
@@ -406,6 +427,29 @@
     flameEl.classList.remove('off');
   }
 
+  /* Congrats overlay */
+  const congrats = $('#congrats');
+  $('#cgClose').addEventListener('click', hideCongrats);
+  function showCongrats(){
+    congrats.classList.add('show');
+    launchBalloons(16);
+  }
+  function hideCongrats(){
+    congrats.classList.remove('show');
+  }
+  function launchBalloons(count=16){
+    const colors = ['#f87171','#60a5fa','#34d399','#fbbf24','#a78bfa','#fb7185','#22d3ee'];
+    for (let i=0;i<count;i++){
+      const b=document.createElement('div'); b.className='balloon';
+      b.style.left=`calc(${Math.random()*100}vw)`;
+      b.style.setProperty('--bcol', colors[Math.floor(Math.random()*colors.length)]);
+      b.style.setProperty('--dur', (5 + Math.random()*4).toFixed(2) + 's');
+      b.style.setProperty('--drift', ((Math.random()*120 - 60)|0) + 'px');
+      document.body.appendChild(b);
+      b.addEventListener('animationend', ()=> b.remove());
+    }
+  }
+
   /* Fullscreen */
   async function goFullscreen(){ try{ if (!document.fullscreenElement){ await document.documentElement.requestFullscreen(); } $('#exitFs').style.display='block'; }catch(e){} }
   function exitFullscreen(){ document.exitFullscreen?.(); $('#exitFs').style.display='none'; }
@@ -413,7 +457,7 @@
   $('#exitFs').addEventListener('click', exitFullscreen);
   document.addEventListener('fullscreenchange', ()=>{ if (!document.fullscreenElement){ $('#exitFs').style.display='none'; } });
 
-  /* Real-time overlay (flip or simple), with visible Back */
+  /* Real-time overlay (flip or simple), with visible Back and 1Hz updates */
   const rtcOverlay=$('#rtcOverlay'), rtcFlipContainer=$('#rtcTimer'), rtcSimple=$('#simpleRTC'), rtcBack=$('#rtcBack');
   let rtcDigits=[], rtcShowH=true, rtcShowS=true, rtcOn=false, rtcId=null, rtcLastSec=-1;
 
@@ -422,7 +466,6 @@
     rtcFlipContainer.style.display = useFlip ? 'flex' : 'none';
     rtcSimple.style.display = useFlip ? 'none' : 'block';
   }
-
   function openRTC(){
     document.body.classList.add('rtc-only'); rtcOverlay.classList.add('show');
     cancelAnimationFrame(rafId); running=false; paused=false; primaryBtn.textContent='Start';
@@ -439,7 +482,7 @@
   }
   function drawRTC(){
     if (!rtcOn) return;
-    const secOfDay = Math.floor(Date.now()/1000)%86400; // throttle to 1Hz
+    const secOfDay = Math.floor(Date.now()/1000)%86400;
     if (secOfDay !== rtcLastSec){
       if ($('#useFlip').checked){
         tickFlip(rtcDigits, secOfDay, rtcShowH, rtcShowS);
@@ -450,9 +493,9 @@
     }
     rtcId = requestAnimationFrame(drawRTC);
   }
-  $('#rtcBack').addEventListener('click', closeRTC);
+  rtcBack.addEventListener('click', closeRTC);
 
-  /* Colors */
+  /* Colors & bindings */
   function restyleClockPanels(){
     document.documentElement.style.setProperty('--clock-c1',$('#clockC1').value);
     document.documentElement.style.setProperty('--clock-c2',$('#clockC2').value);
@@ -462,11 +505,26 @@
   }
   function applyWax(){ document.documentElement.style.setProperty('--wax',$('#waxColor').value); }
 
-  // UI events
-  primaryBtn.addEventListener('click', togglePrimary);
+  // UI wiring
+  const startOrStop = () => togglePrimary();
+  $('#primaryBtn').addEventListener('click', startOrStop);
   $('#resetBtn').addEventListener('click', resetCountdown);
-  $('#useFlip').addEventListener('change', ()=>{ refreshMode(); refreshRTCMode(); });
+  $('#useFlip').addEventListener('change', ()=>{ refreshMode(); refreshRTCMode(); previewLayout(); });
   $('#rtcMode').addEventListener('change', e=> e.target.checked ? openRTC() : closeRTC());
+
+  // Live rebuild when toggling hours/seconds to verify it “works”
+  function previewLayout(){
+    showH = $('#showHours').checked; showS = $('#showSeconds').checked;
+    if (useFlip){
+      flipDigits = buildFlip(timerFlip, showH, showS);
+      tickFlip(flipDigits, 0, showH, showS);
+    }else{
+      renderSimple(0);
+    }
+  }
+  $('#showHours').addEventListener('change', previewLayout);
+  $('#showSeconds').addEventListener('change', previewLayout);
+
   ['bgAngle','bgC1','bgC2','bgC3'].forEach(id=> document.getElementById(id).addEventListener('input', applyGradient));
   ['clockC1','clockC2','clockC3','textColor','colonColor'].forEach(id=> document.getElementById(id).addEventListener('input', restyleClockPanels));
   $('#waxColor').addEventListener('input', applyWax);
@@ -474,9 +532,7 @@
 
   // Init
   applyGradient(); restyleClockPanels(); applyWax();
-  refreshMode(); refreshRTCMode();
-  flipDigits = buildFlip($('#timer'), false, true); // default MM:SS
-  tickFlip(flipDigits,60,false,true);
+  refreshMode(); refreshRTCMode(); previewLayout();
   setWaxHeightByProgress(1); relight(); positionFlame();
 </script>
 </body>
