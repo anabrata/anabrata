@@ -5,17 +5,74 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Candle Timer — V10</title>
   <style>
-    /* Original desktop layout and UI styles here (keep your full style block from the V10 build) */
-    /* ... (Insert all your timers, to‑do, candle, controls, responsiveness and fancy UI styles here) ... */
+    /* --- Core styles, including timer, candle, todo --- */
+    body {
+      margin: 0;
+      font-family: "Comic Sans MS", system-ui, Segoe UI, Arial;
+      background: linear-gradient(135deg,#3a1c71,#d76d77,#ffaf7b);
+      min-height: 100vh;
+      color: #222;
+    }
+    .brand { font-weight: bold; padding: 8px 0 0 8px; font-size: 19px; color:#111; }
+    .main { width: 100%; max-width: 1100px; margin: auto; display: grid; grid-template-columns: 1fr minmax(240px,400px) 1fr; gap: 24px; align-items: stretch; min-height: 70vh; }
+    #timer-container { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    #timer {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      user-select: none;
+    }
+    .digit {
+      width: 70px; height: 100px; border-radius: 12px;
+      background: linear-gradient(135deg,#fff,#fdc);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.11);
+      font-size: 60px; font-weight: bold;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+      margin: 0 2px;
+      color: #211;
+    }
+    .colon { display: flex; align-items:center; justify-content:center; font-size:60px; color: #a33; }
+    #simpleTimer { margin-top: 12px; font-size: 44px; color: #fff; font-weight: bold; text-shadow: 0 0 8px #d76d77; }
 
-    /* Sidebar styles for mobile landscape */
+    /* Candle graphic minimal */
+    #candle-area { display: flex; align-items: end; justify-content: center; }
+    .candle-clip { width: 90px; height: 210px; position: relative; }
+    .wax {
+      position: absolute; bottom:0; left:50%; transform:translateX(-50%);
+      width: 65px; height: 180px; background: #f2e4c7;
+      border-radius: 18px;
+      box-shadow: 0 6px 34px #b58;
+    }
+    .wick { position: absolute; width: 6px; height: 26px; background: #1b1b1b; top: 6px; left: 50%; transform: translateX(-50%); border-radius: 4px; z-index: 4; }
+    .flame {
+      position: absolute; left: 50%; top: -14px; transform: translateX(-50%);
+      width: 30px; height: 54px;
+      pointer-events: none;
+    }
+    .flame-core {
+      width:100%;height:100%;border-radius:50% 50% 38% 38%;
+      background: radial-gradient(ellipse at 50% 22%,#fff7c0 0%,#ffe08a 38%,#ffb347 58%,#ff7a00 78%,transparent 80%);
+      box-shadow:0 0 18px 6px #fab,0 0 35px 14px #fea;
+      opacity: 0.95;
+    }
+
+    /* To‑do list basic */
+    #todo-panel { background: rgba(255,255,255,0.08); border-radius: 12px; padding: 18px; color: #222; box-shadow: 0 6px 24px #a16d771a; max-width: 340px; margin: auto;}
+    #todoTitle { margin: 0 0 8px 0; font-size:16px; font-weight: bold;}
+    #todoList { margin:0; padding:0 0 0 20px; }
+    #todoList li { margin: 9px 0; font-size:15px; }
+
+    /* Controls panel styling */
+    #controls, .card { background: rgba(255,255,255,0.10); border-radius: 12px; padding: 13px 16px; margin-bottom:12px; }
+    .row { margin: 8px 0; display: flex; flex-wrap: wrap; gap: 8px; }
+
+    /* Responsive: On mobile landscape, show settings button/ sidebar only */
     #mobileSidebar {
-      position: fixed;
-      top: 0; right: -320px;
+      position: fixed; top: 0; right: -320px;
       width: 300px; height: 100vh;
       background: rgba(255,255,255,0.15);
       backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
       box-shadow: -4px 0 18px rgba(0,0,0,0.18);
       transition: right 0.3s cubic-bezier(.5,.2,.3,1);
       overflow-y: auto;
@@ -23,25 +80,17 @@
       z-index: 110;
       border-left: 1px solid rgba(255,255,255,0.22);
       border-radius: 12px 0 0 12px;
-      color: #fff;
+      color: #222;
       font-size: 14px;
       display: block;
     }
-    body.sidebar-open #mobileSidebar {
-      right: 0;
-    }
+    body.sidebar-open #mobileSidebar { right: 0; }
     #settingsToggle {
-      position: fixed;
-      bottom: 24px; right: 24px;
-      z-index: 120;
-      font-size: 16px; font-weight: bold;
-      padding: 14px 24px;
-      background: linear-gradient(135deg,#60a5fa,#3b82f6);
-      color: #fff; border-radius: 24px; border: none;
-      box-shadow: 0 7px 18px rgba(0,123,255,0.30);
-      cursor: pointer; transition: background .2s;
-      user-select: none;
-      display: none;
+      position: fixed; bottom: 24px; right: 24px; z-index:120;
+      font-size: 16px; font-weight:bold;
+      padding: 14px 24px; background: linear-gradient(135deg,#60a5fa,#3b82f6);
+      color:#fff; border-radius:24px; border:none; box-shadow:0 7px 18px rgba(0,123,255,0.30);
+      cursor:pointer; transition:background .2s; user-select: none; display: none;
     }
     #settingsToggle:active { background: linear-gradient(135deg,#2563eb,#60a5fa); }
     @media (max-width: 880px) and (orientation: landscape) {
@@ -54,100 +103,120 @@
       #mobileSidebar { display: none !important; }
       #controls { display: block !important; }
     }
-    #mobileSidebar::-webkit-scrollbar {
-      width: 8px;
-    }
-    #mobileSidebar::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.18);
-      border-radius: 6px;
-    }
-    /* Keep all your original component and responsive styles below this comment! */
-    /* ... */
   </style>
 </head>
 <body>
   <div class="brand">MADE BY ANABRATA — V10</div>
-
   <div class="main" id="main">
-    <!-- Timer -->
-    <section id="timer-container" aria-label="Timer">
-      <div id="timer"></div>
-      <div id="simpleTimer">00:00</div>
-    </section>
-    <!-- To‑do -->
-    <section id="todo-panel" class="todo-clear" aria-label="To‑do list">
-      <h4 id="todoTitle">To‑do</h4>
-      <ol id="todoList"></ol>
-    </section>
-    <!-- Candle -->
-    <section id="candle-area" aria-label="Candle">
+    <section id="timer-container"><div id="timer"></div><div id="simpleTimer">00:00</div></section>
+    <section id="todo-panel" class="todo-clear"><h4 id="todoTitle">To‑do</h4><ol id="todoList"></ol></section>
+    <section id="candle-area">
       <div class="candle-clip">
-        <div class="candle-wrap" id="candleWrap">
-          <div class="wax" id="wax">
-            <div class="waxTop"></div>
-            <div class="wick" id="wick"></div>
-          </div>
-          <div class="stub" id="stub"></div>
+        <div class="wax" id="wax">
+          <div class="wick" id="wick"></div>
         </div>
+        <div class="flame" id="flame"><div class="flame-core"></div></div>
       </div>
-      <div class="flame" id="flame"><div class="flame-core"></div></div>
     </section>
   </div>
-
-  <!-- Desktop controls (original) -->
   <div id="controls">
-    <!-- Your full set of card controls go here, copy from your original/txt source -->
-    <!-- ... -->
+    <div class="card">
+      <label>Timer:</label>
+      <div class="row">
+        <input id="hoursInput" type="number" min="0" value="0" style="width:55px;">
+        <input id="minInput" type="number" min="0" value="1" style="width:55px;">
+        <input id="secInput" type="number" min="0" max="59" value="0" style="width:55px;">
+        <label><input type="checkbox" id="showHours"> Show hours</label>
+        <label><input type="checkbox" id="showSeconds" checked> Show seconds</label>
+      </div>
+      <div class="row">
+        <button id="primaryBtn">Start</button>
+        <button id="resetBtn">Reset</button>
+      </div>
+    </div>
+    <!-- You can add more cards/options here exactly as in your original code -->
   </div>
-
-  <!-- Mobile sidebar, content populated via JS live -->
   <div id="mobileSidebar"></div>
-
-  <!-- Settings button appears only in mobile landscape -->
   <button id="settingsToggle" aria-label="Settings">Settings</button>
-
-  <!-- Original scripts and ALL functionality go here -->
   <script>
-    // On DOM ready, copy #controls panel into #mobileSidebar for mobile users.
+    // Clone controls into sidebar on DOM ready
     document.addEventListener('DOMContentLoaded', function() {
       var controls = document.getElementById('controls');
       var sidebar = document.getElementById('mobileSidebar');
-      // Only clone if sidebar and controls exist
-      if (controls && sidebar) {
-        sidebar.innerHTML = controls.innerHTML;
-      }
+      if (controls && sidebar) { sidebar.innerHTML = controls.innerHTML; }
     });
-
-    // Sidebar toggle
     var settingsBtn = document.getElementById('settingsToggle');
     var sidebar = document.getElementById('mobileSidebar');
     settingsBtn.addEventListener('click', function(e){
       e.stopPropagation();
       document.body.classList.toggle('sidebar-open');
       if (document.body.classList.contains('sidebar-open')) {
-        sidebar.setAttribute('aria-hidden','false');
-        sidebar.focus();
-      } else {
-        sidebar.setAttribute('aria-hidden','true');
-      }
+        sidebar.setAttribute('aria-hidden','false'); sidebar.focus();
+      } else { sidebar.setAttribute('aria-hidden','true'); }
     });
-
-    // Close sidebar when clicking outside
     window.addEventListener('click', function(e){
-      if (document.body.classList.contains('sidebar-open') &&
-          !sidebar.contains(e.target) && e.target !== settingsBtn) {
+      if(document.body.classList.contains('sidebar-open') && !sidebar.contains(e.target) && e.target !== settingsBtn){
         document.body.classList.remove('sidebar-open');
       }
     });
-    // Close with Escape
     window.addEventListener('keydown', function(e){
       if(e.key === 'Escape' && document.body.classList.contains('sidebar-open')){
         document.body.classList.remove('sidebar-open');
       }
     });
+    // Timer logic
+    function createDigit(val){
+      const d = document.createElement("div");
+      d.className = "digit";
+      d.textContent = val;
+      return d;
+    }
+    function buildClock(container, h, m, s, showH, showS){
+      container.innerHTML = "";
+      if(showH){ container.appendChild(createDigit(String(h).padStart(2,"0")[0])); container.appendChild(createDigit(String(h).padStart(2,"0")[1])); container.appendChild(createColon()); }
+      container.appendChild(createDigit(String(m).padStart(2,"0")[0])); container.appendChild(createDigit(String(m).padStart(2,"0")[1]));
+      if(showS){ container.appendChild(createColon()); container.appendChild(createDigit(String(s).padStart(2,"0")[0])); container.appendChild(createDigit(String(s).padStart(2,"0")[1])); }
+    }
+    function createColon(){
+      const c = document.createElement("div");
+      c.className = "colon";
+      c.textContent = ":";
+      return c;
+    }
+    function showTime(secs){
+      let h = Math.floor(secs/3600), m = Math.floor((secs%3600)/60), s=secs%60;
+      const showH = document.getElementById('showHours').checked;
+      const showS = document.getElementById('showSeconds').checked;
+      buildClock(document.getElementById('timer'), h, m, s, showH, showS);
+      document.getElementById('simpleTimer').textContent = showH ? `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}` : `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    }
+    // Timer controls
+    let timerInt; let timerSecs = 0;
+    document.getElementById('primaryBtn').onclick = function(){
+      if(timerInt){ clearInterval(timerInt); timerInt=null; this.textContent='Start'; return; }
+      const h = parseInt(document.getElementById('hoursInput').value)||0;
+      const m = parseInt(document.getElementById('minInput').value)||0;
+      const s = parseInt(document.getElementById('secInput').value)||0;
+      timerSecs = h*3600 + m*60 + s;
+      showTime(timerSecs);
+      this.textContent = 'Stop';
+      timerInt = setInterval(function(){
+        if(timerSecs>0){ timerSecs--; showTime(timerSecs);}
+        else{ clearInterval(timerInt); timerInt=null; document.getElementById('primaryBtn').textContent='Start'; }
+      },1000);
+    };
+    document.getElementById('resetBtn').onclick = function(){
+      if(timerInt){ clearInterval(timerInt); timerInt=null; document.getElementById('primaryBtn').textContent='Start'; }
+      showTime(0);
+    };
+    document.getElementById('showHours').onchange = function(){ showTime(timerSecs);}
+    document.getElementById('showSeconds').onchange = function(){ showTime(timerSecs);}
+    // To-do demo
+    document.getElementById('todoList').innerHTML = "<li>Example Task 1</li><li>Example Task 2</li>";
+    // Candle - flame always on
 
-    // --- Paste ALL your original JS timer, to-do, music, candle etc. code here ---
-    // ... Original code from your V10 file ...
+    // On load
+    showTime(0);
   </script>
 </body>
 </html>
