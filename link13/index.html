@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>Candle Timer — Vision 2.3.2</title>
+<title>Candle Timer — Vision 5</title>
 <style>
   :root{
     /* Flip sizes */
@@ -22,10 +22,10 @@
     --clock-c1: #ffffff;
     --clock-c2: #ffffff;
     --clock-c3: #ffffff;
-    --clock-text: #000000;   /* flip digit color */
+    --clock-text: #000000;
 
     /* Simple (non‑flip) text color */
-    --simple-text: #000000;  /* separate color for simple timer/RTC */
+    --simple-text: #000000;
 
     --colon-color: #ffffff;
 
@@ -57,6 +57,23 @@
   #exitFs:hover{ opacity:.65 }
 
   .main{ flex:1; display:flex; align-items:center; justify-content:space-between; gap:min(6vw,56px); padding:22px min(5vw,48px); }
+
+  /* Centering option */
+  .center-clock .main{
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+  }
+  .center-clock #timer-container{
+    justify-content: center;
+  }
+  .center-clock #candle-area{
+    align-self: center;
+  }
+
+  /* Hide candle option */
+  .candle-off #candle-area{ display:none !important; }
 
   /* Flip clock */
   #timer-container{ flex:1; display:flex; align-items:center; justify-content:flex-start; min-width:340px; gap:12px; }
@@ -92,7 +109,7 @@
 
   .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.25); }
 
-  /* Candle */
+  /* Candle (down a bit) */
   #candle-area{ flex:1; display:flex; align-items:flex-end; justify-content:flex-end; min-width:340px; height:max(380px,42vh); position:relative; transform: translateY(var(--candle-offset)); }
   .candle-clip{ position:relative; width:180px; height:380px; overflow:hidden; display:flex; align-items:flex-end; justify-content:center; }
   .candle-wrap{ position:absolute; inset:auto 0 0 0; margin:auto; width:180px; height:380px; display:flex; align-items:flex-end; justify-content:center; transition: transform .5s ease, opacity .5s ease; }
@@ -178,14 +195,14 @@
   .balloon:after{ content:""; position:absolute; bottom:-16px; left:50%; width:2px; height:18px; background:#fff8; transform:translateX(-50%); }
   @keyframes floatUp{ 0%{ transform: translateY(0) translateX(0) scale(1); opacity:.95 } 100%{ transform: translateY(-120vh) translateX(var(--drift,40px)) scale(1.05); opacity:1 } }
 
-  /* Fullscreen */
+  /* Fullscreen: only timer + candle visible */
   .fullscreen-on .brand,
   .fullscreen-on #controls,
   .fullscreen-on #rtcOverlay,
   .fullscreen-on #congrats,
   .fullscreen-on #exitFs{ display:none !important }
 
-  /* Pre-start overlay */
+  /* 3s pre-start overlay (fade animation) */
   #preOverlay{
     position:fixed; inset:0; z-index:100;
     display:none; align-items:center; justify-content:center;
@@ -199,6 +216,7 @@
     text-shadow:0 10px 40px rgba(0,0,0,.6);
     opacity:0; transform:scale(.9);
   }
+  /* fading step per number */
   .step{ animation: fadeStep 1s ease both }
   @keyframes fadeStep{
     0%  { opacity:0; transform:scale(.9) }
@@ -207,13 +225,14 @@
     100%{ opacity:0; transform:scale(1.06) }
   }
 
+  /* Hide everything but overlay while pre-start is active */
   .pre-on .brand,
   .pre-on #controls,
   .pre-on #exitFs,
   .pre-on #rtcOverlay,
   .pre-on #congrats{ display:none !important }
 
-  /* Utility for snap reset */
+  /* Utility: temporarily disable transitions for snap reset */
   .no-transitions{ transition: none !important; }
 
   @media (max-width:980px){ :root{ --digit-w:100px; --digit-h:140px; } }
@@ -221,7 +240,7 @@
 </style>
 </head>
 <body>
-  <div class="brand">MADE BY ANABRATA</div>
+  <div class="brand">MADE BY ANABRATA — Version 5</div>
   <div id="exitFs" title="Exit fullscreen">×</div>
 
   <div class="main" id="main">
@@ -300,7 +319,7 @@
       </div>
     </div>
 
-    <!-- New: Simple timer color (shows only when Use flip style is OFF) -->
+    <!-- Simple timer color (appears only when flip style is OFF) -->
     <div class="card" id="simpleColorCard" style="display:none">
       <label class="small" style="color:#fff">Simple timer color</label>
       <div class="row">
@@ -308,6 +327,15 @@
           <label for="simpleTextColor">Text color</label>
           <input id="simpleTextColor" type="color" value="#000000">
         </div>
+      </div>
+    </div>
+
+    <!-- Layout options -->
+    <div class="card">
+      <label class="small" style="color:#fff">Layout</label>
+      <div class="row">
+        <label><input type="checkbox" id="hideCandle"> Hide candle</label>
+        <label><input type="checkbox" id="centerClock"> Center clock</label>
       </div>
     </div>
 
@@ -383,6 +411,7 @@
     useFlip = $('#useFlip').checked;
     timerFlip.style.display = useFlip ? 'flex' : 'none';
     timerSimple.style.display = useFlip ? 'none' : 'block';
+    refreshSimpleColorCardVisibility();
   }
 
   function renderSimple(sec){
@@ -395,7 +424,7 @@
     const h=+$('#hoursInput').value||0, m=+$('#minInput').value||0, s=Math.max(0,Math.min(59,+$('#secInput').value||0));
     totalSec=h*3600+m*60+s;
 
-    /* Ensure candle is visible when (re)starting */
+    /* Ensure candle is visible when (re)starting) */
     candleWrap.classList.remove('vanish');
     candleWrap.style.opacity = '';
     candleWrap.style.transform = '';
@@ -441,7 +470,7 @@
     document.body.classList.add('pre-on');
     overlay.hidden = false;
 
-    const D = 3000;
+    const D = 3000; // 3 seconds
     const endAt = performance.now() + D;
 
     function step(ts){
@@ -484,7 +513,7 @@
     }
   }
 
-  /* Snap-reset candle + flame (fix from prior step) */
+  /* Snap-reset candle + flame (fix) */
   function snapResetCandle(){
     candleWrap.classList.add('no-transitions');
     waxEl.classList.add('no-transitions');
@@ -497,7 +526,7 @@
     smokeEl.classList.remove('show');
 
     setWaxHeightByProgress(1);
-    void candleWrap.offsetHeight;
+    void candleWrap.offsetHeight; // force reflow
     positionFlame();
 
     requestAnimationFrame(()=>{
@@ -536,7 +565,12 @@
   const area = $('#candle-area'), waxEl=$('#wax'), wickEl=$('#wick'), flameEl=$('#flame'), stubEl=$('#stub'), smokeEl=$('#smoke'), candleWrap=$('#candleWrap');
   const baseWaxHeight=380, minStub=58;
 
+  function candleVisible(){
+    return getComputedStyle(area).display !== 'none';
+  }
+
   function positionFlame(){
+    if (!candleVisible()) return;
     const w=wickEl.getBoundingClientRect(), a=area.getBoundingClientRect();
     const x=w.left+w.width/2-a.left-flameEl.offsetWidth/2, y=w.top-a.top-flameEl.offsetHeight+20;
     flameEl.style.left=`${x}px`; flameEl.style.top=`${y}px`;
@@ -636,8 +670,6 @@
     document.documentElement.style.setProperty('--colon-color',$('#colonColor').value);
   }
   function applyWax(){ document.documentElement.style.setProperty('--wax',$('#waxColor').value); }
-
-  /* New: apply simple timer color */
   function applySimpleTextColor(){
     document.documentElement.style.setProperty('--simple-text', $('#simpleTextColor').value);
   }
@@ -648,7 +680,7 @@
     $('#simpleColorCard').style.display = show ? '' : 'none';
   }
 
-  /* Preview when toggling hours/seconds so Show hours works immediately */
+  /* Preview layout */
   function previewLayout(){
     showH = $('#showHours').checked; showS = $('#showSeconds').checked;
     useFlip = $('#useFlip').checked;
@@ -663,12 +695,25 @@
   // UI events
   $('#primaryBtn').addEventListener('click', togglePrimary);
   $('#resetBtn').addEventListener('click', resetCountdown);
+
   $('#useFlip').addEventListener('change', ()=>{
     refreshMode();
     refreshRTCMode();
     previewLayout();
-    refreshSimpleColorCardVisibility(); // toggle simple color control
   });
+
+  // Layout toggles
+  $('#hideCandle').addEventListener('change', (e)=>{
+    document.body.classList.toggle('candle-off', e.target.checked);
+    if (!e.target.checked){
+      positionFlame();
+    }
+  });
+  $('#centerClock').addEventListener('change', (e)=>{
+    document.body.classList.toggle('center-clock', e.target.checked);
+    positionFlame();
+  });
+
   $('#rtcMode').addEventListener('change', e=> e.target.checked ? openRTC() : closeRTC());
   $('#showHours').addEventListener('change', previewLayout);
   $('#showSeconds').addEventListener('change', previewLayout);
@@ -676,15 +721,14 @@
   ['bgAngle','bgC1','bgC2','bgC3'].forEach(id=> document.getElementById(id).addEventListener('input', applyGradient));
   ['clockC1','clockC2','clockC3','textColor','colonColor'].forEach(id=> document.getElementById(id).addEventListener('input', restyleClockPanels));
   $('#waxColor').addEventListener('input', applyWax);
-  $('#simpleTextColor').addEventListener('input', applySimpleTextColor); // new simple color binding
+  $('#simpleTextColor').addEventListener('input', applySimpleTextColor);
 
   window.addEventListener('resize', positionFlame);
 
   // Init defaults
   applyGradient(); restyleClockPanels(); applyWax();
-  applySimpleTextColor(); // initialize --simple-text from picker
+  applySimpleTextColor();
   refreshMode(); refreshRTCMode(); previewLayout();
-  refreshSimpleColorCardVisibility(); // initial visibility based on flip toggle
   setWaxHeightByProgress(1); relight(); positionFlame();
 </script>
 </body>
