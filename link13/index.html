@@ -37,6 +37,11 @@
     --wax: #f2e4c7;
     --wick: #1b1b1b;
 
+    /* Flame (new: customizable) */
+    --flame-color: #ffb347;
+    --flame-glow-a: rgba(255,170,40,.55);
+    --flame-glow-b: rgba(255,140,0,.40);
+
     /* Layout tweak */
     --candle-offset: 18px;
 
@@ -70,14 +75,13 @@
     position:relative;
     min-height: 60vh;
   }
-  /* Prevent grid children from vanishing due to intrinsic overflow */
   .main > section{ min-width:0; min-height:0; }
 
   #timer-container{ grid-column:1; }
   #todo-panel     { grid-column:2; justify-self:center; align-self:center; }
   #candle-area    { grid-column:3; }
 
-  /* Center Clock: timer centered; To‑do stays LEFT (grid) */
+  /* Center Clock */
   .center-clock .main{ grid-template-columns: max-content 1fr max-content; }
   .center-clock #timer-container{
     position:absolute; left:50%; top:50%;
@@ -88,21 +92,21 @@
     margin-left:min(48px,5vw); z-index:6;
   }
 
-  /* Hide candle → To‑do occupies RIGHT */
+  /* Hide candle */
   .candle-off #candle-area{ display:none !important; }
   .candle-off .main{ grid-template-columns: max-content max-content; }
   .candle-off #todo-panel{
     position:static !important; left:auto !important; top:auto !important; transform:none !important; justify-self:end !important;
   }
 
-  /* Center‑clock + candle‑off → keep To‑do LEFT */
+  /* Center‑clock + candle‑off */
   .center-clock.candle-off .main{ grid-template-columns: max-content 1fr; }
   .center-clock.candle-off #todo-panel{
     position:static !important; grid-column:1 !important; justify-self:start !important;
     margin-left:min(48px,5vw) !important; z-index:6 !important;
   }
 
-  /* Only candle → center candle, hide clock; To‑do LEFT */
+  /* Only candle */
   .only-candle #timer-container{ display:none !important; }
   .only-candle .main{ grid-template-columns: max-content 1fr; }
   .only-candle #todo-panel{
@@ -111,7 +115,7 @@
   }
   .only-candle #candle-area{ grid-column: 2; justify-self: center; }
 
-  /* To‑do visibility via .todo-on */
+  /* To‑do visibility */
   #todo-panel{ display:none; }
   .todo-on #todo-panel{ display:block; }
 
@@ -137,7 +141,6 @@
   #todoList{ margin:0; padding:4px 4px 4px 8px; list-style:none; counter-reset:tdn; font-family:inherit; }
   #todoList li{ counter-increment:tdn; position:relative; padding-left:28px; margin:4px 0; min-height:20px; outline:none; transition: opacity .18s, transform .18s; }
   #todoList li:before{ content: counter(tdn) "."; position:absolute; left:0; top:0; width:22px; text-align:right; padding-right:6px; font-weight:900; opacity:.9; }
-  #todoList li.vanish{ opacity:0; transform:translateY(-3px); }
 
   .todoItem{ display:flex; align-items:center; gap:8px; }
   .todoChk{ appearance:none; width:16px; height:16px; border:2px solid rgba(255,255,255,.75); border-radius:4px; background:transparent; cursor:pointer; }
@@ -171,7 +174,7 @@
   @keyframes bottomFlip{ 0%{transform:rotateX(90deg)} 100%{transform:rotateX(0)} }
   .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.3); flex:0 0 auto; }
 
-  /* Transparent mode for flip cards (kept but not exposed in UI) */
+  /* Transparent style kept for compatibility (not exposed in UI) */
   .clock-transparent .digit{
     background: transparent !important;
     border-color: rgba(255,255,255,.28) !important;
@@ -198,16 +201,17 @@
   .wax:after{ content:""; position:absolute; top:30px; left:24px; width:12px; height:64px; border-radius:10px; background: linear-gradient(180deg,#fff6,#0000 60%), var(--wax); box-shadow: 44px 8px 0 -3px var(--wax), 44px 8px 0 -3px #fff6, 92px 12px 0 -6px var(--wax), 92px 12px 0 -6px #fff6; opacity:.85; }
   .wick{ position:absolute; width:6px; height:30px; background:linear-gradient(180deg,#444,var(--wick)); border-radius:4px; top:-12px; left:50%; transform:translateX(-50%); z-index:4; }
 
-  /* Flame anchored to wick center */
+  /* Flame anchored to wick center (now color‑tunable) */
   .flame{
     position:absolute; width:52px; height:110px; z-index:6; pointer-events:none;
     left:0; top:0; transform: translate(-50%,-100%) translateY(10px);
   }
   .flame-core{
     position:absolute; inset:0; border-radius:50% 50% 38% 38%;
-    background: radial-gradient(ellipse at 50% 22%, #fff7c0 0%, #ffe08a 38%, #ffb347 58%, #ff7a00 78%, transparent 80%),
-                radial-gradient(ellipse at 50% 45%, #ffffff 0%, transparent 65%);
-    box-shadow:0 0 18px 6px rgba(255,170,40,.55), 0 0 36px 14px rgba(255,140,0,.40), 0 -20px 28px rgba(255,220,170,.40);
+    background:
+      radial-gradient(ellipse at 50% 22%, #fff7c0 0%, var(--flame-color) 38%, var(--flame-color) 58%, var(--flame-color) 78%, transparent 80%),
+      radial-gradient(ellipse at 50% 45%, #ffffff 0%, transparent 65%);
+    box-shadow:0 0 18px 6px var(--flame-glow-a), 0 0 36px 14px var(--flame-glow-b), 0 -20px 28px rgba(255,220,170,.40);
     animation: flickerSoft .6s ease-in-out infinite;
   }
   @keyframes flickerSoft{ 0%{ transform:scale(1) rotate(-0.8deg); opacity:.95 } 50%{ transform:scale(1.06) rotate(0.6deg); opacity:.82 } 100%{ transform:scale(1) rotate(-0.8deg); opacity:.95 } }
@@ -414,7 +418,6 @@
         <div style="flex:1"><label for="textColor">Digit color</label><input id="textColor" type="color" value="#000000"></div>
         <div style="flex:1"><label for="colonColor">Colon color</label><input id="colonColor" type="color" value="#ffffff"></div>
       </div>
-      <!-- Transparent flip cards option removed intentionally -->
       <div class="row">
         <div style="flex:1"><label for="simpleColor">Simple timer color</label><input id="simpleColor" type="color" value="#ffffff"></div>
       </div>
@@ -427,6 +430,11 @@
         <label><input type="checkbox" id="centerClock"> Center clock</label>
         <label><input type="checkbox" id="onlyCandle"> Only candle mode</label>
         <label><input type="checkbox" id="showTodo" checked> Show to‑do list</label>
+      </div>
+      <!-- New color controls (only additions requested) -->
+      <div class="row">
+        <div style="flex:1"><label for="flameColor">Flame color</label><input id="flameColor" type="color" value="#ffb347"></div>
+        <div style="flex:1"><label for="waxColor">Wax color</label><input id="waxColor" type="color" value="#f2e4c7"></div>
       </div>
     </div>
   </div>
@@ -443,7 +451,6 @@
       <p id="cgMsg">Timer complete — great focus! 🎉</p>
       <button id="cgClose">Close</button>
     </div>
-    <!-- Balloons -->
     <div class="balloon" style="left:6%;  --bcol:#ff6b6b; --dur:9s;  --drift:12px"></div>
     <div class="balloon" style="left:14%; --bcol:#ffd166; --dur:8.5s;--drift:-10px"></div>
     <div class="balloon" style="left:22%; --bcol:#06d6a0; --dur:10s; --drift:8px"></div>
@@ -462,9 +469,7 @@
   const $ = (s) => document.querySelector(s);
 
   /* ---------- Utilities ---------- */
-  function afterNextPaint(cb){
-    requestAnimationFrame(() => requestAnimationFrame(cb));
-  }
+  function afterNextPaint(cb){ requestAnimationFrame(() => requestAnimationFrame(cb)); }
 
   /* ---------- Background & colors ---------- */
   const gradientStr = (a, c1, c2, c3) => `linear-gradient(${a}deg, ${c1}, ${c2}, ${c3})`;
@@ -483,12 +488,11 @@
     document.body.style.backgroundAttachment = "fixed";
   }
 
-  function setTodoBg(val){
-    document.documentElement.style.setProperty("--todo-bg", val);
-  }
+  function setTodoBg(val){ document.documentElement.style.setProperty("--todo-bg", val); }
 
   function applyWax(){
-    document.documentElement.style.setProperty("--wax", $("#waxColor")?.value || "#f2e4c7");
+    const picker = $("#waxColor");
+    document.documentElement.style.setProperty("--wax", picker ? picker.value : "#f2e4c7");
   }
 
   function restyleClockPanels(){
@@ -499,6 +503,19 @@
     document.documentElement.style.setProperty("--clock-text", $("#textColor").value);
     document.documentElement.style.setProperty("--colon-color", $("#colonColor").value);
     document.documentElement.style.setProperty("--simple-color", $("#simpleColor")?.value || "#ffffff");
+  }
+
+  /* New: flame color setter */
+  function hexToRgb(hex){
+    const h = hex.replace('#','');
+    const bigint = parseInt(h.length===3 ? h.split('').map(c=>c+c).join('') : h,16);
+    return { r:(bigint>>16)&255, g:(bigint>>8)&255, b:bigint&255 };
+  }
+  function setFlameColor(hex){
+    const {r,g,b} = hexToRgb(hex);
+    document.documentElement.style.setProperty('--flame-color', hex);
+    document.documentElement.style.setProperty('--flame-glow-a', `rgba(${r},${g},${b},0.55)`);
+    document.documentElement.style.setProperty('--flame-glow-b', `rgba(${r},${g},${b},0.40)`);
   }
 
   /* ---------- Flip clock ---------- */
@@ -911,31 +928,5 @@
   $("#todoClear").addEventListener("click", () =>{ setTodoBg("transparent"); $("#todo-panel").classList.add("todo-clear"); });
   $("#todoGlass").addEventListener("change", (e)=> $("#todo-panel").classList.toggle("todo-glass", e.target.checked));
 
-  /* Transparent flip cards option removed: no event listener for #clockTransparent */
-
-  /* ---------- Init ---------- */
-  (function boot(){
-    applyGradient(); restyleClockPanels(); applyWax();
-
-    // Force to‑do visible on load if toggle checked
-    if ($("#showTodo")?.checked) document.body.classList.add("todo-on");
-
-    // Apply To‑do transparency if default-checked
-    if ($("#todoGlass")?.checked) $("#todo-panel").classList.add("todo-glass");
-
-    applyLayoutFlags();
-    safeBuildClock();
-    previewLayout();
-
-    // Position flame after first paints and re-check visibility
-    afterNextPaint(()=>{ positionFlame(); ensureVisible(); });
-    setTimeout(()=>{ positionFlame(); ensureVisible(); }, 150);
-
-    setWaxHeightByProgress(1);
-
-    // Seed one empty to‑do
-    const li=makeTodoItem(""); $("#todoList").appendChild(li);
-  })();
-</script>
-</body>
-</html>
+  /* New: listeners for the two color pickers */
+  $("#wax
