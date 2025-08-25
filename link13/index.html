@@ -978,3 +978,310 @@ text-shadow: 0 1px 2px rgba(0,0,0,0.6);
 </script>
 </body>
 </html>
+<style id="flipglass-styles">
+:root{
+  --glass-bg: rgba(255,255,255,0.18);
+  --glass-border: rgba(255,255,255,0.35);
+  --glass-blur: 16px;
+  --glass-radius: 12px;
+
+  --flip-duration: 560ms;
+  --fade-out-duration: 240ms;
+  --fade-in-duration: 260ms;
+  --fade-delay: 80ms;
+  --digit-gap: 14px;
+}
+
+/* container helper (auto-added if missing) */
+.clock-transparent{ display: inline-flex; align-items: center; gap: var(--digit-gap); }
+
+/* glass base for each digit */
+.clock-transparent .digit{
+  position: relative;
+  perspective: 1200px;
+  transform-style: preserve-3d;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  contain: unset !important;
+
+  border-radius: var(--glass-radius);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(140%) contrast(105%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%) contrast(105%);
+  box-shadow:
+    0 10px 28px rgba(0,0,0,0.22),
+    inset 0 1px 0 rgba(255,255,255,0.12),
+    inset 0 -1px 0 rgba(0,0,0,0.08);
+
+  width: clamp(56px, 7.8vw, 92px);
+  height: clamp(84px, 11.6vw, 138px);
+  overflow: hidden;
+}
+
+/* halves keep the frosted fill so blur remains visible in motion */
+.clock-transparent .digit .top,
+.clock-transparent .digit .bottom{
+  position: absolute;
+  left: 0; right: 0;
+  height: 50%;
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(var(--glass-blur)) saturate(140%) contrast(105%) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%) contrast(105%) !important;
+  overflow: hidden;
+}
+
+.clock-transparent .digit .top{
+  top: 0;
+  transform-origin: bottom center;
+  border-bottom: 1px solid rgba(255,255,255,0.25);
+  z-index: 2;
+}
+.clock-transparent .digit .bottom{
+  bottom: 0;
+  transform-origin: top center;
+  border-top: 1px solid rgba(255,255,255,0.22);
+  z-index: 1;
+}
+
+/* numbers */
+.clock-transparent .digit .value{
+  position: absolute;
+  left: 0; right: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+  font-weight: 700;
+  font-size: clamp(48px, 7vw, 112px);
+  line-height: 1;
+  text-align: center;
+  color: #000;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+}
+
+/* vertically center numbers in halves */
+.clock-transparent .digit .top .value{
+  top: 50%;
+  transform: translateY(-60%); /* slight overshoot to account for divider */
+}
+.clock-transparent .digit .bottom .value{
+  top: -10%;
+}
+
+/* nuke any solid fills from other styles/libs */
+.clock-transparent .digit,
+.clock-transparent .digit *{
+  background-image: none !important;
+}
+
+/* animations */
+@keyframes flipTopDown {
+  0%   { transform: rotateX(0deg); }
+  60%  { transform: rotateX(-175deg); }
+  100% { transform: rotateX(-180deg); }
+}
+@keyframes fadeBottomAway {
+  0%   { opacity: 1; filter: blur(0px);   transform: translateY(0) scale(1); }
+  100% { opacity: 0; filter: blur(3px);   transform: translateY(6px) scale(0.985); }
+}
+@keyframes fadeBottomIn {
+  0%   { opacity: 0; filter: blur(3px);   transform: translateY(-6px) scale(0.985); }
+  100% { opacity: 1; filter: blur(0px);   transform: translateY(0)     scale(1); }
+}
+
+.clock-transparent .digit.is-flipping .top{
+  animation: flipTopDown var(--flip-duration) cubic-bezier(.22,.61,.36,1) both;
+}
+.clock-transparent .digit.is-flipping .bottom{
+  animation: fadeBottomAway var(--fade-out-duration) ease-out var(--fade-delay) both;
+}
+.clock-transparent .digit.is-updated .bottom{
+  animation: fadeBottomIn var(--fade-in-duration) ease-out both;
+}
+
+/* colon/dots between digits (optional helper) */
+.clock-transparent .sep{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(12px, 2vw, 18px);
+  color: rgba(255,255,255,0.9);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.25);
+  font-weight: 700;
+  font-size: clamp(28px, 4.2vw, 52px);
+  margin-inline: 2px;
+}
+
+/* accessibility */
+@media (prefers-reduced-motion: reduce){
+  .clock-transparent .digit.is-flipping .top,
+  .clock-transparent .digit.is-flipping .bottom,
+  .clock-transparent .digit.is-updated .bottom{ animation: none; }
+}
+</style>
+
+<script>
+(() => {
+  const SELECTORS = [
+    '[data-flipclock]',           // preferred hook
+    '.flip-clock',                // common library container
+    '.clock',                     // generic
+    '.timer',                     // generic
+  ];
+
+  // Utility: create a digit structure if missing halves
+  function ensureDigitStructure(digit){
+    if (digit.querySelector('.top') && digit.querySelector('.bottom')) return;
+
+    const raw = (digit.textContent || '0').trim().slice(-1) || '0';
+    digit.textContent = '';
+    const top = document.createElement('div');
+    top.className = 'top';
+    const topVal = document.createElement('span');
+    topVal.className = 'value';
+    topVal.textContent = raw;
+    top.appendChild(topVal);
+
+    const bottom = document.createElement('div');
+    bottom.className = 'bottom';
+    const bottomVal = document.createElement('span');
+    bottomVal.className = 'value';
+    bottomVal.textContent = raw;
+    bottom.appendChild(bottomVal);
+
+    digit.appendChild(top);
+    digit.appendChild(bottom);
+    digit.dataset.prev = raw;
+  }
+
+  // Animation driver for one digit
+  function flipDigit(digit, nextChar){
+    const top = digit.querySelector('.top .value');
+    const bottom = digit.querySelector('.bottom .value');
+    if (!top || !bottom) return;
+
+    const prev = digit.dataset.prev ?? bottom.textContent ?? '0';
+    const next = String(nextChar);
+
+    if (prev === next || digit.classList.contains('is-flipping')) {
+      digit.dataset.prev = next;
+      if (bottom.textContent !== next) bottom.textContent = next; // keep in sync
+      return;
+    }
+
+    top.textContent = prev;
+    bottom.textContent = prev;
+    digit.classList.remove('is-updated');
+    // trigger reflow to restart animations
+    void digit.offsetWidth;
+
+    digit.classList.add('is-flipping');
+
+    const onTopEnd = (e) => {
+      if (e.target !== digit.querySelector('.top')) return;
+      bottom.textContent = next;
+      digit.classList.remove('is-flipping');
+      digit.classList.add('is-updated');
+      digit.dataset.prev = next;
+      digit.removeEventListener('animationend', onTopEnd, true);
+      // clean class after fade-in
+      setTimeout(() => digit.classList.remove('is-updated'), 340);
+    };
+    digit.addEventListener('animationend', onTopEnd, true);
+  }
+
+  // Build a four-digit HH:MM layout inside a container if it has data-autostart="time"
+  function ensureTimeLayout(container){
+    if (container.querySelector('.digit')) return; // already has digits
+
+    container.classList.add('clock-transparent');
+
+    const mkDigit = () => {
+      const d = document.createElement('div');
+      d.className = 'digit';
+      ensureDigitStructure(d);
+      return d;
+    };
+
+    const d1 = mkDigit(), d2 = mkDigit(), sep = document.createElement('span'), d3 = mkDigit(), d4 = mkDigit();
+    sep.className = 'sep';
+    sep.textContent = ':';
+    container.append(d1, d2, sep, d3, d4);
+  }
+
+  // Live time updater (HH:MM)
+  function startTime(container){
+    ensureTimeLayout(container);
+    const digits = [...container.querySelectorAll('.digit')].slice(0,4);
+    const tick = () => {
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const chars = (hh + mm).split('');
+      digits.forEach((d, i) => flipDigit(d, chars[i]));
+    };
+    tick(); // immediate
+    const id = setInterval(tick, 1000);
+    container._flipClockInterval = id;
+  }
+
+  // Passive mode: watch for text changes and animate
+  function attachPassiveObserver(container){
+    const digits = container.querySelectorAll('.digit');
+    digits.forEach(ensureDigitStructure);
+    container.classList.add('clock-transparent');
+
+    const applyValue = (digit, value) => flipDigit(digit, String(value).slice(-1));
+
+    const observer = new MutationObserver((mutations) => {
+      const touched = new Set();
+      mutations.forEach(m => {
+        const el = m.target.nodeType === 3 ? m.target.parentElement : m.target;
+        const digit = el && el.closest && el.closest('.digit');
+        if (!digit || touched.has(digit)) return;
+        const nextText = (digit.textContent || '').trim().slice(-1);
+        applyValue(digit, nextText || '0');
+        touched.add(digit);
+      });
+    });
+
+    observer.observe(container, {
+      characterData: true,
+      childList: true,
+      subtree: true
+    });
+
+    container._flipClockObserver = observer;
+  }
+
+  // Auto-boot
+  function init(){
+    // Find likely clock containers
+    const candidates = new Set();
+
+    // explicit hooks
+    SELECTORS.forEach(sel => document.querySelectorAll(sel).forEach(el => candidates.add(el)));
+
+    // implicit: any parent that contains .digit elements
+    document.querySelectorAll('.digit').forEach(d => candidates.add(d.closest(':not(.digit)')));
+
+    candidates.forEach(container => {
+      if (!container) return;
+      container.classList.add('clock-transparent');
+
+      const wantsAutostart = String(container.getAttribute('data-autostart') || '').toLowerCase() === 'time';
+
+      if (wantsAutostart){
+        startTime(container);
+      } else {
+        attachPassiveObserver(container);
+      }
+    });
+  }
+
+  // run when DOM is ready
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
+})();
+</script>
