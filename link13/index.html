@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Candle Timer – v1.8</title>
+<title>Candle Timer – v1.9</title>
 <style>
   :root{
     --digit-w: 120px;
@@ -11,22 +11,26 @@
     --digit-radius: 16px;
     --split-line: rgba(255,255,255,0.10);
 
+    /* Background (gradient default; image overrides via JS) */
     --bg-angle: 135deg;
     --bg-c1: #3a1c71;
     --bg-c2: #d76d77;
     --bg-c3: #ffaf7b;
 
+    /* Flip clock colors */
     --clock-c1: #0e0f13;
     --clock-c2: #242631;
     --clock-c3: #3b3e4b;
     --clock-text: #ffffff;
     --colon-color: #ffffff;
 
-    --accent: #ff9a00;
+    /* Buttons */
+    --btn-font: "Comic Sans MS", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
     --btn-grad: linear-gradient(135deg,#ffd166,#ff9a00);
     --btn-grad-hover: linear-gradient(135deg,#ffe08a,#ffb347);
 
-    --wax: #f0e1c3;
+    /* Candle */
+    --wax: #efe0c2;
     --wick: #1b1b1b;
 
     --side-gap: min(6vw,56px);
@@ -36,7 +40,7 @@
   html,body{height:100%}
   body{
     margin:0; display:flex; flex-direction:column; color:#f5f5f5;
-    font-family:"Comic Sans MS", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
+    font-family:"Comic Sans MS", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
     background: linear-gradient(var(--bg-angle), var(--bg-c1), var(--bg-c2), var(--bg-c3));
     background-attachment: fixed; overflow-x:hidden;
   }
@@ -56,7 +60,7 @@
     position:relative; width:var(--digit-w); height:var(--digit-h); perspective:1200px;
     border-radius:var(--digit-radius); overflow:hidden;
     background: linear-gradient(145deg,var(--clock-c1),var(--clock-c2),var(--clock-c3));
-    box-shadow: inset 0 -1px 0 rgba(255,255,255,.06), inset 0 1px 0 rgba(0,0,0,.45), 0 10px 26px rgba(0,0,0,.35);
+    box-shadow: inset 0 -1px 0 rgba(255,255,255,.06), inset 0 1px 0 rgba(0,0,0,.45);
   }
   .digit .top,.digit .bottom{ position:absolute; left:0; right:0; height:50%; overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden; }
   .digit .top{ top:0; border-bottom:1px solid var(--split-line); }
@@ -72,64 +76,105 @@
   .bottom .value,.bottom-flip .value{ clip-path: inset(50% 0 0 0); transform: translateY(-50%); }
 
   .top-flip,.bottom-flip{ position:absolute; left:0; right:0; height:50%; overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden; background:inherit; }
-  .top-flip{ top:0; transform-origin:bottom; border-bottom:1px solid var(--split-line); animation: topFlip .3s ease-in forwards; box-shadow:0 14px 28px rgba(0,0,0,.35); }
-  .bottom-flip{ bottom:0; transform-origin:top; border-top:1px solid var(--split-line); animation: bottomFlip .3s ease-out forwards; box-shadow:0 8px 16px rgba(0,0,0,.22); }
+  .top-flip{ top:0; transform-origin:bottom; border-bottom:1px solid var(--split-line); animation: topFlip .28s ease-in forwards; }
+  .bottom-flip{ bottom:0; transform-origin:top; border-top:1px solid var(--split-line); animation: bottomFlip .28s ease-out forwards; }
   @keyframes topFlip{ 0%{transform:rotateX(0)} 100%{transform:rotateX(-90deg)} }
   @keyframes bottomFlip{ 0%{transform:rotateX(90deg)} 100%{transform:rotateX(0)} }
 
   .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.6); }
 
-  /* Candle area (flame positioned outside clip so it's never chopped) */
+  /* Candle area */
   #candle-area{ flex:1; display:flex; align-items:flex-end; justify-content:flex-end; min-width:340px; height:max(360px,40vh); position:relative; }
-  .candle-clip{ position:relative; width:160px; height:340px; overflow:hidden; display:flex; align-items:flex-end; justify-content:center; }
-  .candle-wrap{ position:absolute; inset:auto 0 0 0; margin:auto; width:160px; height:340px; display:flex; align-items:flex-end; justify-content:center; }
+
+  /* Clip for wax only; flame sits outside so it’s never clipped */
+  .candle-clip{ position:relative; width:170px; height:360px; overflow:hidden; display:flex; align-items:flex-end; justify-content:center; }
+  .candle-wrap{ position:absolute; inset:auto 0 0 0; margin:auto; width:170px; height:360px; display:flex; align-items:flex-end; justify-content:center; }
+
+  /* High‑quality 3D top: separate rim + inner pool highlights using conic & radial gradients */
   .wax{
-    position:absolute; bottom:0; width:130px; height:100%; z-index:1;
-    background: radial-gradient(112px 25px at 65px 5px, rgba(255,255,255,.75), transparent 60%), linear-gradient(180deg, rgba(255,255,255,.22), rgba(0,0,0,0) 22%), linear-gradient(180deg,#ffffff40,#00000020 30%,#00000030 100%), linear-gradient(180deg,var(--wax),#e6d9bb);
-    border-radius:18px; box-shadow: inset 0 5px 18px rgba(0,0,0,.18), inset 0 -12px 20px rgba(0,0,0,.22), 0 14px 42px rgba(0,0,0,.35);
-    transition: height .25s linear;
+    position:absolute; bottom:0; width:140px; height:100%; z-index:1;
+    border-radius:20px;
+    background:
+      radial-gradient(112px 26px at 70px 6px, rgba(255,255,255,.75), transparent 60%),
+      linear-gradient(180deg, rgba(255,255,255,.18), rgba(0,0,0,0) 24%),
+      linear-gradient(180deg,#ffffff40,#00000022 40%,#00000030 100%),
+      linear-gradient(180deg,var(--wax), #e6d9bb);
+    box-shadow: inset 0 6px 18px rgba(0,0,0,.18), inset 0 -10px 18px rgba(0,0,0,.22);
+    transition: height .22s linear;
   }
-  .wax:before{
-    content:""; position:absolute; top:-18px; left:0; right:0; margin:auto; width:130px; height:34px;
-    background: radial-gradient(65px 17px at 65px 17px,#fff8 0%,#0000 72%), radial-gradient(65px 17px at 65px 17px,var(--wax),var(--wax));
-    border-radius:50%/55% 55% 45% 45%; box-shadow: inset 0 6px 12px rgba(0,0,0,.22);
+  /* Raised elliptical top with rim and specular glow (3D look) */
+  .waxTop{
+    position:absolute; top:-20px; left:50%; transform:translateX(-50%); width:140px; height:40px; pointer-events:none; z-index:2;
+    background:
+      conic-gradient(from 90deg at 50% 50%, rgba(255,255,255,.35), rgba(255,255,255,.05) 30%, rgba(0,0,0,.10) 55%, rgba(255,255,255,.22) 80%, rgba(255,255,255,.35)) ,
+      radial-gradient(60% 50% at 50% 60%, rgba(255,255,255,.65), rgba(255,255,255,.12) 60%, rgba(0,0,0,.12) 100%);
+    border-radius:50%/60% 60% 40% 40%;
+    mix-blend-mode: screen;
+    filter: blur(.2px);
   }
   .wax:after{
-    content:""; position:absolute; top:26px; left:18px; width:12px; height:58px; border-radius:10px;
+    content:""; position:absolute; top:28px; left:22px; width:12px; height:60px; border-radius:10px;
     background: linear-gradient(180deg,#fff6,#0000 60%), var(--wax);
-    box-shadow: 36px 8px 0 -3px var(--wax), 36px 8px 0 -3px #fff6, 78px 12px 0 -6px var(--wax), 78px 12px 0 -6px #fff6; opacity:.8;
+    box-shadow: 42px 8px 0 -3px var(--wax), 42px 8px 0 -3px #fff6, 88px 12px 0 -6px var(--wax), 88px 12px 0 -6px #fff6; opacity:.8;
   }
-  .wick{ position:absolute; width:6px; height:28px; background:linear-gradient(180deg,#444,var(--wick)); border-radius:4px; top:-8px; left:50%; transform:translateX(-50%); z-index:2; box-shadow:0 -1px 2px #fff8; }
+  .wick{ position:absolute; width:6px; height:28px; background:linear-gradient(180deg,#444,var(--wick)); border-radius:4px; top:-10px; left:50%; transform:translateX(-50%); z-index:3; box-shadow:0 -1px 2px #fff8; }
 
-  /* Flame is outside the clip, anchored to wick via JS so it never gets cut */
-  .flame{ position:absolute; width:46px; height:96px; z-index:5; background: radial-gradient(ellipse at 50% 20%,#fff9cc 0%,#ffe08a 35%,#ffac30 55%,#ff7a00 75%,transparent 76%), radial-gradient(ellipse at 50% 40%,#ffffff 0%, transparent 60%); border-radius:50% 50% 38% 38%; filter:blur(.6px); box-shadow:0 0 20px 7px rgba(255,170,40,.6), 0 0 40px 14px rgba(255,140,0,.45), 0 -20px 28px rgba(255,220,170,.42); animation:flicker .12s infinite; transition:opacity .35s ease; pointer-events:none; }
+  /* Flame outside the clip so it never gets cut */
+  .flame{
+    position:absolute; width:50px; height:104px; z-index:6;
+    background:
+      radial-gradient(ellipse at 50% 20%, #fff9cc 0%, #ffe08a 35%, #ffac30 55%, #ff7a00 75%, transparent 76%),
+      radial-gradient(ellipse at 50% 40%, #ffffff 0%, transparent 60%);
+    border-radius:50% 50% 38% 38%; filter: blur(.6px);
+    box-shadow:0 0 20px 7px rgba(255,170,40,.6), 0 0 40px 14px rgba(255,140,0,.45), 0 -20px 28px rgba(255,220,170,.42);
+    animation:flicker .12s infinite;
+    transition:opacity .35s ease;
+    will-change: transform, opacity;
+    pointer-events:none;
+  }
   @keyframes flicker{ 0%{ transform:scale(1) rotate(-1.4deg); opacity:1 } 50%{ transform:scale(1.12) rotate(1.1deg); opacity:.82 } 100%{ transform:scale(1) rotate(-1.2deg); opacity:1 } }
 
-  .stub{ display:none; position:absolute; bottom:0; width:130px; height:54px; background:linear-gradient(180deg,#8a8a8a,#6b6b6b); border-radius:0 0 18px 18px; box-shadow: inset 0 3px 8px rgba(0,0,0,.25), 0 8px 26px rgba(0,0,0,.35); opacity:.9; z-index:1; }
-  .smoke{ position:absolute; width:10px; height:10px; left:0; top:0; border-radius:50%; background:radial-gradient(#bbb, transparent 64%); opacity:0; pointer-events:none; z-index:6; }
-  .smoke.show{ animation:puff 1.7s ease-out forwards; }
+  /* Final stub (no outer shadow per request) */
+  .stub{ display:none; position:absolute; bottom:0; width:140px; height:56px; background:linear-gradient(180deg,#8a8a8a,#6b6b6b); border-radius:0 0 20px 20px; box-shadow: inset 0 3px 8px rgba(0,0,0,.25); z-index:1; }
+  .smoke{ position:absolute; width:10px; height:10px; left:0; top:0; border-radius:50%; background:radial-gradient(#bbb, transparent 64%); opacity:0; pointer-events:none; z-index:7; }
+  .smoke.show{ animation:puff 1.6s ease-out forwards; }
   @keyframes puff{ 0%{ transform:translate(0,0) scale(1); opacity:.8; filter:blur(.5px) } 100%{ transform:translate(0,-130px) scale(2.2); opacity:0; filter:blur(3px) } }
 
   /* Controls */
   #controls{ position:relative; display:grid; grid-auto-flow:column; grid-auto-columns:minmax(240px,1fr); gap:14px; padding:16px; background:rgba(0,0,0,.22); backdrop-filter:blur(8px); scroll-snap-type:x mandatory; overflow-x:auto; border-top-left-radius:16px; border-top-right-radius:16px; z-index:10; }
-  .card{ scroll-snap-align:start; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:12px; min-height:84px; display:flex; flex-direction:column; gap:8px; }
+  .card{ position:relative; scroll-snap-align:start; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:12px; min-height:84px; display:flex; flex-direction:column; gap:8px; }
+  /* Back “shine” for cards */
+  .card::before{ content:""; position:absolute; inset:-8px; z-index:-1; border-radius:18px; background: radial-gradient(60% 60% at 50% 40%, rgba(255,255,255,.20), rgba(255,255,255,0)); filter: blur(12px); }
+
   .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
   label{ font-size:12px; opacity:.95 }
   input[type="number"],input[type="color"],input[type="file"],select{ width:100%; padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.35); color:#fff; outline:none; }
   input[type="checkbox"]{ transform:scale(1.2) }
-  .btn{ padding:12px 18px; border-radius:12px; border:none; font-weight:800; cursor:pointer; background:var(--btn-grad); color:#1b1b1b; box-shadow:0 6px 16px rgba(0,0,0,.25), 0 0 0 0 rgba(255,154,0,0); transition:transform .12s, box-shadow .2s, background .2s; }
-  .btn:hover{ background:var(--btn-grad-hover); box-shadow:0 10px 24px rgba(0,0,0,.32), 0 0 0 8px rgba(255,154,0,.12); }
+
+  /* Buttons: new font + glow behind (shiny from back) */
+  .btn{ position:relative; padding:12px 18px; border-radius:12px; border:none; font-weight:800; cursor:pointer; font-family: var(--btn-font); background:var(--btn-grad); color:#1b1b1b; box-shadow:0 6px 16px rgba(0,0,0,.18); transition:transform .12s, box-shadow .2s, background .2s; }
+  .btn::before{ content:""; position:absolute; inset:-6px; z-index:-1; border-radius:14px; background: radial-gradient(40% 60% at 50% 20%, rgba(255,255,255,.35), rgba(255,255,255,0)); filter: blur(10px); }
+  .btn:hover{ background:var(--btn-grad-hover); box-shadow:0 10px 24px rgba(0,0,0,.28); }
   .btn:active{ transform: translateY(1px) scale(.99); }
   .btn.alt{ background:linear-gradient(135deg,#a5b4fc,#6366f1); color:#0d0d15; }
-  .btn.alt:hover{ background:linear-gradient(135deg,#c7d2fe,#818cf8); box-shadow:0 10px 24px rgba(0,0,0,.32), 0 0 0 8px rgba(99,102,241,.15); }
+  .btn.alt:hover{ background:linear-gradient(135deg,#c7d2fe,#818cf8); }
   .btn.warn{ background:linear-gradient(135deg,#fca5a5,#ef4444); color:#0d0d15; }
-  .btn.warn:hover{ background:linear-gradient(135deg,#fecaca,#f87171); box-shadow:0 10px 24px rgba(0,0,0,.32), 0 0 0 8px rgba(239,68,68,.15); }
+  .btn.warn:hover{ background:linear-gradient(135deg,#fecaca,#f87171); }
+
   .small{ font-size:12px; opacity:.9 }
 
+  /* Fullscreen */
   .fullscreen-on .brand,.fullscreen-on #controls{ display:none }
   .fullscreen-on #exitFs{ display:block }
   .fullscreen-on .main{ padding:10px min(3vw,28px) }
   .fullscreen-on :root{ --digit-w:140px; --digit-h:200px; }
+
+  /* Real-time clock overlay */
+  #rtcOverlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.25); backdrop-filter: blur(2px); z-index:90; }
+  #rtcOverlay.show{ display:flex; }
+  #rtcClock{ font-family: "Comic Sans MS", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; font-weight:900; letter-spacing:.5px; font-size:min(12vw, 120px); color:#fff; text-shadow:0 6px 24px rgba(0,0,0,.45); }
+  #rtcStop{ position:fixed; top:8px; right:10px; opacity:.35; background:rgba(0,0,0,.25); color:#fff; border-radius:10px; padding:6px 10px; font-weight:800; border:none; cursor:pointer; z-index:95; }
+  #rtcStop:hover{ opacity:.65 }
 
   @media (max-width:980px){ :root{ --digit-w:100px; --digit-h:140px; } }
   @media (max-width:720px){ :root{ --digit-w:86px; --digit-h:120px; } }
@@ -139,7 +184,7 @@
   <div class="brand">MADE BY ANABRATA</div>
   <div id="exitFs" title="Exit fullscreen">×</div>
 
-  <div class="main">
+  <div class="main" id="main">
     <!-- Clock -->
     <section id="timer-container" aria-label="Flip clock">
       <div id="timer"></div>
@@ -149,13 +194,22 @@
     <section id="candle-area" aria-label="Candle">
       <div class="candle-clip">
         <div class="candle-wrap" id="candleWrap">
-          <div class="wax" id="wax"><div class="wick" id="wick"></div></div>
+          <div class="wax" id="wax">
+            <div class="waxTop"></div>
+            <div class="wick" id="wick"></div>
+          </div>
           <div class="stub" id="stub"></div>
         </div>
       </div>
       <div class="flame" id="flame"></div>
       <div class="smoke" id="smoke"></div>
     </section>
+  </div>
+
+  <!-- Real-time clock overlay -->
+  <div id="rtcOverlay">
+    <div id="rtcClock">00:00:00</div>
+    <button id="rtcStop" title="Close">Stop</button>
   </div>
 
   <!-- Controls -->
@@ -170,9 +224,11 @@
       <div class="row">
         <label><input type="checkbox" id="showHours"> Show hours</label>
         <label><input type="checkbox" id="showSeconds" checked> Show seconds</label>
+        <label><input type="checkbox" id="rtcMode"> Real‑time clock mode</label>
       </div>
       <div class="row">
         <button id="startBtn" class="btn">Start</button>
+        <button id="toggleBtn" class="btn alt" title="Stop/Resume">Stop</button>
         <button id="resetBtn" class="btn alt">Reset</button>
         <button id="fsBtn" class="btn warn">Fullscreen</button>
       </div>
@@ -190,7 +246,7 @@
         <div style="flex:2"><label for="bgImageInput">Personal image</label><input id="bgImageInput" type="file" accept="image/*"></div>
         <div style="flex:1"><button id="clearBgBtn" class="btn alt" type="button">Clear image</button></div>
       </div>
-      <span class="small">Upload a photo or use multicolor gradients above.</span>
+      <span class="small">Upload a photo or use the multicolor gradient above.</span>
     </div>
 
     <div class="card">
@@ -209,7 +265,7 @@
     <div class="card">
       <label class="small">Candle</label>
       <div class="row">
-        <div style="flex:1"><label for="waxColor">Wax color</label><input id="waxColor" type="color" value="#f0e1c3"></div>
+        <div style="flex:1"><label for="waxColor">Wax color</label><input id="waxColor" type="color" value="#efe0c2"></div>
       </div>
       <span class="small">Flame burns during countdown and fully turns off at 0.</span>
     </div>
@@ -218,7 +274,7 @@
 <script>
   const $ = s => document.querySelector(s);
 
-  /* Gradient helper */
+  /* Background helpers */
   const gradientStr = (angle,c1,c2,c3) => `linear-gradient(${angle}deg, ${c1}, ${c2}${c3 ? ', '+c3 : ''})`;
 
   /* Flip clock core */
@@ -254,7 +310,7 @@
     const topVal = digitEl.querySelector('.top .value');
     const botVal = digitEl.querySelector('.bottom .value');
 
-    // Create top overlay first, then bottom overlay after top completes to remove latency
+    // Top half flips first; bottom opens after top finishes for perfect sync
     const topFlip = document.createElement('div');
     topFlip.className = 'top-flip';
     const topFlipVal = document.createElement('span');
@@ -262,7 +318,6 @@
     topFlipVal.textContent = current;
     topFlip.appendChild(topFlipVal);
 
-    // Base shows current until swap
     topVal.textContent = current; botVal.textContent = current;
     digitEl.appendChild(topFlip);
 
@@ -318,18 +373,18 @@
   }
 
   /* Candle coupling */
-  const candleArea = $('#candle-area');
+  const area = $('#candle-area');
   const waxEl = $('#wax'), wickEl = $('#wick'), flameEl = $('#flame'), stubEl = $('#stub'), smokeEl = $('#smoke');
-  const baseWaxHeight = 340; const minStub = 54;
+  const baseWaxHeight = 360; const minStub = 56;
 
   function positionFlame(){
     const wick = wickEl.getBoundingClientRect();
-    const area = candleArea.getBoundingClientRect();
-    const x = wick.left + wick.width/2 - area.left - flameEl.offsetWidth/2;
-    const y = wick.top - area.top - flameEl.offsetHeight + 18;
+    const a = area.getBoundingClientRect();
+    const x = wick.left + wick.width/2 - a.left - flameEl.offsetWidth/2;
+    const y = wick.top - a.top - flameEl.offsetHeight + 20;
     flameEl.style.left = `${x}px`; flameEl.style.top = `${y}px`;
-    smokeEl.style.left = `${x + flameEl.offsetWidth/2 - 5}px`; // align smoke
-    smokeEl.style.top = `${y - 4}px`;
+    smokeEl.style.left = `${x + flameEl.offsetWidth/2 - 5}px`;
+    smokeEl.style.top = `${y - 2}px`;
   }
 
   function setWaxHeightByProgress(progress){
@@ -348,12 +403,16 @@
     flameEl.style.opacity = '1';
   }
 
-  /* Background, colors */
+  /* Background + colors */
   function applyBackground(){
     if (!document.body.dataset.bgimg){
       const ang = parseInt($('#bgAngle').value||'135',10);
       const c1 = $('#bgC1').value, c2 = $('#bgC2').value, c3 = $('#bgC3').value;
-      document.body.style.background = gradientStr(ang,c1,c2,c3);
+      document.body.style.backgroundImage = gradientStr(ang,c1,c2,c3);
+      document.body.style.backgroundSize = 'cover';
+      document.body.style.backgroundPosition = 'center';
+      document.body.style.backgroundRepeat = 'no-repeat';
+      document.body.style.backgroundAttachment = 'fixed';
     }
   }
   function restyleClockPanels(){
@@ -366,14 +425,18 @@
   }
   function applyWax(){ document.documentElement.style.setProperty('--wax', $('#waxColor').value); }
 
-  /* Custom image background */
+  // Upload personal background image (cover)
   $('#bgImageInput').addEventListener('change', e=>{
     const f = e.target.files && e.target.files;
     if (!f) return;
     const r = new FileReader();
     r.onload = () => {
-      document.body.style.background = `url('${r.result}') center / cover no-repeat fixed`;
       document.body.dataset.bgimg = '1';
+      document.body.style.backgroundImage = `url('${r.result}')`;
+      document.body.style.backgroundSize = 'cover';
+      document.body.style.backgroundPosition = 'center';
+      document.body.style.backgroundRepeat = 'no-repeat';
+      document.body.style.backgroundAttachment = 'fixed';
     };
     r.readAsDataURL(f);
   });
@@ -401,8 +464,29 @@
     if (!document.fullscreenElement){ document.body.classList.remove('fullscreen-on'); $('#exitFs').style.display='none'; }
   });
 
-  /* rAF-driven countdown (low-latency) */
-  let totalSec = 0, remaining = 0, rafId = null, endAtMs = 0, lastWhole = -1, running = false;
+  /* Real-time clock mode */
+  const rtcOverlay = $('#rtcOverlay');
+  const rtcClock = $('#rtcClock');
+  let rtcOn = false, rtcId = null;
+  function drawRTC(){
+    const now = new Date();
+    rtcClock.textContent = now.toLocaleTimeString();
+    if (rtcOn) rtcId = requestAnimationFrame(drawRTC);
+  }
+  function openRTC(){
+    rtcOn = true; rtcOverlay.classList.add('show'); cancelAnimationFrame(rafId); running=false;
+    rtcId = requestAnimationFrame(drawRTC);
+    $('#main').style.display='none';
+  }
+  function closeRTC(){
+    rtcOn = false; rtcOverlay.classList.remove('show'); cancelAnimationFrame(rtcId);
+    $('#main').style.display='';
+  }
+  $('#rtcMode').addEventListener('change', e => e.target.checked ? openRTC() : closeRTC());
+  $('#rtcStop').addEventListener('click', ()=>{ $('#rtcMode').checked=false; closeRTC(); });
+
+  /* rAF-driven countdown with Stop/Resume */
+  let totalSec = 0, rafId = null, endAtMs = 0, lastWhole = -1, running = false, paused = false, pauseRemainMs = 0;
 
   function start(){
     const h = Math.max(0, parseInt($('#hoursInput').value||'0',10));
@@ -419,9 +503,8 @@
     positionFlame();
 
     cancelAnimationFrame(rafId);
-    if (totalSec <= 0){ // immediate end
-      setWaxHeightByProgress(0); extinguish(); running = false; return;
-    }
+    paused = false; $('#toggleBtn').textContent = 'Stop';
+    if (totalSec <= 0){ setWaxHeightByProgress(0); extinguish(); running=false; return; }
     endAtMs = performance.now() + totalSec*1000;
     lastWhole = Math.ceil(totalSec); running = true;
     rafId = requestAnimationFrame(loop);
@@ -447,16 +530,32 @@
     rafId = requestAnimationFrame(loop);
   }
 
+  function toggleStop(){
+    if (!running && !paused) return;
+    if (!paused){
+      // Pause
+      cancelAnimationFrame(rafId);
+      pauseRemainMs = Math.max(0, endAtMs - performance.now());
+      paused = true; running = false;
+      $('#toggleBtn').textContent = 'Resume';
+    }else{
+      // Resume
+      endAtMs = performance.now() + pauseRemainMs;
+      lastWhole = Math.floor(pauseRemainMs/1000);
+      paused = false; running = true;
+      $('#toggleBtn').textContent = 'Stop';
+      rafId = requestAnimationFrame(loop);
+    }
+  }
+
   function reset(){
-    cancelAnimationFrame(rafId);
-    running = false;
-    start();
-    cancelAnimationFrame(rafId);
-    running = false;
+    cancelAnimationFrame(rafId); running=false; paused=false; $('#toggleBtn').textContent='Stop';
+    start(); cancelAnimationFrame(rafId); running=false; paused=false;
   }
 
   // UI
   $('#startBtn').addEventListener('click', start);
+  $('#toggleBtn').addEventListener('click', toggleStop);
   $('#resetBtn').addEventListener('click', reset);
   $('#showHours').addEventListener('change', ()=>{ setupDigits($('#showHours').checked, $('#showSeconds').checked); updateDisplay(lastWhole>0?lastWhole:0); });
   $('#showSeconds').addEventListener('change', ()=>{ setupDigits($('#showHours').checked, $('#showSeconds').checked); updateDisplay(lastWhole>0?lastWhole:0); });
@@ -467,7 +566,9 @@
   window.addEventListener('resize', positionFlame);
 
   // Init
-  applyBackground(); restyleClockPanels(); applyWax();
+  applyBackground();
+  restyleClockPanels();
+  applyWax();
   setupDigits(false,true); updateDisplay(60);
   setWaxHeightByProgress(1); relight(); positionFlame();
 </script>
