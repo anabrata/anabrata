@@ -172,8 +172,96 @@
   .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.3); flex:0 0 auto; }
 
   /* Transparent mode for flip cards */
-<style id="flip-no-anim"> :root{ --glass-bg: rgba(255,255,255,0.18); --glass-border: rgba(255,255,255,0.35); --glass-blur: 16px; --glass-radius: 12px; --digit-gap: 14px; } /* Container */ .clock-transparent{ display: inline-flex; align-items: center; gap: var(--digit-gap); } /* Card base (no animations) */ .clock-transparent .digit{ position: relative; width: clamp(56px, 7.8vw, 92px); height: clamp(84px, 11.6vw, 138px); border-radius: var(--glass-radius); border: 1px solid var(--glass-border); background: var(--glass-bg) !important; box-shadow: 0 10px 28px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.08); backdrop-filter: blur(var(--glass-blur)) saturate(140%) contrast(105%) !important; -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%) contrast(105%) !important; /* kill any library transforms/animations */ animation: none !important; transition: none !important; transform: none !important; contain: unset !important; /* keep blur working */ } /* Halves stay glassy; no transforms */ .clock-transparent .digit .top, .clock-transparent .digit .bottom{ position: absolute; left: 0; right: 0; height: 50%; background: var(--glass-bg) !important; backdrop-filter: inherit !important; -webkit-backdrop-filter: inherit !important; animation: none !important; transition: none !important; transform: none !important; overflow: hidden; } .clock-transparent .digit .top{ top: 0; border-bottom: 1px solid rgba(255,255,255,0.25); } .clock-transparent .digit .bottom{ bottom: 0; border-top: 1px solid rgba(255,255,255,0.22); } /* Digits (centered, readable) */ .clock-transparent .digit .value{ position: absolute; left: 0; right: 0; font: 700 clamp(48px, 7vw, 112px)/1 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans"; text-align: center; color: #000; text-shadow: 0 1px 2px rgba(0,0,0,0.6); animation: none !important; transition: none !important; transform: none !important; } /* Vertical alignment for halves */ .clock-transparent .digit .top .value{ top: 50%; transform: translateY(-60%) !important; } .clock-transparent .digit .bottom .value{ top: -10%; transform: none !important; } /* Remove any solid fills from other styles */ .clock-transparent .digit, .clock-transparent .digit *{ background-image: none !important; } /* Simple colon */ .clock-transparent .sep{ display: inline-flex; align-items: center; justify-content: center; width: clamp(12px, 2vw, 18px); font-weight: 700; font-size: clamp(28px, 4.2vw, 52px); color: rgba(255,255,255,0.9); text-shadow: 0 1px 2px rgba(0,0,0,0.25); } </style> <script> /* No-animation clock: - Keeps glassy transparent cards - Updates HH:MM instantly (no flip/fade/transform) Usage: ensure a container with class "clock-transparent" exists, or add <div class="clock clock-transparent"></div> anywhere. */ (() => { function ensureDigitStructure(digit){ if (digit.querySelector(':scope > .top') && digit.querySelector(':scope > .bottom')) return; const current = (digit.textContent || '0').trim().slice(-1) || '0'; digit.textContent = ''; const top = document.createElement('div'); top.className = 'top'; const tv = document.createElement('span'); tv.className = 'value'; tv.textContent = current; top.appendChild(tv); const bottom = document.createElement('div'); bottom.className = 'bottom'; const bv = document.createElement('span'); bv.className = 'value'; bv.textContent = current; bottom.appendChild(bv); digit.append(top, bottom); } function ensureTimeLayout(container){ if (container.querySelector('.digit')) return; const mkDigit = () => { const d = document.createElement('div'); d.className = 'digit'; ensureDigitStructure(d); return d; }; const d1 = mkDigit(), d2 = mkDigit(), sep = document.createElement('span'), d3 = mkDigit(), d4 = mkDigit(); sep.className = 'sep'; sep.textContent = ':'; container.append(d1, d2, sep, d3, d4); } function setDigits(container, text4){ const digits = [...container.querySelectorAll('.digit')].slice(0,4); const chars = text4.split(''); digits.forEach((d, i) => { const c = chars[i] ?? '0'; const topV = d.querySelector('.top .value'); const botV = d.querySelector('.bottom .value'); if (topV) topV.textContent = c; if (botV) botV.textContent = c; }); } function startHHMM(container){ ensureTimeLayout(container); const tick = () => { const now = new Date(); const hh = String(now.getHours()).padStart(2, '0'); const mm = String(now.getMinutes()).padStart(2, '0'); setDigits(container, hh + mm); }; tick(); setInterval(tick, 1000); } function init(){ const containers = document.querySelectorAll('.clock-transparent'); if (containers.length === 0){ // Create one automatically if none exist const auto = document.createElement('div'); auto.className = 'clock clock-transparent'; document.body.appendChild(auto); startHHMM(auto); return; } containers.forEach(c => { // If a library already placed .digit nodes, keep them; just ensure halves c.querySelectorAll('.digit').forEach(ensureDigitStructure); startHHMM(c); }); } if (document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init, { once:true }); } else { init(); } })(); </script>
+:root{
+  --glass-bg: rgba(255,255,255,0.18);
+  --glass-border: rgba(255,255,255,0.35);
+  --glass-blur: 16px;
+  --glass-radius: 12px;
+}
 
+/* Card */
+.clock-transparent .digit{
+  position: relative;
+  width: clamp(56px, 7.8vw, 92px);
+  height: clamp(84px, 11.6vw, 138px);
+  border-radius: var(--glass-radius);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg) !important;
+  box-shadow:
+    0 10px 28px rgba(0,0,0,0.22),
+    inset 0 1px 0 rgba(255,255,255,0.12),
+    inset 0 -1px 0 rgba(0,0,0,0.08);
+  backdrop-filter: blur(var(--glass-blur)) saturate(140%) contrast(105%) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%) contrast(105%) !important;
+
+  /* Kill any flip/animation from libraries */
+  contain: unset !important;          /* keep backdrop-filter working */
+  will-change: auto !important;
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Halves (stay glassy; no transforms) */
+.clock-transparent .digit .top,
+.clock-transparent .digit .bottom{
+  position: absolute;
+  left: 0; right: 0;
+  height: 50%;
+  background: var(--glass-bg) !important;
+  backdrop-filter: inherit !important;
+  -webkit-backdrop-filter: inherit !important;
+  overflow: hidden;
+
+  /* Disable any flip transforms/animations on faces */
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+.clock-transparent .digit .top{
+  top: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.25);
+}
+.clock-transparent .digit .bottom{
+  bottom: 0;
+  border-top: 1px solid rgba(255,255,255,0.22);
+}
+
+/* Numbers (centered, readable, no animation) */
+.clock-transparent .digit .value{
+  position: absolute;
+  left: 0; right: 0;
+  font: 700 clamp(48px, 7vw, 112px)/1 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans";
+  text-align: center;
+  color: #000;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Vertical alignment for halves */
+.clock-transparent .digit .top .value{ top: 50%; transform: translateY(-60%) !important; }
+.clock-transparent .digit .bottom .value{ top: -10%; transform: none !important; }
+
+/* Remove any solid fills or gradients from external styles */
+.clock-transparent .digit,
+.clock-transparent .digit *{
+  background-image: none !important;
+}
+
+/* Optional: colon between groups */
+.clock-transparent .sep{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(12px, 2vw, 18px);
+  font-weight: 700;
+  font-size: clamp(28px, 4.2vw, 52px);
+  color: rgba(255,255,255,0.9);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.25);
+}
   /* ===== Simple clock ===== */
   #simpleTimer{
     display:none; font-weight:900; letter-spacing:.04em; font-size:min(12vw,160px);
