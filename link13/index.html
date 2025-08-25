@@ -174,29 +174,52 @@
 
   /* Transparent mode for flip cards */
   .clock-transparent .digit{
-background: rgba(255,255,255,0.06) !important; / faint tint for glass /
-border-color: rgba(255,255,255,0.18) !important;
+background: rgba(255,255,255,0.08) !important; / subtle glass tint */
+border: 1px solid rgba(255,255,255,0.18) !important;
 box-shadow:
-0 10px 28px rgba(0,0,0,0.25),
+0 10px 28px rgba(0,0,0,0.22),
 inset 0 0 0 1px rgba(255,255,255,0.05) !important;
-backdrop-filter: blur(14px) saturate(120%) !important; / blur the background behind */
+backdrop-filter: blur(14px) saturate(120%) !important;
 -webkit-backdrop-filter: blur(14px) saturate(120%) !important;
-}
-
-/* Keep the digit halves clean and airy */
-.clock-transparent .digit:before{ background: transparent !important; }
-.clock-transparent .digit .top{ border-bottom: 1px solid rgba(255,255,255,0.15) !important; }
-.clock-transparent .digit .bottom{ border-top: 1px solid rgba(255,255,255,0.15) !important; }
-
-/* Optional: easy color control for the numbers */
-.clock-transparent,
-.clock-transparent .digit,
-.clock-transparent .digit {
 color: var(--clock-number-color, #fff) !important;
-text-shadow: 0 1px 2px rgba(0,0,0,0.35); / readability on glass */
+text-shadow: 0 1px 2px rgba(0,0,0,0.35);
 }
 
-/* Disable flip animations so it behaves like a normal clock */
+/* Ensure only the container has a background; inner faces are fully transparent */
+.clock-transparent .digit *,
+.clock-transparent .top,
+.clock-transparent .bottom,
+.clock-transparent .front,
+.clock-transparent .back{
+background: transparent !important;
+box-shadow: none !important;
+}
+
+/* Keep split-line styling (both halves stay visible) /
+.clock-transparent .digit .top{
+border-bottom: 1px solid rgba(255,255,255,0.16) !important;
+}
+.clock-transparent .digit .bottom{
+border-top: 1px solid rgba(255,255,255,0.16) !important;
+visibility: visible !important; / fix: bottom numbers must remain visible */
+opacity: 1 !important;
+}
+
+/* Remove decorative overlays/shadows that can darken over time */
+.clock-transparent .digit:before,
+.clock-transparent .digit:after,
+.clock-transparent .top:before,
+.clock-transparent .bottom:after,
+.clock-transparent .front:before,
+.clock-transparent .back:after,
+.clock-transparent .shadow{
+content: none !important;
+display: none !important;
+background: transparent !important;
+box-shadow: none !important;
+}
+
+/* Disable all flip animations and 3D transforms so it behaves like a normal clock */
 .clock-transparent .flip,
 .clock-transparent .flip-clock,
 .clock-transparent .flip-card,
@@ -205,23 +228,20 @@ text-shadow: 0 1px 2px rgba(0,0,0,0.35); / readability on glass */
 .clock-transparent .top,
 .clock-transparent .bottom,
 .clock-transparent .front,
-.clock-transparent .back,
-.clock-transparent .shadow{
+.clock-transparent .back{
 animation: none !important;
 transition: none !important;
 transform: none !important;
 perspective: none !important;
 }
 
-/* Hide flip shading/folds and the bottom face to avoid double text /
-.clock-transparent .digit:after,
-.clock-transparent .shadow{
-display: none !important;
+/* Optional: tweak number weight/kerning for readability on glass */
+.clock-transparent .digit,
+.clock-transparent .digit *{
+font-weight: var(--clock-number-weight, 700) !important;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
 }
-.clock-transparent .bottom{
-visibility: hidden !important; / keeps layout, hides duplicate numeral */
-}
-
   /* ===== Simple clock ===== */
   #simpleTimer{
     display:none; font-weight:900; letter-spacing:.04em; font-size:min(12vw,160px);
