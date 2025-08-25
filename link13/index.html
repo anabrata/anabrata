@@ -3,44 +3,33 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Luxury Analog Watch (Canvas, compatible)</title>
+<title>Luxury Analog Watch (Canvas, fixed)</title>
 <style>
   :root{
     --bg1:#0d1117; --bg2:#1b2533;
-    --dial1:#0e1622; --dial2:#0a1018; --dial3:#04070b;
     --marker:#e8eefc; --tick:#cbd5e190; --tickBold:#e5e7ebd0;
     --hand:#f8fafc; --sec:#e11d48;
     --size:min(90vmin,560px);
   }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0; display:grid; place-items:center;
-    font:400 16px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-    background: radial-gradient(120% 120% at 20% 10%, #182234 0%, var(--bg2) 40%, var(--bg1) 100%);
-    color:#e5e7eb;
-  }
+  html,body{height:100%} *{box-sizing:border-box}
+  body{margin:0; display:grid; place-items:center; background:radial-gradient(120% 120% at 20% 10%, #182234 0%, var(--bg2) 40%, var(--bg1) 100%); color:#e5e7eb; font:400 16px system-ui, -apple-system, Segoe UI, Roboto, Arial}
   .wrap{display:grid; gap:14px; place-items:center; padding:16px}
   .watch{ width:var(--size); height:var(--size); position:relative }
-  .bezel{
-    position:absolute; inset:0; border-radius:50%;
-    background:
-      radial-gradient(closest-side, #ffffff20 0 96%, transparent 96% 100%),
-      conic-gradient(from 90deg at 50% 50%, #2a3344, #1d2737, #2a3344);
+  canvas{width:100%; height:100%; display:block; background:transparent}
+  .bezel{ position:absolute; inset:0; border-radius:50%; pointer-events:none;
+    background: radial-gradient(closest-side, #ffffff20 0 96%, transparent 96% 100%),
+                conic-gradient(from 90deg at 50% 50%, #2a3344, #1d2737, #2a3344);
     box-shadow: inset 0 2px 6px #0008, inset 0 -2px 10px #000a, 0 0 0 1px #0009;
-    pointer-events:none;
   }
-  canvas{width:100%; height:100%; display:block}
   .controls{display:flex; gap:10px; align-items:center; justify-content:center; font-size:14px}
-  .lcd{font-variant-numeric: tabular-nums; padding:.3rem .55rem; border:1px solid #2c3a55; border-radius:8px; background:#0b1222a0}
-  @media (prefers-reduced-motion: reduce){ .smooth-only{ display:none } }
+  .lcd{font-variant-numeric:tabular-nums; padding:.3rem .55rem; border:1px solid #2c3a55; border-radius:8px; background:#0b1222a0}
 </style>
 </head>
 <body>
   <div class="wrap">
     <div style="font-weight:600">Luxury analog watch (Rolex‑inspired, no branding)</div>
     <div class="watch">
-      <canvas id="c"></canvas>
+      <canvas id="clock"></canvas>
       <div class="bezel" aria-hidden="true"></div>
     </div>
     <div class="controls">
@@ -51,28 +40,38 @@
 
 <script>
 (function(){
-  const canvas = document.getElementById('c');
+  const canvas = document.getElementById('clock');
+  const ctx = canvas.getContext('2d', {alpha:true, desynchronized:false});
   const lcd = document.getElementById('lcd');
   const beat8 = document.getElementById('beat8');
-  const ctx = canvas.getContext('2d');
 
-  // Handle HiDPI
-  function resize(){
+  let dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 3));
+  let animating = false;
+
+  // Size canvas buffer to CSS box with DPR
+  function sizeToCSS(){
     const rect = canvas.getBoundingClientRect();
-    const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 3));
-    canvas.width = Math.round(rect.width * dpr);
-    canvas.height = Math.round(rect.height * dpr);
-    ctx.setTransform(dpr,0,0,dpr,0,0);
+    dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 3));
+    const w = Math.max(1, Math.round(rect.width * dpr));
+    const h = Math.max(1, Math.round(rect.height * dpr));
+    if (canvas.width !== w || canvas.height !== h){
+      canvas.width = w; canvas.height = h;
+    }
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.scale(dpr, dpr);
   }
-  addEventListener('resize', resize, {passive:true});
-  resize();
 
+  // Observe size changes robustly
+  const ro = new ResizeObserver(sizeToCSS);
+  ro.observe(canvas);
+
+  // Drawing helpers
   function drawFace(cx, cy, R){
-    // Dial gradient
+    // Base dial
     const g = ctx.createRadialGradient(cx, cy, 2, cx, cy, R*0.95);
-    g.addColorStop(0, getComputedStyle(document.documentElement).getPropertyValue('--dial1').trim());
-    g.addColorStop(0.7, getComputedStyle(document.documentElement).getPropertyValue('--dial2').trim());
-    g.addColorStop(1, getComputedStyle(document.documentElement).getPropertyValue('--dial3').trim());
+    g.addColorStop(0, '#0f1b2d');
+    g.addColorStop(0.7, '#0a121e');
+    g.addColorStop(1, '#05080e');
     ctx.fillStyle = g;
     ctx.beginPath(); ctx.arc(cx, cy, R*0.92, 0, Math.PI*2); ctx.fill();
 
@@ -84,17 +83,16 @@
       ctx.strokeStyle = i%5===0 ? getComputedStyle(document.documentElement).getPropertyValue('--tickBold').trim()
                                 : getComputedStyle(document.documentElement).getPropertyValue('--tick').trim();
       ctx.lineWidth = i%5===0 ? 3.2 : 1.6;
-      const x1 = cx + Math.sin(a)*inner, y1 = cy - Math.cos(a)*inner;
-      const x2 = cx + Math.sin(a)*outer, y2 = cy - Math.cos(a)*outer;
-      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.sin(a)*inner, cy - Math.cos(a)*inner);
+      ctx.lineTo(cx + Math.sin(a)*outer, cy - Math.cos(a)*outer);
+      ctx.stroke();
     }
 
     // Hour batons
     ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--marker').trim();
     for(let i=0;i<12;i++){
-      const a = i * Math.PI/6;
-      const w = 6, h = 18;
-      const r = R*0.70;
+      const a = i * Math.PI/6, w = 6, h = 18, r = R*0.70;
       const x = cx + Math.sin(a)*r, y = cy - Math.cos(a)*r;
       ctx.save(); ctx.translate(x,y); ctx.rotate(a);
       ctx.fillRect(-w/2, -h/2, w, h);
@@ -102,70 +100,65 @@
     }
   }
 
-  function drawHand(length, width, color, angle){
+  function hand(length, width, color, angle, cx, cy){
     ctx.save();
-    const rect = canvas.getBoundingClientRect();
-    const cx = rect.width/2, cy = rect.height/2;
-    ctx.translate(cx, cy);           // move origin to center
-    ctx.rotate(angle);                // rotate around center
-    ctx.fillStyle = color; ctx.strokeStyle = color; ctx.lineCap = 'round';
-
-    // hand shaft
+    ctx.translate(cx, cy);
+    ctx.rotate(angle);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.lineCap = 'round';
     ctx.beginPath();
     ctx.moveTo(0, 10);
     ctx.lineTo(0, -length);
-    ctx.lineWidth = width;
     ctx.stroke();
-
     ctx.restore();
   }
 
   function draw(){
-    const rect = canvas.getBoundingClientRect();
-    const w = rect.width, h = rect.height;
+    // Use CSS pixels for math; scale already applied
+    const w = canvas.width / dpr;
+    const h = canvas.height / dpr;
     const cx = w/2, cy = h/2, R = Math.min(w,h)/2;
 
-    // Clear
     ctx.clearRect(0,0,w,h);
 
-    // Dial + markers
     drawFace(cx, cy, R);
 
-    // Time
     const now = new Date();
     const ms = now.getMilliseconds();
     const s = now.getSeconds();
     const m = now.getMinutes();
-    const h12 = now.getHours()%12;
+    const h12 = now.getHours() % 12;
 
-    // Seconds fraction: smooth or 8-beat (125 ms)
-    const useBeat8 = beat8.checked || matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const sFrac = useBeat8 ? (s + Math.floor(ms/125)/8) : (s + ms/1000);
+    const stepped = beat8.checked || matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const sFrac = stepped ? s + Math.floor(ms/125)/8 : s + ms/1000;
 
-    // Angles in radians
-    const aS = (sFrac) * Math.PI/30;                          // 360/60 -> PI/30
+    const aS = sFrac * Math.PI/30;
     const aM = (m + (s + ms/1000)/60) * Math.PI/30;
-    const aH = (h12 + (m + s/60 + ms/60000)/60) * Math.PI/6; // 360/12 -> PI/6
+    const aH = (h12 + (m + s/60 + ms/60000)/60) * Math.PI/6;
 
-    // Hands
-    drawHand(R*0.68, 6.0, getComputedStyle(document.documentElement).getPropertyValue('--hand').trim(), aH);
-    drawHand(R*0.86, 4.0, getComputedStyle(document.documentElement).getPropertyValue('--hand').trim(), aM);
-    drawHand(R*0.90, 2.2, getComputedStyle(document.documentElement).getPropertyValue('--sec').trim(), aS);
+    hand(R*0.68, 6.0, getComputedStyle(document.documentElement).getPropertyValue('--hand').trim(), aH, cx, cy);
+    hand(R*0.86, 4.0, getComputedStyle(document.documentElement).getPropertyValue('--hand').trim(), aM, cx, cy);
+    hand(R*0.90, 2.2, getComputedStyle(document.documentElement).getPropertyValue('--sec').trim(),  aS, cx, cy);
 
     // Center cap
     ctx.fillStyle = '#0f172a'; ctx.strokeStyle = '#e5e7eb'; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.arc(cx, cy, 6.5, 0, Math.PI*2); ctx.fill(); ctx.stroke();
 
-    // LCD time
-    const pad=n=>String(n).padStart(2,'0');
+    // LCD
+    const pad = n => String(n).padStart(2,'0');
     lcd.textContent = `${pad(now.getHours())}:${pad(m)}:${pad(s)}`;
   }
 
   function loop(){
     draw();
-    requestAnimationFrame(loop);
+    if (animating) requestAnimationFrame(loop);
   }
-  requestAnimationFrame(loop);
+
+  // Start once
+  sizeToCSS();
+  if (!animating){ animating = true; requestAnimationFrame(loop); }
+
 })();
 </script>
 </body>
