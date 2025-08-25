@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>Candle Timer — Vision 2.2</title>
+<title>Candle Timer — Vision 2.3.1</title>
 <style>
   :root{
     /* Flip sizes */
@@ -58,7 +58,7 @@
   /* Flip clock */
   #timer-container{ flex:1; display:flex; align-items:center; justify-content:flex-start; min-width:340px; gap:12px; }
   #timer{ display:flex; align-items:center; gap:12px; user-select:none; }
-  #simpleTimer{ display:none; font-weight:900; letter-spacing:.5px; color:#000; text-shadow:0 6px 24px rgba(0,0,0,.25); font-size:min(12vw, 120px); }
+  #simpleTimer{ display:none; font-weight:900; letter-spacing:.5px; color:var(--clock-text); text-shadow:0 6px 24px rgba(0,0,0,.25); font-size:min(12vw, 120px); }
 
   .digit{
     position:relative; width:var(--digit-w); height:var(--digit-h); perspective:1200px;
@@ -159,7 +159,7 @@
   #rtcOverlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:90; }
   #rtcOverlay.show{ display:flex; }
   #rtcTimer{ display:flex; align-items:center; gap:12px; }
-  #simpleRTC{ display:none; font-weight:900; letter-spacing:.5px; color:#000; text-shadow:0 6px 24px rgba(0,0,0,.25); font-size:min(12vw, 120px); }
+  #simpleRTC{ display:none; font-weight:900; letter-spacing:.5px; color:var(--clock-text); text-shadow:0 6px 24px rgba(0,0,0,.25); font-size:min(12vw, 120px); }
   #rtcBack{ position:fixed; top:8px; left:10px; opacity:.45; background:rgba(0,0,0,.25); color:#fff; border-radius:10px; padding:6px 10px; font-weight:800; border:none; cursor:pointer; z-index:95; }
   #rtcBack:hover{ opacity:.75 }
   .rtc-only .brand, .rtc-only #controls, .rtc-only #main, .rtc-only #exitFs { display:none !important; }
@@ -210,6 +210,9 @@
   .pre-on #exitFs,
   .pre-on #rtcOverlay,
   .pre-on #congrats{ display:none !important }
+
+  /* Utility: temporarily disable transitions for snap reset */
+  .no-transitions{ transition: none !important; } /* turn off all transitions during reset snap */
 
   @media (max-width:980px){ :root{ --digit-w:100px; --digit-h:140px; } }
   @media (max-width:720px){ :root{ --digit-w:86px; --digit-h:120px; } }
@@ -468,6 +471,36 @@
     }
   }
 
+  /* Snap-reset candle + flame (fix) */
+  function snapResetCandle(){
+    // Temporarily disable transitions so geometry snaps immediately
+    candleWrap.classList.add('no-transitions');  // cancel transform/opacity transition
+    waxEl.classList.add('no-transitions');       // cancel height transition
+
+    // Restore base visual state
+    candleWrap.classList.remove('vanish');
+    candleWrap.style.opacity = '';
+    candleWrap.style.transform = '';
+    stubEl.style.display = 'none';
+    flameEl.classList.remove('off');
+    smokeEl.classList.remove('show');
+
+    // Reset wax height instantly
+    setWaxHeightByProgress(1);
+
+    // Force layout so styles and sizes apply before positioning
+    void candleWrap.offsetHeight; // reflow
+
+    // Place flame at the correct wick position this same frame
+    positionFlame();
+
+    // Re-enable transitions on the next frame
+    requestAnimationFrame(()=>{ // after next paint
+      candleWrap.classList.remove('no-transitions');
+      waxEl.classList.remove('no-transitions');
+    });
+  }
+
   function resetCountdown(){
     cancelAnimationFrame(rafId); running=false; paused=false;
     if (preRAF){ cancelAnimationFrame(preRAF); preRAF=null; $('#preOverlay').hidden=true; document.body.classList.remove('pre-on'); }
@@ -480,14 +513,8 @@
     }else{
       renderSimple(0);
     }
-    // Fully restore candle (fix for restart)
-    candleWrap.classList.remove('vanish');
-    candleWrap.style.opacity = '';
-    candleWrap.style.transform = '';
-    stubEl.style.display = 'none';
-    flameEl.classList.remove('off');
-    setWaxHeightByProgress(1);
-    positionFlame();
+    // Snap both candle and flame back to original place (fix)
+    snapResetCandle();
     hideCongrats();
   }
 
