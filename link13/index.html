@@ -1,181 +1,285 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>WORLD OF SOLAR SYSTEM</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Candle Timer</title>
   <style>
-    body { margin:0; overflow:hidden; font-family:Arial,sans-serif; background:#000; color:#fff }
-    #banner { position:absolute;top:10px;width:100%;text-align:center;font-size:24px;font-weight:bold;opacity:0;
-      animation:fadeIn 2s forwards; text-shadow:0 0 10px #0ff }
-    @keyframes fadeIn{to{opacity:1}}
-    #infoPanel { position:absolute; top:60px; right:20px; width:260px; background:rgba(0,0,0,0.7);
-      padding:12px; border-radius:8px; display:none; font-size:14px; }
-    #controls { position:absolute; bottom:20px; left:50%; transform:translateX(-50%);
-      background:rgba(0,0,0,0.7); padding:8px 12px; border-radius:8px; display:flex;gap:8px; align-items:center; }
-    #clock { position:absolute; top:10px; left:20px; font-family:monospace }
-    #selector { position:absolute; top:50px; left:20px; }
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #222;
+      transition: background 0.3s;
+      font-family: 'Comic Sans MS', sans-serif;
+    }
+    #controls {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(255,255,255,0.8);
+      padding: 10px;
+      border-radius: 8px;
+      z-index: 10;
+    }
+    #controls label {
+      display: block;
+      margin: 5px 0;
+    }
+    #timer {
+      margin-bottom: 40px;
+    }
+    .flip-card {
+      display: inline-block;
+      perspective: 1000px;
+    }
+    .digit {
+      width: 60px;
+      height: 80px;
+      margin: 0 4px;
+      position: relative;
+      color: #fff;
+      background: #000;
+      border-radius: 6px;
+      overflow: hidden;
+      font-size: 60px;
+      line-height: 80px;
+      text-align: center;
+      font-weight: bold;
+      font-family: inherit;
+    }
+    .digit .top, .digit .bottom, .digit .back-top, .digit .back-bottom {
+      position: absolute;
+      width: 100%;
+      height: 50%;
+      left: 0;
+      backface-visibility: hidden;
+    }
+    .digit .top {
+      top: 0;
+      border-bottom: 1px solid #333;
+      transform-origin: bottom;
+      z-index: 3;
+    }
+    .digit .back-top {
+      top: 0;
+      transform: rotateX(180deg);
+      z-index: 2;
+    }
+    .digit .bottom {
+      bottom: 0;
+      border-top: 1px solid #333;
+      transform-origin: top;
+    }
+    .digit .back-bottom {
+      bottom: 0;
+      transform: rotateX(0deg);
+      z-index: 1;
+    }
+    .flip {
+      animation: flip 0.6s ease-in-out forwards;
+    }
+    @keyframes flip {
+      0% { transform: rotateX(0deg); }
+      50% { transform: rotateX(-90deg); }
+      100% { transform: rotateX(-180deg); }
+    }
+    #candle-container {
+      position: relative;
+      width: 80px;
+      height: 200px;
+      transition: transform 1s ease-in;
+    }
+    #candle {
+      width: 80px;
+      height: 200px;
+      background: #fff;
+      border-radius: 10px;
+      position: relative;
+      transition: background 0.3s;
+    }
+    #flame {
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30px;
+      height: 60px;
+      background: radial-gradient(circle at 50% 20%, #fffa90, #ff9a00 60%, transparent);
+      border-radius: 50% 50% 30% 30%;
+      filter: blur(2px);
+      animation: flicker 0.2s infinite;
+      transition: opacity 0.5s;
+    }
+    @keyframes flicker {
+      0%,100% { transform: translateX(-50%) scale(1); opacity: 1; }
+      50% { transform: translateX(-50%) scale(1.1); opacity: 0.8; }
+    }
+    #candle-out {
+      display: none;
+      position: absolute;
+      top:0; left:0;
+      width: 80px; height:200px;
+      background: #ccc;
+      border-radius: 10px;
+      transform: rotate(45deg) translateY(-100%);
+      opacity: 0.8;
+    }
+    footer {
+      position: absolute;
+      bottom: 10px;
+      font-size: 14px;
+      color: #ddd;
+    }
   </style>
 </head>
 <body>
-  <div id="banner">WELCOME TO THE WORLD OF SOLAR SYSTEM</div>
-  <div id="clock"></div>
-  <div id="selector">
-    <select id="planetSelect"><option value="">Fly to…</option></select>
-  </div>
-  <div id="infoPanel"><div id="infoContent"></div></div>
   <div id="controls">
-    <button id="pauseBtn">⏸️</button>
-    <button id="realTimeBtn">🌍 OFF</button>
-    Speed: <input type="range" id="speed" min="0.1" max="10" step="0.1" value="1">
+    <label>
+      Minutes:
+      <input type="number" id="minInput" value="0" min="0" style="width:60px;" />
+    </label>
+    <label>
+      Seconds:
+      <input type="number" id="secInput" value="30" min="0" max="59" style="width:60px;" />
+    </label>
+    <label><input type="checkbox" id="toggleSec" checked /> Show Seconds</label>
+    <label>
+      Clock Color:
+      <input type="color" id="colorPicker" value="#ffffff" />
+    </label>
+    <label>
+      Background:
+      <input type="color" id="bgPicker" value="#222222" />
+    </label>
+    <label>
+      Candle Color:
+      <input type="color" id="candleColorPicker" value="#ffffff" />
+    </label>
+    <label>
+      Font:
+      <select id="fontPicker">
+        <option value="Comic Sans MS" selected>Comic Sans MS</option>
+        <option value="Arial">Arial</option>
+        <option value="Verdana">Verdana</option>
+        <option value="Courier New">Courier New</option>
+      </select>
+    </label>
+    <button id="startBtn">Start</button>
   </div>
-  <canvas id="c"></canvas>
-  
-  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+
+  <div id="timer"></div>
+  <div id="candle-container">
+    <div id="candle"></div>
+    <div id="flame"></div>
+    <div id="candle-out"></div>
+  </div>
+  <footer>MADE BY ANABRATA</footer>
+
   <script>
-  (async()=> {
-    const canvas=document.getElementById('c'),
-          renderer=new THREE.WebGLRenderer({canvas,antialias:true,logarithmicDepthBuffer:true});
-    renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-    document.body.style.touchAction='none';
-    const scene=new THREE.Scene(),
-          camera=new THREE.PerspectiveCamera(50,1,0.1,1e7);
-    camera.position.set(0,200,700);
-    const controls=new THREE.OrbitControls(camera,canvas);
-    controls.enableDamping=true;controls.dampingFactor=0.05;
-    
-    // Resize
-    const onResize=()=>{const w=innerWidth,h=innerHeight;
-      renderer.setSize(w,h,false);
-      camera.aspect=w/h;camera.updateProjectionMatrix();
-    };
-    window.addEventListener('resize',onResize);onResize();
-    
-    // Light & Sun
-    scene.add(new THREE.AmbientLight(0x222222,0.5));
-    const sunLight=new THREE.PointLight(0xffffff,2,0,2);
-    scene.add(sunLight);
-    const sunGeo=new THREE.SphereGeometry(30,64,32),
-          sunMat=new THREE.MeshBasicMaterial({map:await new THREE.TextureLoader().loadAsync('https://raw.githubusercontent.com/aloisdg/planet-textures/main/textures/sun.jpg')});
-    const sun=new THREE.Mesh(sunGeo,sunMat);
-    scene.add(sun);
-    
-    // Orbital elements (J2000 Schlyter)
-    const RAD=Math.PI/180,TAU=2*Math.PI,
-      rev=x=>x-Math.floor(x/360)*360,
-      kepler=(M,e)=>{let E=M+(180/Math.PI)*e*Math.sin(M*RAD);
-        for(let i=0;i<4;i++){const dE=(E-(180/Math.PI)*e*Math.sin(E*RAD)-M)/(1-e*Math.cos(E*RAD));E-=dE;if(Math.abs(dE)<1e-8)break;}
-        const x=Math.cos(E*RAD)-e,y=Math.sqrt(1-e*e)*Math.sin(E*RAD);
-        return{v:Math.atan2(y,x)/RAD,r:Math.sqrt(x*x+y*y)};},
-      elements={
-        Mercury:d=>({N:48.3313+3.24587e-5*d,i:7.0047,w:29.1241+1.01444e-5*d,a:0.387098,e:0.205635,M:168.6562+4.0923344368*d}),
-        Venus:d=>({N:76.6799+2.46590e-5*d,i:3.3946,w:54.8910+1.38374e-5*d,a:0.723330,e:0.006773,M:48.0052+1.6021302244*d}),
-        Earth:d=>({N:0,i:0,w:282.9404+4.70935e-5*d,a:1.000000,e:0.016709,M:356.0470+0.9856002585*d}),
-        Mars:d=>({N:49.5574+2.11081e-5*d,i:1.8497,w:286.5016+2.92961e-5*d,a:1.523688,e:0.093405,M:18.6021+0.5240207766*d}),
-        Jupiter:d=>({N:100.4542+2.76854e-5*d,i:1.3030,w:273.8777+1.64505e-5*d,a:5.20256,e:0.048498,M:19.8950+0.0830853001*d}),
-        Saturn:d=>({N:113.6634+2.38980e-5*d,i:2.4886,w:339.3939+2.97661e-5*d,a:9.55475,e:0.055546,M:316.9670+0.0334442282*d}),
-        Uranus:d=>({N:74.0005+1.3978e-5*d,i:0.7733,w:96.6612+3.0565e-5*d,a:19.18171,e:0.047318,M:142.5905+0.011725806*d}),
-        Neptune:d=>({N:131.7806+3.0173e-5*d,i:1.7700,w:272.8461,a:30.05826,e:0.008606,M:260.2471+0.005995147*d})
-      },
-      planetInfo={
-        Mercury:{tex:'https://raw.githubusercontent.com/aloisdg/planet-textures/main/textures/mercury.jpg',size:4},
-        Venus:{tex:'https://raw.githubusercontent.com/aloisdg/planet-textures/main/textures/venus.jpg',size:8},
-        Earth:{tex:'https://raw.githubusercontent.com/aloisdg/planet-textures/main/textures/earth.jpg',size:9},
-        Mars:{tex:'https://raw.githubusercontent.com/aloisdg/planet-textures/main/textures/mars.jpg',size:7},
-        Jupiter:{tex:'https://raw.githubusercontent.com/aloisdg/planet-textures/main/textures/jupiter.jpg',size:20},
-        Saturn:{tex:'https://raw.githubusercontent.com/aloisdg/planet-textures/main/textures/saturn.jpg',size:18},
-        Uranus:{tex:'https://raw.githubusercontent.com/aloisdg/planet-textures/main/textures/uranus.jpg',size:12},
-        Neptune:{tex:'https://raw.githubusercontent.com/aloisdg/planet-textures/main/textures/neptune.jpg',size:12}
-      };
-    
-    // Create planet meshes
-    const planets={}, orbitRings={};
-    const mapAU=v=>50+Math.log10(v/0.39)/(Math.log10(30/0.39))*800;
-    for(const name in planetInfo){
-      const {tex,size} = planetInfo[name];
-      const geo=new THREE.SphereGeometry(size,32,32);
-      const mat=new THREE.MeshStandardMaterial({ map: await new THREE.TextureLoader().loadAsync(tex) });
-      const mesh=new THREE.Mesh(geo,mat);
-      scene.add(mesh);
-      planets[name]=mesh;
-      // orbit ring
-      const ring=new THREE.RingGeometry(mapAU(elements[name](0).a)-0.5, mapAU(elements[name](0).a)+0.5, 128);
-      const matR=new THREE.MeshBasicMaterial({ color: 0xffffff, transparent:true, opacity:0.1, side:THREE.DoubleSide });
-      const ringMesh=new THREE.Mesh(ring,matR);
-      ringMesh.rotation.x=Math.PI/2;scene.add(ringMesh);
-      orbitRings[name]=ringMesh;
+    // Utility to create digit elements
+    function createDigit() {
+      const d = document.createElement('div');
+      d.className = 'digit';
+      ['top','back-top','bottom','back-bottom'].forEach(cls => {
+        const part = document.createElement('div');
+        part.className = cls;
+        d.appendChild(part);
+      });
+      return d;
     }
-    
-    // UI
-    const clockElem=document.getElementById('clock'),
-          panel=document.getElementById('infoPanel'),
-          content=document.getElementById('infoContent'),
-          select=document.getElementById('planetSelect');
-    for(const name in planetInfo) select.innerHTML+=`<option value="${name}">${name}</option>`;
-    
-    select.onchange=()=>flyTo(select.value);
-    document.getElementById('pauseBtn').onclick=()=>{animation=!animation};
-    document.getElementById('realTimeBtn').onclick=()=>{
-      realTime=!realTime;
-      document.getElementById('realTimeBtn').textContent = realTime?'🌍 ON':'🌍 OFF';
-    };
-    let speed=1, animation=true, realTime=false;
-    document.getElementById('speed').oninput=e=>speed=parseFloat(e.target.value);
-    
-    // Fly to planet
-    function flyTo(name){
-      if(!name)return;
-      const obj=planets[name];
-      if(!obj)return;
-      const box=new THREE.Box3().setFromObject(obj);
-      const center=box.getCenter(new THREE.Vector3());
-      controls.target.copy(center);
-      camera.position.copy(center.clone().add(new THREE.Vector3(200,100,200)));
-    }
-    
-    // Click info
-    canvas.onclick=e=>{
-      const coords=new THREE.Vector2((e.clientX/innerWidth)*2-1,-(e.clientY/innerHeight)*2+1);
-      const raycaster=new THREE.Raycaster();
-      raycaster.setFromCamera(coords,camera);
-      const hits=raycaster.intersectObjects(Object.values(planets));
-      if(hits.length){
-        const n=hits[0].object;
-        const name=Object.keys(planets).find(k=>planets[k]===n);
-        const el=planetInfo[name];
-        content.innerHTML=`<h3>${name}</h3>
-          <p><strong>Orbit:</strong> ${elements[name](dayNumber(new Date())).a.toFixed(2)} AU</p>
-          <p><strong>Real Size:</strong> ${el.size*1000} km radius</p>`;
-        panel.style.display='block';
+
+    const timerEl = document.getElementById('timer');
+    let digits = [];
+    let totalSec = 0, remaining = 0, intervalId;
+
+    // Initialize digits (MM:SS or MM)
+    function setupDigits(showSec) {
+      timerEl.innerHTML = '';
+      digits = [];
+      // minutes tens, minutes ones
+      timerEl.appendChild(createDigit());
+      timerEl.appendChild(createDigit());
+      if (showSec) {
+        const colon = document.createElement('span');
+        colon.textContent = ':';
+        colon.style.color = getComputedStyle(timerEl).color;
+        colon.style.fontSize = '60px';
+        timerEl.appendChild(colon);
+        // seconds tens, seconds ones
+        timerEl.appendChild(createDigit());
+        timerEl.appendChild(createDigit());
       }
-    };
-    
-    document.body.onclick=e=>{if(!panel.contains(e.target)&&e.target.tagName!=='CANVAS')panel.style.display='none'};
-    
-    // Animation loop
-    let last=0, nowDate=new Date();
-    function update(){
-      requestAnimationFrame(update);
-      const t=performance.now();
-      const dt=(t-last)/1000; last=t;
-      if(realTime) nowDate=new Date();
-      else nowDate=new Date(nowDate.getTime()+dt*1000*speed);
-      clockElem.textContent=nowDate.toISOString().slice(11,19)+' UTC';
-      
-      const d=dayNumber(nowDate);
-      for(const name in planets){
-        const p=planetHelio(name,d), R=mapAU(p.R)/p.R;
-        const m=planets[name];
-        m.position.set(p.x*R,p.z*R,p.y*R);
-        orbitRings[name].position.copy(m.position);
-      }
-      if(animation) controls.update();
-      renderer.render(scene,camera);
+      digits = Array.from(timerEl.querySelectorAll('.digit'));
+      updateDisplay(remaining);
     }
-    update();
+
+    // Update flip animation
+    function flipTo(digit, newVal) {
+      const [top, backTop, bottom, backBottom] = digit.children;
+      const oldVal = top.textContent || '0';
+      if (oldVal === newVal) return;
+      backTop.textContent = oldVal;
+      backBottom.textContent = newVal;
+      bottom.textContent = newVal;
+      digit.classList.add('flip');
+      digit.addEventListener('animationend', () => {
+        top.textContent = newVal;
+        digit.classList.remove('flip');
+      }, { once: true });
+    }
+
+    // Convert seconds to MMSS, update each digit
+    function updateDisplay(sec) {
+      const mins = Math.floor(sec / 60);
+      const secs = sec % 60;
+      const arr = remainingDisplay = [
+        String(mins).padStart(2,'0'),
+        ...(document.getElementById('toggleSec').checked
+          ? [String(secs).padStart(2,'0')] : [])
+      ].join('').split('');
+      digits.forEach((d,i) => flipTo(d, arr[i] || '0'));
+    }
+
+    function tick() {
+      if (remaining <= 0) {
+        clearInterval(intervalId);
+        // extinguish
+        document.getElementById('flame').style.opacity = '0';
+        // drop candle
+        document.getElementById('candle').style.opacity = '0';
+        document.getElementById('candle-out').style.display = 'block';
+        document.getElementById('candle-container').style.transform = 'translateY(200px) rotate(20deg)';
+        return;
+      }
+      remaining--;
+      updateDisplay(remaining);
+    }
+
+    document.getElementById('startBtn').onclick = () => {
+      clearInterval(intervalId);
+      const mins = parseInt(document.getElementById('minInput').value) || 0;
+      const secs = parseInt(document.getElementById('secInput').value) || 0;
+      totalSec = mins*60 + secs;
+      remaining = totalSec;
+      setupDigits(document.getElementById('toggleSec').checked);
+      intervalId = setInterval(tick, 1000);
+    };
+
+    // Controls reactions
+    document.getElementById('toggleSec').onchange = () => setupDigits(!!remaining && document.getElementById('toggleSec').checked);
+    document.getElementById('colorPicker').oninput = e => {
+      timerEl.querySelectorAll('.digit, span').forEach(el => el.style.color = e.target.value);
+    };
+    document.getElementById('bgPicker').oninput = e => document.body.style.background = e.target.value;
+    document.getElementById('candleColorPicker').oninput = e => document.getElementById('candle').style.background = e.target.value;
+    document.getElementById('fontPicker').onchange = e => document.body.style.fontFamily = `'${e.target.value}', sans-serif`;
     
-  })();
+    // Initial setup
+    setupDigits(true);
   </script>
 </body>
 </html>
