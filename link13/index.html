@@ -42,7 +42,7 @@
     /* Layout tweak */
     --candle-offset: 18px;
 
-    /* To‑do list color var (default fully transparent) */
+    /* To‑do list color (default fully transparent) */
     --todo-bg: transparent;
   }
 
@@ -60,25 +60,31 @@
   #exitFs{ position:fixed; right:8px; top:6px; z-index:70; width:24px; height:24px; line-height:24px; text-align:center; font-weight:900; color:#fff; background:rgba(0,0,0,.25); border-radius:50%; cursor:pointer; opacity:.35; display:none; }
   #exitFs:hover{ opacity:.65 }
 
+  /* ================= Main row: Clock | To‑do | Candle ================= */
   .main{
     flex:1; display:flex; align-items:center; justify-content:space-between;
-    gap:min(6vw,56px); padding:22px min(5vw,48px);
+    gap:min(5vw,48px); padding:22px min(5vw,48px);
     position:relative;
   }
 
-  /* Center only the clock overlay; keep candle at right */
+  /* Explicit order so To‑do always lives between */
+  #timer-container{ order:1; flex:1 1 auto; min-width:340px; }
+  #todo-panel     { order:2; align-self:center; }
+  #candle-area    { order:3; flex:0 0 auto; min-width:340px; }
+
+  /* Center clock mode: clock overlays center, To‑do pins left out of the way */
   .center-clock .main{ justify-content:flex-end; }
   .center-clock #candle-area{ margin-left:auto; }
   .center-clock #timer-container{
     position:absolute; left:50%; top:50%;
     transform:translate(-50%,-50%);
-    z-index:5; flex:0 0 auto; min-width:0; width:auto; justify-content:center;
+    z-index:5; min-width:0; width:auto; pointer-events:auto;
   }
 
   /* Hide candle option */
   .candle-off #candle-area{ display:none !important; }
 
-  /* Only candle mode — hide clock, center candle */
+  /* Only candle mode — hide clock, center candle, pin To‑do left */
   .only-candle #timer-container{ display:none !important; }
   .only-candle .main{ justify-content:center; }
   .only-candle #candle-area{ justify-content:center; }
@@ -87,22 +93,34 @@
   #todo-panel{ display:none; }
   .todo-on #todo-panel{ display:block; }
 
-  /* Default: BETWEEN clock and candle (flex child, no overlay) */
+  /* Default: BETWEEN clock and candle (never absolute here) */
   #todo-panel{
-    position: relative; left:auto; top:auto; transform:none; z-index:4;
+    position: static; /* important: no overlay in default layout */
+    z-index:auto;
+
+    /* compact sizing */
     flex: 0 1 clamp(220px, 26vw, 420px);
     max-width: clamp(220px, 26vw, 420px);
     max-height: 60vh;
     margin-inline: clamp(6px, 1.6vw, 12px);
     font-size: 13px;
+
     overflow:auto;
     padding:10px 12px;
     border-radius:12px;
     border:1px solid rgba(255,255,255,.18);
-    background: var(--todo-bg, transparent); /* stays transparent unless user sets a color */
+    background: var(--todo-bg, transparent);
     box-shadow: 0 6px 18px rgba(0,0,0,.16), 0 2px 5px rgba(0,0,0,.1);
     color:#fff;
   }
+
+  /* If transparent, remove border/shadow entirely (no white tint) */
+  #todo-panel.todo-clear{
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+
   /* When CLOCK is centered or ONLY candle is shown, pin To‑do to LEFT */
   .center-clock #todo-panel,
   .only-candle  #todo-panel{
@@ -114,9 +132,10 @@
     max-width: clamp(220px, 26vw, 420px);
     margin-inline: 0;
   }
+
   /* When candle is hidden (and clock not centered), To‑do takes candle place on RIGHT */
   .candle-off:not(.center-clock):not(.only-candle) #todo-panel{
-    position: relative;
+    position: static;
     margin-left:auto;
   }
 
@@ -164,8 +183,8 @@
   .todoText:empty:before{ content:"New task"; opacity:.45; }
 
   /* ================= Flip clock ================= */
-  #timer-container{ flex:1; display:flex; align-items:center; justify-content:flex-start; min-width:340px; gap:12px; }
-  #timer{ display:flex; align-items:center; gap:12px; user-select:none; z-index:5; }
+  #timer{ display:flex; align-items:center; gap:12px; user-select:none; }
+
   #simpleTimer{ display:none; font-weight:900; letter-spacing:.5px; color:var(--simple-text); text-shadow:0 6px 24px rgba(0,0,0,.25); font-size:min(12vw, 120px); }
 
   .digit{
@@ -196,7 +215,7 @@
   .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.25); }
 
   /* ================= Candle ================= */
-  #candle-area{ flex:1; display:flex; align-items:flex-end; justify-content:flex-end; min-width:340px; height:max(380px,42vh); position:relative; transform: translateY(var(--candle-offset)); }
+  #candle-area{ display:flex; align-items:flex-end; justify-content:flex-end; height:max(380px,42vh); position:relative; transform: translateY(var(--candle-offset)); }
   .candle-clip{ position:relative; width:180px; height:380px; overflow:hidden; display:flex; align-items:flex-end; justify-content:center; }
   .candle-wrap{ position:absolute; inset:auto 0 0 0; margin:auto; width:180px; height:380px; display:flex; align-items:flex-end; justify-content:center; transition: transform .5s ease, opacity .5s ease; }
   .candle-wrap.vanish{ transform: scale(.85) translateY(12px); opacity: 0; pointer-events:none; }
@@ -242,38 +261,28 @@
   .flame.off{ opacity:0 !important; animation-play-state: paused !important; }
 
   .stub{ display:none; position:absolute; bottom:0; width:150px; height:58px; background:linear-gradient(180deg,#9a9a9a,#6f6f6f); border-radius:0 0 22px 22px; z-index:1; }
-  .smoke{ position:absolute; width:10px; height:10px; left:0; top:0; border-radius:50%; background:radial-gradient(#bbb, transparent 64%); opacity:0; pointer-events:none; z-index:7; }
-  .smoke.show{ animation:puff 1.4s ease-out forwards; }
-  @keyframes puff{ 0%{ transform:translate(0,0) scale(1); opacity:.8; filter:blur(.4px) } 100%{ transform:translate(0,-120px) scale(2.1); opacity:0; filter:blur(3px) } }
 
   /* Controls rail (transparent) */
   #controls{
     position:relative; display:grid; grid-auto-flow:column; grid-auto-columns:minmax(240px,1fr); gap:14px; padding:16px;
-    background:rgba(0,0,0,.22); backdrop-filter:blur(8px); scroll-snap-type:x mandatory; overflow-x:auto;
+    background:rgba(0,0,0,.22); backdrop-filter:blur(8px); overflow-x:auto;
     border-top-left-radius:16px; border-top-right-radius:16px; z-index:10;
   }
 
-  /* Transparent cards */
   .card{
-    position:relative; scroll-snap-align:start;
-    background:rgba(255,255,255,.06);
+    position:relative; background:rgba(255,255,255,.06);
     border:1px solid rgba(255,255,255,.08);
-    border-radius:14px;
-    padding:12px;
-    min-height:84px;
+    border-radius:14px; padding:12px; min-height:84px;
     display:flex; flex-direction:column; gap:8px;
   }
   .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
   label{ font-size:12px; color:#fff; opacity:.95 }
-
   input[type="number"],input[type="color"],select{
     width:100%; padding:8px 10px; border-radius:10px;
     border:1px solid rgba(255,255,255,.12);
-    background:rgba(0,0,0,.35);
-    color:#fff; outline:none;
+    background:rgba(0,0,0,.35); color:#fff; outline:none;
   }
   input[type="checkbox"]{ transform:scale(1.2) }
-
   .btn{ position:relative; padding:12px 18px; border-radius:12px; border:none; font-weight:800; cursor:pointer; font-family: var(--btn-font); background:var(--btn-grad); color:#1b1b1b; box-shadow:0 6px 16px rgba(0,0,0,.18); transition:transform .12s, box-shadow .2s, background .2s; }
   .btn:hover{ background:var(--btn-grad-hover); box-shadow:0 10px 24px rgba(0,0,0,.28); }
   .btn:active{ transform: translateY(1px) scale(.99); }
@@ -281,33 +290,6 @@
   .btn.warn{ background:linear-gradient(135deg,#fca5a5,#ef4444); color:#0d0d15; }
   .btn.small{ padding:8px 10px; border-radius:10px; font-weight:900; }
   .btn.ghost{ background:rgba(255,255,255,.12); color:#fff; }
-
-  /* Real-time overlay etc. */
-  #rtcOverlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:90; }
-  #rtcOverlay.show{ display:flex; }
-  #rtcTimer{ display:flex; align-items:center; gap:12px; }
-  #simpleRTC{ display:none; font-weight:900; letter-spacing:.5px; color:var(--simple-text); text-shadow:0 6px 24px rgba(0,0,0,.25); font-size:min(12vw, 120px); }
-  #rtcBack{ position:fixed; top:8px; left:10px; opacity:.45; background:rgba(0,0,0,.25); color:#fff; border-radius:10px; padding:6px 10px; font-weight:800; border:none; cursor:pointer; z-index:95; }
-  #rtcBack:hover{ opacity:.75 }
-  .rtc-only .brand, .rtc-only #controls, .rtc-only #main, .rtc-only #exitFs { display:none !important; }
-
-  /* Congrats overlay */
-  #congrats{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; flex-direction:column; background:rgba(0,0,0,.35); z-index:95; backdrop-filter:blur(2px); }
-  #congrats.show{ display:flex; }
-  .cg-card{ background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); padding:22px 26px; border-radius:16px; text-align:center; color:#fff; box-shadow:0 14px 40px rgba(0,0,0,.4); }
-  .cg-title{ font-size:28px; font-weight:900; margin-bottom:6px; }
-  .cg-sub{ font-size:14px; opacity:.95; margin-bottom:12px; }
-
-  /* Pre-start overlay */
-  #preOverlay{ position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center; background: rgba(0,0,0,0.45); backdrop-filter: blur(2px); }
-  #preOverlay:not([hidden]){ display:flex }
-  #preNum{ font-family:"Comic Sans MS", system-ui, -apple-system, Segoe UI, Roboto, Arial; font-size:min(22vw, 220px); font-weight:900; color:#fff; text-shadow:0 10px 40px rgba(0,0,0,.6); opacity:0; transform:scale(.9); }
-  .step{ animation: fadeStep 1s ease both }
-  @keyframes fadeStep{ 0%{ opacity:0; transform:scale(.9) } 20%{ opacity:1; transform:scale(1) } 80%{ opacity:1; transform:scale(1) } 100%{ opacity:0; transform:scale(1.06) } }
-
-  .pre-on .brand, .pre-on #controls, .pre-on #exitFs, .pre-on #rtcOverlay, .pre-on #congrats{ display:none !important }
-
-  .no-transitions{ transition: none !important; }
 
   @media (max-width:980px){
     :root{ --digit-w:100px; --digit-h:140px; }
@@ -330,8 +312,8 @@
       <div id="simpleTimer">00:00</div>
     </section>
 
-    <!-- To‑do panel (compact, transparent by default) -->
-    <section id="todo-panel" aria-label="To‑do list">
+    <!-- To‑do panel -->
+    <section id="todo-panel" class="todo-clear" aria-label="To‑do list">
       <h4 id="todoTitle">To‑do</h4>
       <ol id="todoList"></ol>
     </section>
@@ -348,7 +330,6 @@
         </div>
       </div>
       <div class="flame" id="flame"></div>
-      <div class="smoke" id="smoke"></div>
     </section>
   </div>
 
@@ -360,7 +341,7 @@
   </div>
 
   <!-- Congrats -->
-  <div id="congrats">
+  <div id="congrats" style="display:none">
     <div class="cg-card">
       <div class="cg-title">Congratulations!</div>
       <div class="cg-sub">The timer is complete. Great focus!</div>
@@ -484,7 +465,7 @@
   }
   function applySimpleTextColor(){ document.documentElement.style.setProperty('--simple-text', $('#simpleTextColor').value); }
 
-  /* Flip clock core */
+  /* Flip clock */
   function createDigit(initial="0"){
     const d = document.createElement('div'); d.className='digit'; d.dataset.value=initial;
     const top = document.createElement('div'); top.className='top'; const t=document.createElement('span'); t.className='value'; t.textContent=initial; top.appendChild(t);
@@ -519,7 +500,7 @@
 
   /* Countdown */
   const timerFlip = $('#timer'), timerSimple = $('#simpleTimer'), primaryBtn = $('#primaryBtn');
-  let flipDigits=[], useFlip=true, showH=false, showS=true;
+  let flipDigits=[], useFlip=true;
   let totalSec=0, endAtMs=0, rafId=null, lastWhole=-1, running=false, paused=false, pauseRemainMs=0;
 
   function safeBuildClock(){
@@ -544,7 +525,7 @@
   }
 
   function startCountdown(){
-    showH = $('#showHours').checked; showS = $('#showSeconds').checked;
+    const showH = $('#showHours').checked, showS = $('#showSeconds').checked;
     const h=+$('#hoursInput').value||0, m=+$('#minInput').value||0, s=Math.max(0,Math.min(59,+$('#secInput').value||0));
     totalSec=h*3600+m*60+s;
 
@@ -631,14 +612,14 @@
 
   function finishNow(){
     cancelAnimationFrame(rafId); running=false; paused=false;
-    extinguish();
+    flameEl.classList.add('off');
     candleWrap.classList.add('vanish');
     showCongrats();
     primaryBtn.textContent='Start';
   }
 
-  /* Candle + flame */
-  const area=$('#candle-area'), waxEl=$('#wax'), wickEl=$('#wick'), flameEl=$('#flame'), stubEl=$('#stub'), candleWrap=$('#candleWrap');
+  /* Candle + flame positioning */
+  const area=$('#candle-area'), waxEl=$('#wax'), wickEl=$('#wick'), flameEl=$('#flame'), candleWrap=$('#candleWrap'), stubEl=$('#stub');
   const baseWaxHeight=380, minStub=58, FLAME_OFFSET=10;
 
   function candleVisible(){ return getComputedStyle(area).display!=='none'; }
@@ -654,14 +635,11 @@
     const usable=baseWaxHeight-minStub, h=minStub+Math.max(0, usable*progress);
     waxEl.style.height=`${h}px`;
   }
-  function extinguish(){ flameEl.classList.add('off'); stubEl.style.display='block'; }
-  function relight(){ stubEl.style.display='none'; flameEl.classList.remove('off'); }
-  waxEl.addEventListener('transitionend', ()=> afterNextPaint(positionFlame));
 
   /* Congrats */
-  const congrats=$('#congrats'); $('#cgClose').addEventListener('click', ()=> congrats.classList.remove('show'));
-  function showCongrats(){ congrats.classList.add('show'); }
-  function hideCongrats(){ congrats.classList.remove('show'); }
+  const congrats=$('#congrats'); $('#cgClose').addEventListener('click', ()=> congrats.style.display='none');
+  function showCongrats(){ congrats.style.display='flex'; }
+  function hideCongrats(){ congrats.style.display='none'; }
 
   /* Fullscreen */
   async function goFullscreen(){ try{ if(!document.fullscreenElement){ await document.documentElement.requestFullscreen(); } document.body.classList.add('fullscreen-on'); }catch(e){} }
@@ -674,7 +652,7 @@
   const rtcOverlay=$('#rtcOverlay'), rtcFlipContainer=$('#rtcTimer'), rtcSimple=$('#simpleRTC'), rtcBack=$('#rtcBack');
   let rtcDigits=[], rtcOn=false, rtcId=null, rtcLastSec=-1;
   function refreshRTCMode(){ const uf=$('#useFlip').checked; rtcFlipContainer.style.display=uf?'flex':'none'; rtcSimple.style.display=uf?'none':'block'; }
-  function openRTC(){ document.body.classList.add('rtc-only'); rtcOverlay.classList.add('show'); cancelAnimationFrame(rafId); running=false; paused=false; primaryBtn.textContent='Start'; rtcOn=true; rtcLastSec=-1; if($('#useFlip').checked){ rtcDigits=buildFlip(rtcFlipContainer,true,true); } drawRTC(); }
+  function openRTC(){ document.body.classList.add('rtc-only'); rtcOverlay.classList.add('show'); cancelAnimationFrame(rafId); rtcOn=true; rtcLastSec=-1; if($('#useFlip').checked){ rtcDigits=buildFlip(rtcFlipContainer,true,true); } drawRTC(); }
   function closeRTC(){ document.body.classList.remove('rtc-only'); rtcOverlay.classList.remove('show'); rtcOn=false; cancelAnimationFrame(rtcId); $('#rtcMode').checked=false; }
   function drawRTC(){ if(!rtcOn) return; const secOfDay=Math.floor(Date.now()/1000)%86400; if(secOfDay!==rtcLastSec){ if($('#useFlip').checked){ tickFlip(rtcDigits,secOfDay,true,true); } else { rtcSimple.textContent=new Date().toLocaleTimeString(); } rtcLastSec=secOfDay; } rtcId=requestAnimationFrame(drawRTC); }
   rtcBack.addEventListener('click', closeRTC);
@@ -745,9 +723,15 @@
   $('#waxColor').addEventListener('input', applyWax);
   $('#simpleTextColor').addEventListener('input', applySimpleTextColor);
 
-  // To‑do color: apply only when asked; default remains transparent
-  $('#todoApply').addEventListener('click', ()=> setTodoBg($('#todoColor').value));
-  $('#todoClear').addEventListener('click', ()=> setTodoBg('transparent'));
+  // To‑do color controls
+  $('#todoApply').addEventListener('click', ()=>{
+    setTodoBg($('#todoColor').value);
+    $('#todo-panel').classList.remove('todo-clear');
+  });
+  $('#todoClear').addEventListener('click', ()=>{
+    setTodoBg('transparent');
+    $('#todo-panel').classList.add('todo-clear');
+  });
 
   window.addEventListener('resize', ()=> afterNextPaint(positionFlame));
 
@@ -756,7 +740,8 @@
     applyGradient(); restyleClockPanels(); applyWax(); applySimpleTextColor();
     document.body.classList.add('todo-on'); // show To‑do by default
     safeBuildClock(); refreshRTCMode(); previewLayout();
-    setWaxHeightByProgress(1); relight(); afterNextPaint(positionFlame);
+    setWaxHeightByProgress(1);
+    afterNextPaint(positionFlame);
     // Seed one empty task
     const li=makeTodoItem(""); todoList.appendChild(li);
   })();
