@@ -78,7 +78,8 @@
     transform:translate(-50%,-50%); z-index:5; min-width:0; width:auto;
   }
   .center-clock #todo-panel{
-    position:absolute; left:min(48px,5vw); top:50%; transform:translateY(-50%); justify-self:start;
+    position:absolute; left:min(48px,5vw); top:50%;
+    transform:translateY(-50%); justify-self:start;
     z-index:6; /* keep todo above centered clock edges */
   }
 
@@ -90,7 +91,8 @@
   }
   /* Center‑clock + candle‑off → keep To‑do LEFT */
   .center-clock.candle-off #todo-panel{
-    position:absolute !important; left:min(48px,5vw) !important; top:50% !important; transform:translateY(-50%) !important; justify-self:start !important;
+    position:absolute !important; left:min(48px,5vw) !important; top:50% !important;
+    transform:translateY(-50%) !important; justify-self:start !important;
     z-index:6 !important;
   }
 
@@ -98,7 +100,8 @@
   .only-candle #timer-container{ display:none !important; }
   .only-candle .main{ grid-template-columns: auto max-content; }
   .only-candle #todo-panel{
-    position:absolute; left:min(48px,5vw); top:50%; transform:translateY(-50%); justify-self:start;
+    position:absolute; left:min(48px,5vw); top:50%;
+    transform:translateY(-50%); justify-self:start;
     z-index:6;
   }
   /* Ensure candle is explicitly centered in the second column in only-candle mode */
@@ -482,7 +485,7 @@
   }
 
   /* ---------- Candle & flame positioning ---------- */
-  const area=$('#candle-area'), waxEl=$('#wax'), wickEl=$('#wick'), flameEl=$('#flame'), candleWrap=$('#candleWrap'), stubEl=$('#stub');
+  const area=$('#candle-area'), waxEl=$('#wax'), wickEl=$('#wick'), flameEl=$('#flame'), candleWrap=$('#candleWrap'), stubEl=$('#stub']);
   const baseWaxHeight=380, minStub=58, FLAME_OFFSET=10;
 
   function positionFlame(){
