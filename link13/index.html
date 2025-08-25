@@ -42,9 +42,6 @@
 
     /* To‑do base bg (transparent by default) */
     --todo-bg: transparent;
-
-    /* Stable center-column width so clock never shifts when To‑do toggles */
-    --center-col: minmax(320px, 26vw);
   }
 
   *{box-sizing:border-box}
@@ -66,43 +63,55 @@
   .main{
     flex:1;
     display:grid;
-
-    /* Always keep 3 columns so revealing To‑do never reflows the clock */
-    grid-template-columns: max-content var(--center-col) max-content;
-
+    grid-template-columns: max-content auto max-content; /* clock | todo | candle */
     align-items:center;
     column-gap: var(--gap);
     padding:22px min(5vw,48px);
     position:relative;
     min-height: 60vh;
   }
+  /* Prevent grid children from vanishing due to intrinsic overflow */
   .main > section{ min-width:0; min-height:0; }
 
-  /* Default placement: clock | todo | candle */
-  #timer-container{ grid-column:1; justify-self:center; }
+  #timer-container{ grid-column:1; }
   #todo-panel     { grid-column:2; justify-self:center; align-self:center; }
-  #candle-area    { grid-column:3; justify-self:end; }
+  #candle-area    { grid-column:3; }
 
-  /* Center clock: center inside its original row (not full viewport) */
-  .center-clock .main{ grid-template-columns: var(--center-col) 1fr max-content; }
-  .center-clock #timer-container{ grid-column:2; justify-self:center; align-self:center; position:static; transform:none; z-index:5; }
-  .center-clock #todo-panel{ grid-column:1; justify-self:start; margin-left:min(48px,5vw); z-index:6; }
-  .center-clock #candle-area{ grid-column:3; justify-self:end; transform: translateY(var(--candle-offset)); } /* keep normal offset */
+  /* Center Clock: timer centered; To‑do stays LEFT (grid) */
+  .center-clock .main{ grid-template-columns: max-content 1fr max-content; }
+  .center-clock #timer-container{
+    position:absolute; left:50%; top:50%;
+    transform:translate(-50%,-50%); z-index:5; min-width:0; width:auto;
+  }
+  .center-clock #todo-panel{
+    position:static; grid-column:1; justify-self:start; align-self:center;
+    margin-left:min(48px,5vw); z-index:6;
+  }
 
-  /* Hide candle → still keep the center column width stable */
+  /* Hide candle → To‑do occupies RIGHT */
   .candle-off #candle-area{ display:none !important; }
-  .candle-off .main{ grid-template-columns: max-content var(--center-col); }
-  .center-clock.candle-off .main{ grid-template-columns: var(--center-col) 1fr; }
-  .center-clock.candle-off #timer-container{ grid-column:2; }
-  .candle-off #todo-panel{ justify-self:end; }
+  .candle-off .main{ grid-template-columns: max-content max-content; }
+  .candle-off #todo-panel{
+    position:static !important; left:auto !important; top:auto !important; transform:none !important; justify-self:end !important;
+  }
+
+  /* Center‑clock + candle‑off → keep To‑do LEFT */
+  .center-clock.candle-off .main{ grid-template-columns: max-content 1fr; }
+  .center-clock.candle-off #todo-panel{
+    position:static !important; grid-column:1 !important; justify-self:start !important;
+    margin-left:min(48px,5vw) !important; z-index:6 !important;
+  }
 
   /* Only candle → center candle, hide clock; To‑do LEFT */
   .only-candle #timer-container{ display:none !important; }
   .only-candle .main{ grid-template-columns: max-content 1fr; }
-  .only-candle #todo-panel{ grid-column:1; justify-self:start; margin-left:min(48px,5vw); }
-  .only-candle #candle-area{ grid-column:2; justify-self:center; }
+  .only-candle #todo-panel{
+    position:static; grid-column:1; justify-self:start; align-self:center; margin-left:min(48px,5vw);
+    z-index:6;
+  }
+  .only-candle #candle-area{ grid-column: 2; justify-self: center; }
 
-  /* To‑do visibility */
+  /* To‑do visibility via .todo-on */
   #todo-panel{ display:none; }
   .todo-on #todo-panel{ display:block; }
 
@@ -129,6 +138,7 @@
   #todoList li{ counter-increment:tdn; position:relative; padding-left:28px; margin:4px 0; min-height:20px; outline:none; transition: opacity .18s, transform .18s; }
   #todoList li:before{ content: counter(tdn) "."; position:absolute; left:0; top:0; width:22px; text-align:right; padding-right:6px; font-weight:900; opacity:.9; }
   #todoList li.vanish{ opacity:0; transform:translateY(-3px); }
+
   .todoItem{ display:flex; align-items:center; gap:8px; }
   .todoChk{ appearance:none; width:16px; height:16px; border:2px solid rgba(255,255,255,.75); border-radius:4px; background:transparent; cursor:pointer; }
   .todoChk:checked{ background:#22c55e; border-color:#22c55e; }
@@ -145,6 +155,7 @@
     border: 1px solid var(--clock-glass-border);
     backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     box-shadow: inset 0 -1px 0 rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.18), 0 10px 28px rgba(0,0,0,.22);
+    flex:0 0 auto;
   }
   .digit:before{ content:""; position:absolute; inset:0; background: var(--clock-glass-bg); pointer-events:none; }
   .digit .top,.digit .bottom{ position:absolute; left:0; right:0; height:50%; overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden; }
@@ -158,7 +169,18 @@
   .bottom-flip{ bottom:0; transform-origin:top; border-top:1px solid var(--split-line); animation: bottomFlip .26s ease-out forwards; }
   @keyframes topFlip{ 0%{transform:rotateX(0)} 100%{transform:rotateX(-90deg)} }
   @keyframes bottomFlip{ 0%{transform:rotateX(90deg)} 100%{transform:rotateX(0)} }
-  .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.3); }
+  .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.3); flex:0 0 auto; }
+
+  /* Transparent mode for flip cards (kept but not exposed in UI) */
+  .clock-transparent .digit{
+    background: transparent !important;
+    border-color: rgba(255,255,255,.28) !important;
+    box-shadow: 0 10px 28px rgba(0,0,0,.22) !important;
+    backdrop-filter: none !important;
+  }
+  .clock-transparent .digit:before{ background: transparent !important; }
+  .clock-transparent .digit .top{ border-bottom:1px solid rgba(255,255,255,.25); }
+  .clock-transparent .digit .bottom{ border-top:1px solid rgba(255,255,255,.25); }
 
   /* ===== Simple clock ===== */
   #simpleTimer{
@@ -167,10 +189,7 @@
   }
 
   /* ===== Candle ===== */
-  #candle-area{
-    display:flex; align-items:flex-end; justify-content:flex-end; height:max(380px,42vh);
-    position:relative; transform: translateY(var(--candle-offset)); overflow:visible; z-index:3;
-  }
+  #candle-area{ display:flex; align-items:flex-end; justify-content:flex-end; height:max(380px,42vh); position:relative; transform: translateY(var(--candle-offset)); }
   .candle-clip{ position:relative; width:180px; height:380px; overflow:hidden; display:flex; align-items:flex-end; justify-content:center; }
   .candle-wrap{ position:absolute; inset:auto 0 0 0; margin:auto; width:180px; height:380px; display:flex; align-items:flex-end; justify-content:center; transition: transform .5s ease, opacity .5s ease; }
   .candle-wrap.vanish{ transform: scale(.85) translateY(12px); opacity: 0; pointer-events:none; }
@@ -198,22 +217,15 @@
 
   /* ===== Controls (glass) ===== */
   #controls{
-    position:relative; display:grid; grid-auto-flow:column; grid-auto-columns:minmax(300px,1fr); gap:14px; padding:16px;
+    position:relative; display:grid; grid-auto-flow:column; grid-auto-columns:minmax(260px,1fr); gap:14px; padding:16px;
     background:rgba(0,0,0,.22); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
-    overflow-x:auto; border-top-left-radius:16px; border-top-right-radius:16px; z-index:20; min-height:200px;
-    border-top:1px solid rgba(255,255,255,.18);
+    overflow-x:auto; border-top-left-radius:16px; border-top-right-radius:16px; z-index:10; min-height:200px;
   }
   .card{
-    position:relative; isolation:isolate; /* keep effects inside card */
     background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:12px; min-height:164px;
     display:flex; flex-direction:column; gap:8px; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
-    overflow:hidden; /* prevent glows spilling into next card */
   }
-  .timer-card{ min-width: 560px; }
   .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-  .row.row-actions{ flex-wrap:wrap; }
-  .row.row-actions .btn{ flex:1 1 160px; } /* wrap neatly inside the card */
-
   label{ font-size:12px; color:#fff; opacity:.95 }
   input[type="number"],input[type="color"],input[type="file"]{
     width:100%; padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.35); color:#fff; outline:none;
@@ -230,12 +242,10 @@
   @media (max-width:980px){
     :root{ --digit-w:100px; --digit-h:140px; }
     #todo-panel{ max-width:62vw; }
-    .timer-card{ min-width: 460px; }
   }
   @media (max-width:720px){
     :root{ --digit-w:86px; --digit-h:120px; }
     #todo-panel{ max-width:72vw; }
-    .timer-card{ min-width: 380px; }
   }
 
   .no-transitions, .no-transitions *{ transition: none !important; animation: none !important; }
@@ -332,7 +342,7 @@
 
   <!-- Controls -->
   <div id="controls">
-    <div class="card timer-card">
+    <div class="card">
       <label class="small">Timer</label>
       <div class="row">
         <div style="flex:1"><label for="hoursInput">Hours</label><input id="hoursInput" type="number" min="0" value="0"></div>
@@ -344,7 +354,7 @@
         <label><input type="checkbox" id="showSeconds" checked> Show seconds</label>
         <label><input type="checkbox" id="useFlip" checked> Use flip style</label>
       </div>
-      <div class="row row-actions">
+      <div class="row">
         <button id="primaryBtn" class="btn wide">Start</button>
         <button id="resetBtn" class="btn alt wide">Reset</button>
         <button id="fsBtn" class="btn warn wide">Fullscreen</button>
@@ -404,6 +414,7 @@
         <div style="flex:1"><label for="textColor">Digit color</label><input id="textColor" type="color" value="#000000"></div>
         <div style="flex:1"><label for="colonColor">Colon color</label><input id="colonColor" type="color" value="#ffffff"></div>
       </div>
+      <!-- Transparent flip cards option removed intentionally -->
       <div class="row">
         <div style="flex:1"><label for="simpleColor">Simple timer color</label><input id="simpleColor" type="color" value="#ffffff"></div>
       </div>
@@ -451,7 +462,9 @@
   const $ = (s) => document.querySelector(s);
 
   /* ---------- Utilities ---------- */
-  function afterNextPaint(cb){ requestAnimationFrame(() => requestAnimationFrame(cb)); }
+  function afterNextPaint(cb){
+    requestAnimationFrame(() => requestAnimationFrame(cb));
+  }
 
   /* ---------- Background & colors ---------- */
   const gradientStr = (a, c1, c2, c3) => `linear-gradient(${a}deg, ${c1}, ${c2}, ${c3})`;
@@ -470,8 +483,13 @@
     document.body.style.backgroundAttachment = "fixed";
   }
 
-  function setTodoBg(val){ document.documentElement.style.setProperty("--todo-bg", val); }
-  function applyWax(){ document.documentElement.style.setProperty("--wax", $("#waxColor")?.value || "#f2e4c7"); }
+  function setTodoBg(val){
+    document.documentElement.style.setProperty("--todo-bg", val);
+  }
+
+  function applyWax(){
+    document.documentElement.style.setProperty("--wax", $("#waxColor")?.value || "#f2e4c7");
+  }
 
   function restyleClockPanels(){
     if (!$("#clockC1")) return;
@@ -503,7 +521,8 @@
     b.textContent = initial;
     bottom.appendChild(b);
 
-    d.appendChild(top); d.appendChild(bottom);
+    d.appendChild(top);
+    d.appendChild(bottom);
     return d;
   }
 
@@ -517,20 +536,28 @@
     const topFlip = document.createElement("div");
     topFlip.className = "top-flip";
     const t = document.createElement("span");
-    t.className = "value"; t.textContent = cur;
+    t.className = "value";
+    t.textContent = cur;
     topFlip.appendChild(t);
 
-    topVal.textContent = cur; botVal.textContent = cur; digitEl.appendChild(topFlip);
+    topVal.textContent = cur;
+    botVal.textContent = cur;
+    digitEl.appendChild(topFlip);
 
     topFlip.addEventListener("animationend", () => {
-      topVal.textContent = newVal; topFlip.remove();
+      topVal.textContent = newVal;
+      topFlip.remove();
       const bottomFlip = document.createElement("div");
       bottomFlip.className = "bottom-flip";
       const b = document.createElement("span");
-      b.className = "value"; b.textContent = newVal;
-      bottomFlip.appendChild(b); digitEl.appendChild(bottomFlip);
+      b.className = "value";
+      b.textContent = newVal;
+      bottomFlip.appendChild(b);
+      digitEl.appendChild(bottomFlip);
       bottomFlip.addEventListener("animationend", () => {
-        botVal.textContent = newVal; digitEl.dataset.value = newVal; bottomFlip.remove();
+        botVal.textContent = newVal;
+        digitEl.dataset.value = newVal;
+        bottomFlip.remove();
       });
     });
   }
@@ -538,8 +565,17 @@
   function buildFlip(container, showH = true, showS = true){
     container.innerHTML = "";
     const digits = [];
-    const addDigit = () => { const d = createDigit("0"); container.appendChild(d); digits.push(d); };
-    const addColon = () => { const c = document.createElement("div"); c.className = "colon"; c.textContent = ":"; container.appendChild(c); };
+    const addDigit = () => {
+      const d = createDigit("0");
+      container.appendChild(d);
+      digits.push(d);
+    };
+    const addColon = () => {
+      const c = document.createElement("div");
+      c.className = "colon";
+      c.textContent = ":";
+      container.appendChild(c);
+    };
     if (showH){ addDigit(); addDigit(); addColon(); }
     addDigit(); addDigit();
     if (showS){ addColon(); addDigit(); addDigit(); }
@@ -591,13 +627,11 @@
 
   function safeBuildClock(){
     useFlip = $("#useFlip")?.checked ?? true;
-    const showH = $("#showHours")?.checked ?? false;
-    const showS = $("#showSeconds")?.checked ?? true;
     if (useFlip){
       timerFlip.style.display = "flex";
       timerSimple.style.display = "none";
-      flipDigits = buildFlip(timerFlip, showH, showS);
-      tickFlip(flipDigits, 0, showH, showS);
+      flipDigits = buildFlip(timerFlip, $("#showHours")?.checked ?? false, $("#showSeconds")?.checked ?? true);
+      tickFlip(flipDigits, 0, $("#showHours")?.checked ?? false, $("#showSeconds")?.checked ?? true);
     }else{
       timerFlip.style.display = "none";
       timerSimple.style.display = "block";
@@ -800,12 +834,7 @@
   let playlist=[], trackIndex=0; const objectUrls=new Set();
 
   function updateNow(){ if (musicNow) musicNow.textContent = playlist.length ? `${trackIndex+1}/${playlist.length} • ${playlist[trackIndex].name}` : ""; }
-  function loadPlaylist(files){
-    objectUrls.forEach((u)=>URL.revokeObjectURL(u)); objectUrls.clear();
-    playlist=[]; trackIndex=0;
-    for(const f of files){ const url=URL.createObjectURL(f); objectUrls.add(url); playlist.push({name:f.name,url}); }
-    updateNow(); if(playlist.length){ audio.src=playlist[trackIndex].url; } else { audio.removeAttribute("src"); }
-  }
+  function loadPlaylist(files){ objectUrls.forEach((u)=>URL.revokeObjectURL(u)); objectUrls.clear(); playlist=[]; trackIndex=0; for(const f of files){ const url=URL.createObjectURL(f); objectUrls.add(url); playlist.push({name:f.name,url}); } updateNow(); if(playlist.length){ audio.src=playlist[trackIndex].url; } else { audio.removeAttribute("src"); } }
   function playTrack(i){ if(!playlist.length) return; trackIndex=(i+playlist.length)%playlist.length; audio.src=playlist[trackIndex].url; audio.play().catch(()=>{}); updateNow(); if (musicPlayBtn) musicPlayBtn.textContent="⏸"; }
   function startPlaylist(){ if(!playlist.length) return; if(!audio.src) audio.src=playlist[trackIndex].url; audio.play().then(()=>{ if (musicPlayBtn) musicPlayBtn.textContent="⏸"; }).catch(()=>{}); updateNow(); }
   function pausePlaylist(){ audio.pause(); if (musicPlayBtn) musicPlayBtn.textContent="▶"; }
@@ -882,12 +911,16 @@
   $("#todoClear").addEventListener("click", () =>{ setTodoBg("transparent"); $("#todo-panel").classList.add("todo-clear"); });
   $("#todoGlass").addEventListener("change", (e)=> $("#todo-panel").classList.toggle("todo-glass", e.target.checked));
 
+  /* Transparent flip cards option removed: no event listener for #clockTransparent */
+
   /* ---------- Init ---------- */
   (function boot(){
     applyGradient(); restyleClockPanels(); applyWax();
 
-    // Force To‑do visible on load if toggle checked + glass on by default
+    // Force to‑do visible on load if toggle checked
     if ($("#showTodo")?.checked) document.body.classList.add("todo-on");
+
+    // Apply To‑do transparency if default-checked
     if ($("#todoGlass")?.checked) $("#todo-panel").classList.add("todo-glass");
 
     applyLayoutFlags();
