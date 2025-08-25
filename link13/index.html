@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>Candle Timer — Version 5</title>
+<title>Candle Timer — Version 5 (stable)</title>
 <style>
   :root{
     /* Flip sizes */
@@ -24,9 +24,10 @@
     --clock-c3: #ffffff;
     --clock-text: #000000;
 
-    /* Simple (non‑flip) text color */
+    /* Simple timer text color */
     --simple-text: #000000;
 
+    /* Colon */
     --colon-color: #ffffff;
 
     /* Buttons */
@@ -41,7 +42,7 @@
     /* Layout tweak */
     --candle-offset: 18px;
 
-    /* To‑do list background (default transparent) */
+    /* To‑do list pane (default transparent) */
     --todo-bg: transparent;
   }
 
@@ -86,12 +87,11 @@
   .only-candle .main{ justify-content:center; }
   .only-candle #candle-area{ justify-content:center; }
 
-  /* To‑do visibility flag */
+  /* ================= To‑do list ================= */
   #todo-panel{ display:none; }
   .todo-on #todo-panel{ display:block; }
 
-  /* ========= To‑do positioning (small, non-overlapping) ========= */
-  /* Default: BETWEEN clock and candle as a normal flex child */
+  /* Default: BETWEEN clock and candle as a normal flex child (prevents overlap when Show hours widens the clock) */
   #todo-panel{
     position: relative;
     left:auto; top:auto; transform:none;
@@ -100,9 +100,9 @@
     /* compact sizing */
     flex: 0 1 clamp(220px, 26vw, 420px);
     max-width: clamp(220px, 26vw, 420px);
-    max-height: 60vh;             /* smaller than before */
+    max-height: 60vh;
     margin-inline: clamp(6px, 1.6vw, 12px);
-    font-size: 13px;               /* compact */
+    font-size: 13px;
 
     /* visuals */
     overflow:auto;
@@ -130,7 +130,6 @@
     margin-left:auto;
   }
 
-  /* To‑do look and numbering (Comic Sans MS) */
   #todoTitle{ margin:0 0 6px 0; font-size:12.5px; font-weight:900; letter-spacing:.35px; opacity:.95; }
   #todoList{
     margin:0; padding:4px 4px 4px 8px;
@@ -174,11 +173,9 @@
   }
   .todoText:empty:before{ content:"New task"; opacity:.45; }
 
-  /* Flip clock */
+  /* ================= Flip clock ================= */
   #timer-container{ flex:1; display:flex; align-items:center; justify-content:flex-start; min-width:340px; gap:12px; }
-  #timer{ display:flex; align-items:center; gap:12px; user-select:none; }
-
-  /* Simple timer color */
+  #timer{ display:flex; align-items:center; gap:12px; user-select:none; z-index:5; }
   #simpleTimer{ display:none; font-weight:900; letter-spacing:.5px; color:var(--simple-text); text-shadow:0 6px 24px rgba(0,0,0,.25); font-size:min(12vw, 120px); }
 
   .digit{
@@ -208,7 +205,7 @@
 
   .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.25); }
 
-  /* Candle (right) */
+  /* ================= Candle ================= */
   #candle-area{ flex:1; display:flex; align-items:flex-end; justify-content:flex-end; min-width:340px; height:max(380px,42vh); position:relative; transform: translateY(var(--candle-offset)); }
   .candle-clip{ position:relative; width:180px; height:380px; overflow:hidden; display:flex; align-items:flex-end; justify-content:center; }
   .candle-wrap{ position:absolute; inset:auto 0 0 0; margin:auto; width:180px; height:380px; display:flex; align-items:flex-end; justify-content:center; transition: transform .5s ease, opacity .5s ease; }
@@ -239,14 +236,18 @@
   .wick{ position:absolute; width:6px; height:30px; background:linear-gradient(180deg,#444,var(--wick)); border-radius:4px; top:-12px; left:50%; transform:translateX(-50%); z-index:4; }
 
   .flame{
-    position:absolute; width:52px; height:110px; z-index:6;
+    position:absolute; width:52px; height:110px; z-index:6; pointer-events:none;
     background:
       radial-gradient(ellipse at 50% 22%, #fff7c0 0%, #ffe08a 38%, #ffb347 58%, #ff7a00 78%, transparent 80%),
       radial-gradient(ellipse at 50% 45%, #ffffff 0%, transparent 65%);
     border-radius:50% 50% 38% 38%;
     box-shadow:0 0 18px 6px rgba(255,170,40,.55), 0 0 36px 14px rgba(255,140,0,.40), 0 -20px 28px rgba(255,220,170,.40);
     animation: flickerSoft .6s ease-in-out infinite;
-    transition: opacity .35s ease;
+  }
+  @keyframes flickerSoft{
+    0%{ transform:scale(1) rotate(-0.8deg); opacity:.95 }
+    50%{ transform:scale(1.06) rotate(0.6deg); opacity:.82 }
+    100%{ transform:scale(1) rotate(-0.8deg); opacity:.95 }
   }
   .flame.off{ opacity:0 !important; animation-play-state: paused !important; }
 
@@ -307,32 +308,13 @@
   .cg-sub{ font-size:14px; opacity:.95; margin-bottom:12px; }
 
   /* Pre-start overlay */
-  #preOverlay{
-    position:fixed; inset:0; z-index:100;
-    display:none; align-items:center; justify-content:center;
-    background: rgba(0,0,0,0.45);
-    backdrop-filter: blur(2px);
-  }
+  #preOverlay{ position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center; background: rgba(0,0,0,0.45); backdrop-filter: blur(2px); }
   #preOverlay:not([hidden]){ display:flex }
-  #preNum{
-    font-family:"Comic Sans MS", system-ui, -apple-system, Segoe UI, Roboto, Arial;
-    font-size:min(22vw, 220px); font-weight:900; color:#fff;
-    text-shadow:0 10px 40px rgba(0,0,0,.6);
-    opacity:0; transform:scale(.9);
-  }
+  #preNum{ font-family:"Comic Sans MS", system-ui, -apple-system, Segoe UI, Roboto, Arial; font-size:min(22vw, 220px); font-weight:900; color:#fff; text-shadow:0 10px 40px rgba(0,0,0,.6); opacity:0; transform:scale(.9); }
   .step{ animation: fadeStep 1s ease both }
-  @keyframes fadeStep{
-    0%  { opacity:0; transform:scale(.9) }
-    20% { opacity:1; transform:scale(1) }
-    80% { opacity:1; transform:scale(1) }
-    100%{ opacity:0; transform:scale(1.06) }
-  }
+  @keyframes fadeStep{ 0%{ opacity:0; transform:scale(.9) } 20%{ opacity:1; transform:scale(1) } 80%{ opacity:1; transform:scale(1) } 100%{ opacity:0; transform:scale(1.06) } }
 
-  .pre-on .brand,
-  .pre-on #controls,
-  .pre-on #exitFs,
-  .pre-on #rtcOverlay,
-  .pre-on #congrats{ display:none !important }
+  .pre-on .brand, .pre-on #controls, .pre-on #exitFs, .pre-on #rtcOverlay, .pre-on #congrats{ display:none !important }
 
   .no-transitions{ transition: none !important; }
 
@@ -357,7 +339,7 @@
       <div id="simpleTimer">00:00</div>
     </section>
 
-    <!-- To‑do panel -->
+    <!-- To‑do panel (small, compact) -->
     <section id="todo-panel" aria-label="To‑do list">
       <h4 id="todoTitle">To‑do</h4>
       <ol id="todoList"></ol>
@@ -435,25 +417,20 @@
       </div>
     </div>
 
-    <!-- Simple timer color (appears only when flip style is OFF) -->
     <div class="card" id="simpleColorCard" style="display:none">
       <label class="small">Simple timer color</label>
       <div class="row">
-        <div style="flex:1">
-          <label for="simpleTextColor">Text color</label>
-          <input id="simpleTextColor" type="color" value="#000000">
-        </div>
+        <div style="flex:1"><label for="simpleTextColor">Text color</label><input id="simpleTextColor" type="color" value="#000000"></div>
       </div>
     </div>
 
-    <!-- Layout options + Music box -->
     <div class="card">
       <label class="small">Layout</label>
       <div class="row">
         <label><input type="checkbox" id="hideCandle"> Hide candle</label>
         <label><input type="checkbox" id="centerClock"> Center clock</label>
         <label><input type="checkbox" id="onlyCandle"> Only candle mode</label>
-        <label><input type="checkbox" id="showTodo"> Show to‑do list</label>
+        <label><input type="checkbox" id="showTodo" checked> Show to‑do list</label>
       </div>
 
       <!-- Music mini box -->
@@ -492,9 +469,14 @@
 <script>
   const $ = s => document.querySelector(s);
 
-  /* Background + colors */
+  /* =======================
+     Gradient + global colors
+     ======================= */
   const gradientStr = (a,c1,c2,c3)=>`linear-gradient(${a}deg, ${c1}, ${c2}, ${c3})`;
-  function applyGradient(){ const ang = parseInt($('#bgAngle').value||'135',10); document.body.style.backgroundImage = gradientStr(ang,$('#bgC1').value,$('#bgC2').value,$('#bgC3').value); }
+  function applyGradient(){
+    const ang = parseInt($('#bgAngle').value||'135',10);
+    document.body.style.backgroundImage = gradientStr(ang,$('#bgC1').value,$('#bgC2').value,$('#bgC3').value);
+  }
   function applyTodoBg(){ const v = $('#todoColor').value; if (v) document.documentElement.style.setProperty('--todo-bg', v); }
   function applyWax(){ document.documentElement.style.setProperty('--wax',$('#waxColor').value); }
   function restyleClockPanels(){
@@ -506,7 +488,9 @@
   }
   function applySimpleTextColor(){ document.documentElement.style.setProperty('--simple-text', $('#simpleTextColor').value); }
 
-  /* Flip clock core */
+  /* ==================
+     Flip clock building
+     ================== */
   function createDigit(initial="0"){
     const d = document.createElement('div'); d.className='digit'; d.dataset.value=initial;
     const top = document.createElement('div'); top.className='top'; const t=document.createElement('span'); t.className='value'; t.textContent=initial; top.appendChild(t);
@@ -539,23 +523,28 @@
     const arr=timeArray(sec,showH,showS); digits.forEach((d,i)=> flipTo(d, arr[i] || '0'));
   }
 
-  /* Countdown */
+  /* =========
+     Countdown
+     ========= */
   const timerFlip = $('#timer'), timerSimple = $('#simpleTimer'), primaryBtn = $('#primaryBtn');
   let flipDigits=[], showH=false, showS=true, useFlip=true;
   let totalSec=0, endAtMs=0, rafId=null, lastWhole=-1, running=false, paused=false, pauseRemainMs=0;
 
-  function refreshMode(){
+  function safeBuildClock(){
+    // Always (re)create a visible timer view to avoid “disappear” bugs
     useFlip = $('#useFlip').checked;
-    timerFlip.style.display = useFlip ? 'flex' : 'none';
-    timerSimple.style.display = useFlip ? 'none' : 'block';
-    $('#simpleColorCard').style.display = useFlip ? 'none' : '';
     if (useFlip){
+      timerFlip.style.display='flex'; timerSimple.style.display='none';
       flipDigits = buildFlip(timerFlip, $('#showHours').checked, $('#showSeconds').checked);
       tickFlip(flipDigits, 0, $('#showHours').checked, $('#showSeconds').checked);
     }else{
-      renderSimple(0);
+      timerFlip.style.display='none'; timerSimple.style.display='block';
+      timerSimple.textContent = '00:00';
     }
   }
+
+  function refreshMode(){ safeBuildClock(); $('#simpleColorCard').style.display = $('#useFlip').checked ? 'none' : ''; }
+
   function renderSimple(sec){
     const sH = $('#showHours').checked, sS = $('#showSeconds').checked;
     const out = sH
@@ -569,11 +558,12 @@
     const h=+$('#hoursInput').value||0, m=+$('#minInput').value||0, s=Math.max(0,Math.min(59,+$('#secInput').value||0));
     totalSec=h*3600+m*60+s;
 
+    // Reset candle/flame and align
     candleWrap.classList.remove('vanish');
     stubEl.style.display = 'none';
     flameEl.classList.remove('off');
     setWaxHeightByProgress(1);
-    requestLayoutAlign();
+    afterNextPaint(positionFlame);
 
     if (useFlip){
       flipDigits = buildFlip(timerFlip, showH, showS);
@@ -651,7 +641,7 @@
     cancelAnimationFrame(rafId); running=false; paused=false;
     if (preRAF){ cancelAnimationFrame(preRAF); preRAF=null; $('#preOverlay').hidden=true; document.body.classList.remove('pre-on'); }
     primaryBtn.textContent='Start';
-    refreshMode();
+    safeBuildClock();
     snapResetCandle();
     hideCongrats();
   }
@@ -664,42 +654,46 @@
     primaryBtn.textContent='Start';
   }
 
-  /* Candle + flame */
-  const area = $('#candle-area'), waxEl=$('#wax'), wickEl=$('#wick'), flameEl=$('#flame'), stubEl=$('#stub'), smokeEl=$('#smoke'), candleWrap=$('#candleWrap']);
+  /* =========
+     Candle + flame
+     ========= */
+  const area = $('#candle-area'), waxEl=$('#wax'), wickEl=$('#wick'), flameEl=$('#flame'), stubEl=$('#stub'), smokeEl=$('#smoke'), candleWrap=$('#candleWrap');
   const baseWaxHeight=380, minStub=58;
   const FLAME_OFFSET = 10;
 
   function candleVisible(){ return getComputedStyle(area).display !== 'none'; }
   function positionFlame(){
     if (!candleVisible()) return;
-    const w=wickEl.getBoundingClientRect(), a=area.getBoundingClientRect();
+    const a=area.getBoundingClientRect(), w=wickEl.getBoundingClientRect();
     const x=w.left + w.width/2 - a.left - flameEl.offsetWidth/2;
     const y=w.top - a.top - flameEl.offsetHeight + FLAME_OFFSET;
     flameEl.style.left=`${x}px`; flameEl.style.top=`${y}px`;
-    smokeEl.style.left=`${x + flameEl.offsetWidth/2 - 5}px`; smokeEl.style.top=`${y - 2}px`;
   }
-  function requestLayoutAlign(){ requestAnimationFrame(positionFlame); }
+  function afterNextPaint(fn){ requestAnimationFrame(()=>requestAnimationFrame(fn)); }
   function setWaxHeightByProgress(progress){
     const usable=baseWaxHeight-minStub, h=minStub+Math.max(0, usable*progress);
     waxEl.style.height=`${h}px`;
   }
   function extinguish(){
     flameEl.classList.add('off');
-    smokeEl.classList.remove('show'); void smokeEl.offsetWidth; smokeEl.classList.add('show');
     stubEl.style.display='block';
   }
   function relight(){
     stubEl.style.display='none';
     flameEl.classList.remove('off');
   }
+  waxEl.addEventListener('transitionend', ()=> afterNextPaint(positionFlame));
 
-  /* Congrats */
-  const congrats = $('#congrats');
-  $('#cgClose').addEventListener('click', ()=> congrats.classList.remove('show'));
+  /* =====
+     Congrats
+     ===== */
+  const congrats = $('#congrats'); $('#cgClose').addEventListener('click', ()=> congrats.classList.remove('show'));
   function showCongrats(){ congrats.classList.add('show'); }
   function hideCongrats(){ congrats.classList.remove('show'); }
 
-  /* Fullscreen */
+  /* ==========
+     Fullscreen
+     ========== */
   async function goFullscreen(){
     try{
       if (!document.fullscreenElement){ await document.documentElement.requestFullscreen(); }
@@ -716,7 +710,9 @@
     if (!document.fullscreenElement){ document.body.classList.remove('fullscreen-on'); }
   });
 
-  /* Real-time */
+  /* =========
+     Real-time
+     ========= */
   const rtcOverlay=$('#rtcOverlay'), rtcFlipContainer=$('#rtcTimer'), rtcSimple=$('#simpleRTC'), rtcBack=$('#rtcBack');
   let rtcDigits=[], rtcOn=false, rtcId=null, rtcLastSec=-1;
 
@@ -749,7 +745,9 @@
   }
   rtcBack.addEventListener('click', closeRTC);
 
-  /* To‑do logic (checkbox + auto-remove) */
+  /* ==========
+     To‑do logic (checkbox + auto-remove)
+     ========== */
   const todoList = $('#todoList');
 
   function makeTodoItem(text=""){
@@ -762,8 +760,8 @@
   }
   function addEmptyIfNeeded(){
     if (!todoList.firstElementChild){
-      todoList.appendChild(makeTodoItem(""));
-      placeCaretAtEnd(todoList.firstElementChild.querySelector('.todoText'));
+      const li=makeTodoItem(""); todoList.appendChild(li);
+      placeCaretAtEnd(li.querySelector('.todoText'));
     }
   }
   function placeCaretAtEnd(el){
@@ -786,9 +784,7 @@
     if (e.key==='Backspace' && e.target.textContent.trim()===''){
       const li=e.target.closest('li');
       const prev=li.previousElementSibling?.querySelector('.todoText');
-      if (prev){
-        e.preventDefault(); li.remove(); placeCaretAtEnd(prev);
-      }
+      if (prev){ e.preventDefault(); li.remove(); placeCaretAtEnd(prev); }
       addEmptyIfNeeded();
     }
   });
@@ -798,9 +794,10 @@
     li.classList.add('vanish');
     setTimeout(()=>{ li.remove(); addEmptyIfNeeded(); }, 160);
   });
-  addEmptyIfNeeded();
 
-  /* Music playlist (loop) */
+  /* ==========
+     Music playlist (loop)
+     ========== */
   const musicFiles = $('#musicFiles');
   const musicNow = $('#musicNow');
   const musicPlayBtn = $('#musicPlay');
@@ -810,7 +807,7 @@
   function updateNow(){ musicNow.textContent = playlist.length ? `${trackIndex+1}/${playlist.length} • ${playlist[trackIndex].name}` : ''; }
   function loadPlaylist(files){
     objectUrls.forEach(u=>URL.revokeObjectURL(u)); objectUrls.clear();
-    playlist = []; trackIndex=0;
+    playlist=[]; trackIndex=0;
     for (const f of files){ const url = URL.createObjectURL(f); objectUrls.add(url); playlist.push({name:f.name,url}); }
     updateNow(); if (playlist.length){ audio.src = playlist[trackIndex].url; } else { audio.removeAttribute('src'); }
   }
@@ -819,7 +816,7 @@
   function pausePlaylist(){ audio.pause(); musicPlayBtn.textContent='▶'; }
   function nextTrack(){ if (playlist.length) playTrack(trackIndex+1); }
   function prevTrack(){ if (playlist.length) playTrack(trackIndex-1); }
-  audio.addEventListener('ended', ()=>{ if (!playlist.length) return; nextTrack(); });
+  audio.addEventListener('ended', ()=> nextTrack());
   audio.addEventListener('play', ()=> musicPlayBtn.textContent='⏸');
   audio.addEventListener('pause', ()=> musicPlayBtn.textContent='▶');
   $('#addMusicBtn').addEventListener('click', ()=> musicFiles.click());
@@ -829,7 +826,9 @@
   $('#musicPrev').addEventListener('click', prevTrack);
   window.addEventListener('unload', ()=> objectUrls.forEach(u=>URL.revokeObjectURL(u)));
 
-  /* Layout toggles/handlers */
+  /* ======================
+     Layout toggles/handlers
+     ====================== */
   function ensureCandleVisibleWhenOnlyCandle(on){
     if (on){
       const hc = $('#hideCandle');
@@ -841,18 +840,22 @@
     document.body.classList.toggle('center-clock', $('#centerClock').checked);
     document.body.classList.toggle('only-candle', $('#onlyCandle').checked);
     document.body.classList.toggle('todo-on', $('#showTodo').checked);
-    if (!$('#onlyCandle').checked){ refreshMode(); }
-    requestLayoutAlign();
-  }
-  function previewLayout(){
-    const showH = $('#showHours').checked, showS = $('#showSeconds').checked, useF = $('#useFlip').checked;
-    if (useF){
-      flipDigits = buildFlip(timerFlip, showH, showS);
-      tickFlip(flipDigits, 0, showH, showS);
-    }else{ renderSimple(0); }
-    requestLayoutAlign();
+    if (!$('#onlyCandle').checked){ safeBuildClock(); }
+    afterNextPaint(positionFlame);
   }
 
+  function previewLayout(){
+    const sH = $('#showHours').checked, sS = $('#showSeconds').checked, useF = $('#useFlip').checked;
+    if (useF){
+      flipDigits = buildFlip(timerFlip, sH, sS);
+      tickFlip(flipDigits, 0, sH, sS);
+    }else{
+      renderSimple(0);
+    }
+    afterNextPaint(positionFlame);
+  }
+
+  // UI events
   $('#primaryBtn').addEventListener('click', togglePrimary);
   $('#resetBtn').addEventListener('click', resetCountdown);
 
@@ -872,12 +875,24 @@
   $('#simpleTextColor').addEventListener('input', applySimpleTextColor);
   $('#todoColor').addEventListener('input', applyTodoBg);
 
-  window.addEventListener('resize', requestLayoutAlign);
+  window.addEventListener('resize', ()=> afterNextPaint(positionFlame));
 
-  /* Init */
-  applyGradient(); restyleClockPanels(); applyWax(); applySimpleTextColor();
-  refreshMode(); refreshRTCMode(); previewLayout();
-  setWaxHeightByProgress(1); relight(); requestLayoutAlign();
+  /* ====== Initial boot (prevents disappearing UI) ====== */
+  (function boot(){
+    applyGradient(); restyleClockPanels(); applyWax(); applySimpleTextColor(); applyTodoBg();
+    document.body.classList.add('todo-on'); // show To‑do by default
+    safeBuildClock();
+    refreshRTCMode();
+    previewLayout();
+    setWaxHeightByProgress(1); relight();
+    afterNextPaint(positionFlame);
+    // Seed one empty task
+    const li=document.createElement('li');
+    const label=document.createElement('label'); label.className='todoItem';
+    const chk=document.createElement('input'); chk.type='checkbox'; chk.className='todoChk';
+    const span=document.createElement('span'); span.className='todoText'; span.contentEditable='true'; span.spellcheck=false;
+    label.appendChild(chk); label.appendChild(span); $('#todoList').appendChild(label.parentElement||label.parentNode);
+  })();
 </script>
 </body>
 </html>
