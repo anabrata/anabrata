@@ -86,18 +86,22 @@
   .only-candle .main{ justify-content:center; }
   .only-candle #candle-area{ justify-content:center; }
 
-  /* To‑do panel (hidden until enabled) */
+  /* To‑do panel visibility flag */
   #todo-panel{ display:none; }
   .todo-on #todo-panel{ display:block; }
 
-  /* Default: between clock and candle (center overlay) */
+  /* ================= To‑do positioning rules ================ */
+  /* Default: BETWEEN clock and candle as a normal flex child (prevents overlap when Show hours expands clock) */
   #todo-panel{
-    position:absolute; left:50%; top:50%;
-    transform:translate(-50%,-50%);
+    position: relative;             /* not overlay by default */
+    left:auto; top:auto; transform:none;
     z-index:4;
-    max-width:min(34vw,560px);
-    min-width:260px;
-    max-height:72vh; /* grows when needed */
+
+    flex: 0 1 clamp(260px, 34vw, 560px);
+    max-width: clamp(260px, 34vw, 560px);
+    max-height:72vh;
+    margin-inline: clamp(8px, 2vw, 16px);
+
     overflow:auto;
     padding:12px 14px;
     border-radius:14px;
@@ -106,13 +110,23 @@
     box-shadow: 0 8px 24px rgba(0,0,0,.18), 0 2px 6px rgba(0,0,0,.12);
     color:#fff;
   }
-  /* When either clock or candle is centered, move To‑do to the left side */
+  /* When CLOCK is centered or ONLY candle is shown, pin To‑do to LEFT to avoid overlap with centered clock */
   .center-clock #todo-panel,
   .only-candle  #todo-panel{
+    position:absolute;
     left: min(48px,5vw);
     top:50%;
     transform: translateY(-50%);
+    width: clamp(240px, 34vw, 560px);
+    max-width: clamp(240px, 34vw, 560px);
+    margin-inline: 0;
   }
+  /* When candle is hidden, push To‑do to RIGHT (occupy candle's place) */
+  .candle-off:not(.center-clock):not(.only-candle) #todo-panel{
+    position: relative;
+    margin-left:auto;               /* slide to the right end of the row */
+  }
+  /* ========================================================= */
 
   /* To‑do look and numbering (Comic Sans MS) */
   #todoTitle{ margin:0 0 6px 0; font-size:14px; font-weight:900; letter-spacing:.4px; opacity:.95; }
@@ -139,19 +153,13 @@
   }
   #todoList li.vanish{ opacity:0; transform:translateY(-4px); }
 
-  /* Inline content and checkbox */
-  .todoItem{
-    display:flex; align-items:center; gap:10px;
-  }
+  .todoItem{ display:flex; align-items:center; gap:10px; }
   .todoChk{
     appearance:none; width:18px; height:18px; border:2px solid rgba(255,255,255,.75);
     border-radius:4px; position:relative; cursor:pointer; outline:none; flex:none;
-    box-shadow: 0 0 0 2px rgba(0,0,0,.08) inset;
-    background: transparent;
+    box-shadow: 0 0 0 2px rgba(0,0,0,.08) inset; background: transparent;
   }
-  .todoChk:checked{
-    background: #22c55e; border-color:#22c55e;
-  }
+  .todoChk:checked{ background:#22c55e; border-color:#22c55e; }
   .todoChk:checked::after{
     content:""; position:absolute; inset:0;
     background:
@@ -453,7 +461,6 @@
         <button id="musicPlay" class="btn small" title="Play/Pause">▶</button>
         <button id="musicNext" class="btn small" title="Next">⏭</button>
         <label style="margin-left:4px"><input type="checkbox" id="musicLoop" checked> Loop</label>
-        <label><input type="checkbox" id="musicWithTimer"> With timer</label>
         <span id="musicNow" style="color:#fff; font-size:12px; opacity:.95; max-width:220px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis"></span>
       </div>
     </div>
@@ -490,10 +497,7 @@
     const ang = parseInt($('#bgAngle').value||'135',10);
     document.body.style.backgroundImage = gradientStr(ang,$('#bgC1').value,$('#bgC2').value,$('#bgC3').value);
   }
-  function applyTodoBg(){
-    const v = $('#todoColor').value;
-    if (v) document.documentElement.style.setProperty('--todo-bg', v);
-  }
+  function applyTodoBg(){ const v = $('#todoColor').value; if (v) document.documentElement.style.setProperty('--todo-bg', v); }
   function applyWax(){ document.documentElement.style.setProperty('--wax',$('#waxColor').value); }
   function restyleClockPanels(){
     document.documentElement.style.setProperty('--clock-c1',$('#clockC1').value);
@@ -502,9 +506,7 @@
     document.documentElement.style.setProperty('--clock-text',$('#textColor').value);
     document.documentElement.style.setProperty('--colon-color',$('#colonColor').value);
   }
-  function applySimpleTextColor(){
-    document.documentElement.style.setProperty('--simple-text', $('#simpleTextColor').value);
-  }
+  function applySimpleTextColor(){ document.documentElement.style.setProperty('--simple-text', $('#simpleTextColor').value); }
 
   /* ==================
      Flip clock building
@@ -553,7 +555,6 @@
     timerFlip.style.display = useFlip ? 'flex' : 'none';
     timerSimple.style.display = useFlip ? 'none' : 'block';
     $('#simpleColorCard').style.display = useFlip ? 'none' : '';
-    // Rebuild display
     if (useFlip){
       flipDigits = buildFlip(timerFlip, $('#showHours').checked, $('#showSeconds').checked);
       tickFlip(flipDigits, 0, $('#showHours').checked, $('#showSeconds').checked);
@@ -587,9 +588,6 @@
     }else{
       renderSimple(totalSec);
     }
-
-    // Music with timer
-    if ($('#musicWithTimer').checked){ startPlaylist(); }
 
     cancelAnimationFrame(rafId); paused=false; running=false;
     if (totalSec<=0){ finishNow(); return; }
@@ -652,8 +650,7 @@
     stubEl.style.display = 'none';
     flameEl.classList.remove('off');
     setWaxHeightByProgress(1);
-    void candleWrap.offsetHeight;
-    positionFlame();
+    void candleWrap.offsetHeight; positionFlame();
     requestAnimationFrame(()=>{ candleWrap.classList.remove('no-transitions'); waxEl.classList.remove('no-transitions'); });
   }
 
@@ -825,13 +822,12 @@
   addEmptyIfNeeded();
 
   /* ==========
-     Music playlist (loop, manual or with timer)
+     Music playlist (loop, independent of timer)
      ========== */
   const musicFiles = $('#musicFiles');
   const musicNow = $('#musicNow');
   const musicPlayBtn = $('#musicPlay');
-  const audio = new Audio();
-  audio.preload = 'metadata';
+  const audio = new Audio(); audio.preload = 'metadata';
 
   let playlist = []; // [{name, url}]
   let trackIndex = 0;
@@ -841,72 +837,48 @@
     musicNow.textContent = playlist.length ? `${trackIndex+1}/${playlist.length} • ${playlist[trackIndex].name}` : '';
   }
   function loadPlaylist(files){
-    // Revoke previous object URLs
     objectUrls.forEach(u=>URL.revokeObjectURL(u));
     objectUrls.clear();
-    playlist = [];
-    trackIndex = 0;
+    playlist = []; trackIndex = 0;
     for (const f of files){
       const url = URL.createObjectURL(f);
       objectUrls.add(url);
       playlist.push({name:f.name, url});
     }
     updateNow();
-    if (playlist.length){
-      audio.src = playlist[trackIndex].url;
-    }else{
-      audio.removeAttribute('src');
-    }
+    if (playlist.length){ audio.src = playlist[trackIndex].url; } else { audio.removeAttribute('src'); }
   }
   function playTrack(i){
     if (!playlist.length) return;
     trackIndex = (i+playlist.length)%playlist.length;
     audio.src = playlist[trackIndex].url;
     audio.play().catch(()=>{});
-    updateNow();
-    musicPlayBtn.textContent = '⏸';
+    updateNow(); musicPlayBtn.textContent = '⏸';
   }
   function startPlaylist(){
-    if (!playlist.length){ return; }
+    if (!playlist.length) return;
     if (!audio.src) audio.src = playlist[trackIndex].url;
     audio.play().then(()=>{ musicPlayBtn.textContent='⏸'; }).catch(()=>{});
     updateNow();
   }
-  function pausePlaylist(){
-    audio.pause(); musicPlayBtn.textContent = '▶';
-  }
-  function nextTrack(){
-    if (!playlist.length) return;
-    trackIndex = (trackIndex+1) % playlist.length;
-    playTrack(trackIndex);
-  }
-  function prevTrack(){
-    if (!playlist.length) return;
-    trackIndex = (trackIndex-1+playlist.length) % playlist.length;
-    playTrack(trackIndex);
-  }
+  function pausePlaylist(){ audio.pause(); musicPlayBtn.textContent = '▶'; }
+  function nextTrack(){ if (playlist.length) playTrack(trackIndex+1); }
+  function prevTrack(){ if (playlist.length) playTrack(trackIndex-1); }
 
   audio.addEventListener('ended', ()=>{
     if (!playlist.length) return;
-    if ($('#musicLoop').checked){
-      nextTrack();
-    }else if (trackIndex < playlist.length-1){
-      nextTrack();
-    }else{
-      pausePlaylist();
-    }
+    if ($('#musicLoop').checked) nextTrack();
+    else if (trackIndex < playlist.length-1) nextTrack();
+    else pausePlaylist();
   });
   audio.addEventListener('play', ()=> musicPlayBtn.textContent='⏸');
   audio.addEventListener('pause', ()=> musicPlayBtn.textContent='▶');
 
-  // Music UI bindings
   $('#addMusicBtn').addEventListener('click', ()=> musicFiles.click());
   musicFiles.addEventListener('change', (e)=> loadPlaylist(e.target.files));
   $('#musicPlay').addEventListener('click', ()=> audio.paused ? startPlaylist() : pausePlaylist());
   $('#musicNext').addEventListener('click', nextTrack);
   $('#musicPrev').addEventListener('click', prevTrack);
-
-  // Revoke object URLs on unload
   window.addEventListener('unload', ()=> objectUrls.forEach(u=>URL.revokeObjectURL(u)));
 
   /* ======================
@@ -927,9 +899,6 @@
     requestLayoutAlign();
   }
 
-  /* =================
-     Preview & updates
-     ================= */
   function previewLayout(){
     showH = $('#showHours').checked; showS = $('#showSeconds').checked; useFlip = $('#useFlip').checked;
     if (useFlip){
@@ -954,7 +923,7 @@
   $('#hideCandle').addEventListener('change', ()=>{ applyLayoutFlags(); });
   $('#centerClock').addEventListener('change', ()=>{ applyLayoutFlags(); });
   $('#onlyCandle').addEventListener('change', (e)=>{ ensureCandleVisibleWhenOnlyCandle(e.target.checked); applyLayoutFlags(); });
-  $('#showTodo').addEventListener('change', ()=>{ applyLayoutFlags(); addEmptyIfNeeded(); });
+  $('#showTodo').addEventListener('change', ()=>{ applyLayoutFlags(); });
 
   // Colors & inputs
   ['bgAngle','bgC1','bgC2','bgC3'].forEach(id=> document.getElementById(id).addEventListener('input', applyGradient));
@@ -963,7 +932,6 @@
   $('#simpleTextColor').addEventListener('input', applySimpleTextColor);
   $('#todoColor').addEventListener('input', applyTodoBg);
 
-  // Resize aligns flame and keeps To‑do centered/at left as needed
   window.addEventListener('resize', requestLayoutAlign);
 
   // Init defaults
