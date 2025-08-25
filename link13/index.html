@@ -1,11 +1,10 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>Candle Timer — V2.0</title>
+<title>Candle Timer — V10</title>
 <style>
   :root{
     /* Sizes */
@@ -173,6 +172,7 @@
   .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.3); flex:0 0 auto; }
 
   /* Transparent mode for flip cards */
+  /* Frosted transparency + bottom fade during flip */
 :root{
   --glass-bg: rgba(255,255,255,0.18);
   --glass-border: rgba(255,255,255,0.35);
@@ -256,6 +256,8 @@
 .clock-transparent .digit[data-flip="2"] .bottom{
   animation: bottomFadeIn var(--fade-in) ease-out both;
 }
+55,255,.25); }
+
   /* ===== Simple clock ===== */
   #simpleTimer{
     display:none; font-weight:900; letter-spacing:.04em; font-size:min(12vw,160px);
@@ -384,7 +386,7 @@
 </style>
 </head>
 <body>
-  <div class="brand">MADE BY ANABRATA — V2.0</div>
+  <div class="brand">MADE BY ANABRATA — V10</div>
 
   <div class="main" id="main">
     <!-- Timer -->
@@ -516,7 +518,7 @@
   <div id="congrats" aria-modal="true" role="dialog">
     <div id="cgCard">
       <h2 id="cgTitle">Congratulations!</h2>
-      <p id="cgMsg">Timer complete YOU DONE IT🥰</p>
+      <p id="cgMsg">Timer complete — great focus! 🎉</p>
       <button id="cgClose">Close</button>
     </div>
     <!-- Balloons -->
