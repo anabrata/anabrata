@@ -172,25 +172,19 @@
   .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.3); flex:0 0 auto; }
 
   /* Transparent mode for flip cards */
-  /* Frosted transparency + bottom fade during flip */
-:root{
+  :root{
   --glass-bg: rgba(255,255,255,0.18);
   --glass-border: rgba(255,255,255,0.35);
   --glass-blur: 16px;
-  --flip-duration: 560ms;   /* top card flip time */
-  --fade-out: 240ms;        /* bottom fade out */
-  --fade-in: 260ms;         /* bottom fade in */
-  --fade-delay: 80ms;       /* wait a beat after flip starts */
+
+  --flip-duration: 560ms; /* top flap flip time */
 }
 
 .clock-transparent .digit{
   position: relative;
   transform-style: preserve-3d;
-  will-change: transform, opacity, backdrop-filter;
   transform: translateZ(0);
   backface-visibility: hidden;
-
-  /* IMPORTANT: paint containment can kill backdrop blur */
   contain: unset !important;
 
   background: var(--glass-bg) !important;
@@ -205,7 +199,7 @@
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%) contrast(105%) !important;
 }
 
-/* keep halves translucent so the blur shows while moving */
+/* halves keep the frosted fill so blur shows during motion */
 .clock-transparent .digit .top,
 .clock-transparent .digit .bottom{
   background: var(--glass-bg) !important;
@@ -218,45 +212,43 @@
   transform-origin: bottom center;
   z-index: 2;
 }
-
 .clock-transparent .digit .bottom{
   border-top: 1px solid rgba(255,255,255,0.22);
   transform-origin: top center;
   z-index: 1;
 }
 
-/* readable numbers */
+/* digits */
 .clock-transparent .digit .value{
   color: #000;
   text-shadow: 0 1px 2px rgba(0,0,0,0.6);
 }
 
-/* remove any solid white/gradients introduced elsewhere */
+/* nuke any solid white/gradients from other styles */
 .clock-transparent .digit,
 .clock-transparent .digit *{
   background-image: none !important;
 }
 
-/* Bottom fade animations, triggered via data-flip flag */
-@keyframes bottomFadeOut {
-  0%   { opacity: 1; filter: blur(0);   transform: translateY(0) scale(1); }
-  100% { opacity: 0; filter: blur(3px); transform: translateY(6px) scale(0.985); }
+/* TOP FLIP (keep whatever you already use, or this simple one) */
+@keyframes flipTopDown {
+  0%   { transform: rotateX(0deg); }
+  60%  { transform: rotateX(-175deg); }
+  100% { transform: rotateX(-180deg); }
 }
-@keyframes bottomFadeIn {
-  0%   { opacity: 0; filter: blur(3px); transform: translateY(-6px) scale(0.985); }
-  100% { opacity: 1; filter: blur(0);   transform: translateY(0)     scale(1); }
-}
-
-/* while flip is happening (flag = 1): old bottom fades away */
-.clock-transparent .digit[data-flip="1"] .bottom{
-  animation: bottomFadeOut var(--fade-out) ease-out var(--fade-delay) both;
+.clock-transparent .digit.is-flipping .top{
+  animation: flipTopDown var(--flip-duration) cubic-bezier(.22,.61,.36,1) both;
 }
 
-/* after flip completes (flag = 2): new bottom fades in */
-.clock-transparent .digit[data-flip="2"] .bottom{
-  animation: bottomFadeIn var(--fade-in) ease-out both;
+/* INSTANT hide/show of only the number on the bottom card */
+.clock-transparent .digit.is-flipping .bottom .value{
+  opacity: 0 !important;      /* hide immediately at flip start */
+  transition: none !important;
 }
-55,255,.25); }
+.clock-transparent .digit.is-updated .bottom .value{
+  opacity: 1 !important;      /* show immediately when new value is set */
+  transition: none !important;
+}
 
   /* ===== Simple clock ===== */
   #simpleTimer{
