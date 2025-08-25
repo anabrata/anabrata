@@ -125,10 +125,11 @@
   #todoList li{
     counter-increment: tdn;
     position:relative;
-    padding-left:28px;
+    padding-left:34px;
     margin:6px 0;
-    min-height:22px;
+    min-height:24px;
     outline:none;
+    transition: opacity .22s ease, transform .22s ease;
   }
   #todoList li:before{
     content: counter(tdn) ".";
@@ -136,7 +137,33 @@
     width:24px; text-align:right; padding-right:6px;
     font-weight:900; opacity:.9;
   }
-  #todoList li.done{ opacity:.6; text-decoration: line-through; }
+  #todoList li.vanish{ opacity:0; transform:translateY(-4px); }
+
+  /* Inline content and checkbox */
+  .todoItem{
+    display:flex; align-items:center; gap:10px;
+  }
+  .todoChk{
+    appearance:none; width:18px; height:18px; border:2px solid rgba(255,255,255,.75);
+    border-radius:4px; position:relative; cursor:pointer; outline:none; flex:none;
+    box-shadow: 0 0 0 2px rgba(0,0,0,.08) inset;
+    background: transparent;
+  }
+  .todoChk:checked{
+    background: #22c55e; border-color:#22c55e;
+  }
+  .todoChk:checked::after{
+    content:""; position:absolute; inset:0;
+    background:
+      linear-gradient(45deg, transparent 45%, #fff 45% 55%, transparent 55%),
+      linear-gradient(-45deg, transparent 45%, #fff 45% 55%, transparent 55%);
+    transform: scale(.5);
+  }
+  .todoText{
+    display:inline-block; min-width:40px; min-height:22px; padding:2px 6px; border-radius:6px;
+    outline:none; color:#fff; caret-color:#fff;
+  }
+  .todoText:empty:before{ content:"New task"; opacity:.45; }
 
   /* Flip clock */
   #timer-container{ flex:1; display:flex; align-items:center; justify-content:flex-start; min-width:340px; gap:12px; }
@@ -211,12 +238,6 @@
     box-shadow:0 0 18px 6px rgba(255,170,40,.55), 0 0 36px 14px rgba(255,140,0,.40), 0 -20px 28px rgba(255,220,170,.40);
     animation: flickerSoft .6s ease-in-out infinite;
     transition: opacity .35s ease;
-    pointer-events:none;
-  }
-  @keyframes flickerSoft{
-    0%{ transform:scale(1) rotate(-0.8deg); opacity:.95 }
-    50%{ transform:scale(1.06) rotate(0.6deg); opacity:.82 }
-    100%{ transform:scale(1) rotate(-0.8deg); opacity:.95 }
   }
   .flame.off{ opacity:0 !important; animation-play-state: paused !important; }
 
@@ -232,7 +253,7 @@
     border-top-left-radius:16px; border-top-right-radius:16px; z-index:10;
   }
 
-  /* Transparent cards (like past) */
+  /* Transparent cards */
   .card{
     position:relative; scroll-snap-align:start;
     background:rgba(255,255,255,.06);
@@ -256,8 +277,7 @@
   .btn{ position:relative; padding:12px 18px; border-radius:12px; border:none; font-weight:800; cursor:pointer; font-family: var(--btn-font); background:var(--btn-grad); color:#1b1b1b; box-shadow:0 6px 16px rgba(0,0,0,.18); transition:transform .12s, box-shadow .2s, background .2s; }
   .btn:hover{ background:var(--btn-grad-hover); box-shadow:0 10px 24px rgba(0,0,0,.28); }
   .btn:active{ transform: translateY(1px) scale(.99); }
-  .btn.alt{ background:linear-gradient(135deg,#a5b4fc,#6366f1); color:#0d0d15; }
-  .btn.warn{ background:linear-gradient(135deg,#fca5a5,#ef4444); color:#0d0d15; }
+  .btn.small{ padding:8px 10px; border-radius:10px; font-weight:900; }
 
   /* Real-time overlay */
   #rtcOverlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:90; }
@@ -329,9 +349,7 @@
     <!-- To‑do panel -->
     <section id="todo-panel" aria-label="To‑do list">
       <h4 id="todoTitle">To‑do</h4>
-      <ol id="todoList">
-        <li contenteditable="true"></li>
-      </ol>
+      <ol id="todoList"></ol>
     </section>
 
     <!-- Candle -->
@@ -417,7 +435,7 @@
       </div>
     </div>
 
-    <!-- Layout options -->
+    <!-- Layout options + Music box -->
     <div class="card">
       <label class="small">Layout</label>
       <div class="row">
@@ -425,6 +443,18 @@
         <label><input type="checkbox" id="centerClock"> Center clock</label>
         <label><input type="checkbox" id="onlyCandle"> Only candle mode</label>
         <label><input type="checkbox" id="showTodo"> Show to‑do list</label>
+      </div>
+
+      <!-- Music mini box -->
+      <div class="row" style="gap:8px; align-items:center; margin-top:6px">
+        <button id="addMusicBtn" class="btn alt small" title="Select audio files">Add music</button>
+        <input id="musicFiles" type="file" accept="audio/*" multiple style="display:none" />
+        <button id="musicPrev" class="btn small" title="Previous">⏮</button>
+        <button id="musicPlay" class="btn small" title="Play/Pause">▶</button>
+        <button id="musicNext" class="btn small" title="Next">⏭</button>
+        <label style="margin-left:4px"><input type="checkbox" id="musicLoop" checked> Loop</label>
+        <label><input type="checkbox" id="musicWithTimer"> With timer</label>
+        <span id="musicNow" style="color:#fff; font-size:12px; opacity:.95; max-width:220px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis"></span>
       </div>
     </div>
 
@@ -462,7 +492,6 @@
   }
   function applyTodoBg(){
     const v = $('#todoColor').value;
-    // If user selects a color, apply it; otherwise keep default transparent
     if (v) document.documentElement.style.setProperty('--todo-bg', v);
   }
   function applyWax(){ document.documentElement.style.setProperty('--wax',$('#waxColor').value); }
@@ -524,7 +553,7 @@
     timerFlip.style.display = useFlip ? 'flex' : 'none';
     timerSimple.style.display = useFlip ? 'none' : 'block';
     $('#simpleColorCard').style.display = useFlip ? 'none' : '';
-    // Rebuild a fresh display (prevents disappearing clock)
+    // Rebuild display
     if (useFlip){
       flipDigits = buildFlip(timerFlip, $('#showHours').checked, $('#showSeconds').checked);
       tickFlip(flipDigits, 0, $('#showHours').checked, $('#showSeconds').checked);
@@ -559,6 +588,9 @@
       renderSimple(totalSec);
     }
 
+    // Music with timer
+    if ($('#musicWithTimer').checked){ startPlaylist(); }
+
     cancelAnimationFrame(rafId); paused=false; running=false;
     if (totalSec<=0){ finishNow(); return; }
     endAtMs = performance.now()+totalSec*1000; lastWhole=Math.ceil(totalSec); running=true;
@@ -576,7 +608,7 @@
     }
     const p = totalSec>0 ? remainMs/(totalSec*1000) : 0;
     setWaxHeightByProgress(p);
-    positionFlame(); // keep aligned as wax shrinks
+    positionFlame();
     if (remainMs<=0){ finishNow(); return; }
     rafId=requestAnimationFrame(loop);
   }
@@ -620,7 +652,7 @@
     stubEl.style.display = 'none';
     flameEl.classList.remove('off');
     setWaxHeightByProgress(1);
-    void candleWrap.offsetHeight; // reflow
+    void candleWrap.offsetHeight;
     positionFlame();
     requestAnimationFrame(()=>{ candleWrap.classList.remove('no-transitions'); waxEl.classList.remove('no-transitions'); });
   }
@@ -629,7 +661,7 @@
     cancelAnimationFrame(rafId); running=false; paused=false;
     if (preRAF){ cancelAnimationFrame(preRAF); preRAF=null; $('#preOverlay').hidden=true; document.body.classList.remove('pre-on'); }
     primaryBtn.textContent='Start';
-    refreshMode(); // rebuild display to avoid disappearance
+    refreshMode();
     snapResetCandle();
     hideCongrats();
   }
@@ -647,10 +679,9 @@
      ========= */
   const area = $('#candle-area'), waxEl=$('#wax'), wickEl=$('#wick'), flameEl=$('#flame'), stubEl=$('#stub'), smokeEl=$('#smoke'), candleWrap=$('#candleWrap');
   const baseWaxHeight=380, minStub=58;
-  const FLAME_OFFSET = 10; // vertical fine-tune so the flame sits on the wick
+  const FLAME_OFFSET = 10;
 
   function candleVisible(){ return getComputedStyle(area).display !== 'none'; }
-
   function positionFlame(){
     if (!candleVisible()) return;
     const w=wickEl.getBoundingClientRect(), a=area.getBoundingClientRect();
@@ -737,49 +768,146 @@
   rtcBack.addEventListener('click', closeRTC);
 
   /* ==========
-     To‑do logic
+     To‑do logic (checkbox + auto-remove)
      ========== */
-  const todoPanel = $('#todo-panel');
   const todoList = $('#todoList');
 
-  // Pressing Enter creates a new numbered item; Shift+Enter makes a line break
-  todoList.addEventListener('keydown', (e)=>{
-    if (e.key === 'Enter'){
-      if (e.shiftKey) return; // line break inside item
-      e.preventDefault();
-      const sel = document.getSelection();
-      let li = sel?.anchorNode;
-      while(li && li.nodeType === 3){ li = li.parentElement; }
-      while(li && li.tagName !== 'LI'){ li = li.parentElement; }
-      if (!li){
-        const last = todoList.lastElementChild || todoList.appendChild(document.createElement('li'));
-        last.setAttribute('contenteditable','true');
-        placeCaretAtEnd(last);
-        return;
-      }
-      const newLi = document.createElement('li');
-      newLi.setAttribute('contenteditable','true');
-      li.after(newLi);
-      placeCaretAtEnd(newLi);
+  function makeTodoItem(text=""){
+    const li=document.createElement('li');
+    const label=document.createElement('label'); label.className='todoItem';
+    const chk=document.createElement('input'); chk.type='checkbox'; chk.className='todoChk';
+    const span=document.createElement('span'); span.className='todoText'; span.contentEditable='true'; span.spellcheck=false; span.textContent=text;
+    label.appendChild(chk); label.appendChild(span); li.appendChild(label);
+    return li;
+  }
+  function addEmptyIfNeeded(){
+    if (!todoList.firstElementChild){
+      todoList.appendChild(makeTodoItem(""));
+      placeCaretAtEnd(todoList.firstElementChild.querySelector('.todoText'));
     }
-  });
-
-  // Click with Ctrl/Cmd/Alt to toggle done
-  todoList.addEventListener('click', (e)=>{
-    const li = e.target.closest('li');
-    if (!li) return;
-    if (e.altKey || e.metaKey || e.ctrlKey){ li.classList.toggle('done'); }
-  });
-
+  }
   function placeCaretAtEnd(el){
     el.focus();
-    const range = document.createRange();
-    range.selectNodeContents(el);
-    range.collapse(false);
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
+    const r=document.createRange(); r.selectNodeContents(el); r.collapse(false);
+    const s=window.getSelection(); s.removeAllRanges(); s.addRange(r);
   }
+
+  // Add/remove/enter handling
+  todoList.addEventListener('keydown', (e)=>{
+    const isText = e.target.classList?.contains('todoText');
+    if (!isText) return;
+    if (e.key === 'Enter'){
+      if (e.shiftKey) return; // allow line break with Shift
+      e.preventDefault();
+      const li=e.target.closest('li');
+      const newLi=makeTodoItem("");
+      li.after(newLi);
+      placeCaretAtEnd(newLi.querySelector('.todoText'));
+    }
+    // Backspace on empty item removes it (keeping at least one)
+    if (e.key==='Backspace' && e.target.textContent.trim()===''){
+      const li=e.target.closest('li');
+      const prev=li.previousElementSibling?.querySelector('.todoText');
+      if (prev){
+        e.preventDefault(); li.remove(); placeCaretAtEnd(prev);
+      }
+      addEmptyIfNeeded();
+    }
+  });
+  todoList.addEventListener('change', (e)=>{
+    if (!e.target.classList?.contains('todoChk')) return;
+    const li=e.target.closest('li');
+    li.classList.add('vanish');
+    setTimeout(()=>{ li.remove(); addEmptyIfNeeded(); }, 220);
+  });
+
+  // Seed one empty item
+  addEmptyIfNeeded();
+
+  /* ==========
+     Music playlist (loop, manual or with timer)
+     ========== */
+  const musicFiles = $('#musicFiles');
+  const musicNow = $('#musicNow');
+  const musicPlayBtn = $('#musicPlay');
+  const audio = new Audio();
+  audio.preload = 'metadata';
+
+  let playlist = []; // [{name, url}]
+  let trackIndex = 0;
+  const objectUrls = new Set();
+
+  function updateNow(){
+    musicNow.textContent = playlist.length ? `${trackIndex+1}/${playlist.length} • ${playlist[trackIndex].name}` : '';
+  }
+  function loadPlaylist(files){
+    // Revoke previous object URLs
+    objectUrls.forEach(u=>URL.revokeObjectURL(u));
+    objectUrls.clear();
+    playlist = [];
+    trackIndex = 0;
+    for (const f of files){
+      const url = URL.createObjectURL(f);
+      objectUrls.add(url);
+      playlist.push({name:f.name, url});
+    }
+    updateNow();
+    if (playlist.length){
+      audio.src = playlist[trackIndex].url;
+    }else{
+      audio.removeAttribute('src');
+    }
+  }
+  function playTrack(i){
+    if (!playlist.length) return;
+    trackIndex = (i+playlist.length)%playlist.length;
+    audio.src = playlist[trackIndex].url;
+    audio.play().catch(()=>{});
+    updateNow();
+    musicPlayBtn.textContent = '⏸';
+  }
+  function startPlaylist(){
+    if (!playlist.length){ return; }
+    if (!audio.src) audio.src = playlist[trackIndex].url;
+    audio.play().then(()=>{ musicPlayBtn.textContent='⏸'; }).catch(()=>{});
+    updateNow();
+  }
+  function pausePlaylist(){
+    audio.pause(); musicPlayBtn.textContent = '▶';
+  }
+  function nextTrack(){
+    if (!playlist.length) return;
+    trackIndex = (trackIndex+1) % playlist.length;
+    playTrack(trackIndex);
+  }
+  function prevTrack(){
+    if (!playlist.length) return;
+    trackIndex = (trackIndex-1+playlist.length) % playlist.length;
+    playTrack(trackIndex);
+  }
+
+  audio.addEventListener('ended', ()=>{
+    if (!playlist.length) return;
+    if ($('#musicLoop').checked){
+      nextTrack();
+    }else if (trackIndex < playlist.length-1){
+      nextTrack();
+    }else{
+      pausePlaylist();
+    }
+  });
+  audio.addEventListener('play', ()=> musicPlayBtn.textContent='⏸');
+  audio.addEventListener('pause', ()=> musicPlayBtn.textContent='▶');
+
+  // Music UI bindings
+  $('#addMusicBtn').addEventListener('click', ()=> musicFiles.click());
+  musicFiles.addEventListener('change', (e)=> loadPlaylist(e.target.files));
+  $('#musicPlay').addEventListener('click', ()=> audio.paused ? startPlaylist() : pausePlaylist());
+  $('#musicNext').addEventListener('click', nextTrack);
+  $('#musicPrev').addEventListener('click', prevTrack);
+
+  // Revoke object URLs on unload
+  window.addEventListener('unload', ()=> objectUrls.forEach(u=>URL.revokeObjectURL(u)));
 
   /* ======================
      Layout toggles/handlers
@@ -795,7 +923,7 @@
     document.body.classList.toggle('center-clock', $('#centerClock').checked);
     document.body.classList.toggle('only-candle', $('#onlyCandle').checked);
     document.body.classList.toggle('todo-on', $('#showTodo').checked);
-    if (!$('#onlyCandle').checked){ refreshMode(); } // keep clock present
+    if (!$('#onlyCandle').checked){ refreshMode(); }
     requestLayoutAlign();
   }
 
@@ -826,12 +954,7 @@
   $('#hideCandle').addEventListener('change', ()=>{ applyLayoutFlags(); });
   $('#centerClock').addEventListener('change', ()=>{ applyLayoutFlags(); });
   $('#onlyCandle').addEventListener('change', (e)=>{ ensureCandleVisibleWhenOnlyCandle(e.target.checked); applyLayoutFlags(); });
-  $('#showTodo').addEventListener('change', (e)=>{
-    applyLayoutFlags();
-    if (e.target.checked && !todoList.firstElementChild){
-      const li = document.createElement('li'); li.setAttribute('contenteditable','true'); todoList.appendChild(li);
-    }
-  });
+  $('#showTodo').addEventListener('change', ()=>{ applyLayoutFlags(); addEmptyIfNeeded(); });
 
   // Colors & inputs
   ['bgAngle','bgC1','bgC2','bgC3'].forEach(id=> document.getElementById(id).addEventListener('input', applyGradient));
@@ -847,11 +970,6 @@
   applyGradient(); restyleClockPanels(); applyWax(); applySimpleTextColor();
   refreshMode(); refreshRTCMode(); previewLayout();
   setWaxHeightByProgress(1); relight(); requestLayoutAlign();
-
-  // Safety: ensure at least one li exists (prevents blank OL quirks)
-  if (!todoList.firstElementChild){
-    const li = document.createElement('li'); li.setAttribute('contenteditable','true'); todoList.appendChild(li);
-  }
 </script>
 </body>
 </html>
