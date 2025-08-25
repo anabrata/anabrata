@@ -143,7 +143,9 @@
   .todoChk:checked{ background:#22c55e; border-color:#22c55e; }
   .todoChk:checked::after{ content:""; position:absolute; inset:0; background:linear-gradient(45deg,transparent 47%,#fff 47% 53%,transparent 53%),linear-gradient(-45deg,transparent 47%,#fff 47% 53%,transparent 53%); transform:scale(.48); }
   .todoText{ display:inline-block; min-width:36px; min-height:20px; padding:1px 5px; border-radius:6px; outline:none; color:#fff; caret-color:#fff; }
-  .todoText:empty:before{ content:"New task"; opacity:.45; }... /* ===== Flip clock (glassy) ===== */
+  .todoText:empty:before{ content:"New task"; opacity:.45; }
+
+  /* ===== Flip clock (glassy) ===== */
   #timer{ display:flex; align-items:center; gap:12px; user-select:none; }
   .digit{
     position:relative; width:var(--digit-w); height:var(--digit-h); perspective:1200px; border-radius:var(--digit-radius); overflow:hidden;
@@ -184,7 +186,7 @@
   .wax:after{ content:""; position:absolute; top:30px; left:24px; width:12px; height:64px; border-radius:10px; background: linear-gradient(180deg,#fff6,#0000 60%), var(--wax); box-shadow: 44px 8px 0 -3px var(--wax), 44px 8px 0 -3px #fff6, 92px 12px 0 -6px var(--wax), 92px 12px 0 -6px #fff6; opacity:.85; }
   .wick{ position:absolute; width:6px; height:30px; background:linear-gradient(180deg,#444,var(--wick)); border-radius:4px; top:-12px; left:50%; transform:translateX(-50%); z-index:4; }
 
-  /* Flame anchored to wick center */
+  /* Flame anchored to wick center (positioned by JS each frame/resize) */
   .flame{
     position:absolute; width:52px; height:110px; z-index:6; pointer-events:none;
     left:0; top:0; transform: translate(-50%,-100%) translateY(10px);
@@ -197,7 +199,9 @@
     animation: flickerSoft .6s ease-in-out infinite;
   }
   @keyframes flickerSoft{ 0%{ transform:scale(1) rotate(-0.8deg); opacity:.95 } 50%{ transform:scale(1.06) rotate(0.6deg); opacity:.82 } 100%{ transform:scale(1) rotate(-0.8deg); opacity:.95 } }
-  .flame.off .flame-core{ opacity:0 !important; animation-play-state: paused !important; }... .stub{ display:none; position:absolute; bottom:0; width:150px; height:58px; background:linear-gradient(180deg,#9a9a9a,#6f6f6f); border-radius:0 0 22px 22px; z-index:1; }
+  .flame.off .flame-core{ opacity:0 !important; animation-play-state: paused !important; }
+
+  .stub{ display:none; position:absolute; bottom:0; width:150px; height:58px; background:linear-gradient(180deg,#9a9a9a,#6f6f6f); border-radius:0 0 22px 22px; z-index:1; }
 
   /* ===== Controls (glass) ===== */
   #controls{
@@ -310,7 +314,7 @@
     </section>
 
     <!-- Candle -->
-    <section id="candle-area" aria-label="Candle">
+    <section id="candle-area" aria-label="Candle" >
       <div class="candle-clip">
         <div class="candle-wrap" id="candleWrap">
           <div class="wax" id="wax">
@@ -322,7 +326,9 @@
       </div>
       <div class="flame" id="flame"><div class="flame-core"></div></div>
     </section>
-  </div>... <!-- Controls -->
+  </div>
+
+  <!-- Controls -->
   <div id="controls">
     <div class="card">
       <label class="small">Timer</label>
@@ -415,7 +421,9 @@
   <!-- 3-2-1 overlay -->
   <div id="countOverlay" aria-hidden="true">
     <div id="countInner" class="pop">3</div>
-  </div>... <!-- Congrats overlay with balloons -->
+  </div>
+
+  <!-- Congrats overlay with balloons -->
   <div id="congrats" aria-modal="true" role="dialog">
     <div id="cgCard">
       <h2 id="cgTitle">Congratulations!</h2>
@@ -467,7 +475,8 @@
   }
 
   function applyWax(){
-    document.documentElement.style.setProperty("--wax", $("#waxColor")?.value || "#f2e4c7");
+    const waxPicker = document.getElementById("waxColor");
+    document.documentElement.style.setProperty("--wax", waxPicker ? waxPicker.value : "#f2e4c7");
   }
 
   function restyleClockPanels(){
@@ -602,7 +611,9 @@
   let running = false;
   let paused = false;
   let pauseRemainMs = 0;
-  let countInActive = false;... function safeBuildClock(){
+  let countInActive = false;
+
+  function safeBuildClock(){
     useFlip = $("#useFlip")?.checked ?? true;
     if (useFlip){
       timerFlip.style.display = "flex";
@@ -786,7 +797,8 @@
   document.addEventListener("fullscreenchange", () => { document.body.classList.toggle("is-fs", !!document.fullscreenElement); });
 
   /* ---------- To‑do logic ---------- */
-  const todoList = $("#todoList");... function makeTodoItem(text = ""){
+  const todoList = $("#todoList");
+  function makeTodoItem(text = ""){
     const li = document.createElement("li");
     const label = document.createElement("label"); label.className = "todoItem";
     const chk = document.createElement("input"); chk.type = "checkbox"; chk.className = "todoChk";
@@ -894,6 +906,10 @@
     // Force to‑do visible on load if toggle checked
     if ($("#showTodo")?.checked) document.body.classList.add("todo-on");
 
+    // Ensure To‑do transparency effect is applied on load if option is checked
+    const tg = $("#todoGlass");
+    if (tg?.checked) $("#todo-panel").classList.add("todo-glass");
+
     applyLayoutFlags();
     safeBuildClock();
     previewLayout();
@@ -904,9 +920,4 @@
 
     setWaxHeightByProgress(1);
 
-    // Seed one empty to‑do
-    const li=makeTodoItem(""); $("#todoList").appendChild(li);
-  })();
-</script>
-</body>
-</html>
+    // Seed one empty
