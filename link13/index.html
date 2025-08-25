@@ -2,334 +2,827 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Professional Candle Timer</title>
   <style>
-    :root {
-      --primary-bg: #121212;
-      --panel-bg: rgba(255,255,255,0.05);
+    :root{
+      /* Sizes */
+      --digit-w: 110px;
+      --digit-h: 150px;
+      --digit-radius: 14px;
+      --split-line: rgba(255,255,255,0.08);
+
+      /* Colors (defaults) */
+      --bg-angle: 135deg;
+      --bg-c1: #3a1c71;
+      --bg-c2: #d76d77;
+      --bg-c3: #ffaf7b;
+
+      --clock-c1: #0f0f10;
+      --clock-c2: #2a2a30;
+      --clock-c3: #3f3f47;
+      --clock-text: #ffffff;
+
       --accent: #ff9a00;
-      --text-light: #f0f0f0;
-      --text-dark: #202020;
-      --box-radius: 14px;
-      --transition: 0.3s ease;
+
+      /* Candle */
+      --wax: #f3e5c8;
+      --wick: #1b1b1b;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      background: var(--primary-bg);
-      font-family: 'Arial', sans-serif;
-      color: var(--text-light);
-      overflow-x: hidden;
+
+    *{box-sizing:border-box}
+
+    html,body{
+      height:100%;
     }
-    .main {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 5%;
+    body{
+      margin:0;
+      display:flex;
+      flex-direction:column;
+      color:#f5f5f5;
+      font-family: "Comic Sans MS", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      /* Default multicolor gradient background */
+      background: linear-gradient(var(--bg-angle), var(--bg-c1), var(--bg-c2), var(--bg-c3));
+      background-attachment: fixed;
+      overflow-x:hidden;
     }
-    /* Flip-clock on left */
-    #timer-container {
-      flex: 1;
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
+
+    /* Top bar watermark */
+    .brand{
+      position:fixed;
+      right:14px;
+      top:10px;
+      z-index:20;
+      font-weight:700;
+      font-size:14px;
+      letter-spacing:.2px;
+      opacity:.9;
+      text-shadow:0 1px 2px rgba(0,0,0,0.3);
+      user-select:none;
     }
-    #timer {
-      display: flex;
-      align-items: center;
-      font-family: 'Courier New', monospace;
-      font-size: 1.5rem;
+
+    /* Main split layout: clock left, candle right */
+    .main{
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:min(6vw,60px);
+      padding:24px min(5vw,48px);
     }
-    .digit {
-      width: 80px;
-      height: 100px;
-      margin: 0 8px;
-      position: relative;
-      background: #000;
-      color: var(--text-light);
-      border-radius: var(--box-radius);
-      overflow: hidden;
-      font-size: 80px;
-      line-height: 100px;
-      text-align: center;
-      font-weight: bold;
-      perspective: 800px;
+
+    /* CLOCK LEFT */
+    #timer-container{
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      min-width:320px;
     }
-    .digit div {
-      position: absolute;
-      width: 100%;
-      height: 50%;
-      left: 0;
-      backface-visibility: hidden;
+
+    #timer{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      pointer-events:none;
+      user-select:none;
     }
-    .top { top: 0; transform-origin: bottom; }
-    .bottom { bottom: 0; transform-origin: top; }
-    .back-top { top: 0; transform: rotateX(180deg); }
-    .back-bottom { bottom: 0; }
-    @keyframes flipTop {
-      0% { transform: rotateX(0deg); }
+
+    /* Digit panel with robust clipping so numbers never escape */
+    .digit{
+      position:relative;
+      width:var(--digit-w);
+      height:var(--digit-h);
+      perspective: 1200px;
+      border-radius: var(--digit-radius);
+      overflow:hidden;
+      background: linear-gradient(145deg, var(--clock-c1), var(--clock-c2), var(--clock-c3));
+      box-shadow:
+        inset 0 -1px 0 rgba(255,255,255,0.06),
+        inset 0 1px 0 rgba(0,0,0,0.4),
+        0 8px 24px rgba(0,0,0,0.35);
+    }
+
+    /* Static top/bottom halves (base cards) */
+    .digit .top,
+    .digit .bottom{
+      position:absolute;
+      left:0; right:0;
+      height:50%;
+      overflow:hidden;
+      backface-visibility:hidden;
+      -webkit-backface-visibility:hidden;
+    }
+    .digit .top{
+      top:0;
+      border-bottom:1px solid var(--split-line);
+    }
+    .digit .bottom{
+      bottom:0;
+      border-top:1px solid var(--split-line);
+    }
+
+    /* Number content sizing stays inside panel */
+    .content{
+      position:absolute;
+      left:0; right:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:800;
+      color:var(--clock-text);
+      /* scale font safely within box */
+      font-size: calc(var(--digit-h) * 0.68);
+      line-height:1;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    }
+    /* Align content to respective halves for perfect clipping */
+    .top .content{
+      bottom:0;    /* sits on split line */
+      transform: translateY(8%); /* tiny nudge to reduce seam */
+    }
+    .bottom .content{
+      top:-50%;    /* shift so lower half shows correctly */
+      transform: translateY(-8%); /* tiny nudge */
+    }
+
+    /* Flip overlays created per change */
+    .top-flip,
+    .bottom-flip{
+      position:absolute;
+      left:0; right:0;
+      height:50%;
+      overflow:hidden;
+      backface-visibility:hidden;
+      -webkit-backface-visibility:hidden;
+      background: inherit; /* keeps same gradient as digit */
+    }
+    .top-flip{
+      top:0;
+      transform-origin: bottom;
+      border-bottom:1px solid var(--split-line);
+      animation: topFlip 0.33s ease-in forwards;
+      box-shadow: 0 14px 28px rgba(0,0,0,0.35);
+    }
+    .bottom-flip{
+      bottom:0;
+      transform-origin: top;
+      border-top:1px solid var(--split-line);
+      animation: bottomFlip 0.33s 0.33s ease-out forwards;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.22);
+    }
+    .top-flip span,
+    .bottom-flip span{
+      position:absolute; left:0; right:0;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:800;
+      color:var(--clock-text);
+      font-size: calc(var(--digit-h) * 0.68);
+      line-height:1;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    }
+    .top-flip span{ bottom:0; transform: translateY(8%); }
+    .bottom-flip span{ top:-50%; transform: translateY(-8%); }
+
+    @keyframes topFlip{
+      0%   { transform: rotateX(0deg); }
       100% { transform: rotateX(-90deg); }
     }
-    @keyframes flipBottom {
-      0% { transform: rotateX(90deg); }
+    @keyframes bottomFlip{
+      0%   { transform: rotateX(90deg); }
       100% { transform: rotateX(0deg); }
     }
-    .flipping .top {
-      animation: flipTop 0.3s ease-in forwards;
+
+    /* Colons */
+    .colon{
+      display:flex; align-items:center; justify-content:center;
+      width: calc(var(--digit-w) * 0.3);
+      height: var(--digit-h);
+      color: var(--clock-text);
+      font-weight:900;
+      font-size: calc(var(--digit-h) * 0.6);
+      text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+      user-select:none;
     }
-    .flipping .back-bottom {
-      animation: flipBottom 0.3s 0.3s ease-out forwards;
+
+    /* CANDLE RIGHT */
+    #candle-area{
+      flex:1;
+      display:flex;
+      align-items:flex-end;
+      justify-content:flex-end;
+      min-width:340px;
+      height: max(360px, 40vh);
+      position:relative;
     }
-    /* Candle on right */
-    #candle-container {
-      flex: 1;
-      display: flex;
-      justify-content: flex-end;
-      align-items: flex-end;
-      position: relative;
-      height: 350px;
+    .candle-wrap{
+      position:relative;
+      width:160px;
+      height:360px; /* initial wax height; will shrink */
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
     }
-    #candle, #candle-out {
-      width: 120px;
-      height: 300px;
-      border-radius: 16px;
-      transition: background var(--transition), transform 1s ease, opacity 0.5s;
+    .wax{
+      position:absolute;
+      bottom:0;
+      width:140px;
+      height:100%;
+      background:
+        radial-gradient(120px 26px at 70px 4px, rgba(255,255,255,0.8), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,0.28), rgba(0,0,0,0) 22%),
+        linear-gradient(180deg, #ffffff40, #00000020 30%, #00000030 100%),
+        linear-gradient(180deg, var(--wax), #e6d9bb);
+      border-radius: 18px;
+      box-shadow:
+        inset 0 4px 18px rgba(0,0,0,0.18),
+        inset 0 -10px 20px rgba(0,0,0,0.22),
+        0 12px 40px rgba(0,0,0,0.35);
     }
-    #candle { background: #faf3e0; box-shadow: inset 0 0 10px rgba(0,0,0,0.2); }
-    #flame {
-      position: absolute;
-      top: calc(100% - 330px);
-      left: calc(50% + 10px);
-      width: 40px;
-      height: 90px;
-      background: radial-gradient(circle at 50% 20%, #fff7c2, var(--accent) 55%, transparent);
-      border-radius: 50% 50% 30% 30%;
-      filter: blur(2px);
+    /* Elliptical top for melted wax */
+    .wax:before{
+      content:"";
+      position:absolute;
+      top:-18px; left:0; right:0;
+      margin:auto;
+      width:140px; height:36px;
+      background: radial-gradient(70px 18px at 70px 18px, #fff8 0%, #0000 72%),
+                  radial-gradient(70px 18px at 70px 18px, var(--wax), var(--wax));
+      border-radius: 50%/55% 55% 45% 45%;
+      box-shadow: inset 0 6px 12px rgba(0,0,0,0.22);
+    }
+    /* Simple wax drips */
+    .wax:after{
+      content:"";
+      position:absolute;
+      top:24px; left:18px;
+      width:12px; height:60px;
+      border-radius:10px;
+      background: linear-gradient(180deg, #fff6, #0000 60%), var(--wax);
+      box-shadow:
+        38px 6px 0 -3px var(--wax),
+        38px 6px 0 -3px #fff6,
+        82px 10px 0 -6px var(--wax),
+        82px 10px 0 -6px #fff6;
+      opacity:.75;
+    }
+    /* Wick and flame */
+    .wick{
+      position:absolute;
+      width:6px; height:28px;
+      background: linear-gradient(180deg, #444, var(--wick));
+      border-radius: 4px;
+      top:-6px; left:50%;
+      transform: translateX(-50%);
+      box-shadow: 0 -1px 2px #fff8;
+    }
+    .flame{
+      position:absolute;
+      width:46px; height:96px;
+      left:50%;
+      transform: translateX(-50%);
+      /* Y is dynamically positioned by JS to hug wick */
+      background:
+        radial-gradient(ellipse at 50% 20%, #fff9cc 0%, #ffe08a 35%, #ffac30 55%, #ff7a00 75%, rgba(0,0,0,0) 76%),
+        radial-gradient(ellipse at 50% 40%, #ffffff 0%, rgba(255,255,255,0) 60%);
+      border-radius: 50% 50% 38% 38%;
+      filter: blur(0.6px);
+      box-shadow:
+        0 0 18px 6px rgba(255,170,40,0.65),
+        0 0 38px 12px rgba(255,140,0,0.45),
+        0 -18px 26px rgba(255,220,170,0.45);
       animation: flicker 0.12s infinite;
-      transition: opacity 0.5s;
+      transition: opacity .45s ease;
+      pointer-events:none;
     }
-    @keyframes flicker {
-      0%,100% { transform: translate(-50%,0) scale(1); opacity: 1; }
-      50% { transform: translate(-50%,0) scale(1.2); opacity: 0.7; }
+    @keyframes flicker{
+      0%   { transform: translateX(-50%) scale(1)    rotate(-1.5deg); opacity: 1; }
+      50%  { transform: translateX(-50%) scale(1.12) rotate(1.2deg);  opacity: .82; }
+      100% { transform: translateX(-50%) scale(1)    rotate(-1.2deg); opacity: 1; }
     }
-    #candle-out {
-      background: #555;
-      display: none;
-      transform: rotate(25deg) translateY(-200px);
-      opacity: 0.8;
+    /* Extinguished tilted stub */
+    .stub{
+      display:none;
+      position:absolute;
+      bottom:0;
+      width:140px;
+      height:160px;
+      background: linear-gradient(180deg, #777, #555);
+      border-radius: 18px;
+      transform: rotate(22deg) translateY(-60px);
+      box-shadow:
+        inset 0 6px 12px rgba(0,0,0,0.25),
+        0 12px 40px rgba(0,0,0,0.35);
+      opacity:.85;
     }
-    /* Scroll-linked wave panel */
-    #controls {
-      position: relative;
+    /* Light smoke when off */
+    .smoke{
+      position:absolute;
+      width:10px; height:10px;
+      left:50%; transform: translateX(-50%);
+      top:-20px;
+      border-radius:50%;
+      background: radial-gradient(#bbb, #0000 64%);
+      opacity:0;
+      pointer-events:none;
+    }
+    .smoke.show{
+      animation: puff 1.6s ease-out forwards;
+    }
+    @keyframes puff{
+      0%   { transform: translate(-50%, 0) scale(1); opacity:.8; filter: blur(0.5px); }
+      100% { transform: translate(-50%, -120px) scale(2.2); opacity:0; filter: blur(3px); }
+    }
+
+    /* CONTROL STRIP – non-overlapping scrollable cards */
+    #controls{
+      position:relative;
+      display:grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(220px, 1fr);
+      gap:14px;
+      padding:16px;
+      background: rgba(0,0,0,0.22);
       backdrop-filter: blur(8px);
-      background: var(--panel-bg);
-      padding: 15px 20px;
-      display: flex;
-      gap: 18px;
-      align-items: center;
-      justify-content: space-between;
-      overflow-x: auto;
-      border-top-left-radius: var(--box-radius);
-      border-top-right-radius: var(--box-radius);
       scroll-snap-type: x mandatory;
+      overflow-x:auto;
+      border-top-left-radius:16px;
+      border-top-right-radius:16px;
     }
-    .control-group {
-      flex: 0 0 auto;
-      scroll-snap-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: start;
-      color: var(--text-light);
+    .card{
+      scroll-snap-align:start;
+      background: rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:14px;
+      padding:12px;
+      min-height:84px;
+      display:flex; flex-direction:column; gap:8px;
     }
-    .control-group label {
-      font-size: 13px;
-      margin-bottom: 4px;
+    .row{
+      display:flex; gap:8px; align-items:center; flex-wrap:wrap;
     }
-    .control-group input,
-    .control-group select {
-      padding: 6px 10px;
-      border: none;
-      border-radius: var(--box-radius);
-      outline: none;
-      font-size: 14px;
+    label{font-size:12px; opacity:.9}
+    input[type="number"],
+    input[type="color"],
+    select{
+      width:100%;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.35);
+      color:#fff;
+      outline:none;
     }
-    .control-group input[type="checkbox"] {
-      transform: scale(1.3);
-      margin-right: 6px;
-    }
-    #startBtn {
-      flex: 0 0 auto;
+    input[type="checkbox"]{ transform: scale(1.2); }
+    button{
+      padding:10px 14px;
+      border-radius:10px;
+      border:none;
+      font-weight:700;
+      cursor:pointer;
       background: var(--accent);
-      color: var(--text-dark);
-      border: none;
-      padding: 12px 24px;
-      border-radius: var(--box-radius);
-      font-weight: bold;
-      cursor: pointer;
-      transition: background var(--transition);
-      scroll-snap-align: center;
+      color:#1b1b1b;
     }
-    #startBtn:hover {
-      background: #ff7a00;
+    .small{ font-size:12px; opacity:.9 }
+
+    /* Responsive tweaks */
+    @media (max-width: 980px){
+      :root{ --digit-w: 92px; --digit-h: 130px; }
+      .main{ gap:28px; padding:18px 16px; }
     }
-    footer {
-      text-align: center;
-      padding: 8px;
-      font-size: 12px;
-      color: var(--text-light);
+    @media (max-width: 720px){
+      :root{ --digit-w: 80px; --digit-h: 110px; }
     }
   </style>
 </head>
 <body>
+  <div class="brand">MADE BY ANABRATA</div>
+
   <div class="main">
-    <div id="timer-container">
+    <!-- CLOCK LEFT -->
+    <section id="timer-container" aria-label="Flip clock timer">
       <div id="timer"></div>
-    </div>
-    <div id="candle-container">
-      <div id="candle"></div>
-      <div id="flame"></div>
-      <div id="candle-out"></div>
-    </div>
+    </section>
+
+    <!-- CANDLE RIGHT -->
+    <section id="candle-area" aria-label="Candle">
+      <div class="candle-wrap" id="candleWrap">
+        <div class="wax" id="wax">
+          <div class="wick" id="wick"></div>
+        </div>
+        <div class="flame" id="flame"></div>
+        <div class="stub" id="stub"></div>
+        <div class="smoke" id="smoke"></div>
+      </div>
+    </section>
   </div>
+
+  <!-- CONTROLS: scrollable cards to avoid overlap -->
   <div id="controls">
-    <div class="control-group">
-      <label for="minInput">Minutes</label>
-      <input id="minInput" type="number" value="0" min="0" />
+    <div class="card">
+      <label class="small">Timer</label>
+      <div class="row">
+        <div style="flex:1">
+          <label for="hoursInput">Hours</label>
+          <input id="hoursInput" type="number" min="0" value="0">
+        </div>
+        <div style="flex:1">
+          <label for="minInput">Minutes</label>
+          <input id="minInput" type="number" min="0" value="1">
+        </div>
+        <div style="flex:1">
+          <label for="secInput">Seconds</label>
+          <input id="secInput" type="number" min="0" max="59" value="0">
+        </div>
+      </div>
+      <div class="row">
+        <label><input type="checkbox" id="showHours"> Show hours</label>
+        <label><input type="checkbox" id="showSeconds" checked> Show seconds</label>
+      </div>
+      <div class="row">
+        <button id="startBtn">Start</button>
+        <button id="resetBtn" style="background:#ffd166">Reset</button>
+        <button id="stopBtn"  style="background:#fca5a5">Stop</button>
+      </div>
     </div>
-    <div class="control-group">
-      <label for="secInput">Seconds</label>
-      <input id="secInput" type="number" value="30" min="0" max="59" />
+
+    <div class="card">
+      <label class="small">Background gradient</label>
+      <div class="row">
+        <div style="flex:1">
+          <label for="bgAngle">Angle</label>
+          <input id="bgAngle" type="number" min="0" max="360" value="135">
+        </div>
+        <div style="flex:1">
+          <label for="bgC1">Color 1</label>
+          <input id="bgC1" type="color" value="#3a1c71">
+        </div>
+        <div style="flex:1">
+          <label for="bgC2">Color 2</label>
+          <input id="bgC2" type="color" value="#d76d77">
+        </div>
+        <div style="flex:1">
+          <label for="bgC3">Color 3</label>
+          <input id="bgC3" type="color" value="#ffaf7b">
+        </div>
+      </div>
+      <span class="small">Tip: mix 2–3 colors; angle controls gradient direction.</span>
     </div>
-    <div class="control-group">
-      <label>
-        <input id="toggleSec" type="checkbox" checked /> Show Seconds
-      </label>
+
+    <div class="card">
+      <label class="small">Clock panel gradient</label>
+      <div class="row">
+        <div style="flex:1">
+          <label for="clockC1">Color 1</label>
+          <input id="clockC1" type="color" value="#0f0f10">
+        </div>
+        <div style="flex:1">
+          <label for="clockC2">Color 2</label>
+          <input id="clockC2" type="color" value="#2a2a30">
+        </div>
+        <div style="flex:1">
+          <label for="clockC3">Color 3</label>
+          <input id="clockC3" type="color" value="#3f3f47">
+        </div>
+      </div>
+      <div class="row">
+        <div style="flex:1">
+          <label for="textColor">Text color</label>
+          <input id="textColor" type="color" value="#ffffff">
+        </div>
+        <div style="flex:1">
+          <label for="fontPicker">Font</label>
+          <select id="fontPicker">
+            <option selected>Comic Sans MS</option>
+            <option>Arial</option>
+            <option>Verdana</option>
+            <option>Courier New</option>
+            <option>Georgia</option>
+          </select>
+        </div>
+      </div>
     </div>
-    <div class="control-group">
-      <label for="colorPicker">Clock Color</label>
-      <input id="colorPicker" type="color" value="#ffffff" />
+
+    <div class="card">
+      <label class="small">Candle</label>
+      <div class="row">
+        <div style="flex:1">
+          <label for="waxColor">Wax color</label>
+          <input id="waxColor" type="color" value="#f3e5c8">
+        </div>
+        <div style="flex:1">
+          <label for="flameOn">Flame</label>
+          <select id="flameOn">
+            <option value="on" selected>On</option>
+            <option value="off">Off</option>
+          </select>
+        </div>
+      </div>
+      <span class="small">Candle burns down proportionally with the timer.</span>
     </div>
-    <div class="control-group">
-      <label for="bgPicker">Background</label>
-      <input id="bgPicker" type="color" value="#121212" />
-    </div>
-    <div class="control-group">
-      <label for="candleColorPicker">Candle Color</label>
-      <input id="candleColorPicker" type="color" value="#faf3e0" />
-    </div>
-    <div class="control-group">
-      <label for="fontPicker">Font</label>
-      <select id="fontPicker">
-        <option>Comic Sans MS</option>
-        <option selected>Arial</option>
-        <option>Verdana</option>
-        <option>Courier New</option>
-      </select>
-    </div>
-    <button id="startBtn">Start</button>
   </div>
-  <footer>MADE BY ANABRATA</footer>
 
   <script>
-    function createDigit() {
+    /* ====== Utilities ====== */
+    const $ = s => document.querySelector(s);
+    const timerEl = $('#timer');
+
+    function gradientStr(angle, c1, c2, c3){
+      return `linear-gradient(${angle}deg, ${c1}, ${c2}${c3 ? ', ' + c3 : ''})`;
+    }
+
+    /* ====== Flip digit construction ====== */
+    function createBaseDigit(initial="0"){
       const d = document.createElement('div');
       d.className = 'digit';
-      ['top','back-top','bottom','back-bottom'].forEach(c => {
-        const el = document.createElement('div');
-        el.className = c;
-        d.appendChild(el);
-      });
+      d.dataset.value = initial;
+
+      const top = document.createElement('div');
+      top.className = 'top';
+      const topContent = document.createElement('span');
+      topContent.className = 'content';
+      topContent.textContent = initial;
+      top.appendChild(topContent);
+
+      const bottom = document.createElement('div');
+      bottom.className = 'bottom';
+      const bottomContent = document.createElement('span');
+      bottomContent.className = 'content';
+      bottomContent.textContent = initial;
+      bottom.appendChild(bottomContent);
+
+      d.appendChild(top);
+      d.appendChild(bottom);
       return d;
     }
 
-    const timerEl = document.getElementById('timer');
-    let digits = [], remaining = 0, intervalId;
+    function flipTo(digitEl, newVal){
+      const current = digitEl.dataset.value || "0";
+      if (current === newVal) return;
 
-    function setupDigits(showSec) {
+      const top = digitEl.querySelector('.top .content');
+      const bottom = digitEl.querySelector('.bottom .content');
+
+      // Overlays
+      const topFlip = document.createElement('div');
+      topFlip.className = 'top-flip';
+      const topFlipSpan = document.createElement('span');
+      topFlipSpan.textContent = current;
+      topFlip.appendChild(topFlipSpan);
+
+      const bottomFlip = document.createElement('div');
+      bottomFlip.className = 'bottom-flip';
+      const bottomFlipSpan = document.createElement('span');
+      bottomFlipSpan.textContent = newVal;
+      bottomFlip.appendChild(bottomFlipSpan);
+
+      // Set base states
+      top.textContent = current;
+      bottom.textContent = current;
+
+      topFlip.addEventListener('animationend', () => {
+        top.textContent = newVal;
+        topFlip.remove();
+      });
+      bottomFlip.addEventListener('animationend', () => {
+        bottom.textContent = newVal;
+        digitEl.dataset.value = newVal;
+        bottomFlip.remove();
+      });
+
+      digitEl.appendChild(topFlip);
+      digitEl.appendChild(bottomFlip);
+    }
+
+    /* ====== Timer layout (HH:MM:SS optional) ====== */
+    let digits = []; // array of digit elements in order
+    let colons = [];
+    function setupDigits(showH, showS){
       timerEl.innerHTML = '';
       digits = [];
-      timerEl.appendChild(createDigit());
-      timerEl.appendChild(createDigit());
-      if (showSec) {
-        const colon = document.createElement('span');
-        colon.textContent = ':';
-        colon.style.color = getComputedStyle(timerEl).color;
-        colon.style.fontSize = '80px';
-        timerEl.appendChild(colon);
-        timerEl.appendChild(createDigit());
-        timerEl.appendChild(createDigit());
+      colons = [];
+      // Always at least MM (2 digits)
+      const addDigit = () => {
+        const d = createBaseDigit("0");
+        timerEl.appendChild(d);
+        digits.push(d);
+      };
+      const addColon = () => {
+        const c = document.createElement('div');
+        c.className = 'colon';
+        c.textContent = ':';
+        timerEl.appendChild(c);
+        colons.push(c);
+      };
+
+      if (showH){
+        addDigit(); addDigit(); // HH
+        addColon();
       }
-      digits = Array.from(timerEl.querySelectorAll('.digit'));
-      updateDisplay(remaining);
+      addDigit(); addDigit();   // MM
+      if (showS){
+        addColon();
+        addDigit(); addDigit(); // SS
+      }
+      // Ensure initial values are 00s
+      digits.forEach(d => { d.dataset.value = "0"; d.querySelectorAll('.content').forEach(s => s.textContent = '0'); });
+      restyleClockPanels(); // apply gradient + text color
     }
 
-    function flipTo(digit, newVal) {
-      const [top, backTop, bottom, backBottom] = digit.children;
-      const oldVal = top.textContent || '0';
-      if (oldVal === newVal) return;
-      backTop.textContent = oldVal;
-      bottom.textContent = newVal;
-      backBottom.textContent = newVal;
-      digit.classList.add('flipping');
-      digit.addEventListener('animationend', () => {
-        top.textContent = newVal;
-        digit.classList.remove('flipping');
-      }, { once: true });
+    function timeToArray(sec, showH, showS){
+      let h = Math.floor(sec/3600);
+      let m = Math.floor((sec%3600)/60);
+      let s = sec % 60;
+      // Limit hours to two digits (99h max visual)
+      h = Math.min(h, 99);
+      const arr = [];
+      if (showH){
+        arr.push(...String(h).padStart(2,'0').split(''));
+      }
+      arr.push(...String(m).padStart(2,'0').split(''));
+      if (showS){
+        arr.push(...String(s).padStart(2,'0').split(''));
+      }
+      return arr;
     }
 
-    function updateDisplay(sec) {
-      const m = Math.floor(sec/60), s = sec%60;
-      const arr = [
-        ...String(m).padStart(2,'0'),
-        ...(document.getElementById('toggleSec').checked
-          ? String(s).padStart(2,'0').split('') : [])
-      ];
-      digits.forEach((d,i) => flipTo(d, arr[i] || '0'));
+    function updateDisplay(sec){
+      const showH = $('#showHours').checked;
+      const showS = $('#showSeconds').checked;
+      const arr = timeToArray(sec, showH, showS);
+      digits.forEach((d,i) => {
+        flipTo(d, arr[i] || '0');
+      });
     }
 
-    function tick() {
-      if (remaining <= 0) {
-        clearInterval(intervalId);
-        document.getElementById('flame').style.opacity = '0';
-        document.getElementById('candle').style.opacity = '0';
-        document.getElementById('candle-out').style.display = 'block';
-        document.getElementById('candle-container').style.transform = 'translateY(220px) rotate(25deg)';
+    /* ====== Countdown logic & candle coupling ====== */
+    let totalSec = 0;
+    let remaining = 0;
+    let ticking = null;
+
+    const waxEl = $('#wax');
+    const wickEl = $('#wick');
+    const flameEl = $('#flame');
+    const stubEl = $('#stub');
+    const smokeEl = $('#smoke');
+    const candleWrap = $('#candleWrap');
+    const baseWaxHeight = 360; // px (matches CSS initial)
+
+    function positionFlame(){
+      // Position flame to sit just above the wick top
+      const wickRect = wickEl.getBoundingClientRect();
+      const wrapRect = candleWrap.getBoundingClientRect();
+      const flameH = flameEl.offsetHeight;
+      const topY = wickRect.top - wrapRect.top - flameH + 16; // +16 to tuck into wick
+      flameEl.style.top = `${Math.max(topY, -flameH)}px`;
+    }
+
+    function setWaxHeightByProgress(progress){ // progress: 0..1
+      const h = Math.max(40, baseWaxHeight * progress); // leave a small stub
+      waxEl.style.height = `${h}px`;
+      positionFlame();
+    }
+
+    function extinguish(){
+      flameEl.style.opacity = '0';
+      smokeEl.classList.remove('show');
+      void smokeEl.offsetWidth; // reflow
+      smokeEl.classList.add('show');
+      stubEl.style.display = 'block';
+    }
+
+    function relight(){
+      stubEl.style.display = 'none';
+      flameEl.style.opacity = ($('#flameOn').value === 'on') ? '1' : '0';
+    }
+
+    function tick(){
+      if (remaining <= 0){
+        clearInterval(ticking);
+        ticking = null;
+        updateDisplay(0);
+        setWaxHeightByProgress(0);
+        extinguish();
         return;
       }
       remaining--;
       updateDisplay(remaining);
+      const p = (totalSec > 0) ? (remaining / totalSec) : 0;
+      setWaxHeightByProgress(p);
     }
 
-    document.getElementById('startBtn').onclick = () => {
-      clearInterval(intervalId);
-      const m = +document.getElementById('minInput').value || 0;
-      const s = +document.getElementById('secInput').value || 0;
-      remaining = m*60 + s;
-      setupDigits(document.getElementById('toggleSec').checked);
-      intervalId = setInterval(tick, 1000);
-    };
+    /* ====== Event wiring ====== */
+    function start(){
+      const h = Math.max(0, parseInt($('#hoursInput').value || '0',10));
+      const m = Math.max(0, parseInt($('#minInput').value || '0',10));
+      const s = Math.max(0, Math.min(59, parseInt($('#secInput').value || '0',10)));
+      const showH = $('#showHours').checked;
+      const showS = $('#showSeconds').checked;
 
-    document.getElementById('toggleSec').onchange = () =>
-      setupDigits(document.getElementById('toggleSec').checked);
+      totalSec = h*3600 + m*60 + s;
+      remaining = totalSec;
 
-    document.getElementById('colorPicker').oninput = e =>
-      timerEl.querySelectorAll('.digit, span').forEach(el => el.style.color = e.target.value);
+      setupDigits(showH, showS);
+      updateDisplay(remaining);
 
-    document.getElementById('bgPicker').oninput = e =>
-      document.body.style.background = e.target.value;
+      relight();
+      setWaxHeightByProgress(1);
 
-    document.getElementById('candleColorPicker').oninput = e =>
-      document.getElementById('candle').style.background = e.target.value;
+      if (ticking) clearInterval(ticking);
+      ticking = setInterval(tick, 1000);
+    }
 
-    document.getElementById('fontPicker').onchange = e =>
-      document.body.style.fontFamily = `'${e.target.value}', sans-serif`;
+    function stop(){
+      if (ticking){ clearInterval(ticking); ticking = null; }
+    }
 
-    // Initial
-    setupDigits(true);
+    function reset(){
+      stop();
+      // Reset display to inputs, wax full, flame state, and layout
+      start();
+      stop();
+    }
+
+    // Background gradient binding
+    function applyBackground(){
+      const ang = parseInt($('#bgAngle').value||'135',10);
+      const c1 = $('#bgC1').value;
+      const c2 = $('#bgC2').value;
+      const c3 = $('#bgC3').value;
+      document.body.style.background = gradientStr(ang, c1, c2, c3);
+    }
+
+    // Clock panel gradient/text binding
+    function restyleClockPanels(){
+      const c1 = $('#clockC1').value;
+      const c2 = $('#clockC2').value;
+      const c3 = $('#clockC3').value;
+      const txt = $('#textColor').value;
+
+      document.documentElement.style.setProperty('--clock-c1', c1);
+      document.documentElement.style.setProperty('--clock-c2', c2);
+      document.documentElement.style.setProperty('--clock-c3', c3);
+      document.documentElement.style.setProperty('--clock-text', txt);
+    }
+
+    // Font binding
+    function applyFont(){
+      const f = $('#fontPicker').value;
+      document.body.style.fontFamily = `'${f}', sans-serif`;
+    }
+
+    // Candle color
+    function applyWax(){
+      const w = $('#waxColor').value;
+      document.documentElement.style.setProperty('--wax', w);
+    }
+
+    // Flame toggle
+    $('#flameOn').addEventListener('change', () => {
+      if ($('#flameOn').value === 'on'){
+        relight();
+      } else {
+        flameEl.style.opacity = '0';
+      }
+    });
+
+    // Control hooks
+    $('#startBtn').addEventListener('click', start);
+    $('#stopBtn').addEventListener('click', stop);
+    $('#resetBtn').addEventListener('click', reset);
+
+    $('#showHours').addEventListener('change', () => {
+      setupDigits($('#showHours').checked, $('#showSeconds').checked);
+      updateDisplay(remaining);
+    });
+    $('#showSeconds').addEventListener('change', () => {
+      setupDigits($('#showHours').checked, $('#showSeconds').checked);
+      updateDisplay(remaining);
+    });
+
+    // Style hooks
+    ['bgAngle','bgC1','bgC2','bgC3'].forEach(id => {
+      document.getElementById(id).addEventListener('input', applyBackground);
+    });
+    ['clockC1','clockC2','clockC3','textColor'].forEach(id => {
+      document.getElementById(id).addEventListener('input', restyleClockPanels);
+    });
+    $('#fontPicker').addEventListener('change', applyFont);
+    $('#waxColor').addEventListener('input', applyWax);
+
+    // Resize flame anchor on layout changes
+    window.addEventListener('resize', positionFlame);
+
+    // Init
+    applyBackground();
+    restyleClockPanels();
+    applyFont();
+    applyWax();
+    setupDigits(false, true);      // default MM:SS
+    updateDisplay(60);             // seed display
+    setWaxHeightByProgress(1);     // full candle
+    relight();                     // ensure flame matches select
+    positionFlame();               // correct initial flame position
   </script>
 </body>
 </html>
