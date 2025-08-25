@@ -76,17 +76,11 @@
   #todo-panel     { grid-column:2; justify-self:center; align-self:center; }
   #candle-area    { grid-column:3; }
 
-  /* Center Clock: keep To‑do LEFT, candle RIGHT; timer centered in viewport */
-  .center-clock .main{ grid-template-columns: max-content 1fr max-content; }
-  .center-clock #timer-container{
-    position:fixed; left:50%; top:50%;
-    transform:translate(-50%,-50%); z-index:15; min-width:0; width:auto;
-  }
-  .center-clock #todo-panel{
-    position:static; grid-column:1; justify-self:start; align-self:center;
-    margin-left:min(48px,5vw); z-index:16;
-  }
-  .center-clock #candle-area{ transform: translateY(0) !important; } /* prevent drop in center mode */
+  /* Center Clock: center within its original row (not viewport) */
+  .center-clock .main{ grid-template-columns: 1fr max-content 1fr; }
+  .center-clock #timer-container{ grid-column:2; justify-self:center; align-self:center; position:static; transform:none; z-index:5; }
+  .center-clock #todo-panel{ grid-column:1; justify-self:start; align-self:center; margin-left:min(48px,5vw); z-index:6; }
+  .center-clock #candle-area{ grid-column:3; justify-self:end; transform: translateY(var(--candle-offset)); } /* keep normal vertical offset */
 
   /* Hide candle → To‑do occupies RIGHT */
   .candle-off #candle-area{ display:none !important; }
@@ -99,7 +93,7 @@
   .center-clock.candle-off .main{ grid-template-columns: max-content 1fr; }
   .center-clock.candle-off #todo-panel{
     position:static !important; grid-column:1 !important; justify-self:start !important;
-    margin-left:min(48px,5vw) !important; z-index:16 !important;
+    margin-left:min(48px,5vw) !important; z-index:6 !important;
   }
 
   /* Only candle → center candle, hide clock; To‑do LEFT */
@@ -154,7 +148,6 @@
     border: 1px solid var(--clock-glass-border);
     backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     box-shadow: inset 0 -1px 0 rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.18), 0 10px 28px rgba(0,0,0,.22);
-    flex:0 0 auto;
   }
   .digit:before{ content:""; position:absolute; inset:0; background: var(--clock-glass-bg); pointer-events:none; }
   .digit .top,.digit .bottom{ position:absolute; left:0; right:0; height:50%; overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden; }
@@ -168,7 +161,7 @@
   .bottom-flip{ bottom:0; transform-origin:top; border-top:1px solid var(--split-line); animation: bottomFlip .26s ease-out forwards; }
   @keyframes topFlip{ 0%{transform:rotateX(0)} 100%{transform:rotateX(-90deg)} }
   @keyframes bottomFlip{ 0%{transform:rotateX(90deg)} 100%{transform:rotateX(0)} }
-  .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.3); flex:0 0 auto; }
+  .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.3); }
 
   /* ===== Simple clock ===== */
   #simpleTimer{
@@ -211,12 +204,13 @@
     position:relative; display:grid; grid-auto-flow:column; grid-auto-columns:minmax(260px,1fr); gap:14px; padding:16px;
     background:rgba(0,0,0,.22); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
     overflow-x:auto; border-top-left-radius:16px; border-top-right-radius:16px; z-index:20; min-height:200px;
+    border-top:1px solid rgba(255,255,255,.18);
   }
   .card{
     background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:12px; min-height:164px;
     display:flex; flex-direction:column; gap:8px; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
   }
-  /* Ensure the Start/Reset/Fullscreen row fits; scrolls horizontally if needed */
+  /* Keep Start/Reset/Fullscreen from overlapping next card */
   .timer-card{ min-width: 500px; }
   .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
   .row.row-actions{ flex-wrap:nowrap; }
@@ -908,10 +902,8 @@
   (function boot(){
     applyGradient(); restyleClockPanels(); applyWax();
 
-    // Force To‑do visible on load if toggle checked
+    // To‑do visible on load if toggle checked + glass on by default
     if ($("#showTodo")?.checked) document.body.classList.add("todo-on");
-
-    // Apply To‑do glass by default when checked
     if ($("#todoGlass")?.checked) $("#todo-panel").classList.add("todo-glass");
 
     applyLayoutFlags();
