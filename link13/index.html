@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Candle Timer – v1.4</title>
+<title>Candle Timer – v1.6</title>
 <style>
   :root{
     /* Flip sizes */
@@ -24,10 +24,12 @@
     --clock-c3: #3b3e4b;
     --clock-text: #ffffff;
 
-    /* Accent */
+    /* Accent + buttons */
     --accent: #ff9a00;
+    --btn-grad: linear-gradient(135deg,#ffd166,#ff9a00);
+    --btn-grad-hover: linear-gradient(135deg,#ffe08a,#ffb347);
 
-    /* Candle (slightly smaller than previous) */
+    /* Candle (slightly smaller) */
     --wax: #f0e1c3;
     --wick: #1b1b1b;
 
@@ -89,7 +91,7 @@
   .digit .top{ top:0; border-bottom:1px solid var(--split-line); }
   .digit .bottom{ bottom:0; border-top:1px solid var(--split-line); }
 
-  /* Full-height value layer ensures clean half clipping */
+  /* Full-height value layer; halves clipped with clip-path for perfect halves */
   .value{
     position:absolute; left:0; right:0;
     height:var(--digit-h);
@@ -98,18 +100,8 @@
     font-size: calc(var(--digit-h) * 0.70);
     line-height: var(--digit-h);
   }
-  /* Show only top half in the top card */
-  .top .value,
-  .top-flip .value{
-    transform: translateY(0);
-    clip-path: inset(0 0 50% 0);
-  }
-  /* Show only bottom half in the bottom card */
-  .bottom .value,
-  .bottom-flip .value{
-    transform: translateY(-50%);
-    clip-path: inset(50% 0 0 0);
-  }
+  .top .value, .top-flip .value{ clip-path: inset(0 0 50% 0); transform: translateY(0); }
+  .bottom .value, .bottom-flip .value{ clip-path: inset(50% 0 0 0); transform: translateY(-50%); }
 
   /* Flip overlays */
   .top-flip, .bottom-flip{
@@ -136,9 +128,11 @@
     text-shadow:0 2px 6px rgba(0,0,0,0.6);
   }
 
-  /* Candle right (slightly smaller) */
+  /* Candle right with clip wrapper to keep wax inside */
   #candle-area{ flex:1; display:flex; align-items:flex-end; justify-content:flex-end; min-width:340px; height:max(360px, 40vh); position:relative; }
-  .candle-wrap{ position:relative; width:160px; height:340px; display:flex; align-items:flex-end; justify-content:center; }
+  .candle-clip{ position:relative; width:160px; height:340px; overflow:hidden; display:flex; align-items:flex-end; justify-content:center; }
+  .candle-wrap{ position:absolute; left:0; right:0; bottom:0; margin:auto; width:160px; height:340px; display:flex; align-items:flex-end; justify-content:center; }
+
   .wax{
     position:absolute; bottom:0; width:130px; height:100%;
     background:
@@ -189,11 +183,11 @@
     100%{ transform:translateX(-50%) scale(1) rotate(-1.2deg); opacity:1 }
   }
   .stub{
-    display:none; position:absolute; bottom:0; width:130px; height:150px;
-    background: linear-gradient(180deg, #777, #555);
-    border-radius:18px; transform: rotate(22deg) translateY(-60px);
-    box-shadow: inset 0 6px 12px rgba(0,0,0,0.25), 0 12px 40px rgba(0,0,0,0.35);
-    opacity:.85;
+    display:none; position:absolute; bottom:0; width:130px; height:54px; /* small flat stub at end */
+    background: linear-gradient(180deg, #8a8a8a, #6b6b6b);
+    border-radius: 0 0 18px 18px;
+    box-shadow: inset 0 3px 8px rgba(0,0,0,0.25), 0 8px 26px rgba(0,0,0,0.35);
+    opacity:.9;
   }
   .smoke{ position:absolute; width:10px; height:10px; left:50%; transform:translateX(-50%); top:-24px; border-radius:50%; background:radial-gradient(#bbb, #0000 64%); opacity:0; pointer-events:none; }
   .smoke.show{ animation:puff 1.7s ease-out forwards; }
@@ -202,7 +196,7 @@
     100%{ transform:translate(-50%, -130px) scale(2.2); opacity:0; filter:blur(3px) }
   }
 
-  /* Controls (scroll-snap cards) */
+  /* Controls (non-overlapping) */
   #controls{
     position:relative; display:grid; grid-auto-flow:column; grid-auto-columns:minmax(240px,1fr);
     gap:14px; padding:16px; background:rgba(0,0,0,0.22); backdrop-filter:blur(8px);
@@ -219,7 +213,20 @@
     width:100%; padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,0.12); background:rgba(0,0,0,0.35); color:#fff; outline:none;
   }
   input[type="checkbox"]{ transform:scale(1.2) }
-  button{ padding:10px 14px; border-radius:10px; border:none; font-weight:700; cursor:pointer; background:var(--accent); color:#1b1b1b; }
+
+  /* Attractive buttons */
+  .btn{
+    padding:12px 18px; border-radius:12px; border:none; font-weight:800; cursor:pointer;
+    background: var(--btn-grad); color:#1b1b1b; box-shadow: 0 6px 16px rgba(0,0,0,0.25), 0 0 0 0 rgba(255,154,0,0.0);
+    transition: transform .12s ease, box-shadow .2s ease, background .2s ease;
+  }
+  .btn:hover{ background: var(--btn-grad-hover); box-shadow: 0 10px 24px rgba(0,0,0,0.32), 0 0 0 8px rgba(255,154,0,0.12); }
+  .btn:active{ transform: translateY(1px) scale(.99); }
+  .btn.alt{ background: linear-gradient(135deg,#a5b4fc,#6366f1); color:#0d0d15; }
+  .btn.alt:hover{ background: linear-gradient(135deg,#c7d2fe,#818cf8); box-shadow: 0 10px 24px rgba(0,0,0,0.32), 0 0 0 8px rgba(99,102,241,0.15); }
+  .btn.warn{ background: linear-gradient(135deg,#fca5a5,#ef4444); color:#0d0d15; }
+  .btn.warn:hover{ background: linear-gradient(135deg,#fecaca,#f87171); box-shadow: 0 10px 24px rgba(0,0,0,0.32), 0 0 0 8px rgba(239,68,68,0.15); }
+
   .small{ font-size:12px; opacity:.9 }
 
   /* Fullscreen mode */
@@ -228,7 +235,7 @@
   .fullscreen-on .main{ padding:10px min(3vw,28px) }
   .fullscreen-on :root{ --digit-w: 140px; --digit-h: 200px; }
 
-  /* Congrats overlay + balloons */
+  /* Congrats + balloons reused */
   #congrats{
     position:fixed; inset:0; display:none; align-items:center; justify-content:center; flex-direction:column;
     background: rgba(0,0,0,0.35); z-index:60; backdrop-filter: blur(2px);
@@ -245,12 +252,9 @@
     position:fixed; bottom:-120px; width:28px; height:36px; border-radius:50% 50% 45% 45%;
     background: radial-gradient(circle at 30% 30%, #ffffff88, #ffffff00 40%), var(--bcol, #f87171);
     box-shadow: inset -6px -12px 16px rgba(0,0,0,0.12);
-    z-index:61;
-    animation: floatUp var(--dur, 6s) linear forwards;
+    z-index:61; animation: floatUp var(--dur, 6s) linear forwards;
   }
-  .balloon:after{
-    content:""; position:absolute; bottom:-16px; left:50%; width:2px; height:18px; background:#fff8; transform:translateX(-50%);
-  }
+  .balloon:after{ content:""; position:absolute; bottom:-16px; left:50%; width:2px; height:18px; background:#fff8; transform:translateX(-50%); }
   @keyframes floatUp{
     0%{ transform: translateY(0) translateX(0) scale(1); opacity:.95 }
     100%{ transform: translateY(-120vh) translateX(var(--drift, 40px)) scale(1.05); opacity:1 }
@@ -277,13 +281,13 @@
 
     <!-- Candle -->
     <section id="candle-area" aria-label="Candle">
-      <div class="candle-wrap" id="candleWrap">
-        <div class="wax" id="wax">
-          <div class="wick" id="wick"></div>
+      <div class="candle-clip">
+        <div class="candle-wrap" id="candleWrap">
+          <div class="wax" id="wax"><div class="wick" id="wick"></div></div>
+          <div class="flame" id="flame"></div>
+          <div class="stub" id="stub"></div>
+          <div class="smoke" id="smoke"></div>
         </div>
-        <div class="flame" id="flame"></div>
-        <div class="stub" id="stub"></div>
-        <div class="smoke" id="smoke"></div>
       </div>
     </section>
   </div>
@@ -293,50 +297,28 @@
     <div class="card">
       <label class="small">Timer</label>
       <div class="row">
-        <div style="flex:1">
-          <label for="hoursInput">Hours</label>
-          <input id="hoursInput" type="number" min="0" value="0">
-        </div>
-        <div style="flex:1">
-          <label for="minInput">Minutes</label>
-          <input id="minInput" type="number" min="0" value="1">
-        </div>
-        <div style="flex:1">
-          <label for="secInput">Seconds</label>
-          <input id="secInput" type="number" min="0" max="59" value="0">
-        </div>
+        <div style="flex:1"><label for="hoursInput">Hours</label><input id="hoursInput" type="number" min="0" value="0"></div>
+        <div style="flex:1"><label for="minInput">Minutes</label><input id="minInput" type="number" min="0" value="1"></div>
+        <div style="flex:1"><label for="secInput">Seconds</label><input id="secInput" type="number" min="0" max="59" value="0"></div>
       </div>
       <div class="row">
         <label><input type="checkbox" id="showHours"> Show hours</label>
         <label><input type="checkbox" id="showSeconds" checked> Show seconds</label>
       </div>
       <div class="row">
-        <button id="startBtn">Start</button>
-        <button id="stopBtn"  style="background:#fca5a5">Stop</button>
-        <button id="resetBtn" style="background:#ffd166">Reset</button>
-        <button id="fsBtn"    style="background:#93c5fd">Fullscreen</button>
+        <button id="startBtn" class="btn">Start</button>
+        <button id="resetBtn" class="btn alt">Reset</button>
+        <button id="fsBtn" class="btn warn">Fullscreen</button>
       </div>
     </div>
 
     <div class="card">
       <label class="small">Background gradient</label>
       <div class="row">
-        <div style="flex:1">
-          <label for="bgAngle">Angle</label>
-          <input id="bgAngle" type="number" min="0" max="360" value="135">
-        </div>
-        <div style="flex:1">
-          <label for="bgC1">Color 1</label>
-          <input id="bgC1" type="color" value="#3a1c71">
-        </div>
-        <div style="flex:1">
-          <label for="bgC2">Color 2</label>
-          <input id="bgC2" type="color" value="#d76d77">
-        </div>
-        <div style="flex:1">
-          <label for="bgC3">Color 3</label>
-          <input id="bgC3" type="color" value="#ffaf7b">
-        </div>
+        <div style="flex:1"><label for="bgAngle">Angle</label><input id="bgAngle" type="number" min="0" max="360" value="135"></div>
+        <div style="flex:1"><label for="bgC1">Color 1</label><input id="bgC1" type="color" value="#3a1c71"></div>
+        <div style="flex:1"><label for="bgC2">Color 2</label><input id="bgC2" type="color" value="#d76d77"></div>
+        <div style="flex:1"><label for="bgC3">Color 3</label><input id="bgC3" type="color" value="#ffaf7b"></div>
       </div>
       <span class="small">Mix 2–3 colors; adjust angle for direction.</span>
     </div>
@@ -350,27 +332,7 @@
       </div>
       <div class="row">
         <div style="flex:1"><label for="textColor">Text color</label><input id="textColor" type="color" value="#ffffff"></div>
-        <div style="flex:1"><label for="fontPicker">Font</label>
-          <select id="fontPicker">
-            <option selected>Comic Sans MS</option>
-            <option>Arial</option>
-            <option>Verdana</option>
-            <option>Courier New</option>
-            <option>Georgia</option>
-          </select>
-        </div>
       </div>
-    </div>
-
-    <div class="card">
-      <label class="small">Candle</label>
-      <div class="row">
-        <div style="flex:1"><label for="waxColor">Wax color</label><input id="waxColor" type="color" value="#f0e1c3"></div>
-        <div style="flex:1"><label for="flameOn">Flame</label>
-          <select id="flameOn"><option value="on" selected>On</option><option value="off">Off</option></select>
-        </div>
-      </div>
-      <span class="small">Burn height follows the timer.</span>
     </div>
   </div>
 
@@ -379,7 +341,7 @@
     <div class="congrats-card">
       <div class="congrats-title">Congratulations!</div>
       <div class="congrats-sub">The timer is complete. Great focus!</div>
-      <button id="closeCongrats">Close</button>
+      <button id="closeCongrats" class="btn alt">Close</button>
     </div>
   </div>
 
@@ -417,6 +379,10 @@
     return d;
   }
 
+  function cleanupFlips(){
+    document.querySelectorAll('.top-flip,.bottom-flip').forEach(e=>e.remove());
+  }
+
   function flipTo(digitEl, newVal){
     const current = digitEl.dataset.value || "0";
     if (current === newVal) return;
@@ -424,7 +390,6 @@
     const topVal = digitEl.querySelector('.top .value');
     const botVal = digitEl.querySelector('.bottom .value');
 
-    // Overlays
     const topFlip = document.createElement('div');
     topFlip.className = 'top-flip';
     const topFlipVal = document.createElement('span');
@@ -439,7 +404,6 @@
     bottomFlipVal.textContent = newVal;
     bottomFlip.appendChild(bottomFlipVal);
 
-    // Base shows current until swap points
     topVal.textContent = current;
     botVal.textContent = current;
 
@@ -489,10 +453,10 @@
     digits.forEach((d,i) => flipTo(d, arr[i] || '0'));
   }
 
-  /* Candle coupling (smaller candle) */
+  /* Candle coupling (smaller candle + clip) */
   const waxEl = $('#wax'), wickEl = $('#wick'), flameEl = $('#flame'), stubEl = $('#stub'), smokeEl = $('#smoke'), candleWrap = $('#candleWrap');
   const baseWaxHeight = 340; // px
-  const minStub = 44;
+  const minStub = 54;
 
   function positionFlame(){
     const wickRect = wickEl.getBoundingClientRect();
@@ -516,9 +480,10 @@
   }
   function relight(){
     stubEl.style.display = 'none';
-    flameEl.style.opacity = ($('#flameOn').value === 'on') ? '1' : '0';
+    flameEl.style.opacity = '1';
   }
 
+  /* Balloons */
   function launchBalloons(count=16){
     const colors = ['#f87171','#60a5fa','#34d399','#fbbf24','#a78bfa','#fb7185','#22d3ee'];
     for (let i=0;i<count;i++){
@@ -554,6 +519,7 @@
 
     relight();
     setWaxHeightByProgress(1);
+    cleanupFlips();
 
     if (ticking) clearInterval(ticking);
     if (remaining <= 0){
@@ -572,6 +538,7 @@
       updateDisplay(0);
       setWaxHeightByProgress(0);
       extinguish();
+      cleanupFlips();
       congrats.classList.add('show');
       launchBalloons();
       return;
@@ -582,9 +549,13 @@
     setWaxHeightByProgress(p);
   }
 
-  function stop(){ if (ticking){ clearInterval(ticking); ticking=null; } }
-  function reset(){ stop(); start(); stop(); }
+  function reset(){
+    if (ticking){ clearInterval(ticking); ticking=null; }
+    start();
+    if (ticking){ clearInterval(ticking); ticking=null; }
+  }
 
+  /* Styling bindings */
   function applyBackground(){
     const ang = parseInt($('#bgAngle').value||'135',10);
     const c1 = $('#bgC1').value, c2 = $('#bgC2').value, c3 = $('#bgC3').value;
@@ -597,27 +568,20 @@
     document.documentElement.style.setProperty('--clock-c3', c3);
     document.documentElement.style.setProperty('--clock-text', txt);
   }
-  function applyFont(){ document.body.style.fontFamily = `'${$('#fontPicker').value}', sans-serif`; }
-  function applyWax(){ document.documentElement.style.setProperty('--wax', $('#waxColor').value); }
 
   // UI wiring
   $('#startBtn').addEventListener('click', start);
-  $('#stopBtn').addEventListener('click', stop);
   $('#resetBtn').addEventListener('click', reset);
   $('#showHours').addEventListener('change', ()=>{ setupDigits($('#showHours').checked, $('#showSeconds').checked); updateDisplay(remaining); });
   $('#showSeconds').addEventListener('change', ()=>{ setupDigits($('#showHours').checked, $('#showSeconds').checked); updateDisplay(remaining); });
 
   ['bgAngle','bgC1','bgC2','bgC3'].forEach(id => document.getElementById(id).addEventListener('input', applyBackground));
   ['clockC1','clockC2','clockC3','textColor'].forEach(id => document.getElementById(id).addEventListener('input', restyleClockPanels));
-  $('#fontPicker').addEventListener('change', applyFont);
-  $('#waxColor').addEventListener('input', applyWax);
-  $('#flameOn').addEventListener('change', ()=>{ if ($('#flameOn').value==='on') relight(); else flameEl.style.opacity='0'; });
 
   // Fullscreen controls
   async function goFullscreen(){
     try{
-      if (document.fullscreenElement) return;
-      document.documentElement.requestFullscreen?.();
+      if (!document.fullscreenElement){ await document.documentElement.requestFullscreen(); }
       document.body.classList.add('fullscreen-on');
       $('#exitFs').style.display = 'block';
     }catch(e){}
@@ -633,14 +597,11 @@
     if (!document.fullscreenElement){ document.body.classList.remove('fullscreen-on'); $('#exitFs').style.display='none'; }
   });
 
+  // Layout + init
   window.addEventListener('resize', positionFlame);
-
-  // Init
   applyBackground();
   restyleClockPanels();
-  applyFont();
-  applyWax();
-  setupDigits(false, true);
+  setupDigits(false, true); // default MM:SS
   updateDisplay(60);
   setWaxHeightByProgress(1);
   relight();
