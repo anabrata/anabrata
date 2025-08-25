@@ -3,25 +3,21 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>Candle Timer — V7</title>
+<title>Candle Timer — V8</title>
 <style>
   :root{
-    /* Digit sizes */
     --digit-w: 120px;
     --digit-h: 170px;
     --digit-radius: 16px;
     --split-line: rgba(0,0,0,0.10);
 
-    /* Spacing */
     --gap: clamp(24px, 5vw, 56px);
 
-    /* Background gradient */
     --bg-angle: 135deg;
     --bg-c1: #3a1c71;
     --bg-c2: #d76d77;
     --bg-c3: #ffaf7b;
 
-    /* Flip clock colors (glassy overlay supported) */
     --clock-c1: #ffffff;
     --clock-c2: #ffffff;
     --clock-c3: #ffffff;
@@ -30,17 +26,13 @@
     --clock-glass-bg: rgba(255,255,255,0.06);
     --clock-glass-border: rgba(255,255,255,0.18);
 
-    /* Simple (non‑flip) clock */
     --simple-color: #ffffff;
 
-    /* Candle */
     --wax: #f2e4c7;
     --wick: #1b1b1b;
 
-    /* Layout tweak */
     --candle-offset: 18px;
 
-    /* To‑do base bg (transparent by default) */
     --todo-bg: transparent;
   }
 
@@ -108,7 +100,7 @@
   }
   .only-candle #candle-area{ grid-column: 2; justify-self: center; }
 
-  /* To‑do panel visibility via .todo-on */
+  /* To‑do visibility via .todo-on */
   #todo-panel{ display:none; }
   .todo-on #todo-panel{ display:block; }
 
@@ -123,9 +115,7 @@
     box-shadow: 0 6px 18px rgba(0,0,0,.16), 0 2px 5px rgba(0,0,0,.1);
     color:#fff;
   }
-  #todo-panel.todo-clear{
-    background: transparent !important; border-color: transparent !important; box-shadow: none !important;
-  }
+  #todo-panel.todo-clear{ background: transparent !important; border-color: transparent !important; box-shadow: none !important; }
   #todo-panel.todo-glass{
     background: rgba(255,255,255,.06) !important;
     border:1px solid rgba(255,255,255,.12) !important;
@@ -152,17 +142,10 @@
     background-blend-mode: screen;
     border: 1px solid var(--clock-glass-border);
     backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-    box-shadow:
-      inset 0 -1px 0 rgba(0,0,0,.10),
-      inset 0 1px 0 rgba(255,255,255,.18),
-      0 10px 28px rgba(0,0,0,.22);
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.18), 0 10px 28px rgba(0,0,0,.22);
     flex:0 0 auto;
   }
-  .digit:before{
-    content:""; position:absolute; inset:0;
-    background: var(--clock-glass-bg);
-    pointer-events:none;
-  }
+  .digit:before{ content:""; position:absolute; inset:0; background: var(--clock-glass-bg); pointer-events:none; }
   .digit .top,.digit .bottom{ position:absolute; left:0; right:0; height:50%; overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden; }
   .digit .top{ top:0; border-bottom:1px solid var(--split-line); }
   .digit .bottom{ bottom:0; border-top:1px solid var(--split-line); }
@@ -188,9 +171,22 @@
   .waxTop{ position:absolute; top:-22px; left:50%; transform:translateX(-50%); width:150px; height:44px; pointer-events:none; z-index:3; background: conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,.33) 0deg, rgba(255,255,255,.10) 70deg, rgba(0,0,0,.08) 180deg, rgba(255,255,255,.20) 300deg, rgba(255,255,255,.33) 360deg), radial-gradient(65% 55% at 50% 62%, rgba(255,255,255,.52), rgba(255,255,255,.12) 60%, rgba(0,0,0,.10) 100%); border-radius:50%/62% 62% 38% 38%; }
   .wax:after{ content:""; position:absolute; top:30px; left:24px; width:12px; height:64px; border-radius:10px; background: linear-gradient(180deg,#fff6,#0000 60%), var(--wax); box-shadow: 44px 8px 0 -3px var(--wax), 44px 8px 0 -3px #fff6, 92px 12px 0 -6px var(--wax), 92px 12px 0 -6px #fff6; opacity:.85; }
   .wick{ position:absolute; width:6px; height:30px; background:linear-gradient(180deg,#444,var(--wick)); border-radius:4px; top:-12px; left:50%; transform:translateX(-50%); z-index:4; }
-  .flame{ position:absolute; width:52px; height:110px; z-index:6; pointer-events:none; background: radial-gradient(ellipse at 50% 22%, #fff7c0 0%, #ffe08a 38%, #ffb347 58%, #ff7a00 78%, transparent 80%), radial-gradient(ellipse at 50% 45%, #ffffff 0%, transparent 65%); border-radius:50% 50% 38% 38%; box-shadow:0 0 18px 6px rgba(255,170,40,.55), 0 0 36px 14px rgba(255,140,0,.40), 0 -20px 28px rgba(255,220,170,.40); animation: flickerSoft .6s ease-in-out infinite; left:0; top:0; will-change:left,top; }
+
+  /* Flame container is anchored to wick center (uses translate) */
+  .flame{
+    position:absolute; width:52px; height:110px; z-index:6; pointer-events:none;
+    left:0; top:0; transform: translate(-50%,-100%) translateY(10px);
+  }
+  .flame-core{
+    position:absolute; inset:0; border-radius:50% 50% 38% 38%;
+    background: radial-gradient(ellipse at 50% 22%, #fff7c0 0%, #ffe08a 38%, #ffb347 58%, #ff7a00 78%, transparent 80%),
+                radial-gradient(ellipse at 50% 45%, #ffffff 0%, transparent 65%);
+    box-shadow:0 0 18px 6px rgba(255,170,40,.55), 0 0 36px 14px rgba(255,140,0,.40), 0 -20px 28px rgba(255,220,170,.40);
+    animation: flickerSoft .6s ease-in-out infinite;
+  }
   @keyframes flickerSoft{ 0%{ transform:scale(1) rotate(-0.8deg); opacity:.95 } 50%{ transform:scale(1.06) rotate(0.6deg); opacity:.82 } 100%{ transform:scale(1) rotate(-0.8deg); opacity:.95 } }
-  .flame.off{ opacity:0 !important; animation-play-state: paused !important; }
+  .flame.off .flame-core{ opacity:0 !important; animation-play-state: paused !important; }
+
   .stub{ display:none; position:absolute; bottom:0; width:150px; height:58px; background:linear-gradient(180deg,#9a9a9a,#6f6f6f); border-radius:0 0 22px 22px; z-index:1; }
 
   /* ===== Controls (glass) ===== */
@@ -226,11 +222,7 @@
     #todo-panel{ max-width:72vw; }
   }
 
-  /* Utility: snap without animations during resets */
-  .no-transitions, .no-transitions *{
-    transition: none !important;
-    animation: none !important;
-  }
+  .no-transitions, .no-transitions *{ transition: none !important; animation: none !important; }
 
   /* ===== 3-2-1 Count-in Overlay ===== */
   #countOverlay{
@@ -292,7 +284,7 @@
 </style>
 </head>
 <body>
-  <div class="brand">MADE BY ANABRATA — V7</div>
+  <div class="brand">MADE BY ANABRATA — V8</div>
 
   <div class="main" id="main">
     <!-- Timer -->
@@ -318,7 +310,8 @@
           <div class="stub" id="stub"></div>
         </div>
       </div>
-      <div class="flame" id="flame"></div>
+      <!-- Flame container with animated core -->
+      <div class="flame" id="flame"><div class="flame-core"></div></div>
     </section>
   </div>
 
@@ -402,7 +395,6 @@
       <p id="cgMsg">Timer complete — great focus! 🎉</p>
       <button id="cgClose">Close</button>
     </div>
-    <!-- Balloons -->
     <div class="balloon" style="left:6%;  --bcol:#ff6b6b; --dur:9s;  --drift:12px"></div>
     <div class="balloon" style="left:14%; --bcol:#ffd166; --dur:8.5s;--drift:-10px"></div>
     <div class="balloon" style="left:22%; --bcol:#06d6a0; --dur:10s; --drift:8px"></div>
@@ -435,8 +427,8 @@
       bgObjectUrl = null;
       const nameEl = $("#bgImageName"); if (nameEl) nameEl.textContent = "";
     }
-    const ang = parseInt($("#bgAngle").value || "135", 10);
-    document.body.style.backgroundImage = gradientStr(ang, $("#bgC1").value, $("#bgC2").value, $("#bgC3").value);
+    const ang = parseInt($("#bgAngle")?.value || "135", 10);
+    document.body.style.backgroundImage = gradientStr(ang, $("#bgC1")?.value || "#3a1c71", $("#bgC2")?.value || "#d76d77", $("#bgC3")?.value || "#ffaf7b");
     document.body.style.backgroundSize = "cover";
     document.body.style.backgroundPosition = "center";
     document.body.style.backgroundAttachment = "fixed";
@@ -451,6 +443,7 @@
   }
 
   function restyleClockPanels(){
+    if (!$("#clockC1")) return;
     document.documentElement.style.setProperty("--clock-c1", $("#clockC1").value);
     document.documentElement.style.setProperty("--clock-c2", $("#clockC2").value);
     document.documentElement.style.setProperty("--clock-c3", $("#clockC3").value);
@@ -558,8 +551,8 @@
 
   /* ---------- Simple clock ---------- */
   function renderSimple(sec){
-    const sH = $("#showHours").checked;
-    const sS = $("#showSeconds").checked;
+    const sH = $("#showHours")?.checked;
+    const sS = $("#showSeconds")?.checked;
     const out = sH
       ? `${String(Math.floor(sec / 3600)).padStart(2, "0")}:${String(Math.floor((sec % 3600) / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`
       : `${String(Math.floor(sec / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`;
@@ -583,12 +576,12 @@
   let countInActive = false;
 
   function safeBuildClock(){
-    useFlip = $("#useFlip").checked;
+    useFlip = $("#useFlip")?.checked ?? true;
     if (useFlip){
       timerFlip.style.display = "flex";
       timerSimple.style.display = "none";
-      flipDigits = buildFlip(timerFlip, $("#showHours").checked, $("#showSeconds").checked);
-      tickFlip(flipDigits, 0, $("#showHours").checked, $("#showSeconds").checked);
+      flipDigits = buildFlip(timerFlip, $("#showHours")?.checked ?? false, $("#showSeconds")?.checked ?? true);
+      tickFlip(flipDigits, 0, $("#showHours")?.checked ?? false, $("#showSeconds")?.checked ?? true);
     }else{
       timerFlip.style.display = "none";
       timerSimple.style.display = "block";
@@ -597,31 +590,28 @@
   }
 
   function ensureVisible(){
-    // Guarantee to‑do visibility when checkbox is on
-    if ($("#showTodo").checked && !document.body.classList.contains("todo-on")){
+    if ($("#showTodo")?.checked && !document.body.classList.contains("todo-on")){
       document.body.classList.add("todo-on");
     }
-    // Ensure clock digits are mounted
-    if ($("#useFlip").checked && (timerFlip.style.display !== "none") && timerFlip.children.length === 0){
+    if (($("#useFlip")?.checked ?? true) && timerFlip.style.display !== "none" && timerFlip.children.length === 0){
       safeBuildClock();
     }
   }
 
   function startCountdown(){
-    const h = Math.max(0, parseInt($("#hoursInput").value || "0", 10));
-    const m = Math.max(0, parseInt($("#minInput").value || "0", 10));
-    const s = Math.max(0, Math.min(59, parseInt($("#secInput").value || "0", 10)));
+    const h = Math.max(0, parseInt($("#hoursInput")?.value || "0", 10));
+    const m = Math.max(0, parseInt($("#minInput")?.value || "0", 10));
+    const s = Math.max(0, Math.min(59, parseInt($("#secInput")?.value || "0", 10)));
     totalSec = h * 3600 + m * 60 + s;
 
-    // Reset candle/flame
     candleWrap.classList.remove("vanish");
     stubEl.style.display = "none";
     flameEl.classList.remove("off");
     setWaxHeightByProgress(1);
     afterNextPaint(positionFlame);
 
-    const showH = $("#showHours").checked;
-    const showS = $("#showSeconds").checked;
+    const showH = $("#showHours")?.checked ?? false;
+    const showS = $("#showSeconds")?.checked ?? true;
     if (useFlip){
       flipDigits = buildFlip(timerFlip, showH, showS);
       tickFlip(flipDigits, totalSec, showH, showS);
@@ -633,10 +623,7 @@
     paused = false;
     running = false;
 
-    if (totalSec <= 0){
-      finishNow();
-      return;
-    }
+    if (totalSec <= 0){ finishNow(); return; }
     endAtMs = performance.now() + totalSec * 1000;
     lastWhole = Math.ceil(totalSec);
     running = true;
@@ -651,7 +638,7 @@
 
     if (secWhole !== lastWhole){
       if (useFlip){
-        tickFlip(flipDigits, secWhole, $("#showHours").checked, $("#showSeconds").checked);
+        tickFlip(flipDigits, secWhole, $("#showHours")?.checked ?? false, $("#showSeconds")?.checked ?? true);
       }else{
         renderSimple(secWhole);
       }
@@ -662,14 +649,10 @@
     setWaxHeightByProgress(p);
     positionFlame();
 
-    if (remainMs <= 0){
-      finishNow();
-      return;
-    }
+    if (remainMs <= 0){ finishNow(); return; }
     rafId = requestAnimationFrame(loop);
   }
 
-  // 3‑2‑1 count‑in overlay before starting
   async function startWithCountIn(){
     if (countInActive) return;
     countInActive = true;
@@ -695,51 +678,29 @@
   }
 
   function togglePrimary(){
-    if (!running && !paused){
-      startWithCountIn();
-      return;
-    }
+    if (!running && !paused){ startWithCountIn(); return; }
     if (running){
       cancelAnimationFrame(rafId);
       pauseRemainMs = Math.max(0, endAtMs - performance.now());
-      paused = true;
-      running = false;
-      primaryBtn.textContent = "Resume";
-      afterNextPaint(positionFlame);
-      return;
+      paused = true; running = false; primaryBtn.textContent = "Resume"; afterNextPaint(positionFlame); return;
     }
     if (paused){
-      endAtMs = performance.now() + pauseRemainMs;
-      lastWhole = Math.floor(pauseRemainMs / 1000);
-      paused = false;
-      running = true;
-      primaryBtn.textContent = "Stop";
-      afterNextPaint(positionFlame);
+      endAtMs = performance.now() + pauseRemainMs; lastWhole = Math.floor(pauseRemainMs / 1000);
+      paused = false; running = true; primaryBtn.textContent = "Stop"; afterNextPaint(positionFlame);
       rafId = requestAnimationFrame(loop);
     }
   }
 
   function resetCountdown(){
-    cancelAnimationFrame(rafId);
-    running = false;
-    paused = false;
-    primaryBtn.textContent = "Start";
-    safeBuildClock();
-    snapResetCandle();
-    hideCongrats();
-    $("#countOverlay").style.display = "none";
-    countInActive = false;
+    cancelAnimationFrame(rafId); running=false; paused=false; primaryBtn.textContent="Start";
+    safeBuildClock(); snapResetCandle(); hideCongrats();
+    $("#countOverlay").style.display = "none"; countInActive = false;
     afterNextPaint(ensureVisible);
   }
 
   function finishNow(){
-    cancelAnimationFrame(rafId);
-    running = false;
-    paused = false;
-    flameEl.classList.add("off");
-    candleWrap.classList.add("vanish");
-    showCongrats();
-    primaryBtn.textContent = "Start";
+    cancelAnimationFrame(rafId); running=false; paused=false;
+    flameEl.classList.add("off"); candleWrap.classList.add("vanish"); showCongrats(); primaryBtn.textContent="Start";
   }
 
   /* ---------- Candle & flame positioning ---------- */
@@ -752,16 +713,15 @@
 
   const baseWaxHeight = 380;
   const minStub = 58;
-  const FLAME_OFFSET = 10;
 
   function positionFlame(){
-    if (getComputedStyle(area).display === "none") return;
+    if (!area || getComputedStyle(area).display === "none") return;
     const a = area.getBoundingClientRect();
     const w = wickEl.getBoundingClientRect();
-    const x = w.left + w.width / 2 - a.left - flameEl.offsetWidth / 2;
-    const y = w.top - a.top - flameEl.offsetHeight + FLAME_OFFSET;
-    flameEl.style.left = `${x}px`;
-    flameEl.style.top = `${y}px`;
+    const cx = w.left + w.width / 2 - a.left;
+    const topAnchor = w.top - a.top;
+    flameEl.style.left = `${cx}px`;
+    flameEl.style.top = `${topAnchor + 6}px`; /* tiny offset so flame base meets wick */
   }
 
   function setWaxHeightByProgress(progress){
@@ -771,24 +731,16 @@
   }
 
   function snapResetCandle(){
-    candleWrap.classList.add("no-transitions");
-    waxEl.classList.add("no-transitions");
-    candleWrap.classList.remove("vanish");
-    stubEl.style.display = "none";
-    flameEl.classList.remove("off");
-    setWaxHeightByProgress(1);
-    void candleWrap.offsetHeight; /* force style flush */
-    positionFlame();
-    requestAnimationFrame(() => {
-      candleWrap.classList.remove("no-transitions");
-      waxEl.classList.remove("no-transitions");
-    });
+    candleWrap.classList.add("no-transitions"); waxEl.classList.add("no-transitions");
+    candleWrap.classList.remove("vanish"); stubEl.style.display="none"; flameEl.classList.remove("off");
+    setWaxHeightByProgress(1); void candleWrap.offsetHeight; positionFlame();
+    requestAnimationFrame(()=>{ candleWrap.classList.remove("no-transitions"); waxEl.classList.remove("no-transitions"); });
   }
 
-  new ResizeObserver(() => requestAnimationFrame(() => positionFlame())).observe(area);
-  new MutationObserver(() => requestAnimationFrame(() => positionFlame())).observe(document.body, { attributes: true, attributeFilter: ["class"] });
-  waxEl.addEventListener("transitionend", () => requestAnimationFrame(() => positionFlame()));
-  window.addEventListener("resize", () => requestAnimationFrame(() => positionFlame()));
+  new ResizeObserver(()=> requestAnimationFrame(()=>positionFlame())).observe(area);
+  new MutationObserver(()=> requestAnimationFrame(()=>positionFlame())).observe(document.body,{attributes:true,attributeFilter:["class"]});
+  waxEl.addEventListener("transitionend", ()=> requestAnimationFrame(()=>positionFlame()));
+  window.addEventListener("resize", ()=> requestAnimationFrame(()=>positionFlame()));
 
   /* ---------- Congrats overlay ---------- */
   const congrats = $("#congrats");
@@ -799,166 +751,62 @@
   /* ---------- Fullscreen: whole page; hide brand & menu only ---------- */
   async function enterFullscreen(){
     try{
-      if (!document.fullscreenElement){
-        await document.documentElement.requestFullscreen?.();
-      }else{
-        await document.exitFullscreen?.();
-      }
+      if (!document.fullscreenElement){ await document.documentElement.requestFullscreen?.(); }
+      else { await document.exitFullscreen?.(); }
     }catch(e){}
   }
   $("#fsBtn").addEventListener("click", enterFullscreen);
-  document.addEventListener("fullscreenchange", () => {
-    document.body.classList.toggle("is-fs", !!document.fullscreenElement);
-  });
+  document.addEventListener("fullscreenchange", () => { document.body.classList.toggle("is-fs", !!document.fullscreenElement); });
 
   /* ---------- To‑do logic ---------- */
   const todoList = $("#todoList");
 
   function makeTodoItem(text = ""){
     const li = document.createElement("li");
-    const label = document.createElement("label");
-    label.className = "todoItem";
-    const chk = document.createElement("input");
-    chk.type = "checkbox";
-    chk.className = "todoChk";
-    const span = document.createElement("span");
-    span.className = "todoText";
-    span.contentEditable = "true";
-    span.spellcheck = false;
-    span.textContent = text;
-    label.appendChild(chk);
-    label.appendChild(span);
-    li.appendChild(label);
-    return li;
+    const label = document.createElement("label"); label.className = "todoItem";
+    const chk = document.createElement("input"); chk.type = "checkbox"; chk.className = "todoChk";
+    const span = document.createElement("span"); span.className = "todoText"; span.contentEditable = "true"; span.spellcheck = false; span.textContent = text;
+    label.appendChild(chk); label.appendChild(span); li.appendChild(label); return li;
   }
-
-  function spanFocus(el){
-    el.focus();
-    const r = document.createRange();
-    r.selectNodeContents(el);
-    r.collapse(false);
-    const s = window.getSelection();
-    s.removeAllRanges();
-    s.addRange(r);
-  }
-
-  function addEmptyIfNeeded(){
-    if (!todoList.firstElementChild){
-      const li = makeTodoItem("");
-      todoList.appendChild(li);
-      spanFocus(li.querySelector(".todoText"));
-    }
-  }
-
-  todoList.addEventListener("keydown", (e) => {
-    if (!e.target.classList?.contains("todoText")) return;
-    if (e.key === "Enter"){
-      if (e.shiftKey) return;
-      e.preventDefault();
-      const li = e.target.closest("li");
-      const n = makeTodoItem("");
-      li.after(n);
-      spanFocus(n.querySelector(".todoText"));
-    }
-    if (e.key === "Backspace" && e.target.textContent.trim() === ""){
-      const li = e.target.closest("li");
-      const prev = li.previousElementSibling?.querySelector(".todoText");
-      if (prev){
-        e.preventDefault();
-        li.remove();
-        spanFocus(prev);
-      }
-      addEmptyIfNeeded();
-    }
+  function spanFocus(el){ el.focus(); const r=document.createRange(); r.selectNodeContents(el); r.collapse(false); const s=window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+  function addEmptyIfNeeded(){ if(!todoList.firstElementChild){ const li=makeTodoItem(""); todoList.appendChild(li); spanFocus(li.querySelector(".todoText")); } }
+  todoList.addEventListener("keydown",(e)=>{
+    if(!e.target.classList?.contains("todoText")) return;
+    if(e.key==="Enter"){ if(e.shiftKey) return; e.preventDefault(); const li=e.target.closest("li"); const n=makeTodoItem(""); li.after(n); spanFocus(n.querySelector(".todoText")); }
+    if(e.key==="Backspace" && e.target.textContent.trim()===""){ const li=e.target.closest("li"); const prev=li.previousElementSibling?.querySelector(".todoText"); if(prev){ e.preventDefault(); li.remove(); spanFocus(prev);} addEmptyIfNeeded(); }
   });
+  todoList.addEventListener("change",(e)=>{ if(!e.target.classList?.contains("todoChk")) return; const li=e.target.closest("li"); li.classList.add("vanish"); setTimeout(()=>{ li.remove(); addEmptyIfNeeded(); },160); });
 
-  todoList.addEventListener("change", (e) => {
-    if (!e.target.classList?.contains("todoChk")) return;
-    const li = e.target.closest("li");
-    li.classList.add("vanish");
-    setTimeout(() => {
-      li.remove();
-      addEmptyIfNeeded();
-    }, 160);
-  });
-
-  /* ---------- Music (optional, unchanged behavior) ---------- */
+  /* ---------- Music (optional) ---------- */
   const musicFiles = $("#musicFiles");
   const musicNow = $("#musicNow");
   const musicPlayBtn = $("#musicPlay");
-  const audio = new Audio();
-  audio.preload = "metadata";
+  const audio = new Audio(); audio.preload="metadata";
+  let playlist=[], trackIndex=0; const objectUrls=new Set();
 
-  let playlist = [];
-  let trackIndex = 0;
-  const objectUrls = new Set();
-
-  function updateNow(){
-    if (musicNow) musicNow.textContent = playlist.length ? `${trackIndex + 1}/${playlist.length} • ${playlist[trackIndex].name}` : "";
-  }
-
-  function loadPlaylist(files){
-    objectUrls.forEach((u) => URL.revokeObjectURL(u));
-    objectUrls.clear();
-    playlist = [];
-    trackIndex = 0;
-    for (const f of files){
-      const url = URL.createObjectURL(f);
-      objectUrls.add(url);
-      playlist.push({ name: f.name, url });
-    }
-    updateNow();
-    if (playlist.length){
-      audio.src = playlist[trackIndex].url;
-    }else{
-      audio.removeAttribute("src");
-    }
-  }
-
-  function playTrack(i){
-    if (!playlist.length) return;
-    trackIndex = (i + playlist.length) % playlist.length;
-    audio.src = playlist[trackIndex].url;
-    audio.play().catch(() => {});
-    updateNow();
-    if (musicPlayBtn) musicPlayBtn.textContent = "⏸";
-  }
-  function startPlaylist(){
-    if (!playlist.length) return;
-    if (!audio.src) audio.src = playlist[trackIndex].url;
-    audio.play().then(() => { if (musicPlayBtn) musicPlayBtn.textContent = "⏸"; }).catch(() => {});
-    updateNow();
-  }
-  function pausePlaylist(){
-    audio.pause();
-    if (musicPlayBtn) musicPlayBtn.textContent = "▶";
-  }
-  function nextTrack(){ if (playlist.length) playTrack(trackIndex + 1); }
-  function prevTrack(){ if (playlist.length) playTrack(trackIndex - 1); }
-  audio.addEventListener("ended", () => nextTrack());
-  audio.addEventListener("play", () => { if (musicPlayBtn) musicPlayBtn.textContent = "⏸"; });
-  audio.addEventListener("pause", () => { if (musicPlayBtn) musicPlayBtn.textContent = "▶"; });
-  $("#addMusicBtn")?.addEventListener("click", () => musicFiles?.click());
-  musicFiles?.addEventListener("change", (e) => loadPlaylist(e.target.files));
-  $("#musicPlay")?.addEventListener("click", () => audio.paused ? startPlaylist() : pausePlaylist());
+  function updateNow(){ if (musicNow) musicNow.textContent = playlist.length ? `${trackIndex+1}/${playlist.length} • ${playlist[trackIndex].name}` : ""; }
+  function loadPlaylist(files){ objectUrls.forEach((u)=>URL.revokeObjectURL(u)); objectUrls.clear(); playlist=[]; trackIndex=0; for(const f of files){ const url=URL.createObjectURL(f); objectUrls.add(url); playlist.push({name:f.name,url}); } updateNow(); if(playlist.length){ audio.src=playlist[trackIndex].url; } else { audio.removeAttribute("src"); } }
+  function playTrack(i){ if(!playlist.length) return; trackIndex=(i+playlist.length)%playlist.length; audio.src=playlist[trackIndex].url; audio.play().catch(()=>{}); updateNow(); if (musicPlayBtn) musicPlayBtn.textContent="⏸"; }
+  function startPlaylist(){ if(!playlist.length) return; if(!audio.src) audio.src=playlist[trackIndex].url; audio.play().then(()=>{ if (musicPlayBtn) musicPlayBtn.textContent="⏸"; }).catch(()=>{}); updateNow(); }
+  function pausePlaylist(){ audio.pause(); if (musicPlayBtn) musicPlayBtn.textContent="▶"; }
+  function nextTrack(){ if(playlist.length) playTrack(trackIndex+1); }
+  function prevTrack(){ if(playlist.length) playTrack(trackIndex-1); }
+  audio.addEventListener("ended", ()=> nextTrack());
+  audio.addEventListener("play", ()=> { if (musicPlayBtn) musicPlayBtn.textContent="⏸"; });
+  audio.addEventListener("pause", ()=> { if (musicPlayBtn) musicPlayBtn.textContent="▶"; });
+  $("#addMusicBtn")?.addEventListener("click", ()=> musicFiles?.click());
+  musicFiles?.addEventListener("change", (e)=> loadPlaylist(e.target.files));
+  $("#musicPlay")?.addEventListener("click", ()=> audio.paused ? startPlaylist() : pausePlaylist());
   $("#musicNext")?.addEventListener("click", nextTrack);
   $("#musicPrev")?.addEventListener("click", prevTrack);
-  window.addEventListener("unload", () => objectUrls.forEach((u) => URL.revokeObjectURL(u)));
+  window.addEventListener("unload", ()=> objectUrls.forEach(u=>URL.revokeObjectURL(u)));
 
   /* ---------- Custom background image ---------- */
-  const bgImageBtn = $("#bgImageBtn");
-  const bgImageFile = $("#bgImageFile");
-  const bgImageClear = $("#bgImageClear");
-  const bgImageName = $("#bgImageName");
-
-  bgImageBtn?.addEventListener("click", () => bgImageFile?.click());
-  bgImageFile?.addEventListener("change", (e) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    if (bgObjectUrl){
-      URL.revokeObjectURL(bgObjectUrl);
-      bgObjectUrl = null;
-    }
+  const bgImageBtn = $("#bgImageBtn"), bgImageFile = $("#bgImageFile"), bgImageClear = $("#bgImageClear"), bgImageName = $("#bgImageName");
+  bgImageBtn?.addEventListener("click", ()=> bgImageFile?.click());
+  bgImageFile?.addEventListener("change", (e)=>{
+    const f = e.target.files?.[0]; if (!f) return;
+    if (bgObjectUrl){ URL.revokeObjectURL(bgObjectUrl); bgObjectUrl=null; }
     bgObjectUrl = URL.createObjectURL(f);
     document.body.style.backgroundImage = `url("${bgObjectUrl}")`;
     document.body.style.backgroundSize = "cover";
@@ -972,10 +820,7 @@
   function ensureCandleVisibleWhenOnlyCandle(on){
     if (on){
       const hc = $("#hideCandle");
-      if (hc?.checked){
-        hc.checked = false;
-        document.body.classList.remove("candle-off");
-      }
+      if (hc?.checked){ hc.checked=false; document.body.classList.remove("candle-off"); }
     }
   }
 
@@ -985,44 +830,56 @@
     document.body.classList.toggle("only-candle", $("#onlyCandle")?.checked);
     document.body.classList.toggle("todo-on", $("#showTodo")?.checked);
     safeBuildClock();
-    requestAnimationFrame(() => { positionFlame(); ensureVisible(); });
+    requestAnimationFrame(()=>{ positionFlame(); ensureVisible(); });
   }
 
   function previewLayout(){
-    const sh = $("#showHours").checked;
-    const ss = $("#showSeconds").checked;
-    const uf = $("#useFlip").checked;
-    if (uf){
-      flipDigits = buildFlip(timerFlip, sh, ss);
-      tickFlip(flipDigits, 0, sh, ss);
-    }else{
-      renderSimple(0);
-    }
-    requestAnimationFrame(() => { positionFlame(); ensureVisible(); });
+    const sh = $("#showHours")?.checked ?? false;
+    const ss = $("#showSeconds")?.checked ?? true;
+    const uf = $("#useFlip")?.checked ?? true;
+    if(uf){ flipDigits=buildFlip(timerFlip, sh, ss); tickFlip(flipDigits, 0, sh, ss); } else { renderSimple(0); }
+    requestAnimationFrame(()=>{ positionFlame(); ensureVisible(); });
   }
 
   /* ---------- Bindings ---------- */
   $("#primaryBtn").addEventListener("click", togglePrimary);
   $("#resetBtn").addEventListener("click", resetCountdown);
 
-  $("#useFlip").addEventListener("change", () => { safeBuildClock(); previewLayout(); });
+  $("#useFlip").addEventListener("change", ()=>{ safeBuildClock(); previewLayout(); });
   $("#showHours").addEventListener("change", previewLayout);
   $("#showSeconds").addEventListener("change", previewLayout);
 
-  $("#hideCandle").addEventListener("change", () => applyLayoutFlags());
-  $("#centerClock").addEventListener("change", () => applyLayoutFlags());
-  $("#onlyCandle").addEventListener("change", (e) => { ensureCandleVisibleWhenOnlyCandle(e.target.checked); applyLayoutFlags(); });
-  $("#showTodo").addEventListener("change", () => applyLayoutFlags());
+  $("#hideCandle").addEventListener("change", ()=> applyLayoutFlags());
+  $("#centerClock").addEventListener("change", ()=> applyLayoutFlags());
+  $("#onlyCandle").addEventListener("change", e=>{ ensureCandleVisibleWhenOnlyCandle(e.target.checked); applyLayoutFlags(); });
+  $("#showTodo").addEventListener("change", ()=> applyLayoutFlags());
 
-  ["bgAngle", "bgC1", "bgC2", "bgC3"].forEach((id) => document.getElementById(id)?.addEventListener("input", applyGradient));
-  ["clockC1", "clockC2", "clockC3", "textColor", "colonColor"].forEach((id) => document.getElementById(id)?.addEventListener("input", restyleClockPanels));
+  ["bgAngle","bgC1","bgC2","bgC3"].forEach(id=> document.getElementById(id)?.addEventListener("input", applyGradient));
+  ["clockC1","clockC2","clockC3","textColor","colonColor"].forEach(id=> document.getElementById(id)?.addEventListener("input", restyleClockPanels));
 
-  $("#todoApply").addEventListener("click", () => {
-    setTodoBg($("#todoColor").value);
-    $("#todo-panel").classList.remove("todo-clear");
-  });
-  $("#todoClear").addEventListener("click", () => {
-    setTodoBg("transparent");
-    $("#todo-panel").classList.add("todo-clear");
-  });
-  $("#todoGlass").addEventListener("change", (e) => $("#todo-panel").classList.toggle("todo-glass", e
+  $("#todoApply").addEventListener("click", ()=>{ setTodoBg($("#todoColor").value); $("#todo-panel").classList.remove("todo-clear"); });
+  $("#todoClear").addEventListener("click", ()=>{ setTodoBg("transparent"); $("#todo-panel").classList.add("todo-clear"); });
+  $("#todoGlass").addEventListener("change", (e)=> $("#todo-panel").classList.toggle("todo-glass", e.target.checked));
+
+  /* ---------- Init ---------- */
+  (function boot(){
+    applyGradient(); restyleClockPanels(); applyWax();
+
+    // Ensure initial layout matches toggles and content is visible
+    document.body.classList.add("todo-on"); // default show
+    applyLayoutFlags();
+    safeBuildClock();
+    previewLayout();
+
+    // Position flame after first paints
+    afterNextPaint(positionFlame);
+    setTimeout(positionFlame, 150);
+
+    setWaxHeightByProgress(1);
+
+    // Seed one empty to‑do
+    const li=makeTodoItem(""); $("#todoList").appendChild(li);
+  })();
+</script>
+</body>
+</html>
