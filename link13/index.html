@@ -184,9 +184,7 @@ inset 0 0 0 1px rgba(255,255,255,0.04) !important;
 backdrop-filter: blur(12px) saturate(115%) !important;
 -webkit-backdrop-filter: blur(12px) saturate(115%) !important;
 color: var(--clock-number-color, #fff) !important;
-text-shadow: none !important; / stop “glow” growth */
-perspective: none !important;
-transform-style: flat !important;
+text-shadow: none !important; / avoid glow buildup */
 }
 
 /* Inner faces stay transparent so opacity doesn’t compound */
@@ -201,13 +199,12 @@ filter: none !important;
 mix-blend-mode: normal !important;
 }
 
-/* Keep both halves visible and crisp (no disappearing bottom gate) */
+/* Keep both halves visible (no disappearing bottom gate) */
 .clock-transparent .top,
 .clock-transparent .bottom{
 visibility: visible !important;
 opacity: 1 !important;
 overflow: hidden !important;
-backface-visibility: visible !important;
 }
 
 /* Hinge/seam lines for the flip-box look */
@@ -218,35 +215,47 @@ border-bottom: 1px solid rgba(255,255,255,0.14) !important;
 border-top: 1px solid rgba(255,255,255,0.14) !important;
 }
 
-/* Stop all flip animations but keep layout intact */
+/* HARD STOP: disable all flip animations, transitions, and transforms */
+.clock-transparent,
+.clock-transparent *,
 .clock-transparent .flip,
-.clock-transparent .flip-clock,
+.clock-transparent .flipper,
 .clock-transparent .flip-card,
+.clock-transparent .flip-clock,
+.clock-transparent .flip-clock-wrapper,
 .clock-transparent .digit,
+.clock-transparent .digit *,
 .clock-transparent .top,
 .clock-transparent .bottom,
 .clock-transparent .front,
 .clock-transparent .back,
+.clock-transparent .fold,
+.clock-transparent .unfold,
+.clock-transparent .upperCard,
+.clock-transparent .lowerCard,
+.clock-transparent .inn,
 .clock-transparent .shadow{
 animation: none !important;
+animation-name: none !important;
+animation-duration: 0s !important;
+animation-delay: 0s !important;
+animation-iteration-count: 0 !important;
+animation-play-state: paused !important;
 transition: none !important;
-}
-
-/* Neutralize flip transforms only on the flipping faces */
-.clock-transparent .front,
-.clock-transparent .back{
+transition-property: none !important;
+transition-duration: 0s !important;
 transform: none !important;
+transform-style: flat !important;
+perspective: none !important;
 backface-visibility: visible !important;
-}
+will-change: auto !important;
 
-/* Prevent double-rendered text (no progressive glow) — keep only one layer’s text */
-.clock-transparent .back,
-.clock-transparent .bottom .back,
-.clock-transparent .top .back{
-color: transparent !important;
-text-shadow: none !important;
--webkit-text-stroke: 0 !important;
-pointer-events: none !important;
+/* vendor prefixes */
+-webkit-animation: none !important;
+-webkit-transition: none !important;
+-webkit-transform: none !important;
+-webkit-backface-visibility: visible !important;
+-webkit-perspective: none !important;
 }
 
 /* Remove decorative overlays that can darken or hide halves */
