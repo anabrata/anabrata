@@ -3,281 +3,136 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Candle Timer – v1.7</title>
+<title>Candle Timer – v1.8</title>
 <style>
   :root{
-    /* Flip sizes */
     --digit-w: 120px;
     --digit-h: 170px;
     --digit-radius: 16px;
     --split-line: rgba(255,255,255,0.10);
 
-    /* Background gradient (default multicolor) */
     --bg-angle: 135deg;
     --bg-c1: #3a1c71;
     --bg-c2: #d76d77;
     --bg-c3: #ffaf7b;
 
-    /* Flip clock colors */
     --clock-c1: #0e0f13;
     --clock-c2: #242631;
     --clock-c3: #3b3e4b;
     --clock-text: #ffffff;
     --colon-color: #ffffff;
 
-    /* Accent + buttons */
     --accent: #ff9a00;
     --btn-grad: linear-gradient(135deg,#ffd166,#ff9a00);
     --btn-grad-hover: linear-gradient(135deg,#ffe08a,#ffb347);
 
-    /* Candle */
     --wax: #f0e1c3;
     --wick: #1b1b1b;
 
-    /* Layout */
-    --side-gap: min(6vw, 56px);
+    --side-gap: min(6vw,56px);
   }
 
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
-    margin:0;
-    display:flex;
-    flex-direction:column;
-    color:#f5f5f5;
+    margin:0; display:flex; flex-direction:column; color:#f5f5f5;
     font-family:"Comic Sans MS", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
     background: linear-gradient(var(--bg-angle), var(--bg-c1), var(--bg-c2), var(--bg-c3));
-    background-attachment: fixed;
-    overflow-x:hidden;
+    background-attachment: fixed; overflow-x:hidden;
   }
 
-  .brand{
-    position:fixed; right:12px; top:10px; z-index:40;
-    font-weight:700; font-size:13px; letter-spacing:.2px; opacity:.9;
-    text-shadow:0 1px 2px rgba(0,0,0,0.35);
-    user-select:none;
-  }
+  .brand{ position:fixed; right:12px; top:10px; z-index:40; font-weight:700; font-size:13px; opacity:.9; text-shadow:0 1px 2px rgba(0,0,0,.35); user-select:none; }
 
-  #exitFs{
-    position:fixed; right:8px; top:6px; z-index:70;
-    width:24px; height:24px; line-height:24px; text-align:center;
-    font-weight:900; color:#fff; background:rgba(0,0,0,0.25);
-    border-radius:50%; cursor:pointer; opacity:.35; display:none;
-  }
+  #exitFs{ position:fixed; right:8px; top:6px; z-index:70; width:24px; height:24px; line-height:24px; text-align:center; font-weight:900; color:#fff; background:rgba(0,0,0,.25); border-radius:50%; cursor:pointer; opacity:.35; display:none; }
   #exitFs:hover{ opacity:.65 }
 
-  .main{
-    flex:1; display:flex; align-items:center; justify-content:space-between;
-    gap:var(--side-gap); padding:22px min(5vw,48px);
-  }
+  .main{ flex:1; display:flex; align-items:center; justify-content:space-between; gap:var(--side-gap); padding:22px min(5vw,48px); }
 
-  /* Clock left */
+  /* Clock */
   #timer-container{ flex:1; display:flex; align-items:center; justify-content:flex-start; min-width:340px; }
-  #timer-stack{ display:flex; flex-direction:column; gap:10px; }
   #timer{ display:flex; align-items:center; gap:12px; user-select:none; }
 
-  /* End-time badge */
-  #endTime{
-    align-self:flex-start;
-    padding:6px 10px;
-    border-radius:10px;
-    background: rgba(0,0,0,0.28);
-    font-weight:700;
-    font-size:13px;
-    letter-spacing:.2px;
-  }
-
   .digit{
-    position:relative;
-    width:var(--digit-w); height:var(--digit-h); perspective:1200px;
+    position:relative; width:var(--digit-w); height:var(--digit-h); perspective:1200px;
     border-radius:var(--digit-radius); overflow:hidden;
-    background: linear-gradient(145deg, var(--clock-c1), var(--clock-c2), var(--clock-c3));
-    box-shadow:
-      inset 0 -1px 0 rgba(255,255,255,0.06),
-      inset 0 1px 0 rgba(0,0,0,0.45),
-      0 10px 26px rgba(0,0,0,0.35);
+    background: linear-gradient(145deg,var(--clock-c1),var(--clock-c2),var(--clock-c3));
+    box-shadow: inset 0 -1px 0 rgba(255,255,255,.06), inset 0 1px 0 rgba(0,0,0,.45), 0 10px 26px rgba(0,0,0,.35);
   }
-  .digit .top, .digit .bottom{
-    position:absolute; left:0; right:0; height:50%;
-    overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden;
-  }
+  .digit .top,.digit .bottom{ position:absolute; left:0; right:0; height:50%; overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden; }
   .digit .top{ top:0; border-bottom:1px solid var(--split-line); }
   .digit .bottom{ bottom:0; border-top:1px solid var(--split-line); }
 
-  /* Full-height value layer; clip halves precisely */
   .value{
     position:absolute; left:0; right:0; height:var(--digit-h);
     display:flex; align-items:center; justify-content:center;
-    font-weight:800; color:var(--clock-text); text-shadow:0 2px 6px rgba(0,0,0,0.6);
-    font-size: calc(var(--digit-h) * 0.70); line-height: var(--digit-h);
+    font-weight:800; color:var(--clock-text); text-shadow:0 2px 6px rgba(0,0,0,.6);
+    font-size: calc(var(--digit-h)*.70); line-height:var(--digit-h);
   }
-  .top .value, .top-flip .value{ clip-path: inset(0 0 50% 0); transform: translateY(0); }
-  .bottom .value, .bottom-flip .value{ clip-path: inset(50% 0 0 0); transform: translateY(-50%); }
+  .top .value,.top-flip .value{ clip-path: inset(0 0 50% 0); transform: translateY(0); }
+  .bottom .value,.bottom-flip .value{ clip-path: inset(50% 0 0 0); transform: translateY(-50%); }
 
-  /* Flip overlays */
-  .top-flip, .bottom-flip{
-    position:absolute; left:0; right:0; height:50%; overflow:hidden;
-    backface-visibility:hidden; -webkit-backface-visibility:hidden; background:inherit;
-  }
-  .top-flip{
-    top:0; transform-origin: bottom; border-bottom:1px solid var(--split-line);
-    animation: topFlip .33s ease-in forwards;
-    box-shadow: 0 14px 28px rgba(0,0,0,0.35);
-  }
-  .bottom-flip{
-    bottom:0; transform-origin: top; border-top:1px solid var(--split-line);
-    animation: bottomFlip .33s .33s ease-out forwards;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.22);
-  }
+  .top-flip,.bottom-flip{ position:absolute; left:0; right:0; height:50%; overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden; background:inherit; }
+  .top-flip{ top:0; transform-origin:bottom; border-bottom:1px solid var(--split-line); animation: topFlip .3s ease-in forwards; box-shadow:0 14px 28px rgba(0,0,0,.35); }
+  .bottom-flip{ bottom:0; transform-origin:top; border-top:1px solid var(--split-line); animation: bottomFlip .3s ease-out forwards; box-shadow:0 8px 16px rgba(0,0,0,.22); }
   @keyframes topFlip{ 0%{transform:rotateX(0)} 100%{transform:rotateX(-90deg)} }
   @keyframes bottomFlip{ 0%{transform:rotateX(90deg)} 100%{transform:rotateX(0)} }
 
-  .colon{
-    display:flex; align-items:center; justify-content:center;
-    width: calc(var(--digit-w) * 0.33); height: var(--digit-h);
-    font-size: calc(var(--digit-h) * 0.6); font-weight:900; color: var(--colon-color);
-    text-shadow:0 2px 6px rgba(0,0,0,0.6);
-  }
+  .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.6); }
 
-  /* Candle right with clip wrapper that keeps wax inside; flame sits above */
-  #candle-area{ flex:1; display:flex; align-items:flex-end; justify-content:flex-end; min-width:340px; height:max(360px, 40vh); position:relative; }
+  /* Candle area (flame positioned outside clip so it's never chopped) */
+  #candle-area{ flex:1; display:flex; align-items:flex-end; justify-content:flex-end; min-width:340px; height:max(360px,40vh); position:relative; }
   .candle-clip{ position:relative; width:160px; height:340px; overflow:hidden; display:flex; align-items:flex-end; justify-content:center; }
-  .candle-wrap{ position:absolute; left:0; right:0; bottom:0; margin:auto; width:160px; height:340px; display:flex; align-items:flex-end; justify-content:center; }
-
+  .candle-wrap{ position:absolute; inset:auto 0 0 0; margin:auto; width:160px; height:340px; display:flex; align-items:flex-end; justify-content:center; }
   .wax{
     position:absolute; bottom:0; width:130px; height:100%; z-index:1;
-    background:
-      radial-gradient(112px 25px at 65px 5px, rgba(255,255,255,0.75), transparent 60%),
-      linear-gradient(180deg, rgba(255,255,255,0.22), rgba(0,0,0,0) 22%),
-      linear-gradient(180deg, #ffffff40, #00000020 30%, #00000030 100%),
-      linear-gradient(180deg, var(--wax), #e6d9bb);
-    border-radius:18px;
-    box-shadow: inset 0 5px 18px rgba(0,0,0,0.18), inset 0 -12px 20px rgba(0,0,0,0.22), 0 14px 42px rgba(0,0,0,0.35);
-    transition: height 1s linear;
+    background: radial-gradient(112px 25px at 65px 5px, rgba(255,255,255,.75), transparent 60%), linear-gradient(180deg, rgba(255,255,255,.22), rgba(0,0,0,0) 22%), linear-gradient(180deg,#ffffff40,#00000020 30%,#00000030 100%), linear-gradient(180deg,var(--wax),#e6d9bb);
+    border-radius:18px; box-shadow: inset 0 5px 18px rgba(0,0,0,.18), inset 0 -12px 20px rgba(0,0,0,.22), 0 14px 42px rgba(0,0,0,.35);
+    transition: height .25s linear;
   }
   .wax:before{
-    content:""; position:absolute; top:-18px; left:0; right:0; margin:auto;
-    width:130px; height:34px;
-    background: radial-gradient(65px 17px at 65px 17px, #fff8 0%, #0000 72%),
-                radial-gradient(65px 17px at 65px 17px, var(--wax), var(--wax));
-    border-radius:50%/55% 55% 45% 45%;
-    box-shadow: inset 0 6px 12px rgba(0,0,0,0.22);
+    content:""; position:absolute; top:-18px; left:0; right:0; margin:auto; width:130px; height:34px;
+    background: radial-gradient(65px 17px at 65px 17px,#fff8 0%,#0000 72%), radial-gradient(65px 17px at 65px 17px,var(--wax),var(--wax));
+    border-radius:50%/55% 55% 45% 45%; box-shadow: inset 0 6px 12px rgba(0,0,0,.22);
   }
   .wax:after{
     content:""; position:absolute; top:26px; left:18px; width:12px; height:58px; border-radius:10px;
-    background: linear-gradient(180deg, #fff6, #0000 60%), var(--wax);
-    box-shadow:
-      36px 8px 0 -3px var(--wax), 36px 8px 0 -3px #fff6,
-      78px 12px 0 -6px var(--wax), 78px 12px 0 -6px #fff6;
-    opacity:.8;
+    background: linear-gradient(180deg,#fff6,#0000 60%), var(--wax);
+    box-shadow: 36px 8px 0 -3px var(--wax), 36px 8px 0 -3px #fff6, 78px 12px 0 -6px var(--wax), 78px 12px 0 -6px #fff6; opacity:.8;
   }
-  .wick{
-    position:absolute; width:6px; height:28px; background:linear-gradient(180deg, #444, var(--wick));
-    border-radius:4px; top:-8px; left:50%; transform:translateX(-50%); z-index:2;
-    box-shadow:0 -1px 2px #fff8;
-  }
-  .flame{
-    position:absolute; width:46px; height:96px; left:50%; z-index:3;
-    transform: translateX(-50%);
-    background:
-      radial-gradient(ellipse at 50% 20%, #fff9cc 0%, #ffe08a 35%, #ffac30 55%, #ff7a00 75%, rgba(0,0,0,0) 76%),
-      radial-gradient(ellipse at 50% 40%, #ffffff 0%, rgba(255,255,255,0) 60%);
-    border-radius:50% 50% 38% 38%; filter: blur(.6px);
-    box-shadow: 0 0 20px 7px rgba(255,170,40,0.6), 0 0 40px 14px rgba(255,140,0,0.45), 0 -20px 28px rgba(255,220,170,0.42);
-    animation: flicker .12s infinite;
-    transition: opacity .45s ease;
-    pointer-events:none;
-  }
-  @keyframes flicker{
-    0%{ transform:translateX(-50%) scale(1) rotate(-1.4deg); opacity:1 }
-    50%{ transform:translateX(-50%) scale(1.12) rotate(1.1deg); opacity:.82 }
-    100%{ transform:translateX(-50%) scale(1) rotate(-1.2deg); opacity:1 }
-  }
-  .stub{
-    display:none; position:absolute; bottom:0; width:130px; height:54px;
-    background: linear-gradient(180deg, #8a8a8a, #6b6b6b);
-    border-radius: 0 0 18px 18px;
-    box-shadow: inset 0 3px 8px rgba(0,0,0,0.25), 0 8px 26px rgba(0,0,0,0.35);
-    opacity:.9; z-index:1;
-  }
-  .smoke{ position:absolute; width:10px; height:10px; left:50%; transform:translateX(-50%); top:-24px; border-radius:50%; background:radial-gradient(#bbb, #0000 64%); opacity:0; pointer-events:none; z-index:4; }
+  .wick{ position:absolute; width:6px; height:28px; background:linear-gradient(180deg,#444,var(--wick)); border-radius:4px; top:-8px; left:50%; transform:translateX(-50%); z-index:2; box-shadow:0 -1px 2px #fff8; }
+
+  /* Flame is outside the clip, anchored to wick via JS so it never gets cut */
+  .flame{ position:absolute; width:46px; height:96px; z-index:5; background: radial-gradient(ellipse at 50% 20%,#fff9cc 0%,#ffe08a 35%,#ffac30 55%,#ff7a00 75%,transparent 76%), radial-gradient(ellipse at 50% 40%,#ffffff 0%, transparent 60%); border-radius:50% 50% 38% 38%; filter:blur(.6px); box-shadow:0 0 20px 7px rgba(255,170,40,.6), 0 0 40px 14px rgba(255,140,0,.45), 0 -20px 28px rgba(255,220,170,.42); animation:flicker .12s infinite; transition:opacity .35s ease; pointer-events:none; }
+  @keyframes flicker{ 0%{ transform:scale(1) rotate(-1.4deg); opacity:1 } 50%{ transform:scale(1.12) rotate(1.1deg); opacity:.82 } 100%{ transform:scale(1) rotate(-1.2deg); opacity:1 } }
+
+  .stub{ display:none; position:absolute; bottom:0; width:130px; height:54px; background:linear-gradient(180deg,#8a8a8a,#6b6b6b); border-radius:0 0 18px 18px; box-shadow: inset 0 3px 8px rgba(0,0,0,.25), 0 8px 26px rgba(0,0,0,.35); opacity:.9; z-index:1; }
+  .smoke{ position:absolute; width:10px; height:10px; left:0; top:0; border-radius:50%; background:radial-gradient(#bbb, transparent 64%); opacity:0; pointer-events:none; z-index:6; }
   .smoke.show{ animation:puff 1.7s ease-out forwards; }
-  @keyframes puff{
-    0%{ transform:translate(-50%, 0) scale(1); opacity:.8; filter:blur(.5px) }
-    100%{ transform:translate(-50%, -130px) scale(2.2); opacity:0; filter:blur(3px) }
-  }
+  @keyframes puff{ 0%{ transform:translate(0,0) scale(1); opacity:.8; filter:blur(.5px) } 100%{ transform:translate(0,-130px) scale(2.2); opacity:0; filter:blur(3px) } }
 
   /* Controls */
-  #controls{
-    position:relative; display:grid; grid-auto-flow:column; grid-auto-columns:minmax(240px,1fr);
-    gap:14px; padding:16px; background:rgba(0,0,0,0.22); backdrop-filter:blur(8px);
-    scroll-snap-type:x mandatory; overflow-x:auto; border-top-left-radius:16px; border-top-right-radius:16px; z-index:10;
-  }
-  .card{
-    scroll-snap-align:start; background:rgba(255,255,255,0.06);
-    border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:12px; min-height:84px;
-    display:flex; flex-direction:column; gap:8px;
-  }
+  #controls{ position:relative; display:grid; grid-auto-flow:column; grid-auto-columns:minmax(240px,1fr); gap:14px; padding:16px; background:rgba(0,0,0,.22); backdrop-filter:blur(8px); scroll-snap-type:x mandatory; overflow-x:auto; border-top-left-radius:16px; border-top-right-radius:16px; z-index:10; }
+  .card{ scroll-snap-align:start; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:12px; min-height:84px; display:flex; flex-direction:column; gap:8px; }
   .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
   label{ font-size:12px; opacity:.95 }
-  input[type="number"], input[type="color"], select{
-    width:100%; padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,0.12); background:rgba(0,0,0,0.35); color:#fff; outline:none;
-  }
+  input[type="number"],input[type="color"],input[type="file"],select{ width:100%; padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.35); color:#fff; outline:none; }
   input[type="checkbox"]{ transform:scale(1.2) }
-
-  /* Attractive buttons */
-  .btn{
-    padding:12px 18px; border-radius:12px; border:none; font-weight:800; cursor:pointer;
-    background: var(--btn-grad); color:#1b1b1b; box-shadow: 0 6px 16px rgba(0,0,0,0.25), 0 0 0 0 rgba(255,154,0,0.0);
-    transition: transform .12s ease, box-shadow .2s ease, background .2s ease;
-  }
-  .btn:hover{ background: var(--btn-grad-hover); box-shadow: 0 10px 24px rgba(0,0,0,0.32), 0 0 0 8px rgba(255,154,0,0.12); }
+  .btn{ padding:12px 18px; border-radius:12px; border:none; font-weight:800; cursor:pointer; background:var(--btn-grad); color:#1b1b1b; box-shadow:0 6px 16px rgba(0,0,0,.25), 0 0 0 0 rgba(255,154,0,0); transition:transform .12s, box-shadow .2s, background .2s; }
+  .btn:hover{ background:var(--btn-grad-hover); box-shadow:0 10px 24px rgba(0,0,0,.32), 0 0 0 8px rgba(255,154,0,.12); }
   .btn:active{ transform: translateY(1px) scale(.99); }
-  .btn.alt{ background: linear-gradient(135deg,#a5b4fc,#6366f1); color:#0d0d15; }
-  .btn.alt:hover{ background: linear-gradient(135deg,#c7d2fe,#818cf8); box-shadow: 0 10px 24px rgba(0,0,0,0.32), 0 0 0 8px rgba(99,102,241,0.15); }
-  .btn.warn{ background: linear-gradient(135deg,#fca5a5,#ef4444); color:#0d0d15; }
-  .btn.warn:hover{ background: linear-gradient(135deg,#fecaca,#f87171); box-shadow: 0 10px 24px rgba(0,0,0,0.32), 0 0 0 8px rgba(239,68,68,0.15); }
-
+  .btn.alt{ background:linear-gradient(135deg,#a5b4fc,#6366f1); color:#0d0d15; }
+  .btn.alt:hover{ background:linear-gradient(135deg,#c7d2fe,#818cf8); box-shadow:0 10px 24px rgba(0,0,0,.32), 0 0 0 8px rgba(99,102,241,.15); }
+  .btn.warn{ background:linear-gradient(135deg,#fca5a5,#ef4444); color:#0d0d15; }
+  .btn.warn:hover{ background:linear-gradient(135deg,#fecaca,#f87171); box-shadow:0 10px 24px rgba(0,0,0,.32), 0 0 0 8px rgba(239,68,68,.15); }
   .small{ font-size:12px; opacity:.9 }
 
-  /* Fullscreen mode */
-  .fullscreen-on .brand, .fullscreen-on #controls{ display:none }
+  .fullscreen-on .brand,.fullscreen-on #controls{ display:none }
   .fullscreen-on #exitFs{ display:block }
   .fullscreen-on .main{ padding:10px min(3vw,28px) }
-  .fullscreen-on :root{ --digit-w: 140px; --digit-h: 200px; }
+  .fullscreen-on :root{ --digit-w:140px; --digit-h:200px; }
 
-  /* Congrats + balloons reused */
-  #congrats{
-    position:fixed; inset:0; display:none; align-items:center; justify-content:center; flex-direction:column;
-    background: rgba(0,0,0,0.35); z-index:60; backdrop-filter: blur(2px);
-  }
-  #congrats.show{ display:flex }
-  .congrats-card{
-    background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2);
-    padding:22px 26px; border-radius:16px; text-align:center; color:#fff;
-    box-shadow: 0 14px 40px rgba(0,0,0,0.4);
-  }
-  .congrats-title{ font-size:28px; font-weight:900; letter-spacing:.3px; margin-bottom:6px }
-  .congrats-sub{ font-size:14px; opacity:.95; margin-bottom:14px }
-  .balloon{
-    position:fixed; bottom:-120px; width:28px; height:36px; border-radius:50% 50% 45% 45%;
-    background: radial-gradient(circle at 30% 30%, #ffffff88, #ffffff00 40%), var(--bcol, #f87171);
-    box-shadow: inset -6px -12px 16px rgba(0,0,0,0.12);
-    z-index:61; animation: floatUp var(--dur, 6s) linear forwards;
-  }
-  .balloon:after{ content:""; position:absolute; bottom:-16px; left:50%; width:2px; height:18px; background:#fff8; transform:translateX(-50%); }
-  @keyframes floatUp{
-    0%{ transform: translateY(0) translateX(0) scale(1); opacity:.95 }
-    100%{ transform: translateY(-120vh) translateX(var(--drift, 40px)) scale(1.05); opacity:1 }
-  }
-
-  /* Responsive */
-  @media (max-width: 980px){
-    :root{ --digit-w: 100px; --digit-h: 140px; }
-  }
-  @media (max-width: 720px){
-    :root{ --digit-w: 86px; --digit-h: 120px; }
-  }
+  @media (max-width:980px){ :root{ --digit-w:100px; --digit-h:140px; } }
+  @media (max-width:720px){ :root{ --digit-w:86px; --digit-h:120px; } }
 </style>
 </head>
 <body>
@@ -287,10 +142,7 @@
   <div class="main">
     <!-- Clock -->
     <section id="timer-container" aria-label="Flip clock">
-      <div id="timer-stack">
-        <div id="timer"></div>
-        <div id="endTime" hidden>Ends at —</div>
-      </div>
+      <div id="timer"></div>
     </section>
 
     <!-- Candle -->
@@ -298,11 +150,11 @@
       <div class="candle-clip">
         <div class="candle-wrap" id="candleWrap">
           <div class="wax" id="wax"><div class="wick" id="wick"></div></div>
-          <div class="flame" id="flame"></div>
           <div class="stub" id="stub"></div>
-          <div class="smoke" id="smoke"></div>
         </div>
       </div>
+      <div class="flame" id="flame"></div>
+      <div class="smoke" id="smoke"></div>
     </section>
   </div>
 
@@ -318,7 +170,6 @@
       <div class="row">
         <label><input type="checkbox" id="showHours"> Show hours</label>
         <label><input type="checkbox" id="showSeconds" checked> Show seconds</label>
-        <label><input type="checkbox" id="showEndTime" checked> Show “Ends at”</label>
       </div>
       <div class="row">
         <button id="startBtn" class="btn">Start</button>
@@ -328,14 +179,18 @@
     </div>
 
     <div class="card">
-      <label class="small">Background gradient</label>
+      <label class="small">Background</label>
       <div class="row">
         <div style="flex:1"><label for="bgAngle">Angle</label><input id="bgAngle" type="number" min="0" max="360" value="135"></div>
         <div style="flex:1"><label for="bgC1">Color 1</label><input id="bgC1" type="color" value="#3a1c71"></div>
         <div style="flex:1"><label for="bgC2">Color 2</label><input id="bgC2" type="color" value="#d76d77"></div>
         <div style="flex:1"><label for="bgC3">Color 3</label><input id="bgC3" type="color" value="#ffaf7b"></div>
       </div>
-      <span class="small">Mix 2–3 colors; adjust angle for direction.</span>
+      <div class="row">
+        <div style="flex:2"><label for="bgImageInput">Personal image</label><input id="bgImageInput" type="file" accept="image/*"></div>
+        <div style="flex:1"><button id="clearBgBtn" class="btn alt" type="button">Clear image</button></div>
+      </div>
+      <span class="small">Upload a photo or use multicolor gradients above.</span>
     </div>
 
     <div class="card">
@@ -356,16 +211,7 @@
       <div class="row">
         <div style="flex:1"><label for="waxColor">Wax color</label><input id="waxColor" type="color" value="#f0e1c3"></div>
       </div>
-      <span class="small">Flame runs during countdown and turns off at 0.</span>
-    </div>
-  </div>
-
-  <!-- Congrats overlay -->
-  <div id="congrats">
-    <div class="congrats-card">
-      <div class="congrats-title">Congratulations!</div>
-      <div class="congrats-sub">The timer is complete. Great focus!</div>
-      <button id="closeCongrats" class="btn alt">Close</button>
+      <span class="small">Flame burns during countdown and fully turns off at 0.</span>
     </div>
   </div>
 
@@ -373,11 +219,11 @@
   const $ = s => document.querySelector(s);
 
   /* Gradient helper */
-  const gradientStr = (angle, c1, c2, c3) =>
-    `linear-gradient(${angle}deg, ${c1}, ${c2}${c3 ? ', ' + c3 : ''})`;
+  const gradientStr = (angle,c1,c2,c3) => `linear-gradient(${angle}deg, ${c1}, ${c2}${c3 ? ', '+c3 : ''})`;
 
-  /* Flip clock */
+  /* Flip clock core */
   const timerEl = $('#timer');
+
   function createDigit(initial="0"){
     const d = document.createElement('div');
     d.className = 'digit';
@@ -397,8 +243,7 @@
     bVal.textContent = initial;
     bottom.appendChild(bVal);
 
-    d.appendChild(top);
-    d.appendChild(bottom);
+    d.appendChild(top); d.appendChild(bottom);
     return d;
   }
 
@@ -409,6 +254,7 @@
     const topVal = digitEl.querySelector('.top .value');
     const botVal = digitEl.querySelector('.bottom .value');
 
+    // Create top overlay first, then bottom overlay after top completes to remove latency
     const topFlip = document.createElement('div');
     topFlip.className = 'top-flip';
     const topFlipVal = document.createElement('span');
@@ -416,42 +262,40 @@
     topFlipVal.textContent = current;
     topFlip.appendChild(topFlipVal);
 
-    const bottomFlip = document.createElement('div');
-    bottomFlip.className = 'bottom-flip';
-    const bottomFlipVal = document.createElement('span');
-    bottomFlipVal.className = 'value';
-    bottomFlipVal.textContent = newVal;
-    bottomFlip.appendChild(bottomFlipVal);
-
-    topVal.textContent = current;
-    botVal.textContent = current;
+    // Base shows current until swap
+    topVal.textContent = current; botVal.textContent = current;
+    digitEl.appendChild(topFlip);
 
     topFlip.addEventListener('animationend', () => {
       topVal.textContent = newVal;
       topFlip.remove();
-    });
-    bottomFlip.addEventListener('animationend', () => {
-      botVal.textContent = newVal;
-      digitEl.dataset.value = newVal;
-      bottomFlip.remove();
-    });
 
-    digitEl.appendChild(topFlip);
-    digitEl.appendChild(bottomFlip);
+      const bottomFlip = document.createElement('div');
+      bottomFlip.className = 'bottom-flip';
+      const bottomFlipVal = document.createElement('span');
+      bottomFlipVal.className = 'value';
+      bottomFlipVal.textContent = newVal;
+      bottomFlip.appendChild(bottomFlipVal);
+      digitEl.appendChild(bottomFlip);
+
+      bottomFlip.addEventListener('animationend', () => {
+        botVal.textContent = newVal;
+        digitEl.dataset.value = newVal;
+        bottomFlip.remove();
+      });
+    });
   }
 
   let digits = [], colonEls = [];
   function setupDigits(showH, showS){
-    timerEl.innerHTML = '';
-    digits = []; colonEls = [];
+    timerEl.innerHTML = ''; digits = []; colonEls = [];
     const addDigit = () => { const d = createDigit("0"); timerEl.appendChild(d); digits.push(d); };
     const addColon = () => { const c = document.createElement('div'); c.className='colon'; c.textContent=':'; timerEl.appendChild(c); colonEls.push(c); };
 
     if (showH){ addDigit(); addDigit(); addColon(); }
     addDigit(); addDigit();
     if (showS){ addColon(); addDigit(); addDigit(); }
-
-    restyleClockPanels(); // apply current colors
+    restyleClockPanels();
   }
 
   const timeToArray = (sec, showH, showS) => {
@@ -474,23 +318,24 @@
   }
 
   /* Candle coupling */
-  const waxEl = $('#wax'), wickEl = $('#wick'), flameEl = $('#flame'), stubEl = $('#stub'), smokeEl = $('#smoke'), candleWrap = $('#candleWrap');
-  const baseWaxHeight = 340; // px
-  const minStub = 54;
+  const candleArea = $('#candle-area');
+  const waxEl = $('#wax'), wickEl = $('#wick'), flameEl = $('#flame'), stubEl = $('#stub'), smokeEl = $('#smoke');
+  const baseWaxHeight = 340; const minStub = 54;
 
   function positionFlame(){
-    const wickRect = wickEl.getBoundingClientRect();
-    const wrapRect = candleWrap.getBoundingClientRect();
-    const flameH = flameEl.offsetHeight;
-    const topY = wickRect.top - wrapRect.top - flameH + 20;
-    flameEl.style.top = `${Math.max(topY, -flameH)}px`;
+    const wick = wickEl.getBoundingClientRect();
+    const area = candleArea.getBoundingClientRect();
+    const x = wick.left + wick.width/2 - area.left - flameEl.offsetWidth/2;
+    const y = wick.top - area.top - flameEl.offsetHeight + 18;
+    flameEl.style.left = `${x}px`; flameEl.style.top = `${y}px`;
+    smokeEl.style.left = `${x + flameEl.offsetWidth/2 - 5}px`; // align smoke
+    smokeEl.style.top = `${y - 4}px`;
   }
 
   function setWaxHeightByProgress(progress){
     const usable = baseWaxHeight - minStub;
     const h = minStub + Math.max(0, usable * progress);
     waxEl.style.height = `${h}px`;
-    positionFlame();
   }
 
   function extinguish(){
@@ -503,98 +348,13 @@
     flameEl.style.opacity = '1';
   }
 
-  /* Finish-time label via Intl.DateTimeFormat */
-  const endTimeEl = $('#endTime');
-  const endFmt = new Intl.DateTimeFormat(undefined, { hour:'2-digit', minute:'2-digit', second:'2-digit' });
-  let endsAt = null; // Date
-
-  function showEndTimeLabel(show){
-    endTimeEl.hidden = !show;
-  }
-  function updateEndTimeLabel(){
-    if (!endsAt) { endTimeEl.textContent = 'Ends at —'; return; }
-    endTimeEl.textContent = `Ends at: ${endFmt.format(endsAt)}`;
-  }
-
-  /* Balloons + congrats */
-  function launchBalloons(count=16){
-    const colors = ['#f87171','#60a5fa','#34d399','#fbbf24','#a78bfa','#fb7185','#22d3ee'];
-    for (let i=0;i<count;i++){
-      const b = document.createElement('div');
-      b.className = 'balloon';
-      b.style.left = `calc(${Math.random()*100}vw)`;
-      b.style.setProperty('--bcol', colors[Math.floor(Math.random()*colors.length)]);
-      b.style.setProperty('--dur', (5 + Math.random()*4).toFixed(2) + 's');
-      b.style.setProperty('--drift', ((Math.random()*120 - 60)|0) + 'px');
-      document.body.appendChild(b);
-      setTimeout(()=> b.remove(), 10000);
-    }
-  }
-  const congrats = $('#congrats');
-  $('#closeCongrats').addEventListener('click', () => congrats.classList.remove('show'));
-
-  /* Countdown */
-  let totalSec = 0, remaining = 0, ticking = null;
-
-  function start(){
-    const h = Math.max(0, parseInt($('#hoursInput').value||'0',10));
-    const m = Math.max(0, parseInt($('#minInput').value||'0',10));
-    const s = Math.max(0, Math.min(59, parseInt($('#secInput').value||'0',10)));
-    const showH = $('#showHours').checked;
-    const showS = $('#showSeconds').checked;
-
-    totalSec = h*3600 + m*60 + s;
-    remaining = totalSec;
-
-    setupDigits(showH, showS);
-    updateDisplay(remaining);
-
-    relight();
-    setWaxHeightByProgress(1);
-
-    // compute finish time now
-    endsAt = totalSec > 0 ? new Date(Date.now() + totalSec*1000) : null;
-    showEndTimeLabel($('#showEndTime').checked);
-    updateEndTimeLabel();
-
-    if (ticking) clearInterval(ticking);
-    if (remaining <= 0){
-      setWaxHeightByProgress(0);
-      extinguish();
-      congrats.classList.add('show');
-      launchBalloons();
-      return;
-    }
-    ticking = setInterval(tick, 1000);
-  }
-
-  function tick(){
-    if (remaining <= 0){
-      clearInterval(ticking); ticking = null;
-      updateDisplay(0);
-      setWaxHeightByProgress(0);
-      extinguish();
-      congrats.classList.add('show');
-      launchBalloons();
-      return;
-    }
-    remaining--;
-    updateDisplay(remaining);
-    const p = (totalSec>0) ? (remaining/totalSec) : 0;
-    setWaxHeightByProgress(p);
-  }
-
-  function reset(){
-    if (ticking){ clearInterval(ticking); ticking=null; }
-    start();
-    if (ticking){ clearInterval(ticking); ticking=null; }
-  }
-
-  /* Styling bindings */
+  /* Background, colors */
   function applyBackground(){
-    const ang = parseInt($('#bgAngle').value||'135',10);
-    const c1 = $('#bgC1').value, c2 = $('#bgC2').value, c3 = $('#bgC3').value;
-    document.body.style.background = gradientStr(ang, c1, c2, c3);
+    if (!document.body.dataset.bgimg){
+      const ang = parseInt($('#bgAngle').value||'135',10);
+      const c1 = $('#bgC1').value, c2 = $('#bgC2').value, c3 = $('#bgC3').value;
+      document.body.style.background = gradientStr(ang,c1,c2,c3);
+    }
   }
   function restyleClockPanels(){
     const c1 = $('#clockC1').value, c2 = $('#clockC2').value, c3 = $('#clockC3').value, txt = $('#textColor').value;
@@ -602,23 +362,27 @@
     document.documentElement.style.setProperty('--clock-c2', c2);
     document.documentElement.style.setProperty('--clock-c3', c3);
     document.documentElement.style.setProperty('--clock-text', txt);
-    const colon = $('#colonColor').value;
-    document.documentElement.style.setProperty('--colon-color', colon);
+    document.documentElement.style.setProperty('--colon-color', $('#colonColor').value);
   }
   function applyWax(){ document.documentElement.style.setProperty('--wax', $('#waxColor').value); }
 
-  // UI wiring
-  $('#startBtn').addEventListener('click', start);
-  $('#resetBtn').addEventListener('click', reset);
-  $('#showHours').addEventListener('change', ()=>{ setupDigits($('#showHours').checked, $('#showSeconds').checked); updateDisplay(remaining); });
-  $('#showSeconds').addEventListener('change', ()=>{ setupDigits($('#showHours').checked, $('#showSeconds').checked); updateDisplay(remaining); });
-  $('#showEndTime').addEventListener('change', ()=> showEndTimeLabel($('#showEndTime').checked));
+  /* Custom image background */
+  $('#bgImageInput').addEventListener('change', e=>{
+    const f = e.target.files && e.target.files;
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      document.body.style.background = `url('${r.result}') center / cover no-repeat fixed`;
+      document.body.dataset.bgimg = '1';
+    };
+    r.readAsDataURL(f);
+  });
+  $('#clearBgBtn').addEventListener('click', ()=>{
+    delete document.body.dataset.bgimg;
+    applyBackground();
+  });
 
-  ['bgAngle','bgC1','bgC2','bgC3'].forEach(id => document.getElementById(id).addEventListener('input', applyBackground));
-  ['clockC1','clockC2','clockC3','textColor','colonColor'].forEach(id => document.getElementById(id).addEventListener('input', restyleClockPanels));
-  $('#waxColor').addEventListener('input', applyWax);
-
-  // Fullscreen controls
+  /* Fullscreen */
   async function goFullscreen(){
     try{
       if (!document.fullscreenElement){ await document.documentElement.requestFullscreen(); }
@@ -637,18 +401,75 @@
     if (!document.fullscreenElement){ document.body.classList.remove('fullscreen-on'); $('#exitFs').style.display='none'; }
   });
 
-  // Layout + init
+  /* rAF-driven countdown (low-latency) */
+  let totalSec = 0, remaining = 0, rafId = null, endAtMs = 0, lastWhole = -1, running = false;
+
+  function start(){
+    const h = Math.max(0, parseInt($('#hoursInput').value||'0',10));
+    const m = Math.max(0, parseInt($('#minInput').value||'0',10));
+    const s = Math.max(0, Math.min(59, parseInt($('#secInput').value||'0',10)));
+    const showH = $('#showHours').checked;
+    const showS = $('#showSeconds').checked;
+
+    totalSec = h*3600 + m*60 + s;
+    setupDigits(showH, showS);
+    updateDisplay(totalSec);
+    relight();
+    setWaxHeightByProgress(1);
+    positionFlame();
+
+    cancelAnimationFrame(rafId);
+    if (totalSec <= 0){ // immediate end
+      setWaxHeightByProgress(0); extinguish(); running = false; return;
+    }
+    endAtMs = performance.now() + totalSec*1000;
+    lastWhole = Math.ceil(totalSec); running = true;
+    rafId = requestAnimationFrame(loop);
+  }
+
+  function loop(now){
+    if (!running) return;
+    const remainingMs = Math.max(0, endAtMs - now);
+    const secWhole = Math.floor(remainingMs/1000);
+    if (secWhole !== lastWhole){
+      updateDisplay(secWhole);
+      lastWhole = secWhole;
+    }
+    const p = totalSec > 0 ? remainingMs / (totalSec*1000) : 0;
+    setWaxHeightByProgress(p);
+    positionFlame();
+
+    if (remainingMs <= 0){
+      extinguish();
+      running = false;
+      return;
+    }
+    rafId = requestAnimationFrame(loop);
+  }
+
+  function reset(){
+    cancelAnimationFrame(rafId);
+    running = false;
+    start();
+    cancelAnimationFrame(rafId);
+    running = false;
+  }
+
+  // UI
+  $('#startBtn').addEventListener('click', start);
+  $('#resetBtn').addEventListener('click', reset);
+  $('#showHours').addEventListener('change', ()=>{ setupDigits($('#showHours').checked, $('#showSeconds').checked); updateDisplay(lastWhole>0?lastWhole:0); });
+  $('#showSeconds').addEventListener('change', ()=>{ setupDigits($('#showHours').checked, $('#showSeconds').checked); updateDisplay(lastWhole>0?lastWhole:0); });
+
+  ['bgAngle','bgC1','bgC2','bgC3'].forEach(id => document.getElementById(id).addEventListener('input', applyBackground));
+  ['clockC1','clockC2','clockC3','textColor','colonColor'].forEach(id => document.getElementById(id).addEventListener('input', restyleClockPanels));
+  $('#waxColor').addEventListener('input', applyWax);
   window.addEventListener('resize', positionFlame);
-  applyBackground();
-  restyleClockPanels();
-  applyWax();
-  // Default layout: MM:SS visible
-  setupDigits(false, true);
-  updateDisplay(60);
-  setWaxHeightByProgress(1);
-  relight();
-  positionFlame();
-  showEndTimeLabel($('#showEndTime').checked);
+
+  // Init
+  applyBackground(); restyleClockPanels(); applyWax();
+  setupDigits(false,true); updateDisplay(60);
+  setWaxHeightByProgress(1); relight(); positionFlame();
 </script>
 </body>
 </html>
