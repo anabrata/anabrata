@@ -6,93 +6,76 @@
 <title>Luxury Analog Watch (Rolex‑inspired, no branding)</title>
 <style>
   :root{
-    --bg1:#0d1117;
-    --bg2:#1b2533;
-    --ring:#0a0a0a;
-    --bezel:#1f2937;
-    --dial:#101820;
-    --marker:#d7e3ff;
-    --accent:#22d3ee;
-    --sec:#e11d48;
-    --hand:#f8fafc;
-    --shadow: rgba(0,0,0,.35);
-    --glass: rgba(255,255,255,.12);
+    --bg1:#0d1117; --bg2:#1b2533; --ring:#0a0a0a; --bezel:#1f2937;
+    --dial:#101820; --marker:#d7e3ff; --accent:#22d3ee;
+    --sec:#e11d48; --hand:#f8fafc; --shadow: rgba(0,0,0,.35); --glass: rgba(255,255,255,.12);
     --size:min(88vmin,560px);
   }
-  *{box-sizing:border-box}
-  html,body{height:100%}
+  *{box-sizing:border-box} html,body{height:100%}
   body{
-    margin:0;
-    font:400 16px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+    margin:0; font:400 16px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
     background: radial-gradient(120% 120% at 20% 10%, #182234 0%, var(--bg2) 40%, var(--bg1) 100%);
-    color:#e5e7eb;
-    display:grid; place-items:center;
+    color:#e5e7eb; display:grid; place-items:center;
   }
   .wrap{display:grid; gap:18px; place-items:center; padding:18px}
   .title{font-weight:600; letter-spacing:.3px}
-  .watch{
-    width:var(--size); aspect-ratio:1/1; position:relative;
-    filter: drop-shadow(0 20px 40px var(--shadow));
-  }
+  .watch{ width:var(--size); height:var(--size); position:relative; filter: drop-shadow(0 20px 40px var(--shadow)); }
   .bezel{
     position:absolute; inset:0; border-radius:50%;
     background:
       radial-gradient(closest-side, #ffffff20 0 96%, transparent 96% 100%),
       conic-gradient(from 90deg at 50% 50%, #2a3344, #1d2737, #2a3344);
     box-shadow:
-      inset 0 2px 6px #00000060,
-      inset 0 -2px 10px #00000070,
-      0 0 0 10px #00000015,
-      0 0 0 1px #00000080;
+      inset 0 2px 6px #00000060, inset 0 -2px 10px #00000070, 0 0 0 10px #00000015, 0 0 0 1px #00000080;
   }
   .crystal{
     position:absolute; inset:2.2%; border-radius:50%;
     background:
       radial-gradient(120% 140% at 30% 10%, #ffffff14, transparent 48%),
       radial-gradient(70% 120% at 70% 85%, #ffffff10, transparent 60%);
-    pointer-events:none;
-    mix-blend-mode:screen;
+    pointer-events:none; mix-blend-mode:screen;
   }
   svg{width:100%; height:100%; display:block}
-  /* Hands: compositor-friendly transforms */
   .hand { transform-box: fill-box; transform-origin: 50% 50%; will-change: transform; }
   .hand.hour, .hand.minute, .hand.second { filter: drop-shadow(0 2px 2px #0008); }
-  .hand.second { color: var(--sec); }
-  .hand.minute, .hand.hour { color: var(--hand);}
-  /* Center cap */
+  .hand.minute, .hand.hour { color: var(--hand); }
+  /* Explicit fills so it renders consistently across browsers */
+  .hand path { fill: #fff; }
+  .hand.second rect, .hand.second circle { fill: var(--sec); }
   .cap{filter: drop-shadow(0 1px 2px #0008)}
-  /* Gears backdrop */
   .gears { opacity:.9; }
   .gear { fill:#a1a1aa22; stroke:#a1a1aa55; stroke-width:1; transform-box: fill-box; transform-origin: 50% 50%; will-change: transform; }
-  /* Controls */
   .controls{
     display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center;
-    background:#0f172a80; border:1px solid #334155; border-radius:10px; padding:10px 12px;
-    backdrop-filter: blur(6px);
+    background:#0f172a80; border:1px solid #334155; border-radius:10px; padding:10px 12px; backdrop-filter: blur(6px);
   }
   .controls label{display:flex; gap:8px; align-items:center; font-size:14px}
   .controls input[type="checkbox"], .controls select { accent-color: var(--accent); }
-  .lcd{
-    font-variant-numeric: tabular-nums; letter-spacing:.5px;
-    padding:.35rem .6rem; border-radius:8px; background:#0b122280; border:1px solid #2c3a55;
-  }
-  /* Reduced motion: stop non-essential animation and step seconds */
-  @media (prefers-reduced-motion: reduce){
-    .gears{ display:none; }
-  }
+  .lcd{ font-variant-numeric: tabular-nums; letter-spacing:.5px; padding:.35rem .6rem; border-radius:8px; background:#0b122280; border:1px solid #2c3a55; }
+  @media (prefers-reduced-motion: reduce){ .gears{ display:none; } }
+  /* Small debug pill if a runtime error occurs */
+  #err{position:fixed; bottom:10px; left:10px; right:10px; max-width:720px; margin:auto; padding:8px 12px;
+       background:#7f1d1d; color:#fee2e2; border:1px solid #fecaca; border-radius:8px; font-size:12px; display:none; white-space:pre-wrap}
 </style>
 </head>
 <body>
+  <noscript>
+    <div style="padding:12px; background:#7f1d1d; color:#fff; border-radius:8px; max-width:640px; margin:12px auto;">
+      JavaScript is disabled. Enable it to see the animated watch.
+    </div>
+  </noscript>
+
   <div class="wrap">
     <div class="title">Luxury analog watch (Rolex‑inspired, no branding)</div>
     <div class="watch" aria-label="Analog watch showing current time">
       <div class="bezel" aria-hidden="true"></div>
-      <svg viewBox="0 0 400 400" role="img" aria-labelledby="lbl">
+
+      <!-- Note the xmlns attribute added here -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-labelledby="lbl">
         <title id="lbl">High‑fidelity analog watch face with animated hands</title>
-        <!-- Backdrop gears (behind dial) -->
+
         <g class="gears" id="gears"></g>
 
-        <!-- Dial -->
         <defs>
           <radialGradient id="dialGrad" cx="50%" cy="50%" r="55%">
             <stop offset="0%" stop-color="#0e1622"/>
@@ -105,20 +88,14 @@
           </linearGradient>
         </defs>
 
-        <!-- Dial ring and face -->
         <circle cx="200" cy="200" r="182" fill="#030712" stroke="#0b1220" stroke-width="1.5"/>
         <circle cx="200" cy="200" r="174" fill="url(#dialGrad)" stroke="#111827" stroke-width="0.5"/>
 
-        <!-- Minute ticks -->
         <g fill="none" stroke="#cbd5e180" stroke-width="2">
           <g id="minticks"></g>
         </g>
-        <!-- Hour markers -->
-        <g id="hourMarks" fill="#e5e7eb">
-          <!-- Will be built by JS for clean layout -->
-        </g>
+        <g id="hourMarks" fill="#e5e7eb"></g>
 
-        <!-- Hands -->
         <g id="hands">
           <!-- Hour -->
           <g class="hand hour" id="hHour">
@@ -129,19 +106,18 @@
           <g class="hand minute" id="hMinute">
             <path d="M200 212 L200 78 L203.5 72 L196.5 72 L200 78 Z" fill="url(#handGrad)"/>
           </g>
-          <!-- Second (red) -->
+          <!-- Second -->
           <g class="hand second" id="hSecond">
-            <rect x="199.2" y="95" width="1.6" height="120" rx="1" fill="currentColor"/>
-            <circle cx="200" cy="210" r="5.5" fill="currentColor"/>
+            <!-- switched to explicit CSS fills instead of currentColor -->
+            <rect x="199.2" y="95" width="1.6" height="120" rx="1"/>
+            <circle cx="200" cy="210" r="5.5"/>
           </g>
-          <!-- Center cap on top -->
           <circle class="cap" cx="200" cy="200" r="8.5" fill="#0f172a" stroke="#e5e7eb" stroke-width="2"/>
         </g>
 
-        <!-- Subtle glass edge -->
         <circle cx="200" cy="200" r="172" fill="none" stroke="#ffffff10" stroke-width="3"/>
-
       </svg>
+
       <div class="crystal" aria-hidden="true"></div>
     </div>
 
@@ -159,186 +135,185 @@
     </div>
   </div>
 
+  <div id="err" aria-live="polite"></div>
+
 <script>
 (function(){
-  const svg = document.querySelector('svg');
-  const minticks = document.getElementById('minticks');
-  const hourMarks = document.getElementById('hourMarks');
-  const hHour = document.getElementById('hHour');
-  const hMinute = document.getElementById('hMinute');
-  const hSecond = document.getElementById('hSecond');
-  const lcd = document.getElementById('lcd');
-  const gearsG = document.getElementById('gears');
-  const chkBeat8 = document.getElementById('beat8');
-  const chkGears = document.getElementById('showGears');
-  const selStyle = document.getElementById('style');
+  const onError = (e) => {
+    const box = document.getElementById('err');
+    box.style.display = 'block';
+    box.textContent = 'Script error: ' + (e && (e.message || e.toString()));
+  };
+  try {
+    const svg = document.querySelector('svg');
+    const minticks = document.getElementById('minticks');
+    const hourMarks = document.getElementById('hourMarks');
+    const hHour = document.getElementById('hHour');
+    const hMinute = document.getElementById('hMinute');
+    const hSecond = document.getElementById('hSecond');
+    const lcd = document.getElementById('lcd');
+    const gearsG = document.getElementById('gears');
+    const chkBeat8 = document.getElementById('beat8');
+    const chkGears = document.getElementById('showGears');
+    const selStyle = document.getElementById('style');
 
-  // Build minute ticks (60)
-  for(let i=0;i<60;i++){
-    const a = (i*Math.PI)/30;
-    const r1 = 160, r2 = i%5===0? 148:153;
-    const x1=200+Math.sin(a)*r1, y1=200-Math.cos(a)*r1;
-    const x2=200+Math.sin(a)*r2, y2=200-Math.cos(a)*r2;
-    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
-    line.setAttribute('x1',x1); line.setAttribute('y1',y1);
-    line.setAttribute('x2',x2); line.setAttribute('y2',y2);
-    line.setAttribute('stroke-width', i%5===0? 3.2: 1.6);
-    line.setAttribute('stroke', i%5===0? '#e5e7ebd0':'#cbd5e190');
-    minticks.appendChild(line);
-  }
+    // Build minute ticks (60)
+    for(let i=0;i<60;i++){
+      const a = (i*Math.PI)/30;
+      const r1 = 160, r2 = i%5===0? 148:153;
+      const x1=200+Math.sin(a)*r1, y1=200-Math.cos(a)*r1;
+      const x2=200+Math.sin(a)*r2, y2=200-Math.cos(a)*r2;
+      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1',x1); line.setAttribute('y1',y1);
+      line.setAttribute('x2',x2); line.setAttribute('y2',y2);
+      line.setAttribute('stroke-width', i%5===0? 3.2: 1.6);
+      line.setAttribute('stroke', i%5===0? '#e5e7ebd0':'#cbd5e190');
+      minticks.appendChild(line);
+    }
 
-  // Hour markers (12) rounded batons
-  for(let i=0;i<12;i++){
-    const angle = i*30;
-    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
-    g.setAttribute('transform',`rotate(${angle} 200 200)`);
-    const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
-    rect.setAttribute('x',198.5);
-    rect.setAttribute('y',52);
-    rect.setAttribute('width',3);
-    rect.setAttribute('height',22);
-    rect.setAttribute('rx',1.5);
-    rect.setAttribute('fill','#eef2ff');
-    g.appendChild(rect);
-    hourMarks.appendChild(g);
-  }
-
-  // Simple gear generator (tooth rectangles)
-  function makeGear(cx, cy, r, toothCount, toothH, colorFill='#a1a1aa22', colorStroke='#a1a1aa55'){
-    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
-    g.setAttribute('class','gear');
-    // body
-    const body = document.createElementNS('http://www.w3.org/2000/svg','circle');
-    body.setAttribute('cx',cx); body.setAttribute('cy',cy); body.setAttribute('r',r*0.82);
-    body.setAttribute('fill',colorFill); body.setAttribute('stroke',colorStroke); body.setAttribute('stroke-width','1.5');
-    g.appendChild(body);
-    // teeth
-    for(let i=0;i<toothCount;i++){
-      const ang = i*(360/toothCount);
+    // Hour markers (12)
+    for(let i=0;i<12;i++){
+      const angle = i*30;
+      const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+      g.setAttribute('transform',`rotate(${angle} 200 200)`);
       const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
-      const w = Math.max(3, r*0.22 * (Math.PI*2/toothCount));
-      rect.setAttribute('x',cx - w/2);
-      rect.setAttribute('y',cy - r - toothH);
-      rect.setAttribute('width',w);
-      rect.setAttribute('height',toothH);
-      rect.setAttribute('rx',1);
-      rect.setAttribute('fill',colorFill);
-      rect.setAttribute('stroke',colorStroke);
-      rect.setAttribute('stroke-width','1');
-      rect.setAttribute('transform',`rotate(${ang} ${cx} ${cy})`);
+      rect.setAttribute('x',198.5);
+      rect.setAttribute('y',52);
+      rect.setAttribute('width',3);
+      rect.setAttribute('height',22);
+      rect.setAttribute('rx',1.5);
+      rect.setAttribute('fill','#eef2ff');
       g.appendChild(rect);
-    }
-    // hub + spokes
-    const hub = document.createElementNS('http://www.w3.org/2000/svg','circle');
-    hub.setAttribute('cx',cx); hub.setAttribute('cy',cy); hub.setAttribute('r',r*0.18);
-    hub.setAttribute('fill','#0b1222'); hub.setAttribute('stroke',colorStroke); hub.setAttribute('stroke-width','1.2');
-    g.appendChild(hub);
-    for(let i=0;i<6;i++){
-      const ang = i*60;
-      const spoke = document.createElementNS('http://www.w3.org/2000/svg','rect');
-      spoke.setAttribute('x',cx-1.2); spoke.setAttribute('y',cy-r*0.82);
-      spoke.setAttribute('width',2.4); spoke.setAttribute('height',r*0.64);
-      spoke.setAttribute('fill',colorStroke);
-      spoke.setAttribute('opacity','.65');
-      spoke.setAttribute('transform',`rotate(${ang} ${cx} ${cy})`);
-      g.appendChild(spoke);
-    }
-    return g;
-  }
-
-  // Place two meshing gears
-  const gear1 = makeGear(120,275,55,24,10);
-  const gear2 = makeGear(210,300,35,18,8);
-  const gear3 = makeGear(300,285,48,22,10);
-  gearsG.append(gear1, gear2, gear3);
-
-  // State
-  let running = true;
-  let lastTs = 0;
-
-  // Style switcher
-  function applyStyle(name){
-    const dial = svg.querySelector('radialGradient#dialGrad');
-    if(name==='classic'){
-      dial.innerHTML = '<stop offset="0%" stop-color="#0e1622"/><stop offset="70%" stop-color="#0a1018"/><stop offset="100%" stop-color="#04070b"/>';
-      document.documentElement.style.setProperty('--sec','#e11d48');
-    }else if(name==='navy'){
-      dial.innerHTML = '<stop offset="0%" stop-color="#0f1b32"/><stop offset="70%" stop-color="#0a1330"/><stop offset="100%" stop-color="#060b1b"/>';
-      document.documentElement.style.setProperty('--sec','#22d3ee');
-    }else{
-      dial.innerHTML = '<stop offset="0%" stop-color="#dfe7f1"/><stop offset="70%" stop-color="#bfc9d8"/><stop offset="100%" stop-color="#a5b1c4"/>';
-      document.documentElement.style.setProperty('--sec','#ef4444');
-    }
-  }
-  applyStyle(selStyle.value);
-  selStyle.addEventListener('change', e=>applyStyle(e.target.value));
-
-  // Gear speeds (deg/sec), simple ratio
-  const baseRPM = 6; // 6 deg/sec
-  function setGearDisplay(on){ gearsG.style.display = on? 'block':'none'; }
-  setGearDisplay(chkGears.checked);
-  chkGears.addEventListener('change', e=> setGearDisplay(e.target.checked));
-
-  // Animation loop
-  function tick(ts){
-    if(!running){ requestAnimationFrame(tick); return; }
-
-    // time now
-    const now = new Date();
-    const ms = now.getMilliseconds();
-    const s = now.getSeconds();
-    const m = now.getMinutes();
-    const h = now.getHours()%12;
-
-    // Mode for seconds: smooth or 8-beat (approx 28,800 vph / 8Hz)
-    const beat8 = chkBeat8.checked || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let secFrac;
-    if(beat8){
-      const step = Math.floor(ms/125); // 8 steps per second
-      secFrac = s + step/8;
-    }else{
-      secFrac = s + ms/1000;
+      hourMarks.appendChild(g);
     }
 
-    // Angles
-    const secAngle = secFrac * 6;                 // 360/60
-    const minAngle = (m + (s + ms/1000)/60) * 6;  // 360/60
-    const hourAngle = (h + (m + s/60 + ms/60000)/60) * 30; // 360/12
+    // Simple gears
+    function makeGear(cx, cy, r, toothCount, toothH, colorFill='#a1a1aa22', colorStroke='#a1a1aa55'){
+      const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+      g.setAttribute('class','gear');
+      const body = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      body.setAttribute('cx',cx); body.setAttribute('cy',cy); body.setAttribute('r',r*0.82);
+      body.setAttribute('fill',colorFill); body.setAttribute('stroke',colorStroke); body.setAttribute('stroke-width','1.5');
+      g.appendChild(body);
+      for(let i=0;i<toothCount;i++){
+        const ang = i*(360/toothCount);
+        const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+        const w = Math.max(3, r*0.22 * (Math.PI*2/toothCount));
+        rect.setAttribute('x',cx - w/2);
+        rect.setAttribute('y',cy - r - toothH);
+        rect.setAttribute('width',w);
+        rect.setAttribute('height',toothH);
+        rect.setAttribute('rx',1);
+        rect.setAttribute('fill',colorFill);
+        rect.setAttribute('stroke',colorStroke);
+        rect.setAttribute('stroke-width','1');
+        rect.setAttribute('transform',`rotate(${ang} ${cx} ${cy})`);
+        g.appendChild(rect);
+      }
+      const hub = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      hub.setAttribute('cx',cx); hub.setAttribute('cy',cy); hub.setAttribute('r',r*0.18);
+      hub.setAttribute('fill','#0b1222'); hub.setAttribute('stroke',colorStroke); hub.setAttribute('stroke-width','1.2');
+      g.appendChild(hub);
+      for(let i=0;i<6;i++){
+        const ang = i*60;
+        const spoke = document.createElementNS('http://www.w3.org/2000/svg','rect');
+        spoke.setAttribute('x',cx-1.2); spoke.setAttribute('y',cy-r*0.82);
+        spoke.setAttribute('width',2.4); spoke.setAttribute('height',r*0.64);
+        spoke.setAttribute('fill',colorStroke); spoke.setAttribute('opacity','.65');
+        spoke.setAttribute('transform',`rotate(${ang} ${cx} ${cy})`);
+        g.appendChild(spoke);
+      }
+      return g;
+    }
 
-    // Apply transforms (CSS) with attribute fallback
-    const rot = (el, a) => {
-      el.style.transform = `rotate(${a}deg)`;
-      el.setAttribute('transform', `rotate(${a} 200 200)`);
-    };
-    rot(hSecond, secAngle);
-    rot(hMinute, minAngle);
-    rot(hHour, hourAngle);
+    const gear1 = makeGear(120,275,55,24,10);
+    const gear2 = makeGear(210,300,35,18,8);
+    const gear3 = makeGear(300,285,48,22,10);
+    gearsG.append(gear1, gear2, gear3);
 
-    // LCD
-    const pad = n=> String(n).padStart(2,'0');
-    lcd.textContent = `${pad(now.getHours())}:${pad(m)}:${pad(s)}`;
+    // Style switcher
+    function applyStyle(name){
+      const dial = svg.querySelector('radialGradient#dialGrad');
+      if(name==='classic'){
+        dial.innerHTML = '<stop offset="0%" stop-color="#0e1622"/><stop offset="70%" stop-color="#0a1018"/><stop offset="100%" stop-color="#04070b"/>';
+        document.documentElement.style.setProperty('--sec','#e11d48');
+      }else if(name==='navy'){
+        dial.innerHTML = '<stop offset="0%" stop-color="#0f1b32"/><stop offset="70%" stop-color="#0a1330"/><stop offset="100%" stop-color="#060b1b"/>';
+        document.documentElement.style.setProperty('--sec','#22d3ee');
+      }else{
+        dial.innerHTML = '<stop offset="0%" stop-color="#dfe7f1"/><stop offset="70%" stop-color="#bfc9d8"/><stop offset="100%" stop-color="#a5b1c4"/>';
+        document.documentElement.style.setProperty('--sec','#ef4444');
+      }
+    }
+    applyStyle(selStyle.value);
+    selStyle.addEventListener('change', e=>applyStyle(e.target.value));
 
-    // Gears rotation (simple contra-rotation, proportional speeds)
-    const dt = (ts - lastTs) || 16.67;
-    lastTs = ts;
-    const g1 = (parseFloat(gear1.dataset.a)||0) + baseRPM * (dt/1000);
-    const g2 = (parseFloat(gear2.dataset.a)||0) - baseRPM * (55/35) * (dt/1000);
-    const g3 = (parseFloat(gear3.dataset.a)||0) + baseRPM * (48/35) * (dt/1000);
-    gear1.dataset.a = g1; gear2.dataset.a = g2; gear3.dataset.a = g3;
-    gear1.style.transform = `rotate(${g1}deg)`; gear1.setAttribute('transform',`rotate(${g1} 120 275)`);
-    gear2.style.transform = `rotate(${g2}deg)`; gear2.setAttribute('transform',`rotate(${g2} 210 300)`);
-    gear3.style.transform = `rotate(${g3}deg)`; gear3.setAttribute('transform',`rotate(${g3} 300 285)`);
+    // Controls
+    function setGearDisplay(on){ gearsG.style.display = on? 'block':'none'; }
+    setGearDisplay(chkGears.checked);
+    chkGears.addEventListener('change', e=> setGearDisplay(e.target.checked));
 
+    // Animation state
+    let running = true;
+    let lastTs = 0;
+    const baseRPM = 6;
+
+    function tick(ts){
+      if(!running){ requestAnimationFrame(tick); return; }
+
+      const now = new Date();
+      const ms = now.getMilliseconds();
+      const s = now.getSeconds();
+      const m = now.getMinutes();
+      const h = now.getHours()%12;
+
+      const beat8 = chkBeat8.checked || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let secFrac = beat8 ? (s + Math.floor(ms/125)/8) : (s + ms/1000);
+
+      const secAngle = secFrac * 6;
+      const minAngle = (m + (s + ms/1000)/60) * 6;
+      const hourAngle = (h + (m + s/60 + ms/60000)/60) * 30;
+
+      const rot = (el, a) => {
+        el.style.transform = `rotate(${a}deg)`;
+        el.setAttribute('transform', `rotate(${a} 200 200)`);
+      };
+      rot(hSecond, secAngle);
+      rot(hMinute, minAngle);
+      rot(hHour, hourAngle);
+
+      const pad = n=> String(n).padStart(2,'0');
+      lcd.textContent = `${pad(now.getHours())}:${pad(m)}:${pad(s)}`;
+
+      const dt = (ts - lastTs) || 16.67;
+      lastTs = ts;
+      const g1 = (parseFloat(gear1.dataset.a)||0) + baseRPM * (dt/1000);
+      const g2 = (parseFloat(gear2.dataset.a)||0) - baseRPM * (55/35) * (dt/1000);
+      const g3 = (parseFloat(gear3.dataset.a)||0) + baseRPM * (48/35) * (dt/1000);
+      gear1.dataset.a = g1; gear2.dataset.a = g2; gear3.dataset.a = g3;
+      gear1.style.transform = `rotate(${g1}deg)`; gear1.setAttribute('transform',`rotate(${g1} 120 275)`);
+      gear2.style.transform = `rotate(${g2}deg)`; gear2.setAttribute('transform',`rotate(${g2} 210 300)`);
+      gear3.style.transform = `rotate(${g3}deg)`; gear3.setAttribute('transform',`rotate(${g3} 300 285)`);
+
+      requestAnimationFrame(tick);
+    }
     requestAnimationFrame(tick);
+
+    document.addEventListener('visibilitychange', () => {
+      running = !document.hidden;
+      if (running) requestAnimationFrame(tick);
+    });
+  } catch(err){
+    onError(err);
   }
-  requestAnimationFrame(tick);
 
-  // Page visibility handling (optional explicit pause)
-  document.addEventListener('visibilitychange', () => {
-    running = !document.hidden; // rAF already throttles in background; this ensures we skip work
-    if (running) requestAnimationFrame(tick);
+  // Also catch async errors
+  window.addEventListener('error', (e)=> {
+    const msg = e && e.error ? (e.error.stack || e.error.message) : (e.message || String(e));
+    const box = document.getElementById('err');
+    box.style.display = 'block';
+    box.textContent = 'Script error: ' + msg;
   });
-
 })();
 </script>
 </body>
