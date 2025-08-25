@@ -104,6 +104,13 @@
       linear-gradient(180deg,var(--wax), #e6d9bb);
     transition: height .22s linear;
   }
+  .waxTop{
+    position:absolute; top:-22px; left:50%; transform:translateX(-50%); width:150px; height:44px; pointer-events:none; z-index:3;
+    background:
+      conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,.33) 0deg, rgba(255,255,255,.10) 70deg, rgba(0,0,0,.08) 180deg, rgba(255,255,255,.20) 300deg, rgba(255,255,255,.33) 360deg),
+      radial-gradient(65% 55% at 50% 62%, rgba(255,255,255,.52), rgba(255,255,255,.12) 60%, rgba(0,0,0,.10) 100%);
+    border-radius:50%/62% 62% 38% 38%;
+  }
   .wax:after{
     content:""; position:absolute; top:30px; left:24px; width:12px; height:64px; border-radius:10px;
     background: linear-gradient(180deg,#fff6,#0000 60%), var(--wax);
@@ -188,6 +195,7 @@
     text-shadow:0 10px 40px rgba(0,0,0,.6);
     opacity:0; transform:scale(.9);
   }
+  /* fading step per number */
   .step{ animation: fadeStep 1s ease both }
   @keyframes fadeStep{
     0%  { opacity:0; transform:scale(.9) }
@@ -196,6 +204,7 @@
     100%{ opacity:0; transform:scale(1.06) }
   }
 
+  /* Hide everything but overlay while pre-start is active */
   .pre-on .brand,
   .pre-on #controls,
   .pre-on #exitFs,
@@ -222,7 +231,7 @@
       <div class="candle-clip">
         <div class="candle-wrap" id="candleWrap">
           <div class="wax" id="wax">
-            <!-- waxTop removed to eliminate white circle -->
+            <div class="waxTop"></div>
             <div class="wick" id="wick"></div>
           </div>
           <div class="stub" id="stub"></div>
@@ -425,7 +434,7 @@
       const text = n > 0 ? String(n) : 'Go';
       if (label.textContent !== text){
         label.textContent = text;
-        label.classList.remove('step'); void label.offsetWidth; label.classList.add('step');
+        label.classList.remove('step'); void label.offsetWidth; label.classList.add('step'); // restart fade
       }
       if (remain <= 0){
         overlay.hidden = true;
@@ -440,7 +449,7 @@
 
   function togglePrimary(){
     if (!running && !paused){
-      startWithFadeCountdown();
+      startWithFadeCountdown(); // fade-in pre-start
       return;
     }
     if (running){
@@ -463,6 +472,7 @@
     cancelAnimationFrame(rafId); running=false; paused=false;
     if (preRAF){ cancelAnimationFrame(preRAF); preRAF=null; $('#preOverlay').hidden=true; document.body.classList.remove('pre-on'); }
     primaryBtn.textContent='Start';
+    // rebuild display per current toggles
     showH = $('#showHours').checked; showS = $('#showSeconds').checked;
     if (useFlip){
       flipDigits = buildFlip(timerFlip, showH, showS);
@@ -470,6 +480,7 @@
     }else{
       renderSimple(0);
     }
+    // Fully restore candle (fix for restart)
     candleWrap.classList.remove('vanish');
     candleWrap.style.opacity = '';
     candleWrap.style.transform = '';
@@ -490,7 +501,7 @@
   }
 
   /* Candle coupling */
-  const area = $('#candle-area'), waxEl=$('#wax'), wickEl=$('#wick'), flameEl=$('#flame'), stubEl=$('#stub'), smokeEl=$('#smoke'), candleWrap=$('#candleWrap']);
+  const area = $('#candle-area'), waxEl=$('#wax'), wickEl=$('#wick'), flameEl=$('#flame'), stubEl=$('#stub'), smokeEl=$('#smoke'), candleWrap=$('#candleWrap');
   const baseWaxHeight=380, minStub=58;
 
   function positionFlame(){
@@ -538,7 +549,7 @@
   async function goFullscreen(){
     try{
       if (!document.fullscreenElement){ await document.documentElement.requestFullscreen(); }
-      document.body.classList.add('fullscreen-on');
+      document.body.classList.add('fullscreen-on'); // hide everything except timer + candle
     }catch(e){}
   }
   function exitFullscreen(){
@@ -551,7 +562,7 @@
     if (!document.fullscreenElement){ document.body.classList.remove('fullscreen-on'); }
   });
 
-  /* Real-time overlay */
+  /* Real-time overlay (uses current flip/simple setting) */
   const rtcOverlay=$('#rtcOverlay'), rtcFlipContainer=$('#rtcTimer'), rtcSimple=$('#simpleRTC'), rtcBack=$('#rtcBack');
   let rtcDigits=[], rtcOn=false, rtcId=null, rtcLastSec=-1;
 
@@ -570,11 +581,11 @@
   function closeRTC(){
     document.body.classList.remove('rtc-only'); rtcOverlay.classList.remove('show');
     rtcOn=false; cancelAnimationFrame(rtcId);
-    $('#rtcMode').checked = false;
+    $('#rtcMode').checked = false; // untick when coming back
   }
   function drawRTC(){
     if (!rtcOn) return;
-    const secOfDay = Math.floor(Date.now()/1000)%86400;
+    const secOfDay = Math.floor(Date.now()/1000)%86400; // 1Hz updates
     if (secOfDay !== rtcLastSec){
       if ($('#useFlip').checked){ tickFlip(rtcDigits, secOfDay, true, true); }
       else{ rtcSimple.textContent = new Date().toLocaleTimeString(); }
@@ -594,6 +605,7 @@
   }
   function applyWax(){ document.documentElement.style.setProperty('--wax',$('#waxColor').value); }
 
+  /* Preview when toggling hours/seconds so Show hours works immediately */
   function previewLayout(){
     showH = $('#showHours').checked; showS = $('#showSeconds').checked;
     useFlip = $('#useFlip').checked;
