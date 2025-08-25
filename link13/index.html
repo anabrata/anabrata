@@ -34,10 +34,10 @@
     --simple-color: #ffffff;
 
     /* Candle */
-    --wax: #f2e4c7;
+    --wax: #f2e4c7;          /* user‑tunable */
     --wick: #1b1b1b;
 
-    /* Flame (new: customizable) */
+    /* Flame (user‑tunable core + glow derived from it) */
     --flame-color: #ffb347;
     --flame-glow-a: rgba(255,170,40,.55);
     --flame-glow-b: rgba(255,140,0,.40);
@@ -81,7 +81,7 @@
   #todo-panel     { grid-column:2; justify-self:center; align-self:center; }
   #candle-area    { grid-column:3; }
 
-  /* Center Clock */
+  /* Center Clock: timer centered; To‑do stays LEFT (grid) */
   .center-clock .main{ grid-template-columns: max-content 1fr max-content; }
   .center-clock #timer-container{
     position:absolute; left:50%; top:50%;
@@ -92,30 +92,29 @@
     margin-left:min(48px,5vw); z-index:6;
   }
 
-  /* Hide candle */
+  /* Hide candle → To‑do RIGHT */
   .candle-off #candle-area{ display:none !important; }
   .candle-off .main{ grid-template-columns: max-content max-content; }
   .candle-off #todo-panel{
     position:static !important; left:auto !important; top:auto !important; transform:none !important; justify-self:end !important;
   }
 
-  /* Center‑clock + candle‑off */
+  /* Center‑clock + candle‑off → keep To‑do LEFT */
   .center-clock.candle-off .main{ grid-template-columns: max-content 1fr; }
   .center-clock.candle-off #todo-panel{
     position:static !important; grid-column:1 !important; justify-self:start !important;
     margin-left:min(48px,5vw) !important; z-index:6 !important;
   }
 
-  /* Only candle */
+  /* Only candle → center candle, hide clock; To‑do LEFT */
   .only-candle #timer-container{ display:none !important; }
   .only-candle .main{ grid-template-columns: max-content 1fr; }
   .only-candle #todo-panel{
-    position:static; grid-column:1; justify-self:start; align-self:center; margin-left:min(48px,5vw);
-    z-index:6;
+    position:static; grid-column:1; justify-self:start; align-self:center; margin-left:min(48px,5vw); z-index:6;
   }
   .only-candle #candle-area{ grid-column: 2; justify-self: center; }
 
-  /* To‑do visibility */
+  /* To‑do visibility via .todo-on */
   #todo-panel{ display:none; }
   .todo-on #todo-panel{ display:block; }
 
@@ -172,9 +171,9 @@
   .bottom-flip{ bottom:0; transform-origin:top; border-top:1px solid var(--split-line); animation: bottomFlip .26s ease-out forwards; }
   @keyframes topFlip{ 0%{transform:rotateX(0)} 100%{transform:rotateX(-90deg)} }
   @keyframes bottomFlip{ 0%{transform:rotateX(90deg)} 100%{transform:rotateX(0)} }
-  .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.3); flex:0 0 auto; }
+  .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.3); }
 
-  /* Transparent style kept for compatibility (not exposed in UI) */
+  /* Transparent flip cards (not exposed in UI) */
   .clock-transparent .digit{
     background: transparent !important;
     border-color: rgba(255,255,255,.28) !important;
@@ -201,7 +200,7 @@
   .wax:after{ content:""; position:absolute; top:30px; left:24px; width:12px; height:64px; border-radius:10px; background: linear-gradient(180deg,#fff6,#0000 60%), var(--wax); box-shadow: 44px 8px 0 -3px var(--wax), 44px 8px 0 -3px #fff6, 92px 12px 0 -6px var(--wax), 92px 12px 0 -6px #fff6; opacity:.85; }
   .wick{ position:absolute; width:6px; height:30px; background:linear-gradient(180deg,#444,var(--wick)); border-radius:4px; top:-12px; left:50%; transform:translateX(-50%); z-index:4; }
 
-  /* Flame anchored to wick center (now color‑tunable) */
+  /* Flame anchored to wick center (color‑tunable) */
   .flame{
     position:absolute; width:52px; height:110px; z-index:6; pointer-events:none;
     left:0; top:0; transform: translate(-50%,-100%) translateY(10px);
@@ -431,7 +430,7 @@
         <label><input type="checkbox" id="onlyCandle"> Only candle mode</label>
         <label><input type="checkbox" id="showTodo" checked> Show to‑do list</label>
       </div>
-      <!-- New color controls (only additions requested) -->
+      <!-- New color controls -->
       <div class="row">
         <div style="flex:1"><label for="flameColor">Flame color</label><input id="flameColor" type="color" value="#ffb347"></div>
         <div style="flex:1"><label for="waxColor">Wax color</label><input id="waxColor" type="color" value="#f2e4c7"></div>
@@ -495,6 +494,19 @@
     document.documentElement.style.setProperty("--wax", picker ? picker.value : "#f2e4c7");
   }
 
+  function hexToRgb(hex){
+    const h = hex.replace('#','');
+    const full = (h.length===3) ? h.split('').map(c=>c+c).join('') : h;
+    const bigint = parseInt(full,16);
+    return { r:(bigint>>16)&255, g:(bigint>>8)&255, b:bigint&255 };
+  }
+  function setFlameColor(hex){
+    const {r,g,b} = hexToRgb(hex);
+    document.documentElement.style.setProperty('--flame-color', hex);
+    document.documentElement.style.setProperty('--flame-glow-a', `rgba(${r},${g},${b},0.55)`);
+    document.documentElement.style.setProperty('--flame-glow-b', `rgba(${r},${g},${b},0.40)`);
+  }
+
   function restyleClockPanels(){
     if (!$("#clockC1")) return;
     document.documentElement.style.setProperty("--clock-c1", $("#clockC1").value);
@@ -503,19 +515,6 @@
     document.documentElement.style.setProperty("--clock-text", $("#textColor").value);
     document.documentElement.style.setProperty("--colon-color", $("#colonColor").value);
     document.documentElement.style.setProperty("--simple-color", $("#simpleColor")?.value || "#ffffff");
-  }
-
-  /* New: flame color setter */
-  function hexToRgb(hex){
-    const h = hex.replace('#','');
-    const bigint = parseInt(h.length===3 ? h.split('').map(c=>c+c).join('') : h,16);
-    return { r:(bigint>>16)&255, g:(bigint>>8)&255, b:bigint&255 };
-  }
-  function setFlameColor(hex){
-    const {r,g,b} = hexToRgb(hex);
-    document.documentElement.style.setProperty('--flame-color', hex);
-    document.documentElement.style.setProperty('--flame-glow-a', `rgba(${r},${g},${b},0.55)`);
-    document.documentElement.style.setProperty('--flame-glow-b', `rgba(${r},${g},${b},0.40)`);
   }
 
   /* ---------- Flip clock ---------- */
@@ -582,17 +581,8 @@
   function buildFlip(container, showH = true, showS = true){
     container.innerHTML = "";
     const digits = [];
-    const addDigit = () => {
-      const d = createDigit("0");
-      container.appendChild(d);
-      digits.push(d);
-    };
-    const addColon = () => {
-      const c = document.createElement("div");
-      c.className = "colon";
-      c.textContent = ":";
-      container.appendChild(c);
-    };
+    const addDigit = () => { const d = createDigit("0"); container.appendChild(d); digits.push(d); };
+    const addColon = () => { const c = document.createElement("div"); c.className = "colon"; c.textContent = ":"; container.appendChild(c); };
     if (showH){ addDigit(); addDigit(); addColon(); }
     addDigit(); addDigit();
     if (showS){ addColon(); addDigit(); addDigit(); }
@@ -785,6 +775,7 @@
     if (!area || getComputedStyle(area).display === "none") return;
     const a = area.getBoundingClientRect();
     const w = wickEl.getBoundingClientRect();
+    if (!w.width && !w.height) return;
     const cx = w.left + w.width / 2 - a.left;
     const topAnchor = w.top - a.top;
     flameEl.style.left = `${cx}px`;
@@ -808,6 +799,7 @@
   new MutationObserver(()=> requestAnimationFrame(()=>positionFlame())).observe(document.body,{attributes:true,attributeFilter:["class"]});
   waxEl.addEventListener("transitionend", ()=> requestAnimationFrame(()=>positionFlame()));
   window.addEventListener("resize", () => requestAnimationFrame(() => positionFlame()));
+  window.addEventListener("load", () => setTimeout(positionFlame, 0));
 
   /* ---------- Congrats overlay ---------- */
   const congrats = $("#congrats");
@@ -872,7 +864,7 @@
   const bgImageBtn = $("#bgImageBtn"), bgImageFile = $("#bgImageFile"), bgImageClear = $("#bgImageClear"), bgImageName = $("#bgImageName");
   bgImageBtn?.addEventListener("click", () => bgImageFile?.click());
   bgImageFile?.addEventListener("change", (e)=>{
-    const f = e.target.files?.[0]; if (!f) return;
+    const f = e.target.files?.; if (!f) return;
     if (bgObjectUrl){ URL.revokeObjectURL(bgObjectUrl); bgObjectUrl=null; }
     bgObjectUrl = URL.createObjectURL(f);
     document.body.style.backgroundImage = `url("${bgObjectUrl}")`;
@@ -928,5 +920,28 @@
   $("#todoClear").addEventListener("click", () =>{ setTodoBg("transparent"); $("#todo-panel").classList.add("todo-clear"); });
   $("#todoGlass").addEventListener("change", (e)=> $("#todo-panel").classList.toggle("todo-glass", e.target.checked));
 
-  /* New: listeners for the two color pickers */
-  $("#wax
+  /* New color pickers */
+  $("#flameColor")?.addEventListener("input", (e)=>{ setFlameColor(e.target.value); positionFlame(); });
+  $("#waxColor")?.addEventListener("input",  (e)=>{ document.documentElement.style.setProperty("--wax", e.target.value); positionFlame(); });
+
+  /* ---------- Init ---------- */
+  (function boot(){
+    applyGradient(); restyleClockPanels(); applyWax(); setFlameColor($("#flameColor")?.value || "#ffb347");
+
+    if ($("#showTodo")?.checked) document.body.classList.add("todo-on");
+    if ($("#todoGlass")?.checked) $("#todo-panel").classList.add("todo-glass");
+
+    applyLayoutFlags();
+    safeBuildClock();
+    previewLayout();
+
+    afterNextPaint(()=>{ positionFlame(); ensureVisible(); });
+    setTimeout(()=>{ positionFlame(); ensureVisible(); }, 150);
+
+    setWaxHeightByProgress(1);
+
+    const li=makeTodoItem(""); $("#todoList").appendChild(li);
+  })();
+</script>
+</body>
+</html>
