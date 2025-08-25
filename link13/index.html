@@ -104,13 +104,6 @@
       linear-gradient(180deg,var(--wax), #e6d9bb);
     transition: height .22s linear;
   }
-  .waxTop{
-    position:absolute; top:-22px; left:50%; transform:translateX(-50%); width:150px; height:44px; pointer-events:none; z-index:3;
-    background:
-      conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,.33) 0deg, rgba(255,255,255,.10) 70deg, rgba(0,0,0,.08) 180deg, rgba(255,255,255,.20) 300deg, rgba(255,255,255,.33) 360deg),
-      radial-gradient(65% 55% at 50% 62%, rgba(255,255,255,.52), rgba(255,255,255,.12) 60%, rgba(0,0,0,.10) 100%);
-    border-radius:50%/62% 62% 38% 38%;
-  }
   .wax:after{
     content:""; position:absolute; top:30px; left:24px; width:12px; height:64px; border-radius:10px;
     background: linear-gradient(180deg,#fff6,#0000 60%), var(--wax);
@@ -231,7 +224,7 @@
       <div class="candle-clip">
         <div class="candle-wrap" id="candleWrap">
           <div class="wax" id="wax">
-            <div class="waxTop"></div>
+            <!-- waxTop removed on request -->
             <div class="wick" id="wick"></div>
           </div>
           <div class="stub" id="stub"></div>
@@ -480,7 +473,7 @@
     }else{
       renderSimple(0);
     }
-    // Fully restore candle (fix for restart)
+    // Fully restore candle
     candleWrap.classList.remove('vanish');
     candleWrap.style.opacity = '';
     candleWrap.style.transform = '';
@@ -501,7 +494,7 @@
   }
 
   /* Candle coupling */
-  const area = $('#candle-area'), waxEl=$('#wax'), wickEl=$('#wick'), flameEl=$('#flame'), stubEl=$('#stub'), smokeEl=$('#smoke'), candleWrap=$('#candleWrap');
+  const area = $('#candle-area'), waxEl=$('#wax'), wickEl=$('#wick'), flameEl=$('#flame'), stubEl=$('#stub'), smokeEl=$('#smoke'), candleWrap=$('#candleWrap']);
   const baseWaxHeight=380, minStub=58;
 
   function positionFlame(){
@@ -549,7 +542,7 @@
   async function goFullscreen(){
     try{
       if (!document.fullscreenElement){ await document.documentElement.requestFullscreen(); }
-      document.body.classList.add('fullscreen-on'); // hide everything except timer + candle
+      document.body.classList.add('fullscreen-on'); // only timer + candle
     }catch(e){}
   }
   function exitFullscreen(){
@@ -562,7 +555,7 @@
     if (!document.fullscreenElement){ document.body.classList.remove('fullscreen-on'); }
   });
 
-  /* Real-time overlay (uses current flip/simple setting) */
+  /* Real-time overlay */
   const rtcOverlay=$('#rtcOverlay'), rtcFlipContainer=$('#rtcTimer'), rtcSimple=$('#simpleRTC'), rtcBack=$('#rtcBack');
   let rtcDigits=[], rtcOn=false, rtcId=null, rtcLastSec=-1;
 
@@ -581,11 +574,11 @@
   function closeRTC(){
     document.body.classList.remove('rtc-only'); rtcOverlay.classList.remove('show');
     rtcOn=false; cancelAnimationFrame(rtcId);
-    $('#rtcMode').checked = false; // untick when coming back
+    $('#rtcMode').checked = false;
   }
   function drawRTC(){
     if (!rtcOn) return;
-    const secOfDay = Math.floor(Date.now()/1000)%86400; // 1Hz updates
+    const secOfDay = Math.floor(Date.now()/1000)%86400;
     if (secOfDay !== rtcLastSec){
       if ($('#useFlip').checked){ tickFlip(rtcDigits, secOfDay, true, true); }
       else{ rtcSimple.textContent = new Date().toLocaleTimeString(); }
@@ -605,7 +598,7 @@
   }
   function applyWax(){ document.documentElement.style.setProperty('--wax',$('#waxColor').value); }
 
-  /* Preview when toggling hours/seconds so Show hours works immediately */
+  /* Preview when toggling hours/seconds */
   function previewLayout(){
     showH = $('#showHours').checked; showS = $('#showSeconds').checked;
     useFlip = $('#useFlip').checked;
