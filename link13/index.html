@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Candle Timer — v2.1</title>
+<title>Candle Timer — v2.2</title>
 <style>
   :root{
     --digit-w: 120px;
@@ -50,12 +50,7 @@
     background-attachment: fixed;
   }
 
-  /* Credit on left */
-  .brand{
-    position:fixed; left:12px; top:10px; z-index:40;
-    font-weight:700; font-size:13px; opacity:.9; text-shadow:0 1px 2px rgba(0,0,0,.35);
-    user-select:none;
-  }
+  .brand{ position:fixed; left:12px; top:10px; z-index:40; font-weight:700; font-size:13px; opacity:.9; text-shadow:0 1px 2px rgba(0,0,0,.35); user-select:none; }
 
   #exitFs{ position:fixed; right:8px; top:6px; z-index:70; width:24px; height:24px; line-height:24px; text-align:center; font-weight:900; color:#fff; background:rgba(0,0,0,.25); border-radius:50%; cursor:pointer; opacity:.35; display:none; }
   #exitFs:hover{ opacity:.65 }
@@ -65,6 +60,7 @@
   /* Flip clock */
   #timer-container{ flex:1; display:flex; align-items:center; justify-content:flex-start; min-width:340px; }
   #timer{ display:flex; align-items:center; gap:12px; user-select:none; }
+  #simpleTimer{ display:none; font-weight:900; letter-spacing:.5px; color:var(--clock-text); text-shadow:0 6px 24px rgba(0,0,0,.45); font-size:min(12vw, 120px); }
 
   .digit{
     position:relative; width:var(--digit-w); height:var(--digit-h); perspective:1200px;
@@ -93,7 +89,7 @@
 
   .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.6); }
 
-  /* Candle — lowered a bit, improved 3D top, no outer shadow */
+  /* Candle — lowered, refined top, no outer shadow */
   #candle-area{ flex:1; display:flex; align-items:flex-end; justify-content:flex-end; min-width:340px; height:max(380px,42vh); position:relative; transform: translateY(var(--candle-offset)); }
   .candle-clip{ position:relative; width:180px; height:380px; overflow:hidden; display:flex; align-items:flex-end; justify-content:center; }
   .candle-wrap{ position:absolute; inset:auto 0 0 0; margin:auto; width:180px; height:380px; display:flex; align-items:flex-end; justify-content:center; }
@@ -109,7 +105,6 @@
     box-shadow: inset 0 6px 18px rgba(0,0,0,.18), inset 0 -10px 18px rgba(0,0,0,.22);
     transition: height .22s linear;
   }
-  /* Corrected 3D rim and pool */
   .waxTop{
     position:absolute; top:-22px; left:50%; transform:translateX(-50%); width:150px; height:44px; pointer-events:none; z-index:3;
     background:
@@ -136,6 +131,7 @@
     transition:opacity .35s ease;
     pointer-events:none;
   }
+  .flame.off{ opacity:0 !important; animation-play-state: paused !important; }
   @keyframes flicker{ 0%{ transform:scale(1) rotate(-1.4deg); opacity:1 } 50%{ transform:scale(1.12) rotate(1.1deg); opacity:.82 } 100%{ transform:scale(1) rotate(-1.2deg); opacity:1 } }
 
   .stub{ display:none; position:absolute; bottom:0; width:150px; height:58px; background:linear-gradient(180deg,#8a8a8a,#6b6b6b); border-radius:0 0 22px 22px; box-shadow: inset 0 3px 8px rgba(0,0,0,.25); z-index:1; }
@@ -157,22 +153,11 @@
   .btn.alt{ background:linear-gradient(135deg,#a5b4fc,#6366f1); color:#0d0d15; }
   .btn.warn{ background:linear-gradient(135deg,#fca5a5,#ef4444); color:#0d0d15; }
 
-  .fullscreen-on .brand,.fullscreen-on #controls{ display:none }
-  .fullscreen-on #exitFs{ display:block }
-
-  /* Real-time overlay using flip-clock styling (center) */
+  /* Real-time overlay (flip or simple) and only-clock mode */
   #rtcOverlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:90; }
   #rtcOverlay.show{ display:flex; }
   #rtcTimer{ display:flex; align-items:center; gap:12px; }
-
-  /* Simple digital mode */
-  #simpleTimer, #simpleRTC{
-    display:none; font-weight:900; letter-spacing:.5px; color:var(--clock-text);
-    text-shadow:0 6px 24px rgba(0,0,0,.45);
-    font-size:min(12vw, 120px);
-  }
-
-  /* Only-clock view: hide everything except overlay */
+  #simpleRTC{ display:none; font-weight:900; letter-spacing:.5px; color:var(--clock-text); text-shadow:0 6px 24px rgba(0,0,0,.45); font-size:min(12vw, 120px); }
   .rtc-only .brand, .rtc-only #controls, .rtc-only #main, .rtc-only #exitFs { display:none !important; }
 
   @media (max-width:980px){ :root{ --digit-w:100px; --digit-h:140px; } }
@@ -186,13 +171,11 @@
   <div id="exitFs" title="Exit fullscreen">×</div>
 
   <div class="main" id="main">
-    <!-- Flip or simple timer -->
     <section id="timer-container" aria-label="Timer">
       <div id="timer"></div>
       <div id="simpleTimer">00:00</div>
     </section>
 
-    <!-- Candle -->
     <section id="candle-area" aria-label="Candle">
       <div class="candle-clip">
         <div class="candle-wrap" id="candleWrap">
@@ -208,13 +191,11 @@
     </section>
   </div>
 
-  <!-- Real-time (only clock when enabled) -->
   <div id="rtcOverlay">
     <div id="rtcTimer"></div>
     <div id="simpleRTC">00:00:00</div>
   </div>
 
-  <!-- Controls -->
   <div id="controls">
     <div class="card">
       <label class="small">Timer</label>
@@ -276,9 +257,9 @@
 
 <script>
   const $ = s => document.querySelector(s);
-  const bgLayer = $('#bgLayer');
 
-  /* Gradient or image background */
+  /* Background handling */
+  const bgLayer = $('#bgLayer');
   const gradientStr = (a,c1,c2,c3)=>`linear-gradient(${a}deg, ${c1}, ${c2}${c3 ? ', '+c3 : ''})`;
   function applyGradient(){
     const ang = parseInt($('#bgAngle').value||'135',10);
@@ -286,10 +267,10 @@
     bgLayer.dataset.img='';
   }
   $('#bgImageInput').addEventListener('change', e=>{
-    const f = e.target.files && e.target.files;
-    if (!f) return;
+    const f = e.target.files && e.target.files; if (!f) return;
     const r = new FileReader();
     r.onload = ()=>{
+      // Replace gradient entirely with the image (auto-fit cover/center)
       bgLayer.style.backgroundImage = `url('${r.result}')`;
       bgLayer.style.backgroundSize = 'cover';
       bgLayer.style.backgroundPosition = 'center';
@@ -303,63 +284,38 @@
 
   /* Flip clock core (reusable) */
   function createDigit(initial="0"){
-    const d = document.createElement('div');
-    d.className = 'digit';
-    d.dataset.value = initial;
-
-    const top = document.createElement('div'); top.className='top';
-    const t = document.createElement('span'); t.className='value'; t.textContent=initial; top.appendChild(t);
-
-    const bottom = document.createElement('div'); bottom.className='bottom';
-    const b = document.createElement('span'); b.className='value'; b.textContent=initial; bottom.appendChild(b);
-
-    d.appendChild(top); d.appendChild(bottom);
-    return d;
+    const d = document.createElement('div'); d.className='digit'; d.dataset.value=initial;
+    const top = document.createElement('div'); top.className='top'; const t=document.createElement('span'); t.className='value'; t.textContent=initial; top.appendChild(t);
+    const bottom = document.createElement('div'); bottom.className='bottom'; const b=document.createElement('span'); b.className='value'; b.textContent=initial; bottom.appendChild(b);
+    d.appendChild(top); d.appendChild(bottom); return d;
   }
   function flipTo(digitEl,newVal){
-    const cur = digitEl.dataset.value || "0";
-    if (cur===newVal) return;
-    const topVal = digitEl.querySelector('.top .value');
-    const botVal = digitEl.querySelector('.bottom .value');
-
-    const topFlip = document.createElement('div'); topFlip.className='top-flip';
-    const t = document.createElement('span'); t.className='value'; t.textContent=cur; topFlip.appendChild(t);
-
+    const cur=digitEl.dataset.value||"0"; if (cur===newVal) return;
+    const topVal=digitEl.querySelector('.top .value'); const botVal=digitEl.querySelector('.bottom .value');
+    const topFlip=document.createElement('div'); topFlip.className='top-flip'; const t=document.createElement('span'); t.className='value'; t.textContent=cur; topFlip.appendChild(t);
     topVal.textContent=cur; botVal.textContent=cur; digitEl.appendChild(topFlip);
-
     topFlip.addEventListener('animationend', ()=>{
       topVal.textContent=newVal; topFlip.remove();
-      const bottomFlip = document.createElement('div'); bottomFlip.className='bottom-flip';
-      const b = document.createElement('span'); b.className='value'; b.textContent=newVal; bottomFlip.appendChild(b);
+      const bottomFlip=document.createElement('div'); bottomFlip.className='bottom-flip'; const b=document.createElement('span'); b.className='value'; b.textContent=newVal; bottomFlip.appendChild(b);
       digitEl.appendChild(bottomFlip);
       bottomFlip.addEventListener('animationend', ()=>{ botVal.textContent=newVal; digitEl.dataset.value=newVal; bottomFlip.remove(); });
     });
   }
-
   function buildFlip(container, showH=true, showS=true){
-    container.innerHTML='';
-    const digits=[];
-    const addDigit=()=>{ const d=createDigit("0"); container.appendChild(d); digits.push(d); };
-    const addColon=()=>{ const c=document.createElement('div'); c.className='colon'; c.textContent=':'; container.appendChild(c); };
-    if (showH){ addDigit(); addDigit(); addColon(); }
-    addDigit(); addDigit();
-    if (showS){ addColon(); addDigit(); addDigit(); }
-    return digits;
+    container.innerHTML=''; const digits=[]; const addDigit=()=>{ const d=createDigit("0"); container.appendChild(d); digits.push(d); }; const addColon=()=>{ const c=document.createElement('div'); c.className='colon'; c.textContent=':'; container.appendChild(c); };
+    if (showH){ addDigit(); addDigit(); addColon(); } addDigit(); addDigit(); if (showS){ addColon(); addDigit(); addDigit(); } return digits;
   }
   function timeArray(sec, showH, showS){
     let h=Math.floor(sec/3600), m=Math.floor((sec%3600)/60), s=sec%60; h=Math.min(h,99);
     const arr=[]; if (showH) arr.push(...String(h).padStart(2,'0')); arr.push(...String(m).padStart(2,'0')); if (showS) arr.push(...String(s).padStart(2,'0')); return arr;
   }
   function tickFlip(digits, sec, showH, showS){
-    const arr=timeArray(sec,showH,showS);
-    digits.forEach((d,i)=> flipTo(d, arr[i] || '0'));
+    const arr=timeArray(sec,showH,showS); digits.forEach((d,i)=> flipTo(d, arr[i] || '0'));
   }
 
-  /* Countdown — flip or simple */
-  const timerFlip = $('#timer');
-  const timerSimple = $('#simpleTimer');
+  /* Countdown (flip or simple) */
+  const timerFlip = $('#timer'); const timerSimple = $('#simpleTimer');
   let flipDigits=[], showH=false, showS=true;
-
   let totalSec=0, endAtMs=0, rafId=null, lastWhole=-1, running=false, paused=false, pauseRemainMs=0;
 
   function refreshMode(){
@@ -368,9 +324,13 @@
     timerSimple.style.display = useFlip ? 'none' : 'block';
   }
 
+  function renderSimple(sec){
+    const str = showH ? `${String(Math.floor(sec/3600)).padStart(2,'0')}:${String(Math.floor((sec%3600)/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}` : `${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
+    timerSimple.textContent = str;
+  }
+
   function start(){
-    showH = $('#showHours').checked;
-    showS = $('#showSeconds').checked;
+    showH = $('#showHours').checked; showS = $('#showSeconds').checked;
     const h=+$('#hoursInput').value||0, m=+$('#minInput').value||0, s=Math.max(0,Math.min(59,+$('#secInput').value||0));
     totalSec=h*3600+m*60+s;
 
@@ -378,7 +338,7 @@
       flipDigits = buildFlip(timerFlip, showH, showS);
       tickFlip(flipDigits,totalSec,showH,showS);
     }else{
-      timerSimple.textContent = showH ? `${String(Math.floor(totalSec/3600)).padStart(2,'0')}:${String(Math.floor((totalSec%3600)/60)).padStart(2,'0')}:${String(totalSec%60).padStart(2,'0')}` : `${String(Math.floor(totalSec/60)).padStart(2,'0')}:${String(totalSec%60).padStart(2,'0')}`;
+      renderSimple(totalSec);
     }
 
     relight(); setWaxHeightByProgress(1); positionFlame();
@@ -389,22 +349,22 @@
     rafId = requestAnimationFrame(loop);
   }
 
-  function renderSimple(sec){
-    const str = showH ? `${String(Math.floor(sec/3600)).padStart(2,'0')}:${String(Math.floor((sec%3600)/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}` : `${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
-    timerSimple.textContent = str;
-  }
-
   function loop(now){
     if (!running) return;
     const remainMs=Math.max(0,endAtMs-now), secWhole=Math.floor(remainMs/1000);
     if (secWhole!==lastWhole){
-      if ($('#useFlip').checked) tickFlip(flipDigits,secWhole,showH,showS);
-      else renderSimple(secWhole);
+      if ($('#useFlip').checked) tickFlip(flipDigits,secWhole,showH,showS); else renderSimple(secWhole);
       lastWhole=secWhole;
     }
     const p = totalSec>0 ? remainMs/(totalSec*1000) : 0;
     setWaxHeightByProgress(p); positionFlame();
-    if (remainMs<=0){ extinguish(); running=false; return; }
+
+    if (remainMs<=0){
+      // Ensure flame fully off (pause animation + hide)
+      extinguish();
+      running=false;
+      return;
+    }
     rafId=requestAnimationFrame(loop);
   }
 
@@ -441,24 +401,26 @@
     const usable=baseWaxHeight-minStub, h=minStub+Math.max(0, usable*progress);
     waxEl.style.height=`${h}px`;
   }
-  function extinguish(){ flameEl.style.opacity='0'; smokeEl.classList.remove('show'); void smokeEl.offsetWidth; smokeEl.classList.add('show'); stubEl.style.display='block'; }
-  function relight(){ stubEl.style.display='none'; flameEl.style.opacity='1'; }
+  function extinguish(){
+    flameEl.classList.add('off');
+    smokeEl.classList.remove('show'); void smokeEl.offsetWidth; smokeEl.classList.add('show');
+    stubEl.style.display='block';
+  }
+  function relight(){
+    stubEl.style.display='none';
+    flameEl.classList.remove('off');
+  }
 
   /* Fullscreen */
-  async function goFullscreen(){
-    try{
-      if (!document.fullscreenElement){ await document.documentElement.requestFullscreen(); }
-      $('#exitFs').style.display='block';
-    }catch(e){}
-  }
+  async function goFullscreen(){ try{ if (!document.fullscreenElement){ await document.documentElement.requestFullscreen(); } $('#exitFs').style.display='block'; }catch(e){} }
   function exitFullscreen(){ document.exitFullscreen?.(); $('#exitFs').style.display='none'; }
   $('#fsBtn').addEventListener('click', goFullscreen);
   $('#exitFs').addEventListener('click', exitFullscreen);
   document.addEventListener('fullscreenchange', ()=>{ if (!document.fullscreenElement){ $('#exitFs').style.display='none'; } });
 
-  /* Real-time overlay: flip or simple, same colors */
+  /* Real-time overlay (flip or simple) with throttled updates */
   const rtcOverlay=$('#rtcOverlay'), rtcFlipContainer=$('#rtcTimer'), rtcSimple=$('#simpleRTC');
-  let rtcDigits=[], rtcShowH=true, rtcShowS=true, rtcOn=false, rtcId=null;
+  let rtcDigits=[], rtcShowH=true, rtcShowS=true, rtcOn=false, rtcId=null, rtcLastSec=-1;
 
   function refreshRTCMode(){
     const useFlip=$('#useFlip').checked;
@@ -469,8 +431,7 @@
   function openRTC(){
     document.body.classList.add('rtc-only'); rtcOverlay.classList.add('show');
     cancelAnimationFrame(rafId); running=false; paused=false;
-    rtcOn=true;
-
+    rtcOn=true; rtcLastSec=-1;
     rtcShowH=true; rtcShowS=true;
     if ($('#useFlip').checked){
       rtcDigits = buildFlip(rtcFlipContainer, rtcShowH, rtcShowS);
@@ -481,19 +442,22 @@
     document.body.classList.remove('rtc-only'); rtcOverlay.classList.remove('show');
     rtcOn=false; cancelAnimationFrame(rtcId);
   }
-  function drawRTC(){
+  function drawRTC(nowTs){
     if (!rtcOn) return;
-    const n=new Date();
-    const sec = n.getHours()*3600 + n.getMinutes()*60 + n.getSeconds();
-    if ($('#useFlip').checked){
-      tickFlip(rtcDigits, sec, rtcShowH, rtcShowS);
-    }else{
-      rtcSimple.textContent = n.toLocaleTimeString();
+    // Throttle to once per second to avoid over-flipping
+    const secOfDay = Math.floor(Date.now()/1000)%86400;
+    if (secOfDay !== rtcLastSec){
+      if ($('#useFlip').checked){
+        tickFlip(rtcDigits, secOfDay, rtcShowH, rtcShowS);
+      }else{
+        rtcSimple.textContent = new Date().toLocaleTimeString();
+      }
+      rtcLastSec = secOfDay;
     }
-    rtcId=requestAnimationFrame(drawRTC);
+    rtcId = requestAnimationFrame(drawRTC);
   }
 
-  /* Color bindings */
+  /* Color bindings + background inputs */
   function restyleClockPanels(){
     document.documentElement.style.setProperty('--clock-c1',$('#clockC1').value);
     document.documentElement.style.setProperty('--clock-c2',$('#clockC2').value);
@@ -503,12 +467,10 @@
   }
   function applyWax(){ document.documentElement.style.setProperty('--wax',$('#waxColor').value); }
 
-  // UI
+  // UI wiring
   $('#startBtn').addEventListener('click', start);
   $('#toggleBtn').addEventListener('click', toggleStop);
   $('#resetBtn').addEventListener('click', reset);
-  $('#showHours').addEventListener('change', ()=>{ /* handled on start */ });
-  $('#showSeconds').addEventListener('change', ()=>{ /* handled on start */ });
   $('#useFlip').addEventListener('change', ()=>{ refreshMode(); refreshRTCMode(); });
   $('#rtcMode').addEventListener('change', e=> e.target.checked ? openRTC() : closeRTC());
 
@@ -520,8 +482,7 @@
   // Init
   applyGradient(); restyleClockPanels(); applyWax();
   refreshMode(); refreshRTCMode();
-  // default to MM:SS flip visible
-  const defaultSec=60; flipDigits = buildFlip(timerFlip,false,true); tickFlip(flipDigits,defaultSec,false,true);
+  const defaultSec=60; flipDigits = buildFlip($('#timer'),false,true); tickFlip(flipDigits,defaultSec,false,true);
   setWaxHeightByProgress(1); relight(); positionFlame();
 </script>
 </body>
