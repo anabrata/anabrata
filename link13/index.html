@@ -18,7 +18,7 @@
     --bg-c2: #d76d77;
     --bg-c3: #ffaf7b;
 
-    /* Default flip clock colors (as requested) */
+    /* Default flip clock colors (requested) */
     --clock-c1: #ffffff;    /* white card top-left */
     --clock-c2: #ffffff;    /* white card center */
     --clock-c3: #ffffff;    /* white card bottom-right */
@@ -341,14 +341,21 @@
     const h=+$('#hoursInput').value||0, m=+$('#minInput').value||0, s=Math.max(0,Math.min(59,+$('#secInput').value||0));
     totalSec=h*3600+m*60+s;
 
+    /* Ensure candle is visible when (re)starting */
+    candleWrap.classList.remove('vanish');
+    candleWrap.style.opacity = '';
+    candleWrap.style.transform = '';
+    stubEl.style.display = 'none';
+    flameEl.classList.remove('off');
+    setWaxHeightByProgress(1);
+    positionFlame();
+
     if (useFlip){
       flipDigits = buildFlip(timerFlip, showH, showS);
       tickFlip(flipDigits,totalSec,showH,showS);
     }else{
       renderSimple(totalSec);
     }
-
-    relight(); setWaxHeightByProgress(1); positionFlame();
 
     cancelAnimationFrame(rafId); paused=false; running=false;
     if (totalSec<=0){ finishNow(); return; }
@@ -403,8 +410,10 @@
     }else{
       renderSimple(0);
     }
-    // Restore candle fully
+    // Fully restore candle (fix for restart)
     candleWrap.classList.remove('vanish');
+    candleWrap.style.opacity = '';
+    candleWrap.style.transform = '';
     stubEl.style.display = 'none';
     flameEl.classList.remove('off');
     setWaxHeightByProgress(1);
@@ -494,7 +503,7 @@
   function closeRTC(){
     document.body.classList.remove('rtc-only'); rtcOverlay.classList.remove('show');
     rtcOn=false; cancelAnimationFrame(rtcId);
-    // Ensure the checkbox is unticked after returning (as requested)
+    // ensure checkbox unticks after return
     $('#rtcMode').checked = false;
   }
   function drawRTC(){
@@ -522,7 +531,7 @@
   }
   function applyWax(){ document.documentElement.style.setProperty('--wax',$('#waxColor').value); }
 
-  /* Mode preview when toggling hours/seconds so “Show hours” works immediately */
+  /* Preview when toggling hours/seconds so Show hours works immediately */
   function previewLayout(){
     showH = $('#showHours').checked; showS = $('#showSeconds').checked;
     useFlip = $('#useFlip').checked;
