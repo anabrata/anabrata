@@ -104,13 +104,8 @@
       linear-gradient(180deg,var(--wax), #e6d9bb);
     transition: height .22s linear;
   }
-  .waxTop{
-    position:absolute; top:-22px; left:50%; transform:translateX(-50%); width:150px; height:44px; pointer-events:none; z-index:3;
-    background:
-      conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,.33) 0deg, rgba(255,255,255,.10) 70deg, rgba(0,0,0,.08) 180deg, rgba(255,255,255,.20) 300deg, rgba(255,255,255,.33) 360deg),
-      radial-gradient(65% 55% at 50% 62%, rgba(255,255,255,.52), rgba(255,255,255,.12) 60%, rgba(0,0,0,.10) 100%);
-    border-radius:50%/62% 62% 38% 38%;
-  }
+  /* waxTop removed */
+
   .wax:after{
     content:""; position:absolute; top:30px; left:24px; width:12px; height:64px; border-radius:10px;
     background: linear-gradient(180deg,#fff6,#0000 60%), var(--wax);
@@ -231,7 +226,7 @@
       <div class="candle-clip">
         <div class="candle-wrap" id="candleWrap">
           <div class="wax" id="wax">
-            <div class="waxTop"></div>
+            <!-- waxTop removed -->
             <div class="wick" id="wick"></div>
           </div>
           <div class="stub" id="stub"></div>
@@ -501,7 +496,7 @@
   }
 
   /* Candle coupling */
-  const area = $('#candle-area'), waxEl=$('#wax'), wickEl=$('#wick'), flameEl=$('#flame'), stubEl=$('#stub'), smokeEl=$('#smoke'), candleWrap=$('#candleWrap');
+  const area = $('#candle-area'), waxEl=$('#wax'), wickEl=$('#wick'), flameEl=$('#flame'), stubEl=$('#stub'), smokeEl=$('#smoke'), candleWrap=$('#candleWrap']);
   const baseWaxHeight=380, minStub=58;
 
   function positionFlame(){
