@@ -1,45 +1,256 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>YouTube Player with Quality Selector (No Download)</title>
+  <title>YouTube URL Player — Beautiful Embedded Player</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
   <style>
-    :root { color-scheme: light dark; }
-    body { font-family: system-ui, Arial, sans-serif; margin: 2rem; }
-    .row { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
-    input[type="url"] { flex: 1 1 420px; padding: 0.6rem; font-size: 1rem; }
-    select, button { padding: 0.6rem; font-size: 1rem; }
-    #player { margin-top: 1rem; aspect-ratio: 16/9; width: 100%; max-width: 960px; }
-    #meta { margin-top: 0.75rem; font-size: 0.95rem; opacity: 0.85; }
-    .pill { display:inline-block; padding:0.2rem 0.5rem; border:1px solid currentColor; border-radius:999px; margin-right:0.25rem; font-size:0.85rem; }
+    :root {
+      --bg: #0f1221;
+      --bg2: #12172b;
+      --card: rgba(255,255,255,0.08);
+      --text: #e8ecf1;
+      --muted: #9aa3b2;
+      --accent: #6dd6ff;
+      --accent2: #9b7bff;
+      --ok: #20e3b2;
+      --warn: #ffb86b;
+      --danger: #ff6b6b;
+      color-scheme: light dark;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f7f9fc;
+        --bg2: #eef3fb;
+        --card: rgba(255,255,255,0.8);
+        --text: #0d1321;
+        --muted: #4b5563;
+        --accent: #0ea5e9;
+        --accent2: #7c3aed;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(157, 78, 221, .18), transparent 60%),
+        radial-gradient(900px 500px at 100% 0%, rgba(14, 165, 233, .18), transparent 60%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      color: var(--text);
+      min-height: 100dvh;
+      display: grid;
+      place-items: start center;
+    }
+    .wrap {
+      width: min(1100px, 94vw);
+      margin: 48px 0 72px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+    h1 {
+      margin: 0 0 6px;
+      font-weight: 700;
+      letter-spacing: .2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent;
+    }
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      box-shadow:
+        0 10px 30px rgba(0,0,0,.25),
+        inset 0 1px 0 rgba(255,255,255,.05);
+      padding: 18px;
+    }
+    .row {
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+    }
+    .input {
+      flex: 1 1 520px;
+      display: flex; gap: 10px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 12px;
+      padding: 8px;
+    }
+    input[type="url"] {
+      flex: 1; min-width: 240px;
+      background: transparent;
+      border: 0; outline: 0;
+      color: var(--text);
+      padding: 10px 12px;
+      font-size: 16px;
+    }
+    .btn {
+      appearance: none; border: 0; cursor: pointer;
+      border-radius: 10px; padding: 10px 14px;
+      font-weight: 600; font-size: 15px; letter-spacing: .2px;
+      color: #0b1220; background: linear-gradient(90deg, var(--accent), var(--accent2));
+      box-shadow: 0 6px 18px rgba(109, 214, 255, .35);
+      transition: transform .06s ease, box-shadow .2s ease, opacity .2s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn.secondary {
+      background: rgba(255,255,255,.12);
+      color: var(--text);
+      box-shadow: none;
+      border: 1px solid rgba(255,255,255,.14);
+    }
+    .pill {
+      padding: 7px 10px; border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      color: var(--muted); font-size: 13px;
+    }
+    .controls {
+      display: grid; gap: 10px;
+      grid-template-columns: 1fr auto auto auto auto;
+      align-items: center;
+      margin-top: 10px;
+    }
+    .range {
+      display: flex; align-items: center; gap: 8px;
+    }
+    input[type="range"] {
+      width: 180px; accent-color: var(--accent);
+    }
+    select {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.14);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 14px;
+      min-width: 120px;
+    }
+    .player-shell {
+      margin-top: 14px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.14);
+      background: #000;
+      position: relative;
+    }
+    .stage {
+      width: 100%;
+      aspect-ratio: 16/9;
+    }
+    .theater .stage {
+      aspect-ratio: 16/8;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .kbd {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.18);
+      border-bottom-width: 2px;
+      padding: 2px 6px; border-radius: 6px;
+      color: var(--text);
+    }
+    footer {
+      text-align: center;
+      color: var(--muted);
+      margin-top: 18px;
+      font-size: 13px;
+    }
+    .grow { flex: 1; }
+    .iconbtn {
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .sp {
+      width: 10px; height: 10px; border-radius: 999px; display: inline-block;
+      background: var(--ok);
+      box-shadow: 0 0 0 6px rgba(32,227,178,.14);
+    }
   </style>
 </head>
 <body>
-  <h1>YouTube Player with Quality Selector (No Download)</h1>
+  <div class="wrap">
+    <header>
+      <h1>YouTube URL Player</h1>
+      <p class="subtitle">Paste a YouTube link or ID, then enjoy instant playback with elegant controls.</p>
+    </header>
 
-  <div class="row">
-    <input id="url" type="url" placeholder="Paste YouTube URL or 11-char video ID" />
-    <button id="loadBtn" type="button">Load</button>
-    <label for="quality">Quality:</label>
-    <select id="quality">
-      <option value="auto" selected>Auto</option>
-      <option value="highres">Highres (max)</option>
-      <option value="hd1080">1080p</option>
-      <option value="hd720">720p</option>
-      <option value="large">480p</option>
-      <option value="medium">360p</option>
-      <option value="small">240p</option>
-    </select>
-    <button id="applyQ" type="button">Apply quality</button>
+    <section class="card">
+      <div class="row">
+        <div class="input" style="flex:1">
+          <input id="url" type="url" placeholder="Paste YouTube URL or 11-character ID (e.g. https://youtu.be/M7lc1UVf-VE)" />
+          <button id="loadBtn" class="btn iconbtn" type="button" title="Load video">
+            <span class="sp"></span>
+            Load
+          </button>
+        </div>
+        <span class="pill">Tip: Press Enter to load</span>
+      </div>
+
+      <div class="controls">
+        <div class="row" style="gap:8px">
+          <button id="playPause" class="btn secondary" type="button">Play</button>
+          <button id="mute" class="btn secondary" type="button">Mute</button>
+          <div class="range">
+            <label for="volume" style="color:var(--muted); font-size:13px">Vol</label>
+            <input id="volume" type="range" min="0" max="100" value="80" />
+          </div>
+          <div class="range">
+            <label for="progress" style="color:var(--muted); font-size:13px">Seek</label>
+            <input id="progress" type="range" min="0" max="1000" value="0" />
+          </div>
+        </div>
+        <select id="quality" title="Playback quality">
+          <option value="auto" selected>Quality: Auto</option>
+        </select>
+        <select id="speed" title="Playback speed">
+          <option value="0.25">0.25×</option>
+          <option value="0.5">0.5×</option>
+          <option value="0.75">0.75×</option>
+          <option value="1" selected>1×</option>
+          <option value="1.25">1.25×</option>
+          <option value="1.5">1.5×</option>
+          <option value="1.75">1.75×</option>
+          <option value="2">2×</option>
+        </select>
+        <button id="theater" class="btn secondary" type="button" title="Theater mode">Theater</button>
+        <button id="fullscreen" class="btn secondary" type="button" title="Fullscreen">Fullscreen</button>
+      </div>
+
+      <div id="playerShell" class="player-shell">
+        <div id="player" class="stage"></div>
+      </div>
+
+      <div class="meta">
+        <span>Paste links like youtu.be/ID, youtube.com/watch?v=ID, /embed/ID, or /shorts/ID.</span>
+        <span class="grow"></span>
+        <span>Shortcuts: <span class="kbd">Space</span> play/pause · <span class="kbd">M</span> mute · <span class="kbd">F</span> fullscreen · <span class="kbd">T</span> theater</span>
+      </div>
+    </section>
+
+    <footer>Uses YouTube’s official embedded player API for compliant streaming.</footer>
   </div>
 
-  <div id="meta"></div>
-  <div id="player"></div>
-
   <script>
-    // Load the IFrame Player API
+    // Load the YouTube IFrame Player API
     (function loadYT() {
       const s = document.createElement('script');
       s.src = "https://www.youtube.com/iframe_api";
@@ -47,119 +258,233 @@
     })();
 
     let player = null;
-    let currentVideoId = null;
+    let progressTimer = null;
+    let currentId = null;
 
     function onYouTubeIframeAPIReady() {
-      // Player will be created lazily when a URL is loaded
-    }
-
-    function extractVideoId(input) {
-      const raw = (input || "").trim();
-      // If it's already an 11-char ID
-      if (/^[a-zA-Z0-9_-]{11}$/.test(raw)) return raw;
-      try {
-        const u = new URL(raw);
-        if (u.hostname === "youtu.be") {
-          const id = u.pathname.slice(1).split("/");
-          if (id) return id;
-        }
-        const v = u.searchParams.get("v");
-        if (v && /^[a-zA-Z0-9_-]{11}$/.test(v)) return v;
-        const parts = u.pathname.split("/").filter(Boolean);
-        const eIdx = parts.indexOf("embed");
-        if (eIdx >= 0 && parts[eIdx + 1] && /^[a-zA-Z0-9_-]{11}$/.test(parts[eIdx + 1])) return parts[eIdx + 1];
-        const sIdx = parts.indexOf("shorts");
-        if (sIdx >= 0 && parts[sIdx + 1] && /^[a-zA-Z0-9_-]{11}$/.test(parts[sIdx + 1])) return parts[sIdx + 1];
-      } catch { /* not a URL, fallthrough */ }
-      return null;
-    }
-
-    function ensurePlayer() {
-      if (player) return;
       player = new YT.Player('player', {
         width: '100%',
         height: '100%',
-        videoId: null,
+        videoId: null, // load after user input
         playerVars: {
           rel: 0,
           modestbranding: 1,
           playsinline: 1
         },
         events: {
-          onReady: onPlayerReady,
-          onPlaybackQualityChange: onPlaybackQualityChange,
-          onStateChange: onPlayerStateChange
+          onReady: onReady,
+          onStateChange: onStateChange,
+          onPlaybackQualityChange: onQualityChange
         }
       });
     }
 
-    function onPlayerReady() {
-      updateQualitiesUI();
+    function onReady() {
+      // Set initial volume
+      player.setVolume(80);
+      bindUI();
+      refreshQualities();
     }
 
-    function onPlaybackQualityChange(e) {
-      updateQualitiesUI();
-    }
-
-    function onPlayerStateChange() {
-      updateQualitiesUI();
-    }
-
-    function updateQualitiesUI() {
-      if (!player) return;
-      const avail = (player.getAvailableQualityLevels && player.getAvailableQualityLevels()) || [];
-      const qualitySel = document.getElementById('quality');
-      // Enable options only if available (except Auto)
-      for (const opt of qualitySel.options) {
-        if (opt.value === 'auto') { opt.disabled = false; continue; }
-        opt.disabled = avail.length ? !avail.includes(opt.value) : false;
+    function onStateChange(e) {
+      const playBtn = document.getElementById('playPause');
+      if (e.data === YT.PlayerState.PLAYING) {
+        playBtn.textContent = 'Pause';
+        startProgress();
+      } else {
+        if (e.data === YT.PlayerState.ENDED) seekBar(0);
+        playBtn.textContent = 'Play';
+        stopProgress();
       }
-      const meta = document.getElementById('meta');
-      const curQ = player.getPlaybackQuality ? player.getPlaybackQuality() : 'auto';
-      meta.innerHTML = `
-        <span class="pill">Current: ${curQ || 'auto'}</span>
-        <span class="pill">Available: ${avail.join(', ') || 'unknown'}</span>
-      `;
     }
 
-    async function loadVideoFromInput() {
-      const url = document.getElementById('url').value;
-      const id = extractVideoId(url);
+    function onQualityChange() {
+      refreshQualities();
+    }
+
+    function bindUI() {
+      document.getElementById('loadBtn').addEventListener('click', loadFromInput);
+      document.getElementById('url').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') loadFromInput();
+      });
+
+      document.getElementById('playPause').addEventListener('click', togglePlay);
+      document.getElementById('mute').addEventListener('click', toggleMute);
+      document.getElementById('volume').addEventListener('input', e => {
+        const v = Number(e.target.value);
+        player.setVolume(v);
+        if (player.isMuted() && v > 0) player.unMute();
+        updateMuteButton();
+      });
+      document.getElementById('progress').addEventListener('input', e => {
+        const pct = Number(e.target.value) / 1000;
+        const dur = Math.max(0, player.getDuration() || 0);
+        if (dur > 0) player.seekTo(dur * pct, true);
+      });
+
+      document.getElementById('quality').addEventListener('change', e => {
+        const q = e.target.value;
+        if (!currentId) return;
+        if (q === 'auto') {
+          // Reload current to let player auto-select
+          const t = Math.floor(player.getCurrentTime() || 0);
+          player.loadVideoById({ videoId: currentId, startSeconds: t });
+        } else {
+          try { player.setPlaybackQuality(q); } catch {}
+          // Nudge the player with suggestedQuality
+          const t = Math.floor(player.getCurrentTime() || 0);
+          player.loadVideoById({ videoId: currentId, startSeconds: t, suggestedQuality: q });
+        }
+      });
+
+      document.getElementById('speed').addEventListener('change', e => {
+        const r = Number(e.target.value);
+        try { player.setPlaybackRate(r); } catch {}
+      });
+
+      document.getElementById('theater').addEventListener('click', () => {
+        document.getElementById('playerShell').classList.toggle('theater');
+      });
+      document.getElementById('fullscreen').addEventListener('click', () => {
+        const el = document.getElementById('playerShell');
+        if (document.fullscreenElement) document.exitFullscreen();
+        else el.requestFullscreen?.();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        const tag = (e.target.tagName || '').toLowerCase();
+        if (tag === 'input' || tag === 'select' || tag === 'textarea') return;
+        if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+        else if (e.key.toLowerCase() === 'm') toggleMute();
+        else if (e.key.toLowerCase() === 'f') {
+          const el = document.getElementById('playerShell');
+          if (document.fullscreenElement) document.exitFullscreen();
+          else el.requestFullscreen?.();
+        }
+        else if (e.key.toLowerCase() === 't') {
+          document.getElementById('playerShell').classList.toggle('theater');
+        }
+        else if (e.key === 'ArrowRight') {
+          player.seekTo((player.getCurrentTime() || 0) + 5, true);
+        }
+        else if (e.key === 'ArrowLeft') {
+          player.seekTo(Math.max(0, (player.getCurrentTime() || 0) - 5), true);
+        }
+      });
+    }
+
+    function loadFromInput() {
+      const raw = document.getElementById('url').value.trim();
+      const id = extractVideoId(raw);
       if (!id) {
-        alert("Please paste a valid YouTube URL or 11-character video ID.");
+        alert('Please paste a valid YouTube URL or 11-character video ID.');
         return;
       }
-      currentVideoId = id;
-      ensurePlayer();
-      // Load with suggested quality based on dropdown (if not auto)
-      const q = document.getElementById('quality').value;
-      const payload = { videoId: id };
-      if (q && q !== 'auto') payload.suggestedQuality = q;
-      player.loadVideoById(payload);
+      currentId = id;
+      const qSel = document.getElementById('quality');
+      const suggestedQuality = qSel.value && qSel.value !== 'auto' ? qSel.value : undefined;
+      player.loadVideoById({ videoId: id, suggestedQuality });
+      setTimeout(refreshQualities, 600);
     }
 
-    function applyQuality() {
-      if (!player || !currentVideoId) return;
-      const q = document.getElementById('quality').value;
-      if (q === 'auto') {
-        // Let player auto-select; reload without suggestion
-        const t = Math.floor(player.getCurrentTime() || 0);
-        player.loadVideoById({ videoId: currentVideoId, startSeconds: t });
-        return;
+    function extractVideoId(input) {
+      if (/^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
+      try {
+        const u = new URL(input);
+        // youtu.be/<id>
+        if (u.hostname === 'youtu.be') {
+          const id = u.pathname.slice(1).split('/')[0];
+          if (/^[a-zA-Z0-9_-]{11}$/.test(id)) return id;
+        }
+        // watch?v=<id>
+        const v = u.searchParams.get('v');
+        if (v && /^[a-zA-Z0-9_-]{11}$/.test(v)) return v;
+        // /embed/<id>
+        const parts = u.pathname.split('/').filter(Boolean);
+        const eIdx = parts.indexOf('embed');
+        if (eIdx >= 0 && parts[eIdx + 1] && /^[a-zA-Z0-9_-]{11}$/.test(parts[eIdx + 1])) return parts[eIdx + 1];
+        // /shorts/<id>
+        const sIdx = parts.indexOf('shorts');
+        if (sIdx >= 0 && parts[sIdx + 1] && /^[a-zA-Z0-9_-]{11}$/.test(parts[sIdx + 1])) return parts[sIdx + 1];
+      } catch (err) {
+        // not a URL, fall through
       }
-      // Try to set directly, then fall back to reloading with a suggestion
-      try { player.setPlaybackQuality && player.setPlaybackQuality(q); } catch {}
-      const t = Math.floor(player.getCurrentTime() || 0);
-      // Fallback: reload with suggestedQuality to hint the player
-      player.loadVideoById({ videoId: currentVideoId, startSeconds: t, suggestedQuality: q });
+      return null;
     }
 
-    document.getElementById('loadBtn').addEventListener('click', loadVideoFromInput);
-    document.getElementById('applyQ').addEventListener('click', applyQuality);
-    document.getElementById('quality').addEventListener('change', () => {
-      // Optionally auto-apply on change:
-      // applyQuality();
-    });
+    function togglePlay() {
+      const state = player.getPlayerState();
+      if (state === YT.PlayerState.PLAYING) player.pauseVideo();
+      else player.playVideo();
+    }
+
+    function toggleMute() {
+      if (player.isMuted()) player.unMute(); else player.mute();
+      updateMuteButton();
+    }
+
+    function updateMuteButton() {
+      const btn = document.getElementById('mute');
+      btn.textContent = player.isMuted() ? 'Unmute' : 'Mute';
+    }
+
+    function startProgress() {
+      stopProgress();
+      progressTimer = setInterval(() => {
+        const dur = player.getDuration() || 0;
+        const cur = player.getCurrentTime() || 0;
+        if (dur > 0) {
+          const pct = Math.min(1000, Math.max(0, Math.round((cur / dur) * 1000)));
+          seekBar(pct);
+        }
+      }, 250);
+    }
+    function stopProgress() {
+      if (progressTimer) clearInterval(progressTimer);
+      progressTimer = null;
+    }
+    function seekBar(val) {
+      const el = document.getElementById('progress');
+      el.value = String(val);
+    }
+
+    function refreshQualities() {
+      const sel = document.getElementById('quality');
+      const avail = (player.getAvailableQualityLevels && player.getAvailableQualityLevels()) || [];
+      const cur = player.getPlaybackQuality ? player.getPlaybackQuality() : 'auto';
+
+      const keep = new Set(['auto']);
+      const label = q => {
+        const map = {
+          highres: 'Highres (max)',
+          hd2160: '2160p',
+          hd1440: '1440p',
+          hd1080: '1080p',
+          hd720: '720p',
+          large: '480p',
+          medium: '360p',
+          small: '240p',
+          tiny: '144p'
+        };
+        return map[q] || q;
+      };
+
+      // Rebuild options preserving selection
+      const selected = sel.value || 'auto';
+      sel.innerHTML = '<option value="auto">Quality: Auto</option>';
+      avail.forEach(q => {
+        const opt = document.createElement('option');
+        opt.value = q; opt.textContent = label(q);
+        sel.appendChild(opt);
+        keep.add(q);
+      });
+
+      // Reselect if possible
+      sel.value = keep.has(selected) ? selected : 'auto';
+
+      // Show current in the button title
+      sel.title = `Playback quality: ${cur}`;
+    }
   </script>
 </body>
 </html>
