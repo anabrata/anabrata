@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>Candle Timer — V10</title>
+<title>Candle Timer V2.0</title>
 <style>
   :root{
     /* Sizes */
@@ -36,7 +37,6 @@
     /* Candle */
     --wax: #f2e4c7;
     --wick: #1b1b1b;
-    --flame: #ff7a00;
 
     /* Layout tweak */
     --candle-offset: 18px;
@@ -71,13 +71,14 @@
     position:relative;
     min-height: 60vh;
   }
+  /* Prevent grid children from vanishing due to intrinsic overflow */
   .main > section{ min-width:0; min-height:0; }
 
   #timer-container{ grid-column:1; }
   #todo-panel     { grid-column:2; justify-self:center; align-self:center; }
   #candle-area    { grid-column:3; }
 
-  /* Center Clock: timer centered; To‑do stays LEFT */
+  /* Center Clock: timer centered; To‑do stays LEFT (grid) */
   .center-clock .main{ grid-template-columns: max-content 1fr max-content; }
   .center-clock #timer-container{
     position:absolute; left:50%; top:50%;
@@ -205,13 +206,9 @@
   }
   .flame-core{
     position:absolute; inset:0; border-radius:50% 50% 38% 38%;
-    background:
-      radial-gradient(ellipse at 50% 22%, #fff7c0 0%, #ffe08a 38%, var(--flame) 58%, var(--flame) 78%, transparent 80%),
-      radial-gradient(ellipse at 50% 45%, #ffffff 0%, transparent 65%);
-    box-shadow:
-      0 0 18px 6px var(--flame),
-      0 0 36px 14px var(--flame),
-      0 -20px 28px rgba(255,220,170,.40);
+    background: radial-gradient(ellipse at 50% 22%, #fff7c0 0%, #ffe08a 38%, #ffb347 58%, #ff7a00 78%, transparent 80%),
+                radial-gradient(ellipse at 50% 45%, ##FFA500 0%, transparent 65%);
+    box-shadow:0 0 18px 6px rgba(255,170,40,.55), 0 0 36px 14px rgba(255,140,0,.40), 0 -20px 28px rgba(255,220,170,.40);
     animation: flickerSoft .6s ease-in-out infinite;
   }
   @keyframes flickerSoft{ 0%{ transform:scale(1) rotate(-0.8deg); opacity:.95 } 50%{ transform:scale(1.06) rotate(0.6deg); opacity:.82 } 100%{ transform:scale(1) rotate(-0.8deg); opacity:.95 } }
@@ -313,9 +310,8 @@
   .is-fs #controls{ display:none !important; }
 </style>
 </head>
-<!-- Ensure to‑do shows by default -->
-<body class="todo-on">
-  <div class="brand">MADE BY ANABRATA — V10</div>
+<body>
+  <div class="brand">MADE BY ANABRATA V2.0</div>
 
   <div class="main" id="main">
     <!-- Timer -->
@@ -419,6 +415,7 @@
         <div style="flex:1"><label for="textColor">Digit color</label><input id="textColor" type="color" value="#000000"></div>
         <div style="flex:1"><label for="colonColor">Colon color</label><input id="colonColor" type="color" value="#ffffff"></div>
       </div>
+      <!-- Transparent flip cards option removed intentionally -->
       <div class="row">
         <div style="flex:1"><label for="simpleColor">Simple timer color</label><input id="simpleColor" type="color" value="#ffffff"></div>
       </div>
@@ -432,10 +429,6 @@
         <label><input type="checkbox" id="onlyCandle"> Only candle mode</label>
         <label><input type="checkbox" id="showTodo" checked> Show to‑do list</label>
       </div>
-      <div class="row">
-        <div style="flex:1"><label for="waxColor">Wax color</label><input id="waxColor" type="color" value="#f2e4c7"></div>
-        <div style="flex:1"><label for="flameColor">Flame color</label><input id="flameColor" type="color" value="#ff7a00"></div>
-      </div>
     </div>
   </div>
 
@@ -448,9 +441,10 @@
   <div id="congrats" aria-modal="true" role="dialog">
     <div id="cgCard">
       <h2 id="cgTitle">Congratulations!</h2>
-      <p id="cgMsg">Timer complete — great focus! 🎉</p>
+      <p id="cgMsg">Timer complete 🥰</p>
       <button id="cgClose">Close</button>
     </div>
+    <!-- Balloons -->
     <div class="balloon" style="left:6%;  --bcol:#ff6b6b; --dur:9s;  --drift:12px"></div>
     <div class="balloon" style="left:14%; --bcol:#ffd166; --dur:8.5s;--drift:-10px"></div>
     <div class="balloon" style="left:22%; --bcol:#06d6a0; --dur:10s; --drift:8px"></div>
@@ -496,10 +490,6 @@
 
   function applyWax(){
     document.documentElement.style.setProperty("--wax", $("#waxColor")?.value || "#f2e4c7");
-  }
-
-  function applyFlame(){
-    document.documentElement.style.setProperty("--flame", $("#flameColor")?.value || "#ff7a00");
   }
 
   function restyleClockPanels(){
@@ -860,4 +850,93 @@
   $("#musicNext")?.addEventListener("click", nextTrack);
   $("#musicPrev")?.addEventListener("click", prevTrack);
   $("#musicLoop")?.addEventListener("change", (e)=> audio.loop = !!e.target.checked);
-  window.addEventListener("unload", () => objectUrls.forEach(u
+  window.addEventListener("unload", () => objectUrls.forEach(u=>URL.revokeObjectURL(u)));
+
+  /* ---------- Custom background image ---------- */
+  const bgImageBtn = $("#bgImageBtn"), bgImageFile = $("#bgImageFile"), bgImageClear = $("#bgImageClear"), bgImageName = $("#bgImageName");
+  bgImageBtn?.addEventListener("click", () => bgImageFile?.click());
+  bgImageFile?.addEventListener("change", (e)=>{
+    const f = e.target.files?.[0]; if (!f) return;
+    if (bgObjectUrl){ URL.revokeObjectURL(bgObjectUrl); bgObjectUrl=null; }
+    bgObjectUrl = URL.createObjectURL(f);
+    document.body.style.backgroundImage = `url("${bgObjectUrl}")`;
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+    document.body.style.backgroundAttachment = "fixed";
+    if (bgImageName) bgImageName.textContent = f.name;
+  });
+  bgImageClear?.addEventListener("click", applyGradient);
+
+  /* ---------- Layout flags ---------- */
+  function ensureCandleVisibleWhenOnlyCandle(on){
+    if (on){
+      const hc = $("#hideCandle");
+      if (hc?.checked){ hc.checked=false; document.body.classList.remove("candle-off"); }
+    }
+  }
+
+  function applyLayoutFlags(){
+    document.body.classList.toggle("candle-off", $("#hideCandle")?.checked);
+    document.body.classList.toggle("center-clock", $("#centerClock")?.checked);
+    document.body.classList.toggle("only-candle", $("#onlyCandle")?.checked);
+    document.body.classList.toggle("todo-on", $("#showTodo")?.checked);
+    safeBuildClock();
+    requestAnimationFrame(()=>{ positionFlame(); ensureVisible(); });
+  }
+
+  function previewLayout(){
+    const sh = $("#showHours")?.checked ?? false;
+    const ss = $("#showSeconds")?.checked ?? true;
+    const uf = $("#useFlip")?.checked ?? true;
+    if(uf){ flipDigits=buildFlip(timerFlip, sh, ss); tickFlip(flipDigits, 0, sh, ss); } else { renderSimple(0); }
+    requestAnimationFrame(()=>{ positionFlame(); ensureVisible(); });
+  }
+
+  /* ---------- Bindings ---------- */
+  $("#primaryBtn").addEventListener("click", togglePrimary);
+  $("#resetBtn").addEventListener("click", resetCountdown);
+
+  $("#useFlip").addEventListener("change", ()=>{ safeBuildClock(); previewLayout(); });
+  $("#showHours").addEventListener("change", previewLayout);
+  $("#showSeconds").addEventListener("change", previewLayout);
+
+  $("#hideCandle").addEventListener("change", () => applyLayoutFlags());
+  $("#centerClock").addEventListener("change", () => applyLayoutFlags());
+  $("#onlyCandle").addEventListener("change", e=>{ ensureCandleVisibleWhenOnlyCandle(e.target.checked); applyLayoutFlags(); });
+  $("#showTodo").addEventListener("change", () => applyLayoutFlags());
+
+  ["bgAngle","bgC1","bgC2","bgC3"].forEach(id=> document.getElementById(id)?.addEventListener("input", applyGradient));
+  ["clockC1","clockC2","clockC3","textColor","colonColor","simpleColor"].forEach(id=> document.getElementById(id)?.addEventListener("input", restyleClockPanels));
+
+  $("#todoApply").addEventListener("click", () =>{ setTodoBg($("#todoColor").value); $("#todo-panel").classList.remove("todo-clear"); });
+  $("#todoClear").addEventListener("click", () =>{ setTodoBg("transparent"); $("#todo-panel").classList.add("todo-clear"); });
+  $("#todoGlass").addEventListener("change", (e)=> $("#todo-panel").classList.toggle("todo-glass", e.target.checked));
+
+  /* Transparent flip cards option removed: no event listener for #clockTransparent */
+
+  /* ---------- Init ---------- */
+  (function boot(){
+    applyGradient(); restyleClockPanels(); applyWax();
+
+    // Force to‑do visible on load if toggle checked
+    if ($("#showTodo")?.checked) document.body.classList.add("todo-on");
+
+    // Apply To‑do transparency if default-checked
+    if ($("#todoGlass")?.checked) $("#todo-panel").classList.add("todo-glass");
+
+    applyLayoutFlags();
+    safeBuildClock();
+    previewLayout();
+
+    // Position flame after first paints and re-check visibility
+    afterNextPaint(()=>{ positionFlame(); ensureVisible(); });
+    setTimeout(()=>{ positionFlame(); ensureVisible(); }, 150);
+
+    setWaxHeightByProgress(1);
+
+    // Seed one empty to‑do
+    const li=makeTodoItem(""); $("#todoList").appendChild(li);
+  })();
+</script>
+</body>
+</html>
