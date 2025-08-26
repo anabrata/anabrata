@@ -1,292 +1,115 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Indonesia Donation — Thank You</title>
-  <meta name="description" content="Support donations — thank you for your kindness." />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QR Showcase</title>
+  <meta name="description" content="Embedded QR image displayed inside a modern card without needing to download from Google Drive.">
   <style>
-    :root{
-      --bg1:#0f1226;
-      --bg2:#1b2640;
-      --accent:#ff3d6e;
-      --accent2:#ffb86b;
-      --ring:#ffd166;
-      --ring2:#6df7c1;
-      --card:#0b0f1d;
-      --glass:rgba(255,255,255,0.08);
-      --stroke:rgba(255,255,255,0.12);
-      --text:#e9edf7;
-      --muted:#aab3c7;
-    }
-
+    :root{--bg1:#0f0c29;--bg2:#302b63;--bg3:#24243e;--accent:#ffb703;--card:#ffffff10;--border:#ffffff30}
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      color:var(--text);
-      background: radial-gradient(1200px 800px at 10% 10%, #243056 0%, transparent 70%),
-                  radial-gradient(900px 600px at 90% 20%, #2b345f 0%, transparent 70%),
-                  linear-gradient(160deg, var(--bg1), var(--bg2));
-      overflow-x:hidden;
-    }
-
-    .wrap{
-      min-height:100%;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      color:#eef1f7;
+      background: radial-gradient(1200px 800px at 80% -10%, var(--bg2), transparent),
+                  radial-gradient(900px 600px at -10% 110%, var(--bg3), transparent),
+                  linear-gradient(135deg, var(--bg1), var(--bg3));
       display:grid;
-      place-items:center;
-      padding:40px 20px;
-      position:relative;
-      isolation:isolate;
+      grid-template-rows:auto 1fr auto;
+      min-height:100vh;
     }
+    header{padding:24px 28px;display:flex;gap:12px;align-items:center}
+    .logo{width:32px;height:32px;border-radius:8px;background:conic-gradient(from 210deg, #ffd166, #06d6a0, #118ab2, #ef476f, #ffd166);box-shadow:0 0 0 3px #ffffff20 inset}
+    h1{margin:0;font-size:clamp(22px,3vw,28px);letter-spacing:0.4px}
 
-    /* Floating THANK YOU ring */
-    .ring{
-      position:absolute;
-      inset:0;
-      display:grid;
-      place-items:center;
-      pointer-events:none;
-      filter: drop-shadow(0 0 24px rgba(255,255,255,0.15));
-      z-index:0;
-    }
-    .ring .text{
-      font-weight:900;
-      letter-spacing:0.25em;
-      text-transform:uppercase;
-      font-size: clamp(14px, 2.5vw, 20px);
-      color:transparent;
-      -webkit-text-stroke: 1px rgba(255,255,255,0.28);
-      opacity:0.9;
-      transform: translateZ(0);
-      animation: spin 24s linear infinite;
-    }
-    .ring .gradient{
-      position:absolute;
-      width:min(90vmin, 1200px);
-      height:min(90vmin, 1200px);
-      border-radius:50%;
-      background:
-        conic-gradient(from 0deg, var(--ring), var(--ring2), var(--accent), var(--accent2), var(--ring));
-      filter: blur(80px) opacity(0.2);
-      animation: pulse 8s ease-in-out infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
-
-    /* CTA ribbon */
-    .ribbon{
-      position:absolute;
-      top:24px;
-      left:50%;
-      transform: translateX(-50%);
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      color:#0b0b0f;
-      font-weight:800;
-      padding:10px 18px;
-      border-radius:999px;
-      letter-spacing:0.04em;
-      box-shadow: 0 12px 32px rgba(255, 61, 110, 0.35), inset 0 0 0 1px rgba(0,0,0,0.2);
-      z-index:2;
-    }
-
-    /* Donation card */
+    .wrap{display:grid;place-items:center;padding:28px}
     .card{
-      position:relative;
-      z-index:1;
-      width: min(1100px, 92vw);
-      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
-      backdrop-filter: blur(10px) saturate(120%);
-      border:1px solid var(--stroke);
-      border-radius:24px;
-      overflow:hidden;
-      box-shadow:
-        0 30px 80px rgba(10,15,35,0.55),
-        inset 0 1px 0 rgba(255,255,255,0.06);
-    }
-
-    .cardHeader{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:20px 22px;
-      gap:16px;
-      border-bottom:1px solid var(--stroke);
-      background:
-        radial-gradient(600px 120px at 20% 0%, rgba(255,184,107,0.18), transparent 60%),
-        radial-gradient(600px 120px at 80% 0%, rgba(255,61,110,0.15), transparent 60%),
-        transparent;
-    }
-    .title{
-      font-size: clamp(18px, 2.2vw, 26px);
-      font-weight:800;
-      letter-spacing:0.02em;
-    }
-    .muted{
-      color:var(--muted);
-      font-size: clamp(12px, 1.6vw, 14px);
-    }
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding:10px 14px;
-      background:linear-gradient(90deg, var(--accent), var(--accent2));
-      color:#0b0b0f;
-      font-weight:800;
-      border:none;
-      border-radius:12px;
-      cursor:pointer;
-      text-decoration:none;
-      box-shadow: 0 10px 24px rgba(255, 61, 110, 0.35);
-      transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
-    }
-    .btn:hover{ transform: translateY(-1px); filter: brightness(1.05);}
-    .btn:active{ transform: translateY(0); filter: brightness(.98);}
-
-    .cardBody{
-      padding:18px;
+      width:min(92vw, 760px);
+      background:linear-gradient(180deg, #ffffff22, #ffffff11);
+      border:1px solid var(--border);
+      border-radius:20px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 20px 60px #00000055, 0 0 0 1px #00000033 inset;
+      padding: clamp(18px, 3vw, 28px);
       display:grid;
       grid-template-columns: 1fr;
-      gap:18px;
-      background:
-        radial-gradient(800px 140px at 50% 0%, rgba(109,247,193,0.14), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
+      gap: 18px;
     }
+    @media (min-width: 860px){ .card{ grid-template-columns: 340px 1fr; gap:24px } }
 
-    /* Image box */
-    .imageBox{
+    .imgBox{
       position:relative;
+      aspect-ratio:1/1;
       width:100%;
-      aspect-ratio: 16/9;
-      display:grid;
-      place-items:center;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-      border:1px solid var(--stroke);
-      border-radius:18px;
+      border-radius:16px;
+      border:1px dashed var(--border);
+      background: #111418;
+      display:grid;place-items:center;
       overflow:hidden;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
     }
-    .imageBox::before{
-      content:"";
-      position:absolute; inset:-20%;
-      background:
-        radial-gradient(600px 160px at 15% 20%, rgba(255,61,110,0.18), transparent 60%),
-        radial-gradient(500px 140px at 85% 20%, rgba(109,247,193,0.18), transparent 60%);
-      filter: blur(40px);
-      z-index:0;
-    }
-    .imageBox img{
-      max-width:100%;
-      max-height:100%;
-      width:auto; height:auto;
-      object-fit: contain;
-      border-radius:12px;
-      z-index:1;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.35);
-      transition: transform .6s ease;
-    }
-    .imageBox:hover img{ transform: scale(1.02); }
+    .imgBox::after{content:"";position:absolute;inset:0;border-radius:16px;box-shadow:inset 0 0 0 1px #ffffff25}
+    img.qr{width:92%;height:92%;object-fit:contain;border-radius:10px;box-shadow:0 12px 30px #00000055}
 
-    /* Footer thanks */
-    .thanks{
-      text-align:center;
-      padding:8px 12px 20px;
-      color:var(--muted);
-      font-weight:700;
-      letter-spacing:0.08em;
-      text-transform:uppercase;
-    }
+    .badge{display:inline-flex;align-items:center;gap:8px;color:#111;background:#ffd166;border-radius:999px;padding:6px 10px;font-weight:600;font-size:13px;width:max-content}
+    .badge b{color:#111}
 
-    /* Responsive */
-    @media (min-width: 860px){
-      .cardBody{
-        grid-template-columns: 1.1fr .9fr;
-        align-items:center;
-      }
-      .imageBox{ aspect-ratio: auto; min-height: 360px; }
-    }
+    .title{font-size:clamp(20px,2.4vw,26px);margin:4px 0 6px;font-weight:700}
+    .sub{margin:0;color:#c9d2e2;line-height:1.55}
 
-    /* Accent glow corners */
-    .glowTL, .glowBR{
-      position:absolute; width:380px; height:380px; border-radius:50%;
-      filter: blur(90px); opacity:.28; z-index:0;
-    }
-    .glowTL{ top:-120px; left:-120px; background: radial-gradient(circle at center, var(--accent), transparent 60%); }
-    .glowBR{ bottom:-120px; right:-120px; background: radial-gradient(circle at center, var(--ring2), transparent 60%); }
-
-    /* Simple content on right */
-    .pitch{
-      padding:10px 6px;
-    }
-    .pitch h2{
-      margin:0 0 10px 0;
-      font-size: clamp(18px, 2.2vw, 24px);
-    }
-    .pitch p{
-      margin:0 0 14px 0;
-      color:var(--muted);
-      line-height:1.6;
-    }
-    .bullet{
-      display:flex; align-items:center; gap:10px;
-      margin:8px 0; color:var(--text);
-    }
-    .dot{
-      width:10px; height:10px; border-radius:50%;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      box-shadow: 0 0 12px rgba(255,184,107,0.8);
-    }
+    .ctaRow{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+    .btn{appearance:none;border:none;cursor:pointer;border-radius:12px;padding:12px 16px;font-weight:700}
+    .btn.primary{background:linear-gradient(135deg,#ffb703,#fb8500);color:#1a1200;box-shadow:0 10px 24px #00000055}
+    .btn.ghost{background:#ffffff14;color:#eef;border:1px solid #ffffff2a}
+    footer{padding:18px 28px;color:#9fb0c9;font-size:13px}
+    a{color:#ffb703;text-decoration:none}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="ribbon">Support Indonesia — Thank You</div>
+  <header>
+    <div class="logo"></div>
+    <h1>Instant QR Preview</h1>
+  </header>
 
-    <div class="ring" aria-hidden="true">
-      <div class="gradient"></div>
-      <div class="text">THANK YOU • THANK YOU • THANK YOU • THANK YOU • THANK YOU • THANK YOU •</div>
-    </div>
-
-    <div class="card">
-      <div class="glowTL"></div>
-      <div class="glowBR"></div>
-
-      <div class="cardHeader">
-        <div>
-          <div class="title">Indonesia Relief — Thank You</div>
-          <div class="muted">Every contribution makes a difference</div>
-        </div>
-        <a class="btn" href="https://drive.google.com/file/d/1KeyLQgq0JwcTMYy5c6hhJBLNhWM6HYZS/view?usp=drive_link" target="_blank" rel="noopener">Open Drive Link ➜</a>
+  <main class="wrap">
+    <section class="card" aria-label="QR showcase card">
+      <div class="imgBox">
+        <img class="qr" id="qrImg" alt="QR code" loading="eager" decoding="sync">
       </div>
-
-      <div class="cardBody">
-        <!-- Left: the image box (Google Drive image embedded) -->
-        <div class="imageBox" role="img" aria-label="Donation image">
-          <img
-            src="https://drive.google.com/thumbnail?id=1KeyLQgq0JwcTMYy5c6hhJBLNhWM6HYZS&sz=w2000"
-            alt="Thank you — Indonesia Donation"
-            referrerpolicy="no-referrer"
-          />
-        </div>
-
-        <!-- Right: short pitch and an extra button -->
-        <div class="pitch">
-          <h2>Together, we create impact</h2>
-          <p>Thanks for the generosity and support — this page highlights the shared effort to help communities in Indonesia, with appreciation at the heart of the experience. </p>
-          <div class="bullet"><span class="dot"></span><span>Transparent and uplifting visual focus</span></div>
-          <div class="bullet"><span class="dot"></span><span>Drive link opens in a secure tab</span></div>
-          <div class="bullet"><span class="dot"></span><span>Responsive, accessible, and fast</span></div>
-          <div style="margin-top:14px">
-            <a class="btn" href="https://drive.google.com/file/d/1KeyLQgq0JwcTMYy5c6hhJBLNhWM6HYZS/view?usp=drive_link" target="_blank" rel="noopener">View Image on Drive</a>
-          </div>
+      <div>
+        <span class="badge">No download needed</span>
+        <h2 class="title">View the QR right on the page</h2>
+        <p class="sub">This image box renders the QR automatically either from an embedded data URL or directly from Google Drive when a file ID is provided below.</p>
+        <div class="ctaRow">
+          <button class="btn primary" onclick="location.reload()">Refresh</button>
+          <button class="btn ghost" onclick="alert('Tip: Set driveFileId in the script to pull from Google Drive immediately.')">How it works</button>
         </div>
       </div>
+    </section>
+  </main>
 
-      <div class="thanks">Thank you for supporting Indonesia</div>
-    </div>
-  </div>
+  <footer>
+    Made for quick preview demos. Replace the file ID in the script to show your Google Drive-hosted image instantly.
+  </footer>
+
+  <script>
+    // 1) Embedded fallback (works offline)
+    const embeddedDataUrl = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAEBAQEBAQEBAQEBAQEBAQIBAQEBAQIBAQECAgICAgICAgIDAwQDAwMDAwICAwQDAwQEBAQEAgMFBQQEBQQEBAT/2wBDAQEBAQEBAQIBAQIEAwIDBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAT/wAARCAF0AYMDASIAAhEBAxEB/8QAHwAAAgICAgMBAAAAAAAAAAAAAAoJCwcIAgYBAwUE/8QAiBAAAAQEAwIGBg4LFBEQCgMBAwQFBgABBwgCCRMRFAoVFiEjMxIXMUNTkxgZGiIkOUFRWGFjcdPWJTRzeIGDkZehttUmJygyNTc4QlJUV3eYo6axs7fH1DZERkhVVnaHiJSWtcPG4+bwKUdiZGVmcoSGlaWnwcTR4UVZZ2h0daS0xfOChZKo/8QAHQEAAgEFAQEAAAAAAAAAAAAABgcFAAIDBAgBCf/EAFQRAAAEBOMEGA..."; /* truncated for brevity in this snippet; keep the full base64 string from the assistant reply when using */
+    // 2) Optional: show image from Google Drive by file ID (share the file as anyone with the link)
+    //    Paste only the ID from a link like: https://drive.google.com/file/d/FILE_ID/view
+    const driveFileId = ""; // e.g., "1AbCDeFgHiJkLmNoPQrStuVwXyZ"
+    const img = document.getElementById('qrImg');
+    if (driveFileId) {
+      // Use Drive direct-view endpoint so no click or download dialog appears
+      img.src = `https://drive.google.com/uc?export=view&id=${driveFileId}`;
+      img.referrerPolicy = 'no-referrer';
+      img.crossOrigin = 'anonymous';
+    } else {
+      // Use embedded data URL (from the uploaded image) if no Drive ID is set
+      img.src = embeddedDataUrl;
+    }
+  </script>
 </body>
 </html>
