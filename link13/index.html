@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -286,14 +287,17 @@
     height: 100vh;
     width: 100vw;
     overflow: hidden;
+    background-image: linear-gradient(var(--bg-angle), var(--bg-c1), var(--bg-c2), var(--bg-c3)) !important;
+    background-attachment: fixed !important;
+    background-size: cover !important;
+    background-position: center !important;
   }
   .real-time-mode #main,
   .real-time-mode #controls,
   .real-time-mode .brand {
     display: none !important;
   }
-  .real-time-mode #timer-container,
-  .real-time-mode #simpleTimer {
+  .real-time-mode #timer-container {
     display: block !important;
     position: absolute;
     top: 50%;
@@ -303,6 +307,15 @@
   }
   .real-time-mode #timer {
     display: flex !important;
+  }
+  .real-time-mode #simpleTimer {
+    display: block !important;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+    font-size: min(12vw, 160px);
   }
 </style>
 </head>
@@ -634,13 +647,31 @@
       // Enter real time mode
       document.body.classList.add("real-time-mode");
       realTimeModeActive = true;
-      safeBuildClock(); // Rebuild clock with current settings
+      
+      // Make sure timer container is visible
+      const timerContainer = $("#timer-container");
+      if (timerContainer) {
+        timerContainer.style.display = "block";
+        timerContainer.style.position = "absolute";
+        timerContainer.style.top = "50%";
+        timerContainer.style.left = "50%";
+        timerContainer.style.transform = "translate(-50%, -50%)";
+        timerContainer.style.zIndex = "100";
+      }
+      
+      // Build clock based on current settings
+      safeBuildClock();
+      
+      // Start updating real time
       updateRealTime();
     } else {
       // Exit real time mode
       document.body.classList.remove("real-time-mode");
       realTimeModeActive = false;
+      
+      // Stop real time updates
       cancelAnimationFrame(realTimeRafId);
+      
       // Reset to countdown mode display
       safeBuildClock();
     }
@@ -875,29 +906,9 @@
   /* ---------- Bindings ---------- */
   $("#primaryBtn").addEventListener("click", togglePrimary);
   $("#resetBtn").addEventListener("click", resetCountdown);
-  $("#useFlip").addEventListener("change", ()=>{ 
-    if (realTimeModeActive) {
-      safeBuildClock();
-      updateRealTime();
-    } else {
-      safeBuildClock(); 
-      previewLayout();
-    }
-  });
-  $("#showHours").addEventListener("change", () => {
-    if (realTimeModeActive) {
-      updateRealTime();
-    } else {
-      previewLayout();
-    }
-  });
-  $("#showSeconds").addEventListener("change", () => {
-    if (realTimeModeActive) {
-      updateRealTime();
-    } else {
-      previewLayout();
-    }
-  });
+  $("#useFlip").addEventListener("change", ()=>{ safeBuildClock(); previewLayout(); });
+  $("#showHours").addEventListener("change", previewLayout);
+  $("#showSeconds").addEventListener("change", previewLayout);
   $("#realTimeMode").addEventListener("change", toggleRealTimeMode);
   $("#hideCandle").addEventListener("change", () => applyLayoutFlags());
   $("#centerClock").addEventListener("change", () => applyLayoutFlags());
@@ -1151,3 +1162,67 @@
 <!-- ...to here, right before your </body> tag -->
 <!-- =============== END: EXIT-INTENT DONATION POP-UP CODE =============== -->
 <!-- ===================================================================== -->
+<!-- === Real Time Mode FIX (append before </body>) === -->
+<style>
+  /* Override: don't hide #main; hide only non-clock content in RTM */
+  .real-time-mode #main { display: block !important; }
+  .real-time-mode #todo-panel,
+  .real-time-mode #candle-area { display: none !important; }
+
+  /* Keep these hidden in RTM as before */
+  .real-time-mode #controls,
+  .real-time-mode .brand { display: none !important; }
+</style>
+
+<script>
+  // Override Real Time Mode behavior without touching other logic
+  (function () {
+    const rtmEl = document.getElementById("realTimeMode");
+
+    function toggleRealTimeModeFixed() {
+      if (rtmEl?.checked) {
+        // Enter RTM
+        document.body.classList.add("real-time-mode");
+
+        // Auto-enable "Center clock" option and class
+        const cc = document.getElementById("centerClock");
+        if (cc) cc.checked = true;
+        document.body.classList.add("center-clock");
+
+        // Ensure the timer is visible and centered
+        const timerContainer = document.getElementById("timer-container");
+        if (timerContainer) {
+          timerContainer.style.display = "block";
+          timerContainer.style.position = "absolute";
+          timerContainer.style.top = "50%";
+          timerContainer.style.left = "50%";
+          timerContainer.style.transform = "translate(-50%, -50%)";
+          timerContainer.style.zIndex = "100";
+        }
+
+        // Build the clock and start real-time updates
+        realTimeModeActive = true;
+        safeBuildClock();
+        cancelAnimationFrame(realTimeRafId);
+        updateRealTime();
+      } else {
+        // Exit RTM
+        document.body.classList.remove("real-time-mode");
+        realTimeModeActive = false;
+        cancelAnimationFrame(realTimeRafId);
+        safeBuildClock();
+      }
+    }
+
+    // Rewire the switch to use the fixed handler
+    if (rtmEl) {
+      try { rtmEl.removeEventListener("change", toggleRealTimeMode); } catch (e) {}
+      rtmEl.addEventListener("change", toggleRealTimeModeFixed);
+      // If already on, apply immediately
+      if (rtmEl.checked) toggleRealTimeModeFixed();
+    }
+  })();
+</script>
+<!-- === /Real Time Mode FIX === -->
+
+```
