@@ -1000,3 +1000,32 @@
   });
 })();
 </script>
+<style>
+/* Hotfix: remove the ghost triangle/box above the candle top */
+.waxTop{
+  /* Make the highlight fully fade to transparent at the edges */
+  background:
+    conic-gradient(from 0deg at 50% 50%,
+      rgba(255,255,255,.33) 0deg,
+      rgba(255,255,255,.10) 70deg,
+      rgba(0,0,0,0) 180deg,
+      rgba(255,255,255,0) 300deg,
+      rgba(255,255,255,0) 360deg
+    ),
+    radial-gradient(65% 55% at 50% 62%,
+      rgba(255,255,255,.52) 0%,
+      rgba(255,255,255,.12) 60%,
+      transparent 100%
+    ) !important;
+
+  /* Clip the layer to an ellipse so no rectangular corners can show */
+  clip-path: ellipse(70% 55% at 50% 62%) !important;
+
+  /* Extra safety: mask the outside to transparent (supported in modern browsers) */
+  -webkit-mask-image: radial-gradient(75% 60% at 50% 60%, #000 68%, transparent 72%);
+          mask-image: radial-gradient(75% 60% at 50% 60%, #000 68%, transparent 72%);
+}
+
+/* If you’d rather remove the glossy top entirely, uncomment this: */
+/* .waxTop{ background: none !important; } */
+</style>
