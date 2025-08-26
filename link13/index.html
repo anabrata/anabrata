@@ -1197,18 +1197,23 @@
 <!-- ...to here, right before your </body> tag -->
 <!-- =============== END: EXIT-INTENT DONATION POP-UP CODE =============== -->
 <!-- ===================================================================== -->
-<!-- === Real Time Mode — FINAL FIX === -->
+<!-- === Real Time Mode — FINAL, NON‑INTRUSIVE === -->
 <style>
-  /* Show only the clock in Real Time Mode */
-  .real-time-mode .brand,
+  /* Keep the page layout intact; only hide non‑clock UI in RTM */
   .real-time-mode #controls,
+  .real-time-mode .brand,
   .real-time-mode #todo-panel,
-  .real-time-mode #candle-area { display: none !important; }
+  .real-time-mode #candle-area {
+    display: none !important;
+  }
 
-  /* Keep the main container present so the clock can render */
-  .real-time-mode #main { display: block !important; min-height: 100vh; }
+  /* Do NOT hide #main; keep it present so the timer can render */
+  .real-time-mode #main {
+    display: block !important;
+    min-height: 100vh;
+  }
 
-  /* Center the clock without touching normal layout */
+  /* Center the clock container only while RTM is active */
   .real-time-mode #timer-container {
     position: fixed !important;
     left: 50% !important;
@@ -1217,51 +1222,43 @@
     z-index: 100 !important;
     display: block !important;
   }
-
-  /* Ensure whichever clock is chosen is visible */
-  .real-time-mode #timer { display: flex !important; }
-  .real-time-mode #simpleTimer { display: block !important; }
 </style>
 
 <script>
-/* Replace the Real Time Mode behavior without changing other code */
-(function () {
-  const rtmSwitch = document.getElementById('realTimeMode');
+  (function () {
+    const rtm = document.getElementById('realTimeMode');
 
-  function enterRTM() {
-    document.body.classList.add('real-time-mode');
+    function toggleRealTimeMode() {
+      const on = !!rtm?.checked;
 
-    // Auto-enable Center clock (and class) so the clock stays centered
-    const cc = document.getElementById('centerClock');
-    if (cc && !cc.checked) cc.checked = true;
-    document.body.classList.add('center-clock');
+      if (on) {
+        // Enter Real Time Mode
+        document.body.classList.add('real-time-mode');
 
-    // Build the chosen clock type and start real-time updates
-    realTimeModeActive = true;
-    safeBuildClock();
-    cancelAnimationFrame(realTimeRafId);
-    updateRealTime();
-  }
+        // Do NOT touch other switches or inline styles; just render the clock
+        realTimeModeActive = true;
+        safeBuildClock();
+        cancelAnimationFrame(realTimeRafId);
+        updateRealTime();
+      } else {
+        // Exit Real Time Mode
+        document.body.classList.remove('real-time-mode');
 
-  function exitRTM() {
-    document.body.classList.remove('real-time-mode');
+        // Stop real-time loop and restore normal rendering
+        realTimeModeActive = false;
+        cancelAnimationFrame(realTimeRafId);
+        safeBuildClock();
+      }
+    }
 
-    // Stop the real-time loop; layout goes back automatically (no inline styles used)
-    realTimeModeActive = false;
-    cancelAnimationFrame(realTimeRafId);
-    safeBuildClock();
-  }
+    // Rebind to ensure this non-intrusive handler runs
+    if (rtm) {
+      try { rtm.removeEventListener('change', toggleRealTimeMode); } catch (e) {}
+      rtm.addEventListener('change', toggleRealTimeMode);
 
-  function onToggle() {
-    if (rtmSwitch.checked) enterRTM(); else exitRTM();
-  }
-
-  // Detach the original handler (if present) and attach the fixed one
-  try { rtmSwitch.removeEventListener('change', toggleRealTimeMode); } catch (e) {}
-  rtmSwitch.addEventListener('change', onToggle);
-
-  // If the page loads with Real Time already on, apply immediately
-  if (rtmSwitch.checked) enterRTM();
-})();
+      // If toggled on before paste/reload, apply immediately
+      if (rtm.checked) toggleRealTimeMode();
+    }
+  })();
 </script>
-<!-- === / Real Time Mode — FINAL FIX === -->
+<!-- === / Real Time Mode — FINAL, NON‑INTRUSIVE === -->
