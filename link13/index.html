@@ -5,71 +5,154 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Donate — Thank You</title>
   <style>
-    * {margin:0; padding:0; box-sizing:border-box;}
-
+    :root {
+      --bg1: #0f2027;
+      --bg2: #203a43;
+      --bg3: #2c5364;
+      --accent: #ff6b6b;
+      --card-bg: rgba(255,255,255,0.98);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
     body {
-      height:100vh;
+      min-height:100vh;
       display:flex;
-      flex-direction:column;
       align-items:center;
       justify-content:center;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #ff9a9e, #fad0c4, #fad390, #a18cd1);
-      background-size: 300% 300%;
-      animation: gradientShift 12s ease infinite;
-      color:#fff;
-      text-align:center;
+      font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
+      background-size: 400% 400%;
+      animation: bgShift 12s ease infinite;
+      color: #111;
+      padding: 32px;
+    }
+    @keyframes bgShift {
+      0%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 50%}
     }
 
-    @keyframes gradientShift {
-      0%{background-position:0% 50%;}
-      50%{background-position:100% 50%;}
-      100%{background-position:0% 50%;}
+    .container {
+      width:100%;
+      max-width:980px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:20px;
+      padding:28px;
+      box-shadow: 0 20px 60px rgba(2,6,23,0.55);
+      display:flex;
+      gap:28px;
+      align-items:center;
     }
 
-    .qr-box {
-      background: #fff;
-      padding: 20px;
-      border-radius: 20px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.25);
-      margin-bottom: 20px;
-      max-width: 90%;
+    .left { flex:0 0 360px; display:flex; align-items:center; justify-content:center; }
+
+    .qr-card {
+      background: var(--card-bg);
+      padding:18px;
+      border-radius:18px;
+      box-shadow: 0 12px 30px rgba(2,6,23,0.25);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      width:320px;
+      height:320px;
     }
 
-    .qr-box img {
-      width: 280px;
-      height: auto;
-      display:block;
-    }
+    .qr-card img { width:100%; height:100%; object-fit:contain; border-radius:10px; display:block; }
 
-    h1 {
-      font-size: 2rem;
-      margin-top: 10px;
-      font-weight: bold;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-    }
+    .right { flex:1; color: #fff; padding-right:12px; }
 
-    p {
-      font-size: 1.1rem;
-      margin-top: 8px;
-      opacity: 0.9;
-    }
+    h1 { font-size:28px; margin-bottom:8px; letter-spacing: -0.4px; text-shadow: 0 6px 18px rgba(0,0,0,0.45); }
+    p.lead { font-size:16px; margin-bottom:16px; color: rgba(255,255,255,0.9); }
+    .muted { color: rgba(255,255,255,0.75); margin-bottom:20px; }
 
-    @media(max-width:600px){
-      .qr-box img {
-        width:200px;
-      }
-      h1 { font-size:1.5rem; }
-      p { font-size:1rem; }
+    .actions { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .btn {
+      appearance:none;border:0;
+      background:linear-gradient(90deg,#ff7a7a,#ffbc8a);
+      color:#fff;padding:12px 16px;border-radius:10px;font-weight:600;cursor:pointer;
+      box-shadow: 0 8px 18px rgba(255,107,107,0.18);
+      transition: transform .15s ease;
+      text-decoration:none;display:inline-flex;gap:8px;align-items:center;
+    }
+    .btn.ghost { background:transparent;border:1px solid rgba(255,255,255,0.12);color: #fff;box-shadow:none; }
+
+    .info-box { margin-top:18px;padding:12px 14px;background: rgba(255,255,255,0.03);border-radius:8px;color: rgba(255,255,255,0.85);font-size:14px; }
+
+    footer { margin-top:18px;color: rgba(255,255,255,0.6);font-size:13px; }
+
+    @media(max-width:900px){
+      .container {flex-direction:column; align-items:center; gap:18px; padding:20px;}
+      .left{flex:unset}
+      .qr-card{width:260px;height:260px}
+      .right{padding:0;text-align:center}
+      h1{font-size:22px}
+    }
+    @media(max-width:420px){
+      .qr-card{width:220px;height:220px}
+      h1{font-size:20px}
     }
   </style>
 </head>
 <body>
-  <div class="qr-box">
-    <!-- Replace qr.png with your uploaded file name -->
-    <img src="qr.png" alt="Donate QR Code">
+  <div class="container" role="main" aria-labelledby="donate-title">
+    <div class="left">
+      <div class="qr-card" aria-hidden="false">
+        <!-- Replace {DATA_URI} with a data URI or a local filename like 'qr.png' -->
+        <img id="qrImage" src="{DATA_URI}" alt="Donation QR code — scan to donate">
+      </div>
+    </div>
+
+    <div class="right">
+      <h1 id="donate-title">Thank you for your support ❤️</h1>
+      <p class="lead">Scan the QR code with your phone camera or a QR app to donate securely. Your contribution makes a real difference.</p>
+
+      <div class="muted">Tip: If scanning doesn't work, use the "Download QR" button to save the image and open it from your phone gallery.</div>
+
+      <div class="actions">
+        <button class="btn" id="downloadBtn" title="Download QR image">⬇️ Download QR</button>
+        <a class="btn ghost" id="openBtn" href="#" target="_blank" rel="noopener">🔍 Open image</a>
+        <button class="btn ghost" id="copyLinkBtn">🔗 Copy image link</button>
+      </div>
+
+      <div class="info-box" id="copyStatus" style="display:none;">Image link copied to clipboard.</div>
+
+      <footer>If you need the direct image link for another platform, use the "Copy image link" button.</footer>
+    </div>
   </div>
-  <h1>Thank you for your support ❤️</h1>
-  <p>Scan the QR code to donate and make a difference.</p>
+
+  <script>
+    // The real file you downloaded already has the DATA_URI inserted.
+    const dataUri = "{DATA_URI}";
+
+    document.getElementById('downloadBtn').addEventListener('click', function(){
+      const a = document.createElement('a');
+      a.href = dataUri;
+      a.download = 'donation-qr.png';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+
+    document.getElementById('openBtn').addEventListener('click', function(e){
+      e.preventDefault();
+      const w = window.open();
+      w.document.write('<title>Donation QR</title>');
+      w.document.write('<img src="' + dataUri + '" style="max-width:100%;height:auto;display:block;margin:20px auto;">');
+      w.document.close();
+    });
+
+    document.getElementById('copyLinkBtn').addEventListener('click', async function(){
+      try {
+        await navigator.clipboard.writeText(dataUri);
+        const status = document.getElementById('copyStatus');
+        status.style.display = 'block';
+        status.textContent = 'Image data link copied to clipboard. You can paste it where needed.';
+        setTimeout(()=> status.style.display = 'none', 3000);
+      } catch (err) {
+        alert('Could not copy to clipboard. Please try manually.');
+      }
+    });
+  </script>
 </body>
 </html>
