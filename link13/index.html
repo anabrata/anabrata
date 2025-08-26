@@ -1031,3 +1031,169 @@
 /* If you’d rather remove the glossy top entirely, uncomment this: */
 /* .waxTop{ background: none !important; } */
 </style>
+<!-- =================================================================== -->
+<!-- ============== START: EXIT-INTENT DONATION POP-UP CODE ============== -->
+<!-- Copy and paste everything from here... -->
+
+<!-- 1. The HTML for the Pop-up Box (Initially Hidden) -->
+<div id="donate-modal-overlay">
+  <div id="donate-modal-content">
+    <span id="close-donate-modal" title="Close">&times;</span>
+    <h2>Enjoying this App?</h2>
+    <p>
+      My name is Anabrata, and I am a 16-year-old developer who built this tool.
+      Your support would help me maintain this project and build even bigger and better things in the future.
+    </p>
+    <p>
+      If you find this useful, please consider making a small donation. Every little bit helps!
+    </p>
+    <!-- IMPORTANT: Change the link below to your actual donation page URL -->
+    <a href="https://www.your-donation-link.com" target="_blank" id="donate-button">
+      Donate Now
+    </a>
+  </div>
+</div>
+
+<!-- 2. The CSS to Style the Pop-up Box -->
+<style>
+  /* The semi-transparent background overlay */
+  #donate-modal-overlay {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place even when scrolling */
+    z-index: 9999; /* Sit on top of everything else */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Black background with opacity */
+    -webkit-backdrop-filter: blur(5px); /* Optional: blur the background */
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s;
+  }
+
+  /* The pop-up box itself */
+  #donate-modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #2c2c2e; /* Dark background for the box */
+    color: #f2f2f7; /* Light text color */
+    padding: 30px 40px;
+    border: 1px solid #444;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    animation: slideIn 0.4s ease-out;
+  }
+  
+  #donate-modal-content h2 {
+    margin-top: 0;
+    color: #ffffff;
+    font-size: 24px;
+  }
+  
+  #donate-modal-content p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  /* The Close Button (X) */
+  #close-donate-modal {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  #close-donate-modal:hover {
+    color: #fff;
+  }
+
+  /* The Donate Button */
+  #donate-button {
+    display: inline-block;
+    background-color: #007aff; /* A nice blue color */
+    color: white;
+    padding: 12px 30px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  #donate-button:hover {
+    background-color: #0a84ff; /* A slightly lighter blue on hover */
+  }
+  
+  /* Animations for the pop-up */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes slideIn {
+    from { top: 40%; opacity: 0; }
+    to { top: 50%; opacity: 1; }
+  }
+
+</style>
+
+<!-- 3. The JavaScript to Control the Pop-up -->
+<script>
+  (function() {
+    const modal = document.getElementById('donate-modal-overlay');
+    const closeButton = document.getElementById('close-donate-modal');
+    let hasBeenShown = false; // Flag to ensure it only shows once per page visit
+
+    // Function to show the modal
+    function showModal() {
+      if (!hasBeenShown) {
+        modal.style.display = 'block';
+        hasBeenShown = true;
+      }
+    }
+
+    // Function to hide the modal
+    function hideModal() {
+      modal.style.display = 'none';
+    }
+
+    // --- EVENT LISTENERS ---
+
+    // Listen for the mouse leaving the document window (the trigger)
+    document.addEventListener('mouseout', function(e) {
+      // e.toElement === null and e.relatedTarget === null means the mouse left the window
+      if (!e.toElement && !e.relatedTarget) {
+        showModal();
+      }
+    });
+
+    // Hide the modal if the close button (X) is clicked
+    closeButton.addEventListener('click', hideModal);
+
+    // Hide the modal if the user clicks on the dark overlay background
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        hideModal();
+      }
+    });
+
+  })(); // We wrap the script in a function to avoid conflicts with your other code
+</script>
+
+<!-- ...to here, right before your </body> tag -->
+<!-- =============== END: EXIT-INTENT DONATION POP-UP CODE =============== -->
+<!-- ===================================================================== -->
