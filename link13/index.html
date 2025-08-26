@@ -1,6 +1,4 @@
-
-
-
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,16 +12,13 @@
     --digit-h: 170px;
     --digit-radius: 16px;
     --split-line: rgba(0,0,0,0.10);
-
     /* Spacing */
     --gap: clamp(24px, 5vw, 56px);
-
     /* Background gradient */
     --bg-angle: 135deg;
     --bg-c1: #3a1c71;
     --bg-c2: #d76d77;
     --bg-c3: #ffaf7b;
-
     /* Flip clock colors (with glass overlay) */
     --clock-c1: #ffffff;
     --clock-c2: #ffffff;
@@ -32,21 +27,16 @@
     --colon-color: #ffffff;
     --clock-glass-bg: rgba(255,255,255,0.06);
     --clock-glass-border: rgba(255,255,255,0.18);
-
     /* Simple (non‑flip) clock color */
     --simple-color: #ffffff;
-
     /* Candle */
     --wax: #f2e4c7;
     --wick: #1b1b1b;
-
     /* Layout tweak */
     --candle-offset: 18px;
-
     /* To‑do base bg (transparent by default) */
     --todo-bg: transparent;
   }
-
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
@@ -55,13 +45,11 @@
     background-image: linear-gradient(var(--bg-angle), var(--bg-c1), var(--bg-c2), var(--bg-c3));
     background-attachment: fixed; background-size: cover; background-position: center;
   }
-
   .brand{
     position:fixed; left:12px; top:10px; z-index:40; color:#fff;
     font-weight:800; font-size:13px; letter-spacing:.3px;
     text-shadow:0 1px 2px rgba(0,0,0,.35); user-select:none;
   }
-
   /* ===== Main layout: Clock | To‑do | Candle ===== */
   .main{
     flex:1;
@@ -75,11 +63,9 @@
   }
   /* Prevent grid children from vanishing due to intrinsic overflow */
   .main > section{ min-width:0; min-height:0; }
-
   #timer-container{ grid-column:1; }
   #todo-panel     { grid-column:2; justify-self:center; align-self:center; }
   #candle-area    { grid-column:3; }
-
   /* Center Clock: timer centered; To‑do stays LEFT (grid) */
   .center-clock .main{ grid-template-columns: max-content 1fr max-content; }
   .center-clock #timer-container{
@@ -90,21 +76,18 @@
     position:static; grid-column:1; justify-self:start; align-self:center;
     margin-left:min(48px,5vw); z-index:6;
   }
-
   /* Hide candle → To‑do occupies RIGHT */
   .candle-off #candle-area{ display:none !important; }
   .candle-off .main{ grid-template-columns: max-content max-content; }
   .candle-off #todo-panel{
     position:static !important; left:auto !important; top:auto !important; transform:none !important; justify-self:end !important;
   }
-
   /* Center‑clock + candle‑off → keep To‑do LEFT */
   .center-clock.candle-off .main{ grid-template-columns: max-content 1fr; }
   .center-clock.candle-off #todo-panel{
     position:static !important; grid-column:1 !important; justify-self:start !important;
     margin-left:min(48px,5vw) !important; z-index:6 !important;
   }
-
   /* Only candle → center candle, hide clock; To‑do LEFT */
   .only-candle #timer-container{ display:none !important; }
   .only-candle .main{ grid-template-columns: max-content 1fr; }
@@ -113,11 +96,9 @@
     z-index:6;
   }
   .only-candle #candle-area{ grid-column: 2; justify-self: center; }
-
   /* To‑do visibility via .todo-on */
   #todo-panel{ display:none; }
   .todo-on #todo-panel{ display:block; }
-
   /* To‑do styling */
   #todo-panel{
     max-width: clamp(220px, 26vw, 420px);
@@ -141,14 +122,12 @@
   #todoList li{ counter-increment:tdn; position:relative; padding-left:28px; margin:4px 0; min-height:20px; outline:none; transition: opacity .18s, transform .18s; }
   #todoList li:before{ content: counter(tdn) "."; position:absolute; left:0; top:0; width:22px; text-align:right; padding-right:6px; font-weight:900; opacity:.9; }
   #todoList li.vanish{ opacity:0; transform:translateY(-3px); }
-
   .todoItem{ display:flex; align-items:center; gap:8px; }
   .todoChk{ appearance:none; width:16px; height:16px; border:2px solid rgba(255,255,255,.75); border-radius:4px; background:transparent; cursor:pointer; }
   .todoChk:checked{ background:#22c55e; border-color:#22c55e; }
   .todoChk:checked::after{ content:""; position:absolute; inset:0; background:linear-gradient(45deg,transparent 47%,#fff 47% 53%,transparent 53%),linear-gradient(-45deg,transparent 47%,#fff 47% 53%,transparent 53%); transform:scale(.48); }
   .todoText{ display:inline-block; min-width:36px; min-height:20px; padding:1px 5px; border-radius:6px; outline:none; color:#fff; caret-color:#fff; }
   .todoText:empty:before{ content:"New task"; opacity:.45; }
-
   /* ===== Flip clock (glassy) ===== */
   #timer{ display:flex; align-items:center; gap:12px; user-select:none; }
   .digit{
@@ -173,7 +152,6 @@
   @keyframes topFlip{ 0%{transform:rotateX(0)} 100%{transform:rotateX(-90deg)} }
   @keyframes bottomFlip{ 0%{transform:rotateX(90deg)} 100%{transform:rotateX(0)} }
   .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.3); flex:0 0 auto; }
-
   /* Transparent mode for flip cards (kept but not exposed in UI) */
   .clock-transparent .digit{
     background: transparent !important;
@@ -184,13 +162,11 @@
   .clock-transparent .digit:before{ background: transparent !important; }
   .clock-transparent .digit .top{ border-bottom:1px solid rgba(255,255,255,.25); }
   .clock-transparent .digit .bottom{ border-top:1px solid rgba(255,255,255,.25); }
-
   /* ===== Simple clock ===== */
   #simpleTimer{
     display:none; font-weight:900; letter-spacing:.04em; font-size:min(12vw,160px);
     color:var(--simple-color); text-shadow:0 0 10px rgba(0,0,0,.25), 0 12px 32px rgba(0,0,0,.25);
   }
-
   /* ===== Candle ===== */
   #candle-area{ display:flex; align-items:flex-end; justify-content:flex-end; height:max(380px,42vh); position:relative; transform: translateY(var(--candle-offset)); }
   .candle-clip{ position:relative; width:180px; height:380px; overflow:hidden; display:flex; align-items:flex-end; justify-content:center; }
@@ -200,7 +176,6 @@
   .waxTop{ position:absolute; top:-22px; left:50%; transform:translateX(-50%); width:150px; height:44px; pointer-events:none; z-index:3; background: conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,.33) 0deg, rgba(255,255,255,.10) 70deg, rgba(0,0,0,.08) 180deg, rgba(255,255,255,.20) 300deg, rgba(255,255,255,.33) 360deg), radial-gradient(65% 55% at 50% 62%, rgba(255,255,255,.52), rgba(255,255,255,.12) 60%, rgba(0,0,0,.10) 100%); }
   .wax:after{ content:""; position:absolute; top:30px; left:24px; width:12px; height:64px; border-radius:10px; background: linear-gradient(180deg,#fff6,#0000 60%), var(--wax); box-shadow: 44px 8px 0 -3px var(--wax), 44px 8px 0 -3px #fff6, 92px 12px 0 -6px var(--wax), 92px 12px 0 -6px #fff6; opacity:.85; }
   .wick{ position:absolute; width:6px; height:30px; background:linear-gradient(180deg,#444,var(--wick)); border-radius:4px; top:-12px; left:50%; transform:translateX(-50%); z-index:4; }
-
   /* Flame anchored to wick center */
   .flame{
     position:absolute; width:52px; height:110px; z-index:6; pointer-events:none;
@@ -215,9 +190,7 @@
   }
   @keyframes flickerSoft{ 0%{ transform:scale(1) rotate(-0.8deg); opacity:.95 } 50%{ transform:scale(1.06) rotate(0.6deg); opacity:.82 } 100%{ transform:scale(1) rotate(-0.8deg); opacity:.95 } }
   .flame.off .flame-core{ opacity:0 !important; animation-play-state: paused !important; }
-
   .stub{ display:none; position:absolute; bottom:0; width:150px; height:58px; background:linear-gradient(180deg,#9a9a9a,#6f6f6f); border-radius:0 0 22px 22px; z-index:1; }
-
   /* ===== Controls (glass) ===== */
   #controls{
     position:relative; display:grid; grid-auto-flow:column; grid-auto-columns:minmax(260px,1fr); gap:14px; padding:16px;
@@ -241,7 +214,6 @@
   .btn.warn{ background:linear-gradient(135deg,#fca5a5,#ef4444); color:#0d0d15; }
   .btn.small{ padding:8px 10px; border-radius:10px; font-weight:900; }
   .btn.wide{ min-width:110px; }
-
   @media (max-width:980px){
     :root{ --digit-w:100px; --digit-h:140px; }
     #todo-panel{ max-width:62vw; }
@@ -250,9 +222,7 @@
     :root{ --digit-w:86px; --digit-h:120px; }
     #todo-panel{ max-width:72vw; }
   }
-
   .no-transitions, .no-transitions *{ transition: none !important; animation: none !important; }
-
   /* ===== 3-2-1 Count-in Overlay ===== */
   #countOverlay{
     position:fixed; inset:0; display:none; align-items:center; justify-content:center;
@@ -269,7 +239,6 @@
     65%{ transform:scale(.96) }
     100%{ transform:scale(1) }
   }
-
   /* ===== Congrats Overlay with Balloons ===== */
   #congrats{
     position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:120;
@@ -306,28 +275,63 @@
     60%{ transform: translateY(-60vh) translateX(var(--drift, 10px)) scale(1.02) }
     100%{ transform: translateY(-110vh) translateX(var(--drift, 10px)) scale(1.04); opacity:0 }
   }
-
   /* ===== Fullscreen: hide brand + controls only ===== */
   .is-fs .brand,
   .is-fs #controls{ display:none !important; }
+  /* ===== Real Time Mode ===== */
+  .real-time-mode {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    background-image: linear-gradient(var(--bg-angle), var(--bg-c1), var(--bg-c2), var(--bg-c3)) !important;
+    background-attachment: fixed !important;
+    background-size: cover !important;
+    background-position: center !important;
+  }
+  .real-time-mode #main,
+  .real-time-mode #controls,
+  .real-time-mode .brand {
+    display: none !important;
+  }
+  .real-time-mode #timer-container {
+    display: block !important;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+  }
+  .real-time-mode #timer {
+    display: flex !important;
+  }
+  .real-time-mode #simpleTimer {
+    display: block !important;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+    font-size: min(12vw, 160px);
+  }
 </style>
 </head>
 <body>
   <div class="brand">MADE BY ANABRATA V2.0</div>
-
   <div class="main" id="main">
     <!-- Timer -->
     <section id="timer-container" aria-label="Timer">
       <div id="timer"></div>
       <div id="simpleTimer">00:00</div>
     </section>
-
     <!-- To‑do -->
     <section id="todo-panel" class="todo-clear" aria-label="To‑do list">
       <h4 id="todoTitle">To‑do</h4>
       <ol id="todoList"></ol>
     </section>
-
     <!-- Candle -->
     <section id="candle-area" aria-label="Candle">
       <div class="candle-clip">
@@ -342,7 +346,6 @@
       <div class="flame" id="flame"><div class="flame-core"></div></div>
     </section>
   </div>
-
   <!-- Controls -->
   <div id="controls">
     <div class="card">
@@ -356,6 +359,7 @@
         <label><input type="checkbox" id="showHours"> Show hours</label>
         <label><input type="checkbox" id="showSeconds" checked> Show seconds</label>
         <label><input type="checkbox" id="useFlip" checked> Use flip style</label>
+        <label><input type="checkbox" id="realTimeMode"> Real Time Mode</label>
       </div>
       <div class="row">
         <button id="primaryBtn" class="btn wide">Start</button>
@@ -363,7 +367,6 @@
         <button id="fsBtn" class="btn warn wide">Fullscreen</button>
       </div>
     </div>
-
     <div class="card">
       <label class="small">Background gradient</label>
       <div class="row">
@@ -386,7 +389,6 @@
         <label><input type="checkbox" id="todoGlass" checked> To‑do transparency effect</label>
       </div>
     </div>
-
     <div class="card">
       <label class="small">Media &amp; background</label>
       <div class="row" style="gap:8px; align-items:center">
@@ -405,7 +407,6 @@
         <span id="bgImageName" style="color:#fff; font-size:12px; opacity:.95; max-width:240px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis"></span>
       </div>
     </div>
-
     <div class="card">
       <label class="small">Flip clock colors</label>
       <div class="row">
@@ -422,7 +423,6 @@
         <div style="flex:1"><label for="simpleColor">Simple timer color</label><input id="simpleColor" type="color" value="#ffffff"></div>
       </div>
     </div>
-
     <div class="card">
       <label class="small">Layout</label>
       <div class="row">
@@ -433,12 +433,10 @@
       </div>
     </div>
   </div>
-
   <!-- 3-2-1 overlay -->
   <div id="countOverlay" aria-hidden="true">
     <div id="countInner" class="pop">3</div>
   </div>
-
   <!-- Congrats overlay with balloons -->
   <div id="congrats" aria-modal="true" role="dialog">
     <div id="cgCard">
@@ -460,19 +458,15 @@
     <div class="balloon" style="left:86%; --bcol:#f472b6; --dur:9.2s;--drift:14px"></div>
     <div class="balloon" style="left:94%; --bcol:#06d6a0; --dur:10.6s;--drift:-16px"></div>
   </div>
-
 <script>
   const $ = (s) => document.querySelector(s);
-
   /* ---------- Utilities ---------- */
   function afterNextPaint(cb){
     requestAnimationFrame(() => requestAnimationFrame(cb));
   }
-
   /* ---------- Background & colors ---------- */
   const gradientStr = (a, c1, c2, c3) => `linear-gradient(${a}deg, ${c1}, ${c2}, ${c3})`;
   let bgObjectUrl = null;
-
   function applyGradient(){
     if (bgObjectUrl){
       URL.revokeObjectURL(bgObjectUrl);
@@ -485,15 +479,12 @@
     document.body.style.backgroundPosition = "center";
     document.body.style.backgroundAttachment = "fixed";
   }
-
   function setTodoBg(val){
     document.documentElement.style.setProperty("--todo-bg", val);
   }
-
   function applyWax(){
     document.documentElement.style.setProperty("--wax", $("#waxColor")?.value || "#f2e4c7");
   }
-
   function restyleClockPanels(){
     if (!$("#clockC1")) return;
     document.documentElement.style.setProperty("--clock-c1", $("#clockC1").value);
@@ -503,50 +494,41 @@
     document.documentElement.style.setProperty("--colon-color", $("#colonColor").value);
     document.documentElement.style.setProperty("--simple-color", $("#simpleColor")?.value || "#ffffff");
   }
-
   /* ---------- Flip clock ---------- */
   function createDigit(initial = "0"){
     const d = document.createElement("div");
     d.className = "digit";
     d.dataset.value = initial;
-
     const top = document.createElement("div");
     top.className = "top";
     const t = document.createElement("span");
     t.className = "value";
     t.textContent = initial;
     top.appendChild(t);
-
     const bottom = document.createElement("div");
     bottom.className = "bottom";
     const b = document.createElement("span");
     b.className = "value";
     b.textContent = initial;
     bottom.appendChild(b);
-
     d.appendChild(top);
     d.appendChild(bottom);
     return d;
   }
-
   function flipTo(digitEl, newVal){
     const cur = digitEl.dataset.value || "0";
     if (cur === newVal) return;
-
     const topVal = digitEl.querySelector(".top .value");
     const botVal = digitEl.querySelector(".bottom .value");
-
     const topFlip = document.createElement("div");
     topFlip.className = "top-flip";
     const t = document.createElement("span");
     t.className = "value";
     t.textContent = cur;
     topFlip.appendChild(t);
-
     topVal.textContent = cur;
     botVal.textContent = cur;
     digitEl.appendChild(topFlip);
-
     topFlip.addEventListener("animationend", () => {
       topVal.textContent = newVal;
       topFlip.remove();
@@ -564,7 +546,6 @@
       });
     });
   }
-
   function buildFlip(container, showH = true, showS = true){
     container.innerHTML = "";
     const digits = [];
@@ -584,7 +565,6 @@
     if (showS){ addColon(); addDigit(); addDigit(); }
     return digits;
   }
-
   function timeArray(sec, showH, showS){
     let h = Math.floor(sec / 3600);
     let m = Math.floor((sec % 3600) / 60);
@@ -596,12 +576,10 @@
     if (showS) arr.push(...String(s).padStart(2, "0"));
     return arr;
   }
-
   function tickFlip(digits, sec, showH, showS){
     const arr = timeArray(sec, showH, showS);
     digits.forEach((d, i) => flipTo(d, arr[i] || "0"));
   }
-
   /* ---------- Simple clock ---------- */
   function renderSimple(sec){
     const sH = $("#showHours")?.checked;
@@ -611,12 +589,10 @@
       : `${String(Math.floor(sec / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`;
     $("#simpleTimer").textContent = out;
   }
-
   /* ---------- Countdown state ---------- */
   const timerFlip = $("#timer");
   const timerSimple = $("#simpleTimer");
   const primaryBtn = $("#primaryBtn");
-
   let flipDigits = [];
   let useFlip = true;
   let totalSec = 0;
@@ -627,6 +603,8 @@
   let paused = false;
   let pauseRemainMs = 0;
   let countInActive = false;
+  let realTimeRafId = null;
+  let realTimeModeActive = false;
 
   function safeBuildClock(){
     useFlip = $("#useFlip")?.checked ?? true;
@@ -641,7 +619,64 @@
       renderSimple(0);
     }
   }
-
+  
+  function updateRealTime() {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+    
+    const showH = $("#showHours")?.checked ?? false;
+    const showS = $("#showSeconds")?.checked ?? true;
+    
+    if ($("#useFlip")?.checked) {
+      const timeSec = hours * 3600 + minutes * 60 + seconds;
+      tickFlip(flipDigits, timeSec, showH, showS);
+    } else {
+      const timeStr = showH 
+        ? `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+        : `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      $("#simpleTimer").textContent = timeStr;
+    }
+    
+    realTimeRafId = requestAnimationFrame(updateRealTime);
+  }
+  
+  function toggleRealTimeMode() {
+    if ($("#realTimeMode")?.checked) {
+      // Enter real time mode
+      document.body.classList.add("real-time-mode");
+      realTimeModeActive = true;
+      
+      // Make sure timer container is visible
+      const timerContainer = $("#timer-container");
+      if (timerContainer) {
+        timerContainer.style.display = "block";
+        timerContainer.style.position = "absolute";
+        timerContainer.style.top = "50%";
+        timerContainer.style.left = "50%";
+        timerContainer.style.transform = "translate(-50%, -50%)";
+        timerContainer.style.zIndex = "100";
+      }
+      
+      // Build clock based on current settings
+      safeBuildClock();
+      
+      // Start updating real time
+      updateRealTime();
+    } else {
+      // Exit real time mode
+      document.body.classList.remove("real-time-mode");
+      realTimeModeActive = false;
+      
+      // Stop real time updates
+      cancelAnimationFrame(realTimeRafId);
+      
+      // Reset to countdown mode display
+      safeBuildClock();
+    }
+  }
+  
   function ensureVisible(){
     if ($("#showTodo")?.checked && !document.body.classList.contains("todo-on")){
       document.body.classList.add("todo-on");
@@ -650,19 +685,16 @@
       safeBuildClock();
     }
   }
-
   function startCountdown(){
     const h = Math.max(0, parseInt($("#hoursInput")?.value || "0", 10));
     const m = Math.max(0, parseInt($("#minInput")?.value || "0", 10));
     const s = Math.max(0, Math.min(59, parseInt($("#secInput")?.value || "0", 10)));
     totalSec = h * 3600 + m * 60 + s;
-
     candleWrap.classList.remove("vanish");
     stubEl.style.display = "none";
     flameEl.classList.remove("off");
     setWaxHeightByProgress(1);
     afterNextPaint(positionFlame);
-
     const showH = $("#showHours")?.checked ?? false;
     const showS = $("#showSeconds")?.checked ?? true;
     if (useFlip){
@@ -671,11 +703,9 @@
     }else{
       renderSimple(totalSec);
     }
-
     cancelAnimationFrame(rafId);
     paused = false;
     running = false;
-
     if (totalSec <= 0){ finishNow(); return; }
     endAtMs = performance.now() + totalSec * 1000;
     lastWhole = Math.ceil(totalSec);
@@ -683,12 +713,10 @@
     primaryBtn.textContent = "Stop";
     rafId = requestAnimationFrame(loop);
   }
-
   function loop(now){
     if (!running) return;
     const remainMs = Math.max(0, endAtMs - now);
     const secWhole = Math.floor(remainMs / 1000);
-
     if (secWhole !== lastWhole){
       if (useFlip){
         tickFlip(flipDigits, secWhole, $("#showHours")?.checked ?? false, $("#showSeconds")?.checked ?? true);
@@ -697,24 +725,19 @@
       }
       lastWhole = secWhole;
     }
-
     const p = totalSec > 0 ? remainMs / (totalSec * 1000) : 0;
     setWaxHeightByProgress(p);
     positionFlame();
-
     if (remainMs <= 0){ finishNow(); return; }
     rafId = requestAnimationFrame(loop);
   }
-
   async function startWithCountIn(){
     if (countInActive) return;
     countInActive = true;
     primaryBtn.disabled = true;
-
     const ov = $("#countOverlay");
     const num = $("#countInner");
     ov.style.display = "flex";
-
     const steps = ["3","2","1","Go!"];
     for (let i=0; i<steps.length; i++){
       num.textContent = steps[i];
@@ -723,14 +746,14 @@
       num.classList.add("pop");
       await new Promise(r => setTimeout(r, i < steps.length-1 ? 760 : 560));
     }
-
     ov.style.display = "none";
     primaryBtn.disabled = false;
     countInActive = false;
     startCountdown();
   }
-
   function togglePrimary(){
+    if (realTimeModeActive) return; // Disable primary button in real time mode
+    
     if (!running && !paused){ startWithCountIn(); return; }
     if (running){
       cancelAnimationFrame(rafId);
@@ -743,19 +766,20 @@
       rafId = requestAnimationFrame(loop);
     }
   }
-
   function resetCountdown(){
+    if (realTimeModeActive) return; // Disable reset in real time mode
+    
     cancelAnimationFrame(rafId); running=false; paused=false; primaryBtn.textContent="Start";
     safeBuildClock(); snapResetCandle(); hideCongrats();
     $("#countOverlay").style.display = "none"; countInActive = false;
     afterNextPaint(ensureVisible);
   }
-
   function finishNow(){
+    if (realTimeModeActive) return; // Shouldn't happen in real time mode
+    
     cancelAnimationFrame(rafId); running=false; paused=false;
     flameEl.classList.add("off"); candleWrap.classList.add("vanish"); showCongrats(); primaryBtn.textContent="Start";
   }
-
   /* ---------- Candle & flame positioning ---------- */
   const area = $("#candle-area");
   const waxEl = $("#wax");
@@ -763,10 +787,8 @@
   const flameEl = $("#flame");
   const candleWrap = $("#candleWrap");
   const stubEl = $("#stub");
-
   const baseWaxHeight = 380;
   const minStub = 58;
-
   function positionFlame(){
     if (!area || getComputedStyle(area).display === "none") return;
     const a = area.getBoundingClientRect();
@@ -776,31 +798,26 @@
     flameEl.style.left = `${cx}px`;
     flameEl.style.top = `${topAnchor + 6}px`;
   }
-
   function setWaxHeightByProgress(progress){
     const usable = baseWaxHeight - minStub;
     const h = minStub + Math.max(0, usable * progress);
     waxEl.style.height = `${h}px`;
   }
-
   function snapResetCandle(){
     candleWrap.classList.add("no-transitions"); waxEl.classList.add("no-transitions");
     candleWrap.classList.remove("vanish"); stubEl.style.display="none"; flameEl.classList.remove("off");
     setWaxHeightByProgress(1); void candleWrap.offsetHeight; positionFlame();
     requestAnimationFrame(()=>{ candleWrap.classList.remove("no-transitions"); waxEl.classList.remove("no-transitions"); });
   }
-
   new ResizeObserver(()=> requestAnimationFrame(()=>positionFlame())).observe(area);
   new MutationObserver(()=> requestAnimationFrame(()=>positionFlame())).observe(document.body,{attributes:true,attributeFilter:["class"]});
   waxEl.addEventListener("transitionend", ()=> requestAnimationFrame(()=>positionFlame()));
   window.addEventListener("resize", () => requestAnimationFrame(() => positionFlame()));
-
   /* ---------- Congrats overlay ---------- */
   const congrats = $("#congrats");
   $("#cgClose")?.addEventListener("click", () => { if (congrats) congrats.style.display = "none"; });
   function showCongrats(){ if (congrats) congrats.style.display = "flex"; }
   function hideCongrats(){ if (congrats) congrats.style.display = "none"; }
-
   /* ---------- Fullscreen ---------- */
   async function enterFullscreen(){
     try{
@@ -810,7 +827,6 @@
   }
   $("#fsBtn").addEventListener("click", enterFullscreen);
   document.addEventListener("fullscreenchange", () => { document.body.classList.toggle("is-fs", !!document.fullscreenElement); });
-
   /* ---------- To‑do logic ---------- */
   const todoList = $("#todoList");
   function makeTodoItem(text = ""){
@@ -828,14 +844,12 @@
     if(e.key==="Backspace" && e.target.textContent.trim()===""){ const li=e.target.closest("li"); const prev=li.previousElementSibling?.querySelector(".todoText"); if(prev){ e.preventDefault(); li.remove(); spanFocus(prev);} addEmptyIfNeeded(); }
   });
   todoList.addEventListener("change",(e)=>{ if(!e.target.classList?.contains("todoChk")) return; const li=e.target.closest("li"); li.classList.add("vanish"); setTimeout(()=>{ li.remove(); addEmptyIfNeeded(); },160); });
-
   /* ---------- Music ---------- */
   const musicFiles = $("#musicFiles");
   const musicNow = $("#musicNow");
   const musicPlayBtn = $("#musicPlay");
   const audio = new Audio(); audio.preload="metadata";
   let playlist=[], trackIndex=0; const objectUrls=new Set();
-
   function updateNow(){ if (musicNow) musicNow.textContent = playlist.length ? `${trackIndex+1}/${playlist.length} • ${playlist[trackIndex].name}` : ""; }
   function loadPlaylist(files){ objectUrls.forEach((u)=>URL.revokeObjectURL(u)); objectUrls.clear(); playlist=[]; trackIndex=0; for(const f of files){ const url=URL.createObjectURL(f); objectUrls.add(url); playlist.push({name:f.name,url}); } updateNow(); if(playlist.length){ audio.src=playlist[trackIndex].url; } else { audio.removeAttribute("src"); } }
   function playTrack(i){ if(!playlist.length) return; trackIndex=(i+playlist.length)%playlist.length; audio.src=playlist[trackIndex].url; audio.play().catch(()=>{}); updateNow(); if (musicPlayBtn) musicPlayBtn.textContent="⏸"; }
@@ -853,7 +867,6 @@
   $("#musicPrev")?.addEventListener("click", prevTrack);
   $("#musicLoop")?.addEventListener("change", (e)=> audio.loop = !!e.target.checked);
   window.addEventListener("unload", () => objectUrls.forEach(u=>URL.revokeObjectURL(u)));
-
   /* ---------- Custom background image ---------- */
   const bgImageBtn = $("#bgImageBtn"), bgImageFile = $("#bgImageFile"), bgImageClear = $("#bgImageClear"), bgImageName = $("#bgImageName");
   bgImageBtn?.addEventListener("click", () => bgImageFile?.click());
@@ -868,7 +881,6 @@
     if (bgImageName) bgImageName.textContent = f.name;
   });
   bgImageClear?.addEventListener("click", applyGradient);
-
   /* ---------- Layout flags ---------- */
   function ensureCandleVisibleWhenOnlyCandle(on){
     if (on){
@@ -876,7 +888,6 @@
       if (hc?.checked){ hc.checked=false; document.body.classList.remove("candle-off"); }
     }
   }
-
   function applyLayoutFlags(){
     document.body.classList.toggle("candle-off", $("#hideCandle")?.checked);
     document.body.classList.toggle("center-clock", $("#centerClock")?.checked);
@@ -885,7 +896,6 @@
     safeBuildClock();
     requestAnimationFrame(()=>{ positionFlame(); ensureVisible(); });
   }
-
   function previewLayout(){
     const sh = $("#showHours")?.checked ?? false;
     const ss = $("#showSeconds")?.checked ?? true;
@@ -893,49 +903,37 @@
     if(uf){ flipDigits=buildFlip(timerFlip, sh, ss); tickFlip(flipDigits, 0, sh, ss); } else { renderSimple(0); }
     requestAnimationFrame(()=>{ positionFlame(); ensureVisible(); });
   }
-
   /* ---------- Bindings ---------- */
   $("#primaryBtn").addEventListener("click", togglePrimary);
   $("#resetBtn").addEventListener("click", resetCountdown);
-
   $("#useFlip").addEventListener("change", ()=>{ safeBuildClock(); previewLayout(); });
   $("#showHours").addEventListener("change", previewLayout);
   $("#showSeconds").addEventListener("change", previewLayout);
-
+  $("#realTimeMode").addEventListener("change", toggleRealTimeMode);
   $("#hideCandle").addEventListener("change", () => applyLayoutFlags());
   $("#centerClock").addEventListener("change", () => applyLayoutFlags());
   $("#onlyCandle").addEventListener("change", e=>{ ensureCandleVisibleWhenOnlyCandle(e.target.checked); applyLayoutFlags(); });
   $("#showTodo").addEventListener("change", () => applyLayoutFlags());
-
   ["bgAngle","bgC1","bgC2","bgC3"].forEach(id=> document.getElementById(id)?.addEventListener("input", applyGradient));
   ["clockC1","clockC2","clockC3","textColor","colonColor","simpleColor"].forEach(id=> document.getElementById(id)?.addEventListener("input", restyleClockPanels));
-
   $("#todoApply").addEventListener("click", () =>{ setTodoBg($("#todoColor").value); $("#todo-panel").classList.remove("todo-clear"); });
   $("#todoClear").addEventListener("click", () =>{ setTodoBg("transparent"); $("#todo-panel").classList.add("todo-clear"); });
   $("#todoGlass").addEventListener("change", (e)=> $("#todo-panel").classList.toggle("todo-glass", e.target.checked));
-
   /* Transparent flip cards option removed: no event listener for #clockTransparent */
-
   /* ---------- Init ---------- */
   (function boot(){
     applyGradient(); restyleClockPanels(); applyWax();
-
     // Force to‑do visible on load if toggle checked
     if ($("#showTodo")?.checked) document.body.classList.add("todo-on");
-
     // Apply To‑do transparency if default-checked
     if ($("#todoGlass")?.checked) $("#todo-panel").classList.add("todo-glass");
-
     applyLayoutFlags();
     safeBuildClock();
     previewLayout();
-
     // Position flame after first paints and re-check visibility
     afterNextPaint(()=>{ positionFlame(); ensureVisible(); });
     setTimeout(()=>{ positionFlame(); ensureVisible(); }, 150);
-
     setWaxHeightByProgress(1);
-
     // Seed one empty to‑do
     const li=makeTodoItem(""); $("#todoList").appendChild(li);
   })();
@@ -944,12 +942,10 @@
 </html>
 <!-- Candle color config (optional, keep anywhere before the script below) -->
 <script id="wax-config" type="application/json">{"wax":"#fcd474"}</script>
-
 <!-- Auto-apply candle wax color -->
 <script>
 (function(){
   const root = document.documentElement;
-
   function normalizeHex(c){
     if(typeof c !== 'string') return '';
     c = c.trim();
@@ -958,7 +954,6 @@
     const m = c.match(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/);
     return m ? c.toLowerCase() : '';
   }
-
   function readConfigTag(){
     const el = document.getElementById('wax-config');
     if(!el) return '';
@@ -967,27 +962,21 @@
       return normalizeHex(obj.wax || obj.color || '');
     }catch(e){ return ''; }
   }
-
   function readQuery(){
     const u = new URL(window.location.href);
     const v = u.searchParams.get('wax') || '';
     const h = new URLSearchParams(u.hash.replace(/^#/, '')).get('wax') || '';
     return normalizeHex(v || h);
   }
-
   function readDataAttr(){
     return normalizeHex(document.body?.dataset?.wax || '');
   }
-
   function readStored(){
     return normalizeHex(localStorage.getItem('waxColor') || '');
   }
-
   const color = readQuery() || readConfigTag() || readDataAttr() || readStored() || '#d9c9a3';
-
   root.style.setProperty('--wax', color);
   try{ localStorage.setItem('waxColor', color); }catch(e){}
-
   // Optional: auto-wire any color input marked for wax syncing
   const pickers = document.querySelectorAll('input[type="color"][data-sync="wax"], #waxPicker');
   pickers.forEach(p => {
@@ -1019,22 +1008,18 @@
       rgba(255,255,255,.12) 60%,
       transparent 100%
     ) !important;
-
   /* Clip the layer to an ellipse so no rectangular corners can show */
   clip-path: ellipse(70% 55% at 50% 62%) !important;
-
   /* Extra safety: mask the outside to transparent (supported in modern browsers) */
   -webkit-mask-image: radial-gradient(75% 60% at 50% 60%, #000 68%, transparent 72%);
           mask-image: radial-gradient(75% 60% at 50% 60%, #000 68%, transparent 72%);
 }
-
 /* If you’d rather remove the glossy top entirely, uncomment this: */
 /* .waxTop{ background: none !important; } */
 </style>
 <!-- =================================================================== -->
 <!-- ============== START: EXIT-INTENT DONATION POP-UP CODE ============== -->
 <!-- Copy and paste everything from here... -->
-
 <!-- 1. The HTML for the Pop-up Box (Initially Hidden) -->
 <div id="donate-modal-overlay">
   <div id="donate-modal-content">
@@ -1053,7 +1038,6 @@
     </a>
   </div>
 </div>
-
 <!-- 2. The CSS to Style the Pop-up Box -->
 <style>
   /* The semi-transparent background overlay */
@@ -1070,7 +1054,6 @@
     backdrop-filter: blur(5px);
     animation: fadeIn 0.3s;
   }
-
   /* The pop-up box itself */
   #donate-modal-content {
     position: absolute;
@@ -1089,19 +1072,16 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     animation: slideIn 0.4s ease-out;
   }
-  
   #donate-modal-content h2 {
     margin-top: 0;
     color: #ffffff;
     font-size: 24px;
   }
-  
   #donate-modal-content p {
     font-size: 16px;
     line-height: 1.6;
     margin-bottom: 20px;
   }
-
   /* The Close Button (X) */
   #close-donate-modal {
     color: #aaa;
@@ -1113,11 +1093,9 @@
     cursor: pointer;
     transition: color 0.2s;
   }
-
   #close-donate-modal:hover {
     color: #fff;
   }
-
   /* The Donate Button */
   #donate-button {
     display: inline-block;
@@ -1133,31 +1111,25 @@
     cursor: pointer;
     transition: background-color 0.2s ease-in-out;
   }
-
   #donate-button:hover {
     background-color: #0a84ff; /* A slightly lighter blue on hover */
   }
-  
   /* Animations for the pop-up */
   @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
   }
-  
   @keyframes slideIn {
     from { top: 40%; opacity: 0; }
     to { top: 50%; opacity: 1; }
   }
-
 </style>
-
 <!-- 3. The JavaScript to Control the Pop-up -->
 <script>
   (function() {
     const modal = document.getElementById('donate-modal-overlay');
     const closeButton = document.getElementById('close-donate-modal');
     let hasBeenShown = false; // Flag to ensure it only shows once per page visit
-
     // Function to show the modal
     function showModal() {
       if (!hasBeenShown) {
@@ -1165,14 +1137,11 @@
         hasBeenShown = true;
       }
     }
-
     // Function to hide the modal
     function hideModal() {
       modal.style.display = 'none';
     }
-
     // --- EVENT LISTENERS ---
-
     // Listen for the mouse leaving the document window (the trigger)
     document.addEventListener('mouseout', function(e) {
       // e.toElement === null and e.relatedTarget === null means the mouse left the window
@@ -1180,23 +1149,20 @@
         showModal();
       }
     });
-
     // Hide the modal if the close button (X) is clicked
     closeButton.addEventListener('click', hideModal);
-
     // Hide the modal if the user clicks on the dark overlay background
     modal.addEventListener('click', function(e) {
       if (e.target === modal) {
         hideModal();
       }
     });
-
   })(); // We wrap the script in a function to avoid conflicts with your other code
 </script>
-
 <!-- ...to here, right before your </body> tag -->
 <!-- =============== END: EXIT-INTENT DONATION POP-UP CODE =============== -->
 <!-- ===================================================================== -->
+```
 <!-- === Real Time Mode — FINAL, NON‑INTRUSIVE === -->
 <style>
   /* Keep the page layout intact; only hide non‑clock UI in RTM */
