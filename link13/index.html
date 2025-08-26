@@ -1031,18 +1031,3 @@
 /* If you’d rather remove the glossy top entirely, uncomment this: */
 /* .waxTop{ background: none !important; } */
 </style>
-<!-- Put near the end of <body> -->
-<img src="generated-image-1.jpg"
-     alt="Reload"
-     style="height:48px;width:48px;cursor:pointer"
-     onclick="window.location.reload()">
-<!-- Accessible button with JS listener -->
-<button id="reload-btn" type="button" aria-label="Reload page" title="Reload" style="padding:0;border:none;background:none;cursor:pointer">
-  <img src="generated-image-1.jpg" alt="Reload" style="height:48px;width:48px">
-</button>
-
-<script>
-  document.getElementById('reload-btn').addEventListener('click', () => {
-    window.location.reload(); // reloads the current URL
-  });
-</script>
