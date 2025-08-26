@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
 <link rel="canonical" href="https://timerz.com/">
 <meta property="og:url" content="https://timerz.com/">
-
 <title>Candle Timer V2.0</title>
 <style>
   :root{
@@ -746,4 +745,289 @@
   }
 
   function resetCountdown(){
-    cancelAnimationFrame(rafId); running=false; paused```
+    cancelAnimationFrame(rafId); running=false; paused=false; primaryBtn.textContent="Start";
+    safeBuildClock(); snapResetCandle(); hideCongrats();
+    $("#countOverlay").style.display = "none"; countInActive = false;
+    afterNextPaint(ensureVisible);
+  }
+
+  function finishNow(){
+    cancelAnimationFrame(rafId); running=false; paused=false;
+    flameEl.classList.add("off"); candleWrap.classList.add("vanish"); showCongrats(); primaryBtn.textContent="Start";
+  }
+
+  /* ---------- Candle & flame positioning ---------- */
+  const area = $("#candle-area");
+  const waxEl = $("#wax");
+  const wickEl = $("#wick");
+  const flameEl = $("#flame");
+  const candleWrap = $("#candleWrap");
+  const stubEl = $("#stub");
+
+  const baseWaxHeight = 380;
+  const minStub = 58;
+
+  function positionFlame(){
+    if (!area || getComputedStyle(area).display === "none") return;
+    const a = area.getBoundingClientRect();
+    const w = wickEl.getBoundingClientRect();
+    const cx = w.left + w.width / 2 - a.left;
+    const topAnchor = w.top - a.top;
+    flameEl.style.left = `${cx}px`;
+    flameEl.style.top = `${topAnchor + 6}px`;
+  }
+
+  function setWaxHeightByProgress(progress){
+    const usable = baseWaxHeight - minStub;
+    const h = minStub + Math.max(0, usable * progress);
+    waxEl.style.height = `${h}px`;
+  }
+
+  function snapResetCandle(){
+    candleWrap.classList.add("no-transitions"); waxEl.classList.add("no-transitions");
+    candleWrap.classList.remove("vanish"); stubEl.style.display="none"; flameEl.classList.remove("off");
+    setWaxHeightByProgress(1); void candleWrap.offsetHeight; positionFlame();
+    requestAnimationFrame(()=>{ candleWrap.classList.remove("no-transitions"); waxEl.classList.remove("no-transitions"); });
+  }
+
+  new ResizeObserver(()=> requestAnimationFrame(()=>positionFlame())).observe(area);
+  new MutationObserver(()=> requestAnimationFrame(()=>positionFlame())).observe(document.body,{attributes:true,attributeFilter:["class"]});
+  waxEl.addEventListener("transitionend", ()=> requestAnimationFrame(()=>positionFlame()));
+  window.addEventListener("resize", () => requestAnimationFrame(() => positionFlame()));
+
+  /* ---------- Congrats overlay ---------- */
+  const congrats = $("#congrats");
+  $("#cgClose")?.addEventListener("click", () => { if (congrats) congrats.style.display = "none"; });
+  function showCongrats(){ if (congrats) congrats.style.display = "flex"; }
+  function hideCongrats(){ if (congrats) congrats.style.display = "none"; }
+
+  /* ---------- Fullscreen ---------- */
+  async function enterFullscreen(){
+    try{
+      if (!document.fullscreenElement){ await document.documentElement.requestFullscreen?.(); }
+      else { await document.exitFullscreen?.(); }
+    }catch(e){}
+  }
+  $("#fsBtn").addEventListener("click", enterFullscreen);
+  document.addEventListener("fullscreenchange", () => { document.body.classList.toggle("is-fs", !!document.fullscreenElement); });
+
+  /* ---------- To‑do logic ---------- */
+  const todoList = $("#todoList");
+  function makeTodoItem(text = ""){
+    const li = document.createElement("li");
+    const label = document.createElement("label"); label.className = "todoItem";
+    const chk = document.createElement("input"); chk.type = "checkbox"; chk.className = "todoChk";
+    const span = document.createElement("span"); span.className = "todoText"; span.contentEditable = "true"; span.spellcheck = false; span.textContent = text;
+    label.appendChild(chk); label.appendChild(span); li.appendChild(label); return li;
+  }
+  function spanFocus(el){ el.focus(); const r=document.createRange(); r.selectNodeContents(el); r.collapse(false); const s=window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+  function addEmptyIfNeeded(){ if(!todoList.firstElementChild){ const li=makeTodoItem(""); todoList.appendChild(li); spanFocus(li.querySelector(".todoText")); } }
+  todoList.addEventListener("keydown",(e)=>{
+    if(!e.target.classList?.contains("todoText")) return;
+    if(e.key==="Enter"){ if(e.shiftKey) return; e.preventDefault(); const li=e.target.closest("li"); const n=makeTodoItem(""); li.after(n); spanFocus(n.querySelector(".todoText")); }
+    if(e.key==="Backspace" && e.target.textContent.trim()===""){ const li=e.target.closest("li"); const prev=li.previousElementSibling?.querySelector(".todoText"); if(prev){ e.preventDefault(); li.remove(); spanFocus(prev);} addEmptyIfNeeded(); }
+  });
+  todoList.addEventListener("change",(e)=>{ if(!e.target.classList?.contains("todoChk")) return; const li=e.target.closest("li"); li.classList.add("vanish"); setTimeout(()=>{ li.remove(); addEmptyIfNeeded(); },160); });
+
+  /* ---------- Music ---------- */
+  const musicFiles = $("#musicFiles");
+  const musicNow = $("#musicNow");
+  const musicPlayBtn = $("#musicPlay");
+  const audio = new Audio(); audio.preload="metadata";
+  let playlist=[], trackIndex=0; const objectUrls=new Set();
+
+  function updateNow(){ if (musicNow) musicNow.textContent = playlist.length ? `${trackIndex+1}/${playlist.length} • ${playlist[trackIndex].name}` : ""; }
+  function loadPlaylist(files){ objectUrls.forEach((u)=>URL.revokeObjectURL(u)); objectUrls.clear(); playlist=[]; trackIndex=0; for(const f of files){ const url=URL.createObjectURL(f); objectUrls.add(url); playlist.push({name:f.name,url}); } updateNow(); if(playlist.length){ audio.src=playlist[trackIndex].url; } else { audio.removeAttribute("src"); } }
+  function playTrack(i){ if(!playlist.length) return; trackIndex=(i+playlist.length)%playlist.length; audio.src=playlist[trackIndex].url; audio.play().catch(()=>{}); updateNow(); if (musicPlayBtn) musicPlayBtn.textContent="⏸"; }
+  function startPlaylist(){ if(!playlist.length) return; if(!audio.src) audio.src=playlist[trackIndex].url; audio.play().then(()=>{ if (musicPlayBtn) musicPlayBtn.textContent="⏸"; }).catch(()=>{}); updateNow(); }
+  function pausePlaylist(){ audio.pause(); if (musicPlayBtn) musicPlayBtn.textContent="▶"; }
+  function nextTrack(){ if(playlist.length) playTrack(trackIndex+1); }
+  function prevTrack(){ if(playlist.length) playTrack(trackIndex-1); }
+  audio.addEventListener("ended", () => nextTrack());
+  audio.addEventListener("play", () => { if (musicPlayBtn) musicPlayBtn.textContent="⏸"; });
+  audio.addEventListener("pause", () => { if (musicPlayBtn) musicPlayBtn.textContent="▶"; });
+  $("#addMusicBtn")?.addEventListener("click", () => musicFiles?.click());
+  musicFiles?.addEventListener("change", (e)=> loadPlaylist(e.target.files));
+  $("#musicPlay")?.addEventListener("click", () => audio.paused ? startPlaylist() : pausePlaylist());
+  $("#musicNext")?.addEventListener("click", nextTrack);
+  $("#musicPrev")?.addEventListener("click", prevTrack);
+  $("#musicLoop")?.addEventListener("change", (e)=> audio.loop = !!e.target.checked);
+  window.addEventListener("unload", () => objectUrls.forEach(u=>URL.revokeObjectURL(u)));
+
+  /* ---------- Custom background image ---------- */
+  const bgImageBtn = $("#bgImageBtn"), bgImageFile = $("#bgImageFile"), bgImageClear = $("#bgImageClear"), bgImageName = $("#bgImageName");
+  bgImageBtn?.addEventListener("click", () => bgImageFile?.click());
+  bgImageFile?.addEventListener("change", (e)=>{
+    const f = e.target.files?.[0]; if (!f) return;
+    if (bgObjectUrl){ URL.revokeObjectURL(bgObjectUrl); bgObjectUrl=null; }
+    bgObjectUrl = URL.createObjectURL(f);
+    document.body.style.backgroundImage = `url("${bgObjectUrl}")`;
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+    document.body.style.backgroundAttachment = "fixed";
+    if (bgImageName) bgImageName.textContent = f.name;
+  });
+  bgImageClear?.addEventListener("click", applyGradient);
+
+  /* ---------- Layout flags ---------- */
+  function ensureCandleVisibleWhenOnlyCandle(on){
+    if (on){
+      const hc = $("#hideCandle");
+      if (hc?.checked){ hc.checked=false; document.body.classList.remove("candle-off"); }
+    }
+  }
+
+  function applyLayoutFlags(){
+    document.body.classList.toggle("candle-off", $("#hideCandle")?.checked);
+    document.body.classList.toggle("center-clock", $("#centerClock")?.checked);
+    document.body.classList.toggle("only-candle", $("#onlyCandle")?.checked);
+    document.body.classList.toggle("todo-on", $("#showTodo")?.checked);
+    safeBuildClock();
+    requestAnimationFrame(()=>{ positionFlame(); ensureVisible(); });
+  }
+
+  function previewLayout(){
+    const sh = $("#showHours")?.checked ?? false;
+    const ss = $("#showSeconds")?.checked ?? true;
+    const uf = $("#useFlip")?.checked ?? true;
+    if(uf){ flipDigits=buildFlip(timerFlip, sh, ss); tickFlip(flipDigits, 0, sh, ss); } else { renderSimple(0); }
+    requestAnimationFrame(()=>{ positionFlame(); ensureVisible(); });
+  }
+
+  /* ---------- Bindings ---------- */
+  $("#primaryBtn").addEventListener("click", togglePrimary);
+  $("#resetBtn").addEventListener("click", resetCountdown);
+
+  $("#useFlip").addEventListener("change", ()=>{ safeBuildClock(); previewLayout(); });
+  $("#showHours").addEventListener("change", previewLayout);
+  $("#showSeconds").addEventListener("change", previewLayout);
+
+  $("#hideCandle").addEventListener("change", () => applyLayoutFlags());
+  $("#centerClock").addEventListener("change", () => applyLayoutFlags());
+  $("#onlyCandle").addEventListener("change", e=>{ ensureCandleVisibleWhenOnlyCandle(e.target.checked); applyLayoutFlags(); });
+  $("#showTodo").addEventListener("change", () => applyLayoutFlags());
+
+  ["bgAngle","bgC1","bgC2","bgC3"].forEach(id=> document.getElementById(id)?.addEventListener("input", applyGradient));
+  ["clockC1","clockC2","clockC3","textColor","colonColor","simpleColor"].forEach(id=> document.getElementById(id)?.addEventListener("input", restyleClockPanels));
+
+  $("#todoApply").addEventListener("click", () =>{ setTodoBg($("#todoColor").value); $("#todo-panel").classList.remove("todo-clear"); });
+  $("#todoClear").addEventListener("click", () =>{ setTodoBg("transparent"); $("#todo-panel").classList.add("todo-clear"); });
+  $("#todoGlass").addEventListener("change", (e)=> $("#todo-panel").classList.toggle("todo-glass", e.target.checked));
+
+  /* Transparent flip cards option removed: no event listener for #clockTransparent */
+
+  /* ---------- Init ---------- */
+  (function boot(){
+    applyGradient(); restyleClockPanels(); applyWax();
+
+    // Force to‑do visible on load if toggle checked
+    if ($("#showTodo")?.checked) document.body.classList.add("todo-on");
+
+    // Apply To‑do transparency if default-checked
+    if ($("#todoGlass")?.checked) $("#todo-panel").classList.add("todo-glass");
+
+    applyLayoutFlags();
+    safeBuildClock();
+    previewLayout();
+
+    // Position flame after first paints and re-check visibility
+    afterNextPaint(()=>{ positionFlame(); ensureVisible(); });
+    setTimeout(()=>{ positionFlame(); ensureVisible(); }, 150);
+
+    setWaxHeightByProgress(1);
+
+    // Seed one empty to‑do
+    const li=makeTodoItem(""); $("#todoList").appendChild(li);
+  })();
+</script>
+</body>
+</html>
+<!-- Candle color config (optional, keep anywhere before the script below) -->
+<script id="wax-config" type="application/json">{"wax":"#fcd474"}</script>
+
+<!-- Auto-apply candle wax color -->
+<script>
+(function(){
+  const root = document.documentElement;
+
+  function normalizeHex(c){
+    if(typeof c !== 'string') return '';
+    c = c.trim();
+    if(!c) return '';
+    if(c[0] !== '#') c = '#' + c;
+    const m = c.match(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/);
+    return m ? c.toLowerCase() : '';
+  }
+
+  function readConfigTag(){
+    const el = document.getElementById('wax-config');
+    if(!el) return '';
+    try{
+      const obj = JSON.parse(el.textContent || '{}');
+      return normalizeHex(obj.wax || obj.color || '');
+    }catch(e){ return ''; }
+  }
+
+  function readQuery(){
+    const u = new URL(window.location.href);
+    const v = u.searchParams.get('wax') || '';
+    const h = new URLSearchParams(u.hash.replace(/^#/, '')).get('wax') || '';
+    return normalizeHex(v || h);
+  }
+
+  function readDataAttr(){
+    return normalizeHex(document.body?.dataset?.wax || '');
+  }
+
+  function readStored(){
+    return normalizeHex(localStorage.getItem('waxColor') || '');
+  }
+
+  const color = readQuery() || readConfigTag() || readDataAttr() || readStored() || '#d9c9a3';
+
+  root.style.setProperty('--wax', color);
+  try{ localStorage.setItem('waxColor', color); }catch(e){}
+
+  // Optional: auto-wire any color input marked for wax syncing
+  const pickers = document.querySelectorAll('input[type="color"][data-sync="wax"], #waxPicker');
+  pickers.forEach(p => {
+    p.value = color;
+    ['input','change'].forEach(ev => p.addEventListener(ev, e=>{
+      const val = normalizeHex(e.target.value);
+      if(val){
+        root.style.setProperty('--wax', val);
+        try{ localStorage.setItem('waxColor', val);}catch(_e){}
+      }
+    }));
+  });
+})();
+</script>
+<style>
+/* Hotfix: remove the ghost triangle/box above the candle top */
+.waxTop{
+  /* Make the highlight fully fade to transparent at the edges */
+  background:
+    conic-gradient(from 0deg at 50% 50%,
+      rgba(255,255,255,.33) 0deg,
+      rgba(255,255,255,.10) 70deg,
+      rgba(0,0,0,0) 180deg,
+      rgba(255,255,255,0) 300deg,
+      rgba(255,255,255,0) 360deg
+    ),
+    radial-gradient(65% 55% at 50% 62%,
+      rgba(255,255,255,.52) 0%,
+      rgba(255,255,255,.12) 60%,
+      transparent 100%
+    ) !important;
+
+  /* Clip the layer to an ellipse so no rectangular corners can show */
+  clip-path: ellipse(70% 55% at 50% 62%) !important;
+
+  /* Extra safety: mask the outside to transparent (supported in modern browsers) */
+  -webkit-mask-image: radial-gradient(75% 60% at 50% 60%, #000 68%, transparent 72%);
+          mask-image: radial-gradient(75% 60% at 50% 60%, #000 68%, transparent 72%);
+}
+
+/* If you’d rather remove the glossy top entirely, uncomment this: */
+/* .waxTop{ background: none !important; } */
+</style>
