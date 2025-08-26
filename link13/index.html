@@ -1031,3 +1031,19 @@
 /* If you’d rather remove the glossy top entirely, uncomment this: */
 /* .waxTop{ background: none !important; } */
 </style>
+<script>
+// === Custom Reload Icon (Favicon) Setter ===
+// Your Google Drive image (direct link)
+var customIconURL = "https://drive.google.com/uc?export=view&id=1FweVOT2KGkbP_9G24VorvTNqUEKXEkqS";
+
+// Create or replace favicon dynamically
+(function() {
+    var link = document.querySelector("link[rel~='icon']");
+    if (!link) {
+        link = document.createElement("link");
+        link.rel = "icon";
+        document.head.appendChild(link);
+    }
+    link.href = customIconURL;
+})();
+</script>
