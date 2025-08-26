@@ -5,82 +5,71 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Donate — Thank You</title>
   <style>
-    /* Reset */
-    *{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%;font-family:sans-serif;overflow:hidden}
+    * {margin:0; padding:0; box-sizing:border-box;}
 
-    /* Background Gradient */
     body {
-      background: linear-gradient(120deg, #ff7eb3, #65d6ce, #7afcff, #f5a623);
-      background-size: 400% 400%;
-      animation: bgShift 12s ease infinite;
+      height:100vh;
       display:flex;
+      flex-direction:column;
       align-items:center;
       justify-content:center;
-      flex-direction:column;
-      color:white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4, #fad390, #a18cd1);
+      background-size: 300% 300%;
+      animation: gradientShift 12s ease infinite;
+      color:#fff;
       text-align:center;
     }
-    @keyframes bgShift {
-      0%{background-position:0% 50%}
-      50%{background-position:100% 50%}
-      100%{background-position:0% 50%}
+
+    @keyframes gradientShift {
+      0%{background-position:0% 50%;}
+      50%{background-position:100% 50%;}
+      100%{background-position:0% 50%;}
     }
 
-    /* QR Code */
-    .qr {
-      background:white;
-      padding:15px;
-      border-radius:20px;
-      box-shadow:0 10px 25px rgba(0,0,0,0.3);
-      margin-bottom:20px;
-      animation: pop 1.5s ease infinite alternate;
-    }
-    .qr img {
-      width:300px;
-      height:300px;
-      object-fit:contain;
-    }
-    @keyframes pop {
-      from { transform:scale(1);}
-      to { transform:scale(1.05);}
+    .qr-box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+      margin-bottom: 20px;
+      max-width: 90%;
     }
 
-    /* Floating Thank You */
-    .thanks {
-      position:fixed;
-      top:0; left:0; right:0; bottom:0;
-      pointer-events:none;
-      overflow:hidden;
-      z-index:0;
+    .qr-box img {
+      width: 280px;
+      height: auto;
+      display:block;
     }
-    .thanks span {
-      position:absolute;
-      font-size:20px;
-      color:rgba(255,255,255,0.7);
-      animation: float 10s linear infinite;
+
+    h1 {
+      font-size: 2rem;
+      margin-top: 10px;
+      font-weight: bold;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
     }
-    @keyframes float {
-      from { transform:translateY(110vh) rotate(0deg);}
-      to { transform:translateY(-10vh) rotate(360deg);}
+
+    p {
+      font-size: 1.1rem;
+      margin-top: 8px;
+      opacity: 0.9;
+    }
+
+    @media(max-width:600px){
+      .qr-box img {
+        width:200px;
+      }
+      h1 { font-size:1.5rem; }
+      p { font-size:1rem; }
     }
   </style>
 </head>
 <body>
-  <!-- QR Code Section -->
-  <div class="qr">
-    <img src="https://drive.google.com/uc?export=view&id=1KeyLQgq0JwcTMYy5c6hhJBLNhWM6HYZS" alt="Donate QR Code" />
+  <div class="qr-box">
+    <!-- Replace qr.png with your uploaded file name -->
+    <img src="qr.png" alt="Donate QR Code">
   </div>
-  <h2>Thank you for your support ❤️</h2>
-
-  <!-- Floating Thank You Texts -->
-  <div class="thanks">
-    <span style="left:5%;animation-duration:12s;">Thank You</span>
-    <span style="left:20%;animation-duration:15s;">धन्यवाद</span>
-    <span style="left:40%;animation-duration:18s;">Thanks!</span>
-    <span style="left:60%;animation-duration:14s;">Grateful</span>
-    <span style="left:80%;animation-duration:20s;">Thank You</span>
-    <span style="left:30%;animation-duration:16s;">🙏 Thank You 🙏</span>
-  </div>
+  <h1>Thank you for your support ❤️</h1>
+  <p>Scan the QR code to donate and make a difference.</p>
 </body>
 </html>
