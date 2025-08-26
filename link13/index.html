@@ -1197,208 +1197,183 @@
 <!-- ...to here, right before your </body> tag -->
 <!-- =============== END: EXIT-INTENT DONATION POP-UP CODE =============== -->
 <!-- ===================================================================== -->
-<!-- ======= Real Time Mode (paste before </body>) ======= -->
-<style id="rtm-style">
-  /* Minimal, isolated styles for Real Time Mode */
-  #rtm-overlay{position:fixed;inset:0;display:none;z-index:2147483646;align-items:center;justify-content:center;background:var(--rtm-bg,rgba(0,0,0,0.95));color:var(--rtm-color,#fff);backdrop-filter:var(--rtm-backdrop,blur(6px));}
-  #rtm-overlay[aria-hidden="false"]{display:flex}
-  #rtm-rtbox{display:flex;flex-direction:column;align-items:center;gap:1rem;padding:24px;max-width:100%;width:100%;height:100%;box-sizing:border-box}
-  #rtm-topbar{position:absolute;top:12px;left:12px;right:12px;display:flex;align-items:center;justify-content:space-between;gap:8px}
-  #rtm-topbar .rtm-controls{display:flex;gap:8px;align-items:center}
-  #rtm-topbar button, #rtm-topbar label{background:transparent;border:0;color:inherit;font:inherit;cursor:pointer}
-  #rtm-topbar button{padding:8px 12px;border-radius:6px;background:rgba(255,255,255,0.06)}
-  #rtm-display{display:flex;align-items:center;justify-content:center;flex:1;width:100%;height:100%}
-  /* Digital style */
-  .rtm-digital .rtm-time{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial; font-weight:700; font-size:10vw; line-height:1; letter-spacing:.02em; text-align:center}
-  /* Flip-like simplified style */
-  .rtm-flip{display:flex;gap:1.2vw;align-items:center;justify-content:center;font-family:monospace; font-weight:700; font-size:10vw}
-  .rtm-flip .rtm-seg{display:inline-block;min-width:6ch;text-align:center;position:relative}
-  .rtm-digit{display:block;position:relative;overflow:visible}
-  .rtm-digit .rtm-old, .rtm-digit .rtm-new{display:block;padding:.05em 0}
-  .rtm-flip .anim { animation:rtm-flip-anim .45s cubic-bezier(.2,.9,.3,1); transform-origin:center bottom }
-  @keyframes rtm-flip-anim {
-    0% { transform: rotateX(0deg) translateY(0); opacity:1 }
-    40% { transform: rotateX(-75deg) translateY(-8%); opacity:.2 }
-    100% { transform: rotateX(0deg) translateY(0); opacity:1 }
-  }
-  /* colon */
-  .rtm-sep{font-weight:600; font-size:10vw}
-  /* Responsive clamp */
-  @media (max-width:600px){ .rtm-digital .rtm-time, .rtm-flip{font-size:18vw} .rtm-sep{font-size:18vw} }
-  /* Floating fallback button if timer menu not found */
-  #rtm-floating-btn{position:fixed;right:16px;bottom:16px;z-index:2147483647;padding:10px 14px;border-radius:10px;border:0;background:#111;color:#fff;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.45)}
-</style>
-
-<!-- Overlay - inserted by script if enabled -->
-<div id="rtm-overlay" aria-hidden="true">
-  <div id="rtm-rtbox" role="dialog" aria-modal="true" aria-label="Real Time Mode">
-    <div id="rtm-topbar" aria-hidden="false">
-      <div class="rtm-controls" aria-hidden="false">
-        <button id="rtm-exit" title="Exit (Esc)">Exit ✕</button>
-        <label title="Auto tries to follow your site's flip setting">
-          <input type="radio" name="rtm-style" value="auto" id="rtm-style-auto"> Auto
-        </label>
-        <label>
-          <input type="radio" name="rtm-style" value="digital" id="rtm-style-digital"> Digital
-        </label>
-        <label>
-          <input type="radio" name="rtm-style" value="flip" id="rtm-style-flip"> Flip
-        </label>
-      </div>
-      <div style="opacity:.85;font-size:0.9rem">Real Time Mode</div>
-    </div>
-
-    <div id="rtm-display">
-      <div class="rtm-digital" aria-hidden="false"><div class="rtm-time" id="rtm-digital-time">00:00:00</div></div>
-      <div class="rtm-flip" id="rtm-flip-time" aria-hidden="true">
-        <!-- flip segments inserted dynamically -->
-      </div>
-    </div>
-  </div>
+```html
+<div id="timer-menu" style="position: fixed; bottom: 20px; right: 20px; background: rgba(0,0,0,0.8); color: white; padding: 10px; border-radius: 8px; z-index: 9999; font-family: Arial, sans-serif; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
+  <button id="timer-toggle" style="background: #4CAF50; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; margin-right: 10px;">Enable Real Time</button>
+  <select id="clock-type" style="background: white; color: black; padding: 8px; border-radius: 4px;">
+    <option value="digital">Digital Clock</option>
+    <option value="flip">Flip Clock</option>
+  </select>
 </div>
 
-<button id="rtm-floating-btn" style="display:none">Real Time</button>
+<div id="fullscreen-timer" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; justify-content: center; align-items: center; flex-direction: column;">
+</div>
 
 <script>
-(function(){
-  // Namespace-safe variables & helpers
-  const overlay = document.getElementById('rtm-overlay');
-  const exitBtn = document.getElementById('rtm-exit');
-  const floatingBtn = document.getElementById('rtm-floating-btn');
-  const digitalEl = document.getElementById('rtm-digital-time');
-  const flipContainer = document.getElementById('rtm-flip-time');
-  const styleAuto = document.getElementById('rtm-style-auto');
-  const styleDigital = document.getElementById('rtm-style-digital');
-  const styleFlip = document.getElementById('rtm-style-flip');
+  const timerToggle = document.getElementById('timer-toggle');
+  const clockType = document.getElementById('clock-type');
+  const fullscreenTimer = document.getElementById('fullscreen-timer');
+  let timerInterval;
+  let isFullscreen = false;
 
-  let running = false;
-  let timerHandle = null;
-  let lastValues = {h:'', m:'', s:''};
+  function updateDigitalClock() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString();
+    const dateString = now.toLocaleDateString();
+    
+    fullscreenTimer.innerHTML = `
+      <div style="font-size: 8rem; color: #fff; font-family: 'Arial', sans-serif; text-align: center;">
+        ${timeString}
+      </div>
+      <div style="font-size: 2rem; color: #aaa; font-family: 'Arial', sans-serif; margin-top: 20px;">
+        ${dateString}
+      </div>
+    `;
+  }
 
-  // Non-destructive: try to append a control into user's timer menu if present
-  function attachMenuControl(){
-    const menu = document.querySelector('#timer-menu, .timer-menu, [data-timer-menu]');
-    if(menu){
-      // create a small option wrapper
-      const wrapper = document.createElement('div');
-      wrapper.className = 'rtm-menu-option';
-      wrapper.style.cssText = 'margin-top:8px;font:14px/1.2 system-ui,-apple-system,Segoe UI,Roboto,Arial;color:inherit';
-      wrapper.innerHTML = '<label style="cursor:pointer;"><input type="checkbox" id="rtm-enable-checkbox" style="margin-right:8px">Enable Real Time Mode</label>';
-      // append safely
-      menu.appendChild(wrapper);
-      const chk = document.getElementById('rtm-enable-checkbox');
-      chk.addEventListener('change', e => {
-        if(e.target.checked) openOverlay();
-        else closeOverlay();
-      });
-      return true;
+  function createFlipClock() {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const seconds = now.getSeconds().toString().padStart(2, '0');
+    const dateString = now.toLocaleDateString();
+
+    const flipClockHTML = `
+      <div style="display: flex; gap: 10px; font-family: 'Arial', sans-serif;">
+        <div class="flip-container" style="perspective: 1000px; width: 100px; height: 150px;">
+          <div class="flip-card" style="width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.6s;">
+            <div class="flip-card-front" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: #333; color: #fff; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 8rem;">
+              ${hours[0]}
+            </div>
+            <div class="flip-card-back" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: #333; color: #fff; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 8rem; transform: rotateX(180deg);">
+              ${hours[0]}
+            </div>
+          </div>
+        </div>
+        <div class="flip-container" style="perspective: 1000px; width: 100px; height: 150px;">
+          <div class="flip-card" style="width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.6s;">
+            <div class="flip-card-front" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: #333; color: #fff; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 8rem;">
+              ${hours[1]}
+            </div>
+            <div class="flip-card-back" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: #333; color: #fff; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 8rem; transform: rotateX(180deg);">
+              ${hours[1]}
+            </div>
+          </div>
+        </div>
+        
+        <div style="display: flex; align-items: center; font-size: 4rem; color: #fff;">:</div>
+        
+        <div class="flip-container" style="perspective: 1000px; width: 100px; height: 150px;">
+          <div class="flip-card" style="width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.6s;">
+            <div class="flip-card-front" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: #333; color: #fff; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 8rem;">
+              ${minutes[0]}
+            </div>
+            <div class="flip-card-back" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: #333; color: #fff; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 8rem; transform: rotateX(180deg);">
+              ${minutes[0]}
+            </div>
+          </div>
+        </div>
+        <div class="flip-container" style="perspective: 1000px; width: 100px; height: 150px;">
+          <div class="flip-card" style="width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.6s;">
+            <div class="flip-card-front" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: #333; color: #fff; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 8rem;">
+              ${minutes[1]}
+            </div>
+            <div class="flip-card-back" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: #333; color: #fff; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 8rem; transform: rotateX(180deg);">
+              ${minutes[1]}
+            </div>
+          </div>
+        </div>
+        
+        <div style="display: flex; align-items: center; font-size: 4rem; color: #fff;">:</div>
+        
+        <div class="flip-container" style="perspective: 1000px; width: 100px; height: 150px;">
+          <div class="flip-card" style="width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.6s;">
+            <div class="flip-card-front" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: #333; color: #fff; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 8rem;">
+              ${seconds[0]}
+            </div>
+            <div class="flip-card-back" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: #333; color: #fff; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 8rem; transform: rotateX(180deg);">
+              ${seconds[0]}
+            </div>
+          </div>
+        </div>
+        <div class="flip-container" style="perspective: 1000px; width: 100px; height: 150px;">
+          <div class="flip-card" style="width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.6s;">
+            <div class="flip-card-front" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: #333; color: #fff; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 8rem;">
+              ${seconds[1]}
+            </div>
+            <div class="flip-card-back" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: #333; color: #fff; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 8rem; transform: rotateX(180deg);">
+              ${seconds[1]}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-size: 2rem; color: #aaa; margin-top: 20px;">
+        ${dateString}
+      </div>
+    `;
+  }
+
+  function showFullscreenTimer() {
+    fullscreenTimer.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    isFullscreen = true;
+    
+    if (clockType.value === 'flip') {
+      createFlipClock();
+      // Update flip clock every second
+      timerInterval = setInterval(() => {
+        createFlipClock();
+      }, 1000);
+    } else {
+      updateDigitalClock();
+      // Update digital clock every second
+      timerInterval = setInterval(updateDigitalClock, 1000);
     }
-    return false;
   }
 
-  // Fallback: show floating button
-  function showFloatingButton(){
-    floatingBtn.style.display = '';
-    floatingBtn.addEventListener('click', () => {
-      // if overlay already on, just close
-      if(overlay.getAttribute('aria-hidden') === 'false') closeOverlay();
-      else openOverlay();
-    });
-  }
-
-  // Detect whether page has a "flip" option (common labels / inputs)
-  function detectSiteFlipSetting(){
-    // search for inputs/labels mentioning 'flip'
-    try{
-      const candidates = Array.from(document.querySelectorAll('input, label, select, button, span'));
-      for(const el of candidates){
-        const text = (el.innerText || el.textContent || '') + ' ' + (el.getAttribute && (el.getAttribute('id')||'') );
-        if(/flip/i.test(text)){
-          // if it's an input and checked, return true
-          if((el.tagName === 'INPUT' || el.tagName === 'SELECT') && (el.checked || el.value && /flip/i.test(el.value))) return true;
-          // if label contains flip and contains input child
-          const childInput = el.querySelector && el.querySelector('input[type="checkbox"], input[type="radio"]');
-          if(childInput && childInput.checked) return true;
-        }
-      }
-    }catch(e){}
-    return false;
-  }
-
-  // Format time
-  function pad(n){ return String(n).padStart(2,'0') }
-  function nowParts(){
-    const d = new Date();
-    return {h:pad(d.getHours()), m:pad(d.getMinutes()), s:pad(d.getSeconds()), ms: d.getMilliseconds()};
-  }
-
-  // Update digital display
-  function updateDigital(){
-    const p = nowParts();
-    digitalEl.textContent = p.h + ':' + p.m + ':' + p.s;
-  }
-
-  // Build flip segments (HH:MM:SS, each as 2 digits)
-  function buildFlipLayout(){
-    flipContainer.innerHTML = '';
-    const parts = ['hh','mm','ss'];
-    parts.forEach((p, idx) => {
-      const seg = document.createElement('div');
-      seg.className = 'rtm-seg';
-      seg.setAttribute('data-which', p);
-      // two-digit container
-      const digits = document.createElement('div');
-      digits.className = 'rtm-digit';
-      digits.innerHTML = '<span class="rtm-old">00</span><span class="rtm-new" aria-hidden="true">00</span>';
-      seg.appendChild(digits);
-      flipContainer.appendChild(seg);
-      if(idx < parts.length - 1){
-        const colon = document.createElement('div');
-        colon.className = 'rtm-sep';
-        colon.textContent = ':';
-        flipContainer.appendChild(colon);
-      }
-    });
-  }
-
-  // Update flip display with basic animate
-  function updateFlip(){
-    const p = nowParts();
-    const H = p.h, M = p.m, S = p.s;
-    const mapping = {hh:H, mm:M, ss:S};
-    const segs = flipContainer.querySelectorAll('.rtm-seg');
-    segs.forEach(seg => {
-      const which = seg.getAttribute('data-which');
-      const newVal = mapping[which] || '00';
-      const oldSpan = seg.querySelector('.rtm-old');
-      const newSpan = seg.querySelector('.rtm-new');
-      if(!oldSpan || !newSpan) return;
-      const current = oldSpan.textContent || '';
-      if(current !== newVal){
-        // set new
-        newSpan.textContent = newVal;
-        // trigger animation by toggling class on digit
-        const digitWrap = seg.querySelector('.rtm-digit');
-        digitWrap.classList.remove('anim');
-        // small reflow to restart
-        void digitWrap.offsetWidth;
-        digitWrap.classList.add('anim');
-        // after animation settle, put new into old
-        setTimeout(()=>{ oldSpan.textContent = newVal; newSpan.textContent = ''; digitWrap.classList.remove('anim'); }, 430);
-      }
-    });
-  }
-
-  // Choose display style based on radio/auto or site setting
-  function getChosenStyle(){
-    if(styleAuto && styleAuto.checked){
-      return detectSiteFlipSetting() ? 'flip' : 'digital';
+  function hideFullscreenTimer() {
+    fullscreenTimer.style.display = 'none';
+    document.body.style.overflow = '';
+    isFullscreen = false;
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
     }
-    if(styleFlip && styleFlip.checked) return 'flip';
-    return 'digital';
   }
 
-  // Render UI visibility
-  function renderStyleVisibility(){
-    const style = getChosenStyle();
-    if(style === 'flip'
+  timerToggle.addEventListener('click', () => {
+    if (isFullscreen) {
+      hideFullscreenTimer();
+      timerToggle.textContent = 'Enable Real Time';
+    } else {
+      showFullscreenTimer();
+      timerToggle.textContent = 'Disable Real Time';
+    }
+  });
+
+  clockType.addEventListener('change', () => {
+    if (isFullscreen) {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+      }
+      if (clockType.value === 'flip') {
+        createFlipClock();
+        timerInterval = setInterval(() => {
+          createFlipClock();
+        }, 1000);
+      } else {
+        updateDigitalClock();
+        timerInterval = setInterval(updateDigitalClock, 1000);
+      }
+    }
+  });
+
+  // Close fullscreen on ESC key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isFullscreen) {
+      hideFullscreenTimer();
+      timerToggle.textContent = 'Enable Real Time';
+    }
+  });
+</script>
+```
