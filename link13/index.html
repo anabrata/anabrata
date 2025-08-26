@@ -1029,3 +1029,37 @@
 /* If you’d rather remove the glossy top entirely, uncomment this: */
 /* .waxTop{ background: none !important; } */
 </style>
+<!-- Put this just before </body> -->
+<script>
+(function () {
+  // CHANGE THIS to where the image file is saved in your project:
+  const ICON = "/icons/site-icon.png"; // e.g., /icons/site-icon.png
+
+  const head = document.head || document.getElementsByTagName('head');
+
+  // Remove any existing icons to avoid duplicates
+  document.querySelectorAll('link[rel="icon"],link[rel="shortcut icon"],link[rel="apple-touch-icon"],link[rel="mask-icon"]').forEach(n => n.remove());
+
+  // Helper to add <link> elements
+  function add(rel, href, type, sizes){
+    const link = document.createElement('link');
+    link.rel = rel;
+    link.href = href;
+    if (type) link.type = type;
+    if (sizes) link.sizes = sizes;
+    head.appendChild(link);
+  }
+
+  // Modern favicon + legacy fallback
+  add('icon', ICON, 'image/png');            // Standard favicon for most browsers
+  add('shortcut icon', ICON, 'image/png');   // Legacy fallback (some browsers still read this)
+
+  // iOS home‑screen icon (uses same image)
+  add('apple-touch-icon', ICON, 'image/png', '180x180');
+
+  // Optional: set a toolbar/address‑bar tint for supporting browsers
+  let theme = document.querySelector('meta[name="theme-color"]');
+  if (!theme) { theme = document.createElement('meta'); theme.name = 'theme-color'; head.appendChild(theme); }
+  theme.setAttribute('content', '#0ea5ff');
+})();
+</script>
