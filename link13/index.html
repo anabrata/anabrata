@@ -12,15 +12,12 @@
       --text: #ffffff;
       --accent: #ffdd57;
     }
-
-    /* Page baseline */
     * { box-sizing: border-box; }
     html, body { height: 100%; }
     body {
       margin: 0;
       color: var(--text);
       font: 500 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
-      /* Animated gradient background */
       background: linear-gradient(120deg, #1e1b4b, #312e81, #7c3aed, #0ea5e9, #22c55e, #f59e0b);
       background-size: 400% 400%;
       animation: bgMove 24s ease-in-out infinite;
@@ -28,8 +25,6 @@
       place-items: center;
       overflow: hidden;
     }
-
-    /* Center wrapper */
     .wrap {
       position: relative;
       width: min(960px, 92vw);
@@ -37,8 +32,6 @@
       text-align: center;
       z-index: 1;
     }
-
-    /* Title with shimmering gradient text */
     .title {
       margin: 0 0 0.15em 0;
       font-size: clamp(40px, 7vw, 72px);
@@ -57,8 +50,6 @@
       font-size: clamp(16px, 2.5vw, 22px);
       opacity: 0.9;
     }
-
-    /* Glassy QR card */
     .card {
       margin-inline: auto;
       width: min(420px, 80vw);
@@ -74,8 +65,6 @@
       transition: transform 0.6s ease, box-shadow 0.6s ease;
     }
     .card:hover { transform: translateY(-4px); }
-
-    /* QR image with gentle glow pulse */
     .qr {
       display: block;
       width: 100%;
@@ -85,14 +74,7 @@
       box-shadow: 0 8px 24px rgba(0,0,0,0.35), var(--glow);
       animation: pulse 2.6s ease-in-out infinite;
     }
-
-    .note {
-      margin-top: 16px;
-      font-size: 14px;
-      opacity: 0.85;
-    }
-
-    /* Decorative soft light */
+    .note { margin-top: 16px; font-size: 14px; opacity: 0.85; }
     .aura {
       position: absolute;
       inset: -30vmax;
@@ -102,32 +84,26 @@
       pointer-events: none;
       animation: auraFloat 18s ease-in-out infinite alternate;
     }
-
-    /* Animations */
     @keyframes bgMove {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
     @keyframes shine {
-      0%   { background-position: 0% 50%; }
+      0% { background-position: 0% 50%; }
       100% { background-position: 300% 50%; }
     }
     @keyframes pulse {
       0%, 100% { box-shadow: 0 8px 24px rgba(0,0,0,0.35), 0 0 0 0 rgba(255,221,87,0.0); }
-      50%      { box-shadow: 0 10px 28px rgba(0,0,0,0.45), 0 0 30px 8px rgba(255,221,87,0.35); }
+      50% { box-shadow: 0 10px 28px rgba(0,0,0,0.45), 0 0 30px 8px rgba(255,221,87,0.35); }
     }
     @keyframes auraFloat {
       from { transform: translateY(-2%) rotate(0deg); }
       to   { transform: translateY(2%)  rotate(6deg); }
     }
-
-    /* Respect users who prefer reduced motion */
     @media (prefers-reduced-motion: reduce) {
       * { animation: none !important; transition: none !important; }
     }
-
-    /* Small helper badge */
     .badge {
       margin-top: 14px;
       display: inline-block;
@@ -140,8 +116,6 @@
       font-size: 13px;
       letter-spacing: 0.3px;
     }
-
-    /* Canvas sits behind everything */
     #confetti {
       position: fixed;
       inset: 0;
@@ -160,8 +134,11 @@
     <p class="subtitle">Scan the QR to donate and help this project grow.</p>
 
     <section class="card" aria-label="Donation QR Code">
-      <!-- Replace src with the provided file name if different -->
-      <img class="qr" src="qr-code.jpg" alt="Donation QR code for contributions" />
+      <!-- Place this JPEG next to this HTML file; name must match exactly -->
+      <img
+        class="qr"
+        src="WhatsApp-Image-2025-08-22-at-18.03.47_d5afdd83.jpg"
+        alt="Donation QR code for contributions" />
       <div class="badge">Safe • Quick • Appreciated</div>
     </section>
 
@@ -171,8 +148,6 @@
   <script>
     (function () {
       const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-      // Skip confetti if reduced motion is requested
       if (prefersReduced) return;
 
       const canvas = document.getElementById('confetti');
@@ -187,23 +162,17 @@
       resize();
 
       function rand(min, max) { return Math.random() * (max - min) + min; }
-
       function makePiece() {
         const colors = ['#ffd166', '#06d6a0', '#118ab2', '#ef476f', '#ffffff'];
         return {
-          x: rand(0, W),
-          y: rand(-H, 0),
-          w: rand(6, 12),
-          h: rand(8, 16),
-          vy: rand(1.2, 2.2),
-          vx: rand(-0.6, 0.6),
-          r: rand(0, Math.PI * 2),
-          vr: rand(-0.05, 0.05),
+          x: rand(0, W), y: rand(-H, 0),
+          w: rand(6, 12), h: rand(8, 16),
+          vy: rand(1.2, 2.2), vx: rand(-0.6, 0.6),
+          r: rand(0, Math.PI * 2), vr: rand(-0.05, 0.05),
           color: colors[(Math.random() * colors.length) | 0],
           alpha: rand(0.75, 1)
         };
       }
-
       for (let i = 0; i < 130; i++) pieces.push(makePiece());
 
       function drawPiece(p) {
@@ -219,22 +188,12 @@
       function step() {
         ctx.clearRect(0, 0, W, H);
         tick++;
-
         if (tick % 3 === 0 && pieces.length < 180) pieces.push(makePiece());
-
         for (let i = pieces.length - 1; i >= 0; i--) {
           const p = pieces[i];
-          p.x += p.vx;
-          p.y += p.vy;
-          p.r += p.vr;
-
+          p.x += p.vx; p.y += p.vy; p.r += p.vr;
           drawPiece(p);
-
-          if (p.y - 20 > H) {
-            // recycle piece from top
-            pieces[i] = makePiece();
-            pieces[i].y = -20;
-          }
+          if (p.y - 20 > H) { pieces[i] = makePiece(); pieces[i].y = -20; }
         }
         requestAnimationFrame(step);
       }
