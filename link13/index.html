@@ -630,7 +630,8 @@
       : `${String(Math.floor(sec / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`;
     $("#simpleTimer").textContent = out;
   }
-  /* ---------- Countdown state ---------- */
+  /* ---------- Countdown state----------*/
+ 
   const timerFlip = $("#timer");
   const timerSimple = $("#simpleTimer");
   const primaryBtn = $("#primaryBtn");
@@ -676,7 +677,7 @@
     setWaxHeightByProgress(1);
     afterNextPaint(positionFlame);
     const showH = $("#showHours")?.checked ?? false;
-    const showS = $("#showSeconds")?.checked ?? true;
+    const showS =$("#showSeconds")?.checked ?? true;
     if (useFlip){
       flipDigits = buildFlip(timerFlip, showH, showS);
       tickFlip(flipDigits, totalSec, showH, showS);
@@ -841,7 +842,7 @@
   $("#musicPrev")?.addEventListener("click", prevTrack);
   $("#musicLoop")?.addEventListener("change", (e)=> audio.loop = !!e.target.checked);
   window.addEventListener("unload", () => objectUrls.forEach(u=>URL.revokeObjectURL(u)));
-  /* ---------- Custom background image ---------- */
+  /* ----------Custom background image----------*/
   const bgImageBtn = $("#bgImageBtn"), bgImageFile = $("#bgImageFile"), bgImageClear = $("#bgImageClear"), bgImageName = $("#bgImageName");
   bgImageBtn?.addEventListener("click", () => bgImageFile?.click());
   bgImageFile?.addEventListener("change", (e)=>{
@@ -855,7 +856,7 @@
     if (bgImageName) bgImageName.textContent = f.name;
   });
   bgImageClear?.addEventListener("click", applyGradient);
-  /* ---------- Layout flags ---------- */
+  /*----------Layout flags----------*/
   function ensureCandleVisibleWhenOnlyCandle(on){
     if (on){
       const hc = $("#hideCandle");
@@ -878,17 +879,11 @@
     const useFlip = $("#useFlip")?.checked ?? true;
     const realTimeContainer = $("#realTimeContainer");
     if ($("#realTimeMode")?.checked) {
-      // Get current background from body
-      const bodyBg = getComputedStyle(document.body).backgroundImage;
-      const bodyBgColor = getComputedStyle(document.body).backgroundColor;
-      
-      // Apply the same background to real time container
-      realTimeContainer.style.backgroundImage = bodyBg;
-      realTimeContainer.style.backgroundColor = bodyBgColor;
-      realTimeContainer.style.backgroundSize = "cover";
-      realTimeContainer.style.backgroundPosition = "center";
-      realTimeContainer.style.backgroundAttachment = "fixed";
-      
+      // Save current background
+      const bgImage = getComputedStyle(document.body).backgroundImage;
+      const bgColor = getComputedStyle(document.body).backgroundColor;
+      realTimeContainer.style.setProperty('--bg-image', bgImage);
+      realTimeContainer.style.setProperty('--bg-color', bgColor);
       // Show real time mode
       realTimeContainer.style.display = "flex";
       // Update clock immediately and set interval
@@ -1140,6 +1135,7 @@
     background-color: #0a84ff; /* A slightly lighter blue on hover */
   }
   /* Animations for the pop-up */
+ 
   @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
