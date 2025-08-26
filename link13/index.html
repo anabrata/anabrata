@@ -1,115 +1,74 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>QR Showcase</title>
-  <meta name="description" content="Embedded QR image displayed inside a modern card without needing to download from Google Drive.">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Donation Page</title>
   <style>
-    :root{--bg1:#0f0c29;--bg2:#302b63;--bg3:#24243e;--accent:#ffb703;--card:#ffffff10;--border:#ffffff30}
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-      color:#eef1f7;
-      background: radial-gradient(1200px 800px at 80% -10%, var(--bg2), transparent),
-                  radial-gradient(900px 600px at -10% 110%, var(--bg3), transparent),
-                  linear-gradient(135deg, var(--bg1), var(--bg3));
-      display:grid;
-      grid-template-rows:auto 1fr auto;
-      min-height:100vh;
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Poppins", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #ff7eb3, #ff758c, #8e2de2, #4a00e0);
+      background-size: 300% 300%;
+      animation: gradientBG 10s ease infinite;
+      color: white;
+      text-align: center;
     }
-    header{padding:24px 28px;display:flex;gap:12px;align-items:center}
-    .logo{width:32px;height:32px;border-radius:8px;background:conic-gradient(from 210deg, #ffd166, #06d6a0, #118ab2, #ef476f, #ffd166);box-shadow:0 0 0 3px #ffffff20 inset}
-    h1{margin:0;font-size:clamp(22px,3vw,28px);letter-spacing:0.4px}
 
-    .wrap{display:grid;place-items:center;padding:28px}
-    .card{
-      width:min(92vw, 760px);
-      background:linear-gradient(180deg, #ffffff22, #ffffff11);
-      border:1px solid var(--border);
-      border-radius:20px;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0 20px 60px #00000055, 0 0 0 1px #00000033 inset;
-      padding: clamp(18px, 3vw, 28px);
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 18px;
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
-    @media (min-width: 860px){ .card{ grid-template-columns: 340px 1fr; gap:24px } }
 
-    .imgBox{
-      position:relative;
-      aspect-ratio:1/1;
-      width:100%;
-      border-radius:16px;
-      border:1px dashed var(--border);
-      background: #111418;
-      display:grid;place-items:center;
-      overflow:hidden;
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
     }
-    .imgBox::after{content:"";position:absolute;inset:0;border-radius:16px;box-shadow:inset 0 0 0 1px #ffffff25}
-    img.qr{width:92%;height:92%;object-fit:contain;border-radius:10px;box-shadow:0 12px 30px #00000055}
 
-    .badge{display:inline-flex;align-items:center;gap:8px;color:#111;background:#ffd166;border-radius:999px;padding:6px 10px;font-weight:600;font-size:13px;width:max-content}
-    .badge b{color:#111}
+    p {
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+    }
 
-    .title{font-size:clamp(20px,2.4vw,26px);margin:4px 0 6px;font-weight:700}
-    .sub{margin:0;color:#c9d2e2;line-height:1.55}
+    .qr-box {
+      background: white;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0px 8px 25px rgba(0,0,0,0.5);
+      display: inline-block;
+    }
 
-    .ctaRow{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
-    .btn{appearance:none;border:none;cursor:pointer;border-radius:12px;padding:12px 16px;font-weight:700}
-    .btn.primary{background:linear-gradient(135deg,#ffb703,#fb8500);color:#1a1200;box-shadow:0 10px 24px #00000055}
-    .btn.ghost{background:#ffffff14;color:#eef;border:1px solid #ffffff2a}
-    footer{padding:18px 28px;color:#9fb0c9;font-size:13px}
-    a{color:#ffb703;text-decoration:none}
+    .qr-box img {
+      max-width: 250px;
+      height: auto;
+      border-radius: 10px;
+    }
+
+    .footer-msg {
+      margin-top: 20px;
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <div class="logo"></div>
-    <h1>Instant QR Preview</h1>
-  </header>
 
-  <main class="wrap">
-    <section class="card" aria-label="QR showcase card">
-      <div class="imgBox">
-        <img class="qr" id="qrImg" alt="QR code" loading="eager" decoding="sync">
-      </div>
-      <div>
-        <span class="badge">No download needed</span>
-        <h2 class="title">View the QR right on the page</h2>
-        <p class="sub">This image box renders the QR automatically either from an embedded data URL or directly from Google Drive when a file ID is provided below.</p>
-        <div class="ctaRow">
-          <button class="btn primary" onclick="location.reload()">Refresh</button>
-          <button class="btn ghost" onclick="alert('Tip: Set driveFileId in the script to pull from Google Drive immediately.')">How it works</button>
-        </div>
-      </div>
-    </section>
-  </main>
+  <h1>🙏 Thank You for Your Support!</h1>
+  <p>Your donation helps us continue our mission ❤️</p>
 
-  <footer>
-    Made for quick preview demos. Replace the file ID in the script to show your Google Drive-hosted image instantly.
-  </footer>
+  <div class="qr-box">
+    <img src="5c7020ee-12f9-4dc9-9df8-43ec9dcadaf7.png" alt="Donation QR Code">
+  </div>
 
-  <script>
-    // 1) Embedded fallback (works offline)
-    const embeddedDataUrl = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAEBAQEBAQEBAQEBAQEBAQIBAQEBAQIBAQECAgICAgICAgIDAwQDAwMDAwICAwQDAwQEBAQEAgMFBQQEBQQEBAT/2wBDAQEBAQEBAQIBAQIEAwIDBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAT/wAARCAF0AYMDASIAAhEBAxEB/8QAHwAAAgICAgMBAAAAAAAAAAAAAAoJCwcIAgYBAwUE/8QAiBAAAAQEAwIGBg4LFBEQCgMBAwQFBgABBwgCCRMRFAoVFiEjMxIXMUNTkxgZGiIkOUFRWGFjcdPWJTRzeIGDkZehttUmJygyNTc4QlJUV3eYo6axs7fH1DZERkhVVnaHiJSWtcPG4+bwKUdiZGVmcoSGlaWnwcTR4UVZZ2h0daS0xfOChZKo/8QAHQEAAgEFAQEAAAAAAAAAAAAABgcFAAIDBAgBCf/EAFQRAAAEBOMEGA..."; /* truncated for brevity in this snippet; keep the full base64 string from the assistant reply when using */
-    // 2) Optional: show image from Google Drive by file ID (share the file as anyone with the link)
-    //    Paste only the ID from a link like: https://drive.google.com/file/d/FILE_ID/view
-    const driveFileId = ""; // e.g., "1AbCDeFgHiJkLmNoPQrStuVwXyZ"
-    const img = document.getElementById('qrImg');
-    if (driveFileId) {
-      // Use Drive direct-view endpoint so no click or download dialog appears
-      img.src = `https://drive.google.com/uc?export=view&id=${driveFileId}`;
-      img.referrerPolicy = 'no-referrer';
-      img.crossOrigin = 'anonymous';
-    } else {
-      // Use embedded data URL (from the uploaded image) if no Drive ID is set
-      img.src = embeddedDataUrl;
-    }
-  </script>
+  <p class="footer-msg">Scan the QR code to donate and make a difference ✨</p>
+
 </body>
 </html>
