@@ -1,81 +1,1199 @@
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Donate — Thank You</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500&display=swap');
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Baloo 2', cursive;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-      background-size: 300% 300%;
-      animation: bgShift 10s ease infinite;
-      color: #fff;
-      text-align: center;
-    }
-    @keyframes bgShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Candle Timer V2.0</title>
+<style>
+  :root{
+    /* Sizes */
+    --digit-w: 120px;
+    --digit-h: 170px;
+    --digit-radius: 16px;
+    --split-line: rgba(0,0,0,0.10);
 
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 10px;
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
-    }
+    /* Spacing */
+    --gap: clamp(24px, 5vw, 56px);
 
-    p {
-      font-size: 1.3rem;
-      margin-bottom: 20px;
-    }
+    /* Background gradient */
+    --bg-angle: 135deg;
+    --bg-c1: #3a1c71;
+    --bg-c2: #d76d77;
+    --bg-c3: #ffaf7b;
 
-    .qr-card {
-      background: white;
-      padding: 25px;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-      display: inline-block;
-    }
+    /* Flip clock colors (with glass overlay) */
+    --clock-c1: #ffffff;
+    --clock-c2: #ffffff;
+    --clock-c3: #ffffff;
+    --clock-text: #000000;
+    --colon-color: #ffffff;
+    --clock-glass-bg: rgba(255,255,255,0.06);
+    --clock-glass-border: rgba(255,255,255,0.18);
 
-    .qr-card img {
-      max-width: 260px;
-      height: auto;
-      border-radius: 10px;
-    }
+    /* Simple (non‑flip) clock color */
+    --simple-color: #ffffff;
 
-    .footer {
-      margin-top: 20px;
-      font-size: 1.1rem;
-      opacity: 0.9;
-    }
-  </style>
+    /* Candle */
+    --wax: #f2e4c7;
+    --wick: #1b1b1b;
+
+    /* Layout tweak */
+    --candle-offset: 18px;
+
+    /* To‑do base bg (transparent by default) */
+    --todo-bg: transparent;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; display:flex; flex-direction:column; color:#111;
+    font-family:"Comic Sans MS", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+    background-image: linear-gradient(var(--bg-angle), var(--bg-c1), var(--bg-c2), var(--bg-c3));
+    background-attachment: fixed; background-size: cover; background-position: center;
+  }
+
+  .brand{
+    position:fixed; left:12px; top:10px; z-index:40; color:#fff;
+    font-weight:800; font-size:13px; letter-spacing:.3px;
+    text-shadow:0 1px 2px rgba(0,0,0,.35); user-select:none;
+  }
+
+  /* ===== Main layout: Clock | To‑do | Candle ===== */
+  .main{
+    flex:1;
+    display:grid;
+    grid-template-columns: max-content auto max-content; /* clock | todo | candle */
+    align-items:center;
+    column-gap: var(--gap);
+    padding:22px min(5vw,48px);
+    position:relative;
+    min-height: 60vh;
+  }
+  /* Prevent grid children from vanishing due to intrinsic overflow */
+  .main > section{ min-width:0; min-height:0; }
+
+  #timer-container{ grid-column:1; }
+  #todo-panel     { grid-column:2; justify-self:center; align-self:center; }
+  #candle-area    { grid-column:3; }
+
+  /* Center Clock: timer centered; To‑do stays LEFT (grid) */
+  .center-clock .main{ grid-template-columns: max-content 1fr max-content; }
+  .center-clock #timer-container{
+    position:absolute; left:50%; top:50%;
+    transform:translate(-50%,-50%); z-index:5; min-width:0; width:auto;
+  }
+  .center-clock #todo-panel{
+    position:static; grid-column:1; justify-self:start; align-self:center;
+    margin-left:min(48px,5vw); z-index:6;
+  }
+
+  /* Hide candle → To‑do occupies RIGHT */
+  .candle-off #candle-area{ display:none !important; }
+  .candle-off .main{ grid-template-columns: max-content max-content; }
+  .candle-off #todo-panel{
+    position:static !important; left:auto !important; top:auto !important; transform:none !important; justify-self:end !important;
+  }
+
+  /* Center‑clock + candle‑off → keep To‑do LEFT */
+  .center-clock.candle-off .main{ grid-template-columns: max-content 1fr; }
+  .center-clock.candle-off #todo-panel{
+    position:static !important; grid-column:1 !important; justify-self:start !important;
+    margin-left:min(48px,5vw) !important; z-index:6 !important;
+  }
+
+  /* Only candle → center candle, hide clock; To‑do LEFT */
+  .only-candle #timer-container{ display:none !important; }
+  .only-candle .main{ grid-template-columns: max-content 1fr; }
+  .only-candle #todo-panel{
+    position:static; grid-column:1; justify-self:start; align-self:center; margin-left:min(48px,5vw);
+    z-index:6;
+  }
+  .only-candle #candle-area{ grid-column: 2; justify-self: center; }
+
+  /* To‑do visibility via .todo-on */
+  #todo-panel{ display:none; }
+  .todo-on #todo-panel{ display:block; }
+
+  /* To‑do styling */
+  #todo-panel{
+    max-width: clamp(220px, 26vw, 420px);
+    max-height: 60vh;
+    font-size: 13px;
+    overflow:auto; padding:10px 12px; border-radius:12px;
+    border:1px solid rgba(255,255,255,.18);
+    background: var(--todo-bg, transparent);
+    box-shadow: 0 6px 18px rgba(0,0,0,.16), 0 2px 5px rgba(0,0,0,.1);
+    color:#fff;
+  }
+  #todo-panel.todo-clear{ background: transparent !important; border-color: transparent !important; box-shadow: none !important; }
+  #todo-panel.todo-glass{
+    background: rgba(255,255,255,.06) !important;
+    border:1px solid rgba(255,255,255,.12) !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,.18), 0 2px 6px rgba(0,0,0,.12) !important;
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  }
+  #todoTitle{ margin:0 0 6px 0; font-size:12.5px; font-weight:900; letter-spacing:.35px; opacity:.95; }
+  #todoList{ margin:0; padding:4px 4px 4px 8px; list-style:none; counter-reset:tdn; font-family:inherit; }
+  #todoList li{ counter-increment:tdn; position:relative; padding-left:28px; margin:4px 0; min-height:20px; outline:none; transition: opacity .18s, transform .18s; }
+  #todoList li:before{ content: counter(tdn) "."; position:absolute; left:0; top:0; width:22px; text-align:right; padding-right:6px; font-weight:900; opacity:.9; }
+  #todoList li.vanish{ opacity:0; transform:translateY(-3px); }
+
+  .todoItem{ display:flex; align-items:center; gap:8px; }
+  .todoChk{ appearance:none; width:16px; height:16px; border:2px solid rgba(255,255,255,.75); border-radius:4px; background:transparent; cursor:pointer; }
+  .todoChk:checked{ background:#22c55e; border-color:#22c55e; }
+  .todoChk:checked::after{ content:""; position:absolute; inset:0; background:linear-gradient(45deg,transparent 47%,#fff 47% 53%,transparent 53%),linear-gradient(-45deg,transparent 47%,#fff 47% 53%,transparent 53%); transform:scale(.48); }
+  .todoText{ display:inline-block; min-width:36px; min-height:20px; padding:1px 5px; border-radius:6px; outline:none; color:#fff; caret-color:#fff; }
+  .todoText:empty:before{ content:"New task"; opacity:.45; }
+
+  /* ===== Flip clock (glassy) ===== */
+  #timer{ display:flex; align-items:center; gap:12px; user-select:none; }
+  .digit{
+    position:relative; width:var(--digit-w); height:var(--digit-h); perspective:1200px; border-radius:var(--digit-radius); overflow:hidden;
+    background: linear-gradient(145deg,var(--clock-c1),var(--clock-c2),var(--clock-c3));
+    background-blend-mode: screen;
+    border: 1px solid var(--clock-glass-border);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.18), 0 10px 28px rgba(0,0,0,.22);
+    flex:0 0 auto;
+  }
+  .digit:before{ content:""; position:absolute; inset:0; background: var(--clock-glass-bg); pointer-events:none; }
+  .digit .top,.digit .bottom{ position:absolute; left:0; right:0; height:50%; overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden; }
+  .digit .top{ top:0; border-bottom:1px solid var(--split-line); }
+  .digit .bottom{ bottom:0; border-top:1px solid var(--split-line); }
+  .value{ position:absolute; left:0; right:0; height:var(--digit-h); display:flex; align-items:center; justify-content:center; font-weight:900; color:var(--clock-text); font-size: calc(var(--digit-h)*.70); line-height:var(--digit-h); text-shadow: 0 2px 8px rgba(0,0,0,.22); }
+  .top .value,.top-flip .value{ clip-path: inset(0 0 50% 0); transform: translateY(0); }
+  .bottom .value,.bottom-flip .value{ clip-path: inset(50% 0 0 0); transform: translateY(-50%); }
+  .top-flip,.bottom-flip{ position:absolute; left:0; right:0; height:50%; overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden; background:inherit; }
+  .top-flip{ top:0; transform-origin:bottom; border-bottom:1px solid var(--split-line); animation: topFlip .26s ease-in forwards; }
+  .bottom-flip{ bottom:0; transform-origin:top; border-top:1px solid var(--split-line); animation: bottomFlip .26s ease-out forwards; }
+  @keyframes topFlip{ 0%{transform:rotateX(0)} 100%{transform:rotateX(-90deg)} }
+  @keyframes bottomFlip{ 0%{transform:rotateX(90deg)} 100%{transform:rotateX(0)} }
+  .colon{ display:flex; align-items:center; justify-content:center; width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); font-weight:900; color:var(--colon-color); text-shadow:0 2px 6px rgba(0,0,0,.3); flex:0 0 auto; }
+
+  /* Transparent mode for flip cards (kept but not exposed in UI) */
+  .clock-transparent .digit{
+    background: transparent !important;
+    border-color: rgba(255,255,255,.28) !important;
+    box-shadow: 0 10px 28px rgba(0,0,0,.22) !important;
+    backdrop-filter: none !important;
+  }
+  .clock-transparent .digit:before{ background: transparent !important; }
+  .clock-transparent .digit .top{ border-bottom:1px solid rgba(255,255,255,.25); }
+  .clock-transparent .digit .bottom{ border-top:1px solid rgba(255,255,255,.25); }
+
+  /* ===== Simple clock ===== */
+  #simpleTimer{
+    display:none; font-weight:900; letter-spacing:.04em; font-size:min(12vw,160px);
+    color:var(--simple-color); text-shadow:0 0 10px rgba(0,0,0,.25), 0 12px 32px rgba(0,0,0,.25);
+  }
+
+  /* ===== Candle ===== */
+  #candle-area{ display:flex; align-items:flex-end; justify-content:flex-end; height:max(380px,42vh); position:relative; transform: translateY(var(--candle-offset)); }
+  .candle-clip{ position:relative; width:180px; height:380px; overflow:hidden; display:flex; align-items:flex-end; justify-content:center; }
+  .candle-wrap{ position:absolute; inset:auto 0 0 0; margin:auto; width:180px; height:380px; display:flex; align-items:flex-end; justify-content:center; transition: transform .5s ease, opacity .5s ease; }
+  .candle-wrap.vanish{ transform: scale(.85) translateY(12px); opacity: 0; pointer-events:none; }
+  .wax{ position:absolute; bottom:0; width:150px; height:100%; z-index:1; border-radius:22px; background: radial-gradient(120px 26px at 75px 6px, rgba(255,255,255,.70), transparent 62%), linear-gradient(180deg, rgba(255,255,255,.18), rgba(0,0,0,0) 24%), linear-gradient(180deg,#ffffff33,#00000022 40%,#00000028 100%), linear-gradient(180deg,var(--wax), #e6d9bb); transition: height .22s linear; }
+  .waxTop{ position:absolute; top:-22px; left:50%; transform:translateX(-50%); width:150px; height:44px; pointer-events:none; z-index:3; background: conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,.33) 0deg, rgba(255,255,255,.10) 70deg, rgba(0,0,0,.08) 180deg, rgba(255,255,255,.20) 300deg, rgba(255,255,255,.33) 360deg), radial-gradient(65% 55% at 50% 62%, rgba(255,255,255,.52), rgba(255,255,255,.12) 60%, rgba(0,0,0,.10) 100%); }
+  .wax:after{ content:""; position:absolute; top:30px; left:24px; width:12px; height:64px; border-radius:10px; background: linear-gradient(180deg,#fff6,#0000 60%), var(--wax); box-shadow: 44px 8px 0 -3px var(--wax), 44px 8px 0 -3px #fff6, 92px 12px 0 -6px var(--wax), 92px 12px 0 -6px #fff6; opacity:.85; }
+  .wick{ position:absolute; width:6px; height:30px; background:linear-gradient(180deg,#444,var(--wick)); border-radius:4px; top:-12px; left:50%; transform:translateX(-50%); z-index:4; }
+
+  /* Flame anchored to wick center */
+  .flame{
+    position:absolute; width:52px; height:110px; z-index:6; pointer-events:none;
+    left:0; top:0; transform: translate(-50%,-100%) translateY(10px);
+  }
+  .flame-core{
+    position:absolute; inset:0; border-radius:50% 50% 38% 38%;
+    background: radial-gradient(ellipse at 50% 22%, #fff7c0 0%, #ffe08a 38%, #ffb347 58%, #ff7a00 78%, transparent 80%),
+                radial-gradient(ellipse at 50% 45%, #ffffff 0%, transparent 65%);
+    box-shadow:0 0 18px 6px rgba(255,170,40,.55), 0 0 36px 14px rgba(255,140,0,.40), 0 -20px 28px rgba(255,220,170,.40);
+    animation: flickerSoft .6s ease-in-out infinite;
+  }
+  @keyframes flickerSoft{ 0%{ transform:scale(1) rotate(-0.8deg); opacity:.95 } 50%{ transform:scale(1.06) rotate(0.6deg); opacity:.82 } 100%{ transform:scale(1) rotate(-0.8deg); opacity:.95 } }
+  .flame.off .flame-core{ opacity:0 !important; animation-play-state: paused !important; }
+
+  .stub{ display:none; position:absolute; bottom:0; width:150px; height:58px; background:linear-gradient(180deg,#9a9a9a,#6f6f6f); border-radius:0 0 22px 22px; z-index:1; }
+
+  /* ===== Controls (glass) ===== */
+  #controls{
+    position:relative; display:grid; grid-auto-flow:column; grid-auto-columns:minmax(260px,1fr); gap:14px; padding:16px;
+    background:rgba(0,0,0,.22); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    overflow-x:auto; border-top-left-radius:16px; border-top-right-radius:16px; z-index:10; min-height:200px;
+  }
+  .card{
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:12px; min-height:164px;
+    display:flex; flex-direction:column; gap:8px; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+  }
+  .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  label{ font-size:12px; color:#fff; opacity:.95 }
+  input[type="number"],input[type="color"],input[type="file"]{
+    width:100%; padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.35); color:#fff; outline:none;
+  }
+  input[type="checkbox"]{ transform:scale(1.2) }
+  .btn{ padding:12px 18px; border-radius:12px; border:none; font-weight:800; cursor:pointer; font-family:inherit; background:linear-gradient(135deg,#ffd166,#ff9a00); color:#1b1b1b; box-shadow:0 6px 16px rgba(0,0,0,.18); transition:transform .12s, box-shadow .2s, background .2s; }
+  .btn:hover{ background:linear-gradient(135deg,#ffe08a,#ffb347); box-shadow:0 10px 24px rgba(0,0,0,.28); }
+  .btn:active{ transform: translateY(1px) scale(.99); }
+  .btn.alt{ background:linear-gradient(135deg,#a5b4fc,#6366f1); color:#0d0d15; }
+  .btn.warn{ background:linear-gradient(135deg,#fca5a5,#ef4444); color:#0d0d15; }
+  .btn.small{ padding:8px 10px; border-radius:10px; font-weight:900; }
+  .btn.wide{ min-width:110px; }
+
+  @media (max-width:980px){
+    :root{ --digit-w:100px; --digit-h:140px; }
+    #todo-panel{ max-width:62vw; }
+  }
+  @media (max-width:720px){
+    :root{ --digit-w:86px; --digit-h:120px; }
+    #todo-panel{ max-width:72vw; }
+  }
+
+  .no-transitions, .no-transitions *{ transition: none !important; animation: none !important; }
+
+  /* ===== 3-2-1 Count-in Overlay ===== */
+  #countOverlay{
+    position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+    background: rgba(0,0,0,0.35); z-index:100; backdrop-filter: blur(2px);
+  }
+  #countInner{
+    color:#fff; font-weight:900; font-size:min(22vw, 280px); line-height:1;
+    text-shadow: 0 6px 22px rgba(0,0,0,.45);
+  }
+  .pop{ animation: pop .72s ease forwards; }
+  @keyframes pop{
+    0%{ transform:scale(.6); opacity:0 }
+    35%{ transform:scale(1.08); opacity:1 }
+    65%{ transform:scale(.96) }
+    100%{ transform:scale(1) }
+  }
+
+  /* ===== Congrats Overlay with Balloons ===== */
+  #congrats{
+    position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:120;
+    background: radial-gradient(120% 120% at 50% 20%, rgba(0,0,0,.15), rgba(0,0,0,.45));
+    overflow:hidden;
+  }
+  #cgCard{
+    position:relative; padding:28px 32px; border-radius:18px;
+    background: rgba(255,255,255,.12); color:#fff; text-align:center;
+    border: 1px solid rgba(255,255,255,.25);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 14px 44px rgba(0,0,0,.35);
+  }
+  #cgTitle{ margin:0 0 6px 0; font-size: clamp(28px, 6vw, 46px); font-weight:900; letter-spacing:.4px; }
+  #cgMsg{ margin:0 0 14px 0; opacity:.95; font-size: clamp(14px, 2.4vw, 18px) }
+  #cgClose{
+    appearance:none; cursor:pointer; border:none; border-radius:12px;
+    padding:10px 14px; font-weight:900; background:#fff; color:#111;
+    box-shadow:0 6px 16px rgba(0,0,0,.2);
+  }
+  .balloon{
+    position:absolute; bottom:-20vh; width:28px; height:36px;
+    border-radius:50% 50% 46% 46%; background: var(--bcol, #ff6b6b);
+    box-shadow: inset 0 -8px 14px rgba(0,0,0,.18), 0 10px 24px rgba(0,0,0,.18);
+    animation: rise var(--dur, 8s) linear infinite;
+  }
+  .balloon:after{
+    content:""; position:absolute; left:50%; bottom:-12px; width:2px; height:48px;
+    background: rgba(255,255,255,.75); transform:translateX(-50%); opacity:.85;
+  }
+  @keyframes rise{
+    0%{ transform: translateY(0) translateX(0) scale(1); opacity:0 }
+    10%{ opacity:1 }
+    60%{ transform: translateY(-60vh) translateX(var(--drift, 10px)) scale(1.02) }
+    100%{ transform: translateY(-110vh) translateX(var(--drift, 10px)) scale(1.04); opacity:0 }
+  }
+
+  /* ===== Fullscreen: hide brand + controls only ===== */
+  .is-fs .brand,
+  .is-fs #controls{ display:none !important; }
+</style>
 </head>
 <body>
+  <div class="brand">MADE BY ANABRATA V2.0</div>
 
-  <h1>🙏 Thank You for Your Support!</h1>
-  <p>Your donation helps us continue our mission ❤️</p>
+  <div class="main" id="main">
+    <!-- Timer -->
+    <section id="timer-container" aria-label="Timer">
+      <div id="timer"></div>
+      <div id="simpleTimer">00:00</div>
+    </section>
 
-  <div class="qr-card">
-    <img id="qrImage" src="" alt="Donation QR Code">
+    <!-- To‑do -->
+    <section id="todo-panel" class="todo-clear" aria-label="To‑do list">
+      <h4 id="todoTitle">To‑do</h4>
+      <ol id="todoList"></ol>
+    </section>
+
+    <!-- Candle -->
+    <section id="candle-area" aria-label="Candle">
+      <div class="candle-clip">
+        <div class="candle-wrap" id="candleWrap">
+          <div class="wax" id="wax">
+            <div class="waxTop"></div>
+            <div class="wick" id="wick"></div>
+          </div>
+          <div class="stub" id="stub"></div>
+        </div>
+      </div>
+      <div class="flame" id="flame"><div class="flame-core"></div></div>
+    </section>
   </div>
 
-  <p class="footer">Scan the QR code to donate and make a difference ✨</p>
+  <!-- Controls -->
+  <div id="controls">
+    <div class="card">
+      <label class="small">Timer</label>
+      <div class="row">
+        <div style="flex:1"><label for="hoursInput">Hours</label><input id="hoursInput" type="number" min="0" value="0"></div>
+        <div style="flex:1"><label for="minInput">Minutes</label><input id="minInput" type="number" min="0" value="1"></div>
+        <div style="flex:1"><label for="secInput">Seconds</label><input id="secInput" type="number" min="0" max="59" value="0"></div>
+      </div>
+      <div class="row">
+        <label><input type="checkbox" id="showHours"> Show hours</label>
+        <label><input type="checkbox" id="showSeconds" checked> Show seconds</label>
+        <label><input type="checkbox" id="useFlip" checked> Use flip style</label>
+      </div>
+      <div class="row">
+        <button id="primaryBtn" class="btn wide">Start</button>
+        <button id="resetBtn" class="btn alt wide">Reset</button>
+        <button id="fsBtn" class="btn warn wide">Fullscreen</button>
+      </div>
+    </div>
 
-  <script>
-     // Replace this string with the base64-encoded QR image if updating
-     const base64QR = "REPLACE_WITH_YOUR_BASE64_DATA_URI";
+    <div class="card">
+      <label class="small">Background gradient</label>
+      <div class="row">
+        <div style="flex:1"><label for="bgAngle">Angle</label><input id="bgAngle" type="number" min="0" max="360" value="135"></div>
+        <div style="flex:1"><label for="bgC1">Color 1</label><input id="bgC1" type="color" value="#3a1c71"></div>
+        <div style="flex:1"><label for="bgC2">Color 2</label><input id="bgC2" type="color" value="#d76d77"></div>
+        <div style="flex:1"><label for="bgC3">Color 3</label><input id="bgC3" type="color" value="#ffaf7b"></div>
+      </div>
+      <div class="row">
+        <div style="flex:1; display:flex; gap:8px; align-items:center">
+          <div style="flex:1">
+            <label for="todoColor">To‑do list color</label>
+            <input id="todoColor" type="color" value="#ffffff">
+          </div>
+          <button id="todoApply" class="btn small">Apply</button>
+          <button id="todoClear" class="btn small" title="Transparent">Clear</button>
+        </div>
+      </div>
+      <div class="row">
+        <label><input type="checkbox" id="todoGlass" checked> To‑do transparency effect</label>
+      </div>
+    </div>
 
-     const imgTag = document.getElementById('qrImage');
-     imgTag.src = base64QR;
-  </script>
+    <div class="card">
+      <label class="small">Media &amp; background</label>
+      <div class="row" style="gap:8px; align-items:center">
+        <button id="addMusicBtn" class="btn alt small">Add music</button>
+        <input id="musicFiles" type="file" accept="audio/*" multiple style="display:none" />
+        <button id="musicPrev" class="btn small" title="Previous">⏮</button>
+        <button id="musicPlay" class="btn small" title="Play/Pause">▶</button>
+        <button id="musicNext" class="btn small" title="Next">⏭</button>
+        <label style="margin-left:4px"><input type="checkbox" id="musicLoop" checked> Loop</label>
+        <span id="musicNow" style="color:#fff; font-size:12px; opacity:.95; max-width:220px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis"></span>
+      </div>
+      <div class="row" style="gap:8px; align-items:center; margin-top:6px">
+        <button id="bgImageBtn" class="btn small">Custom image</button>
+        <input id="bgImageFile" type="file" accept="image/*" style="display:none" />
+        <button id="bgImageClear" class="btn small">Clear image</button>
+        <span id="bgImageName" style="color:#fff; font-size:12px; opacity:.95; max-width:240px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="small">Flip clock colors</label>
+      <div class="row">
+        <div style="flex:1"><label for="clockC1">Panel 1</label><input id="clockC1" type="color" value="#ffffff"></div>
+        <div style="flex:1"><label for="clockC2">Panel 2</label><input id="clockC2" type="color" value="#ffffff"></div>
+        <div style="flex:1"><label for="clockC3">Panel 3</label><input id="clockC3" type="color" value="#ffffff"></div>
+      </div>
+      <div class="row">
+        <div style="flex:1"><label for="textColor">Digit color</label><input id="textColor" type="color" value="#000000"></div>
+        <div style="flex:1"><label for="colonColor">Colon color</label><input id="colonColor" type="color" value="#ffffff"></div>
+      </div>
+      <!-- Transparent flip cards option removed intentionally -->
+      <div class="row">
+        <div style="flex:1"><label for="simpleColor">Simple timer color</label><input id="simpleColor" type="color" value="#ffffff"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="small">Layout</label>
+      <div class="row">
+        <label><input type="checkbox" id="hideCandle"> Hide candle</label>
+        <label><input type="checkbox" id="centerClock"> Center clock</label>
+        <label><input type="checkbox" id="onlyCandle"> Only candle mode</label>
+        <label><input type="checkbox" id="showTodo" checked> Show to‑do list</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3-2-1 overlay -->
+  <div id="countOverlay" aria-hidden="true">
+    <div id="countInner" class="pop">3</div>
+  </div>
+
+  <!-- Congrats overlay with balloons -->
+  <div id="congrats" aria-modal="true" role="dialog">
+    <div id="cgCard">
+      <h2 id="cgTitle">Congratulations!</h2>
+      <p id="cgMsg">Timer complete 🥰</p>
+      <button id="cgClose">Close</button>
+    </div>
+    <!-- Balloons -->
+    <div class="balloon" style="left:6%;  --bcol:#ff6b6b; --dur:9s;  --drift:12px"></div>
+    <div class="balloon" style="left:14%; --bcol:#ffd166; --dur:8.5s;--drift:-10px"></div>
+    <div class="balloon" style="left:22%; --bcol:#06d6a0; --dur:10s; --drift:8px"></div>
+    <div class="balloon" style="left:30%; --bcol:#a78bfa; --dur:8.8s;--drift:-6px"></div>
+    <div class="balloon" style="left:38%; --bcol:#f472b6; --dur:9.4s;--drift:16px"></div>
+    <div class="balloon" style="left:46%; --bcol:#60a5fa; --dur:8.2s;--drift:-12px"></div>
+    <div class="balloon" style="left:54%; --bcol:#f59e0b; --dur:9.8s;--drift:18px"></div>
+    <div class="balloon" style="left:62%; --bcol:#34d399; --dur:8.6s;--drift:-14px"></div>
+    <div class="balloon" style="left:70%; --bcol:#f87171; --dur:10.4s;--drift:10px"></div>
+    <div class="balloon" style="left:78%; --bcol:#93c5fd; --dur:8.1s;--drift:-8px"></div>
+    <div class="balloon" style="left:86%; --bcol:#f472b6; --dur:9.2s;--drift:14px"></div>
+    <div class="balloon" style="left:94%; --bcol:#06d6a0; --dur:10.6s;--drift:-16px"></div>
+  </div>
+
+<script>
+  const $ = (s) => document.querySelector(s);
+
+  /* ---------- Utilities ---------- */
+  function afterNextPaint(cb){
+    requestAnimationFrame(() => requestAnimationFrame(cb));
+  }
+
+  /* ---------- Background & colors ---------- */
+  const gradientStr = (a, c1, c2, c3) => `linear-gradient(${a}deg, ${c1}, ${c2}, ${c3})`;
+  let bgObjectUrl = null;
+
+  function applyGradient(){
+    if (bgObjectUrl){
+      URL.revokeObjectURL(bgObjectUrl);
+      bgObjectUrl = null;
+      const nameEl = $("#bgImageName"); if (nameEl) nameEl.textContent = "";
+    }
+    const ang = parseInt($("#bgAngle")?.value || "135", 10);
+    document.body.style.backgroundImage = gradientStr(ang, $("#bgC1")?.value || "#3a1c71", $("#bgC2")?.value || "#d76d77", $("#bgC3")?.value || "#ffaf7b");
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+    document.body.style.backgroundAttachment = "fixed";
+  }
+
+  function setTodoBg(val){
+    document.documentElement.style.setProperty("--todo-bg", val);
+  }
+
+  function applyWax(){
+    document.documentElement.style.setProperty("--wax", $("#waxColor")?.value || "#f2e4c7");
+  }
+
+  function restyleClockPanels(){
+    if (!$("#clockC1")) return;
+    document.documentElement.style.setProperty("--clock-c1", $("#clockC1").value);
+    document.documentElement.style.setProperty("--clock-c2", $("#clockC2").value);
+    document.documentElement.style.setProperty("--clock-c3", $("#clockC3").value);
+    document.documentElement.style.setProperty("--clock-text", $("#textColor").value);
+    document.documentElement.style.setProperty("--colon-color", $("#colonColor").value);
+    document.documentElement.style.setProperty("--simple-color", $("#simpleColor")?.value || "#ffffff");
+  }
+
+  /* ---------- Flip clock ---------- */
+  function createDigit(initial = "0"){
+    const d = document.createElement("div");
+    d.className = "digit";
+    d.dataset.value = initial;
+
+    const top = document.createElement("div");
+    top.className = "top";
+    const t = document.createElement("span");
+    t.className = "value";
+    t.textContent = initial;
+    top.appendChild(t);
+
+    const bottom = document.createElement("div");
+    bottom.className = "bottom";
+    const b = document.createElement("span");
+    b.className = "value";
+    b.textContent = initial;
+    bottom.appendChild(b);
+
+    d.appendChild(top);
+    d.appendChild(bottom);
+    return d;
+  }
+
+  function flipTo(digitEl, newVal){
+    const cur = digitEl.dataset.value || "0";
+    if (cur === newVal) return;
+
+    const topVal = digitEl.querySelector(".top .value");
+    const botVal = digitEl.querySelector(".bottom .value");
+
+    const topFlip = document.createElement("div");
+    topFlip.className = "top-flip";
+    const t = document.createElement("span");
+    t.className = "value";
+    t.textContent = cur;
+    topFlip.appendChild(t);
+
+    topVal.textContent = cur;
+    botVal.textContent = cur;
+    digitEl.appendChild(topFlip);
+
+    topFlip.addEventListener("animationend", () => {
+      topVal.textContent = newVal;
+      topFlip.remove();
+      const bottomFlip = document.createElement("div");
+      bottomFlip.className = "bottom-flip";
+      const b = document.createElement("span");
+      b.className = "value";
+      b.textContent = newVal;
+      bottomFlip.appendChild(b);
+      digitEl.appendChild(bottomFlip);
+      bottomFlip.addEventListener("animationend", () => {
+        botVal.textContent = newVal;
+        digitEl.dataset.value = newVal;
+        bottomFlip.remove();
+      });
+    });
+  }
+
+  function buildFlip(container, showH = true, showS = true){
+    container.innerHTML = "";
+    const digits = [];
+    const addDigit = () => {
+      const d = createDigit("0");
+      container.appendChild(d);
+      digits.push(d);
+    };
+    const addColon = () => {
+      const c = document.createElement("div");
+      c.className = "colon";
+      c.textContent = ":";
+      container.appendChild(c);
+    };
+    if (showH){ addDigit(); addDigit(); addColon(); }
+    addDigit(); addDigit();
+    if (showS){ addColon(); addDigit(); addDigit(); }
+    return digits;
+  }
+
+  function timeArray(sec, showH, showS){
+    let h = Math.floor(sec / 3600);
+    let m = Math.floor((sec % 3600) / 60);
+    let s = Math.max(0, sec % 60);
+    h = Math.min(h, 99);
+    const arr = [];
+    if (showH) arr.push(...String(h).padStart(2, "0"));
+    arr.push(...String(m).padStart(2, "0"));
+    if (showS) arr.push(...String(s).padStart(2, "0"));
+    return arr;
+  }
+
+  function tickFlip(digits, sec, showH, showS){
+    const arr = timeArray(sec, showH, showS);
+    digits.forEach((d, i) => flipTo(d, arr[i] || "0"));
+  }
+
+  /* ---------- Simple clock ---------- */
+  function renderSimple(sec){
+    const sH = $("#showHours")?.checked;
+    const sS = $("#showSeconds")?.checked;
+    const out = sH
+      ? `${String(Math.floor(sec / 3600)).padStart(2, "0")}:${String(Math.floor((sec % 3600) / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`
+      : `${String(Math.floor(sec / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`;
+    $("#simpleTimer").textContent = out;
+  }
+
+  /* ---------- Countdown state ---------- */
+  const timerFlip = $("#timer");
+  const timerSimple = $("#simpleTimer");
+  const primaryBtn = $("#primaryBtn");
+
+  let flipDigits = [];
+  let useFlip = true;
+  let totalSec = 0;
+  let endAtMs = 0;
+  let rafId = null;
+  let lastWhole = -1;
+  let running = false;
+  let paused = false;
+  let pauseRemainMs = 0;
+  let countInActive = false;
+
+  function safeBuildClock(){
+    useFlip = $("#useFlip")?.checked ?? true;
+    if (useFlip){
+      timerFlip.style.display = "flex";
+      timerSimple.style.display = "none";
+      flipDigits = buildFlip(timerFlip, $("#showHours")?.checked ?? false, $("#showSeconds")?.checked ?? true);
+      tickFlip(flipDigits, 0, $("#showHours")?.checked ?? false, $("#showSeconds")?.checked ?? true);
+    }else{
+      timerFlip.style.display = "none";
+      timerSimple.style.display = "block";
+      renderSimple(0);
+    }
+  }
+
+  function ensureVisible(){
+    if ($("#showTodo")?.checked && !document.body.classList.contains("todo-on")){
+      document.body.classList.add("todo-on");
+    }
+    if (($("#useFlip")?.checked ?? true) && timerFlip.style.display !== "none" && timerFlip.children.length === 0){
+      safeBuildClock();
+    }
+  }
+
+  function startCountdown(){
+    const h = Math.max(0, parseInt($("#hoursInput")?.value || "0", 10));
+    const m = Math.max(0, parseInt($("#minInput")?.value || "0", 10));
+    const s = Math.max(0, Math.min(59, parseInt($("#secInput")?.value || "0", 10)));
+    totalSec = h * 3600 + m * 60 + s;
+
+    candleWrap.classList.remove("vanish");
+    stubEl.style.display = "none";
+    flameEl.classList.remove("off");
+    setWaxHeightByProgress(1);
+    afterNextPaint(positionFlame);
+
+    const showH = $("#showHours")?.checked ?? false;
+    const showS = $("#showSeconds")?.checked ?? true;
+    if (useFlip){
+      flipDigits = buildFlip(timerFlip, showH, showS);
+      tickFlip(flipDigits, totalSec, showH, showS);
+    }else{
+      renderSimple(totalSec);
+    }
+
+    cancelAnimationFrame(rafId);
+    paused = false;
+    running = false;
+
+    if (totalSec <= 0){ finishNow(); return; }
+    endAtMs = performance.now() + totalSec * 1000;
+    lastWhole = Math.ceil(totalSec);
+    running = true;
+    primaryBtn.textContent = "Stop";
+    rafId = requestAnimationFrame(loop);
+  }
+
+  function loop(now){
+    if (!running) return;
+    const remainMs = Math.max(0, endAtMs - now);
+    const secWhole = Math.floor(remainMs / 1000);
+
+    if (secWhole !== lastWhole){
+      if (useFlip){
+        tickFlip(flipDigits, secWhole, $("#showHours")?.checked ?? false, $("#showSeconds")?.checked ?? true);
+      }else{
+        renderSimple(secWhole);
+      }
+      lastWhole = secWhole;
+    }
+
+    const p = totalSec > 0 ? remainMs / (totalSec * 1000) : 0;
+    setWaxHeightByProgress(p);
+    positionFlame();
+
+    if (remainMs <= 0){ finishNow(); return; }
+    rafId = requestAnimationFrame(loop);
+  }
+
+  async function startWithCountIn(){
+    if (countInActive) return;
+    countInActive = true;
+    primaryBtn.disabled = true;
+
+    const ov = $("#countOverlay");
+    const num = $("#countInner");
+    ov.style.display = "flex";
+
+    const steps = ["3","2","1","Go!"];
+    for (let i=0; i<steps.length; i++){
+      num.textContent = steps[i];
+      num.classList.remove("pop");
+      void num.offsetWidth;
+      num.classList.add("pop");
+      await new Promise(r => setTimeout(r, i < steps.length-1 ? 760 : 560));
+    }
+
+    ov.style.display = "none";
+    primaryBtn.disabled = false;
+    countInActive = false;
+    startCountdown();
+  }
+
+  function togglePrimary(){
+    if (!running && !paused){ startWithCountIn(); return; }
+    if (running){
+      cancelAnimationFrame(rafId);
+      pauseRemainMs = Math.max(0, endAtMs - performance.now());
+      paused = true; running = false; primaryBtn.textContent = "Resume"; afterNextPaint(positionFlame); return;
+    }
+    if (paused){
+      endAtMs = performance.now() + pauseRemainMs; lastWhole = Math.floor(pauseRemainMs / 1000);
+      paused = false; running = true; primaryBtn.textContent = "Stop"; afterNextPaint(positionFlame);
+      rafId = requestAnimationFrame(loop);
+    }
+  }
+
+  function resetCountdown(){
+    cancelAnimationFrame(rafId); running=false; paused=false; primaryBtn.textContent="Start";
+    safeBuildClock(); snapResetCandle(); hideCongrats();
+    $("#countOverlay").style.display = "none"; countInActive = false;
+    afterNextPaint(ensureVisible);
+  }
+
+  function finishNow(){
+    cancelAnimationFrame(rafId); running=false; paused=false;
+    flameEl.classList.add("off"); candleWrap.classList.add("vanish"); showCongrats(); primaryBtn.textContent="Start";
+  }
+
+  /* ---------- Candle & flame positioning ---------- */
+  const area = $("#candle-area");
+  const waxEl = $("#wax");
+  const wickEl = $("#wick");
+  const flameEl = $("#flame");
+  const candleWrap = $("#candleWrap");
+  const stubEl = $("#stub");
+
+  const baseWaxHeight = 380;
+  const minStub = 58;
+
+  function positionFlame(){
+    if (!area || getComputedStyle(area).display === "none") return;
+    const a = area.getBoundingClientRect();
+    const w = wickEl.getBoundingClientRect();
+    const cx = w.left + w.width / 2 - a.left;
+    const topAnchor = w.top - a.top;
+    flameEl.style.left = `${cx}px`;
+    flameEl.style.top = `${topAnchor + 6}px`;
+  }
+
+  function setWaxHeightByProgress(progress){
+    const usable = baseWaxHeight - minStub;
+    const h = minStub + Math.max(0, usable * progress);
+    waxEl.style.height = `${h}px`;
+  }
+
+  function snapResetCandle(){
+    candleWrap.classList.add("no-transitions"); waxEl.classList.add("no-transitions");
+    candleWrap.classList.remove("vanish"); stubEl.style.display="none"; flameEl.classList.remove("off");
+    setWaxHeightByProgress(1); void candleWrap.offsetHeight; positionFlame();
+    requestAnimationFrame(()=>{ candleWrap.classList.remove("no-transitions"); waxEl.classList.remove("no-transitions"); });
+  }
+
+  new ResizeObserver(()=> requestAnimationFrame(()=>positionFlame())).observe(area);
+  new MutationObserver(()=> requestAnimationFrame(()=>positionFlame())).observe(document.body,{attributes:true,attributeFilter:["class"]});
+  waxEl.addEventListener("transitionend", ()=> requestAnimationFrame(()=>positionFlame()));
+  window.addEventListener("resize", () => requestAnimationFrame(() => positionFlame()));
+
+  /* ---------- Congrats overlay ---------- */
+  const congrats = $("#congrats");
+  $("#cgClose")?.addEventListener("click", () => { if (congrats) congrats.style.display = "none"; });
+  function showCongrats(){ if (congrats) congrats.style.display = "flex"; }
+  function hideCongrats(){ if (congrats) congrats.style.display = "none"; }
+
+  /* ---------- Fullscreen ---------- */
+  async function enterFullscreen(){
+    try{
+      if (!document.fullscreenElement){ await document.documentElement.requestFullscreen?.(); }
+      else { await document.exitFullscreen?.(); }
+    }catch(e){}
+  }
+  $("#fsBtn").addEventListener("click", enterFullscreen);
+  document.addEventListener("fullscreenchange", () => { document.body.classList.toggle("is-fs", !!document.fullscreenElement); });
+
+  /* ---------- To‑do logic ---------- */
+  const todoList = $("#todoList");
+  function makeTodoItem(text = ""){
+    const li = document.createElement("li");
+    const label = document.createElement("label"); label.className = "todoItem";
+    const chk = document.createElement("input"); chk.type = "checkbox"; chk.className = "todoChk";
+    const span = document.createElement("span"); span.className = "todoText"; span.contentEditable = "true"; span.spellcheck = false; span.textContent = text;
+    label.appendChild(chk); label.appendChild(span); li.appendChild(label); return li;
+  }
+  function spanFocus(el){ el.focus(); const r=document.createRange(); r.selectNodeContents(el); r.collapse(false); const s=window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+  function addEmptyIfNeeded(){ if(!todoList.firstElementChild){ const li=makeTodoItem(""); todoList.appendChild(li); spanFocus(li.querySelector(".todoText")); } }
+  todoList.addEventListener("keydown",(e)=>{
+    if(!e.target.classList?.contains("todoText")) return;
+    if(e.key==="Enter"){ if(e.shiftKey) return; e.preventDefault(); const li=e.target.closest("li"); const n=makeTodoItem(""); li.after(n); spanFocus(n.querySelector(".todoText")); }
+    if(e.key==="Backspace" && e.target.textContent.trim()===""){ const li=e.target.closest("li"); const prev=li.previousElementSibling?.querySelector(".todoText"); if(prev){ e.preventDefault(); li.remove(); spanFocus(prev);} addEmptyIfNeeded(); }
+  });
+  todoList.addEventListener("change",(e)=>{ if(!e.target.classList?.contains("todoChk")) return; const li=e.target.closest("li"); li.classList.add("vanish"); setTimeout(()=>{ li.remove(); addEmptyIfNeeded(); },160); });
+
+  /* ---------- Music ---------- */
+  const musicFiles = $("#musicFiles");
+  const musicNow = $("#musicNow");
+  const musicPlayBtn = $("#musicPlay");
+  const audio = new Audio(); audio.preload="metadata";
+  let playlist=[], trackIndex=0; const objectUrls=new Set();
+
+  function updateNow(){ if (musicNow) musicNow.textContent = playlist.length ? `${trackIndex+1}/${playlist.length} • ${playlist[trackIndex].name}` : ""; }
+  function loadPlaylist(files){ objectUrls.forEach((u)=>URL.revokeObjectURL(u)); objectUrls.clear(); playlist=[]; trackIndex=0; for(const f of files){ const url=URL.createObjectURL(f); objectUrls.add(url); playlist.push({name:f.name,url}); } updateNow(); if(playlist.length){ audio.src=playlist[trackIndex].url; } else { audio.removeAttribute("src"); } }
+  function playTrack(i){ if(!playlist.length) return; trackIndex=(i+playlist.length)%playlist.length; audio.src=playlist[trackIndex].url; audio.play().catch(()=>{}); updateNow(); if (musicPlayBtn) musicPlayBtn.textContent="⏸"; }
+  function startPlaylist(){ if(!playlist.length) return; if(!audio.src) audio.src=playlist[trackIndex].url; audio.play().then(()=>{ if (musicPlayBtn) musicPlayBtn.textContent="⏸"; }).catch(()=>{}); updateNow(); }
+  function pausePlaylist(){ audio.pause(); if (musicPlayBtn) musicPlayBtn.textContent="▶"; }
+  function nextTrack(){ if(playlist.length) playTrack(trackIndex+1); }
+  function prevTrack(){ if(playlist.length) playTrack(trackIndex-1); }
+  audio.addEventListener("ended", () => nextTrack());
+  audio.addEventListener("play", () => { if (musicPlayBtn) musicPlayBtn.textContent="⏸"; });
+  audio.addEventListener("pause", () => { if (musicPlayBtn) musicPlayBtn.textContent="▶"; });
+  $("#addMusicBtn")?.addEventListener("click", () => musicFiles?.click());
+  musicFiles?.addEventListener("change", (e)=> loadPlaylist(e.target.files));
+  $("#musicPlay")?.addEventListener("click", () => audio.paused ? startPlaylist() : pausePlaylist());
+  $("#musicNext")?.addEventListener("click", nextTrack);
+  $("#musicPrev")?.addEventListener("click", prevTrack);
+  $("#musicLoop")?.addEventListener("change", (e)=> audio.loop = !!e.target.checked);
+  window.addEventListener("unload", () => objectUrls.forEach(u=>URL.revokeObjectURL(u)));
+
+  /* ---------- Custom background image ---------- */
+  const bgImageBtn = $("#bgImageBtn"), bgImageFile = $("#bgImageFile"), bgImageClear = $("#bgImageClear"), bgImageName = $("#bgImageName");
+  bgImageBtn?.addEventListener("click", () => bgImageFile?.click());
+  bgImageFile?.addEventListener("change", (e)=>{
+    const f = e.target.files?.[0]; if (!f) return;
+    if (bgObjectUrl){ URL.revokeObjectURL(bgObjectUrl); bgObjectUrl=null; }
+    bgObjectUrl = URL.createObjectURL(f);
+    document.body.style.backgroundImage = `url("${bgObjectUrl}")`;
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+    document.body.style.backgroundAttachment = "fixed";
+    if (bgImageName) bgImageName.textContent = f.name;
+  });
+  bgImageClear?.addEventListener("click", applyGradient);
+
+  /* ---------- Layout flags ---------- */
+  function ensureCandleVisibleWhenOnlyCandle(on){
+    if (on){
+      const hc = $("#hideCandle");
+      if (hc?.checked){ hc.checked=false; document.body.classList.remove("candle-off"); }
+    }
+  }
+
+  function applyLayoutFlags(){
+    document.body.classList.toggle("candle-off", $("#hideCandle")?.checked);
+    document.body.classList.toggle("center-clock", $("#centerClock")?.checked);
+    document.body.classList.toggle("only-candle", $("#onlyCandle")?.checked);
+    document.body.classList.toggle("todo-on", $("#showTodo")?.checked);
+    safeBuildClock();
+    requestAnimationFrame(()=>{ positionFlame(); ensureVisible(); });
+  }
+
+  function previewLayout(){
+    const sh = $("#showHours")?.checked ?? false;
+    const ss = $("#showSeconds")?.checked ?? true;
+    const uf = $("#useFlip")?.checked ?? true;
+    if(uf){ flipDigits=buildFlip(timerFlip, sh, ss); tickFlip(flipDigits, 0, sh, ss); } else { renderSimple(0); }
+    requestAnimationFrame(()=>{ positionFlame(); ensureVisible(); });
+  }
+
+  /* ---------- Bindings ---------- */
+  $("#primaryBtn").addEventListener("click", togglePrimary);
+  $("#resetBtn").addEventListener("click", resetCountdown);
+
+  $("#useFlip").addEventListener("change", ()=>{ safeBuildClock(); previewLayout(); });
+  $("#showHours").addEventListener("change", previewLayout);
+  $("#showSeconds").addEventListener("change", previewLayout);
+
+  $("#hideCandle").addEventListener("change", () => applyLayoutFlags());
+  $("#centerClock").addEventListener("change", () => applyLayoutFlags());
+  $("#onlyCandle").addEventListener("change", e=>{ ensureCandleVisibleWhenOnlyCandle(e.target.checked); applyLayoutFlags(); });
+  $("#showTodo").addEventListener("change", () => applyLayoutFlags());
+
+  ["bgAngle","bgC1","bgC2","bgC3"].forEach(id=> document.getElementById(id)?.addEventListener("input", applyGradient));
+  ["clockC1","clockC2","clockC3","textColor","colonColor","simpleColor"].forEach(id=> document.getElementById(id)?.addEventListener("input", restyleClockPanels));
+
+  $("#todoApply").addEventListener("click", () =>{ setTodoBg($("#todoColor").value); $("#todo-panel").classList.remove("todo-clear"); });
+  $("#todoClear").addEventListener("click", () =>{ setTodoBg("transparent"); $("#todo-panel").classList.add("todo-clear"); });
+  $("#todoGlass").addEventListener("change", (e)=> $("#todo-panel").classList.toggle("todo-glass", e.target.checked));
+
+  /* Transparent flip cards option removed: no event listener for #clockTransparent */
+
+  /* ---------- Init ---------- */
+  (function boot(){
+    applyGradient(); restyleClockPanels(); applyWax();
+
+    // Force to‑do visible on load if toggle checked
+    if ($("#showTodo")?.checked) document.body.classList.add("todo-on");
+
+    // Apply To‑do transparency if default-checked
+    if ($("#todoGlass")?.checked) $("#todo-panel").classList.add("todo-glass");
+
+    applyLayoutFlags();
+    safeBuildClock();
+    previewLayout();
+
+    // Position flame after first paints and re-check visibility
+    afterNextPaint(()=>{ positionFlame(); ensureVisible(); });
+    setTimeout(()=>{ positionFlame(); ensureVisible(); }, 150);
+
+    setWaxHeightByProgress(1);
+
+    // Seed one empty to‑do
+    const li=makeTodoItem(""); $("#todoList").appendChild(li);
+  })();
+</script>
 </body>
 </html>
+<!-- Candle color config (optional, keep anywhere before the script below) -->
+<script id="wax-config" type="application/json">{"wax":"#fcd474"}</script>
+
+<!-- Auto-apply candle wax color -->
+<script>
+(function(){
+  const root = document.documentElement;
+
+  function normalizeHex(c){
+    if(typeof c !== 'string') return '';
+    c = c.trim();
+    if(!c) return '';
+    if(c[0] !== '#') c = '#' + c;
+    const m = c.match(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/);
+    return m ? c.toLowerCase() : '';
+  }
+
+  function readConfigTag(){
+    const el = document.getElementById('wax-config');
+    if(!el) return '';
+    try{
+      const obj = JSON.parse(el.textContent || '{}');
+      return normalizeHex(obj.wax || obj.color || '');
+    }catch(e){ return ''; }
+  }
+
+  function readQuery(){
+    const u = new URL(window.location.href);
+    const v = u.searchParams.get('wax') || '';
+    const h = new URLSearchParams(u.hash.replace(/^#/, '')).get('wax') || '';
+    return normalizeHex(v || h);
+  }
+
+  function readDataAttr(){
+    return normalizeHex(document.body?.dataset?.wax || '');
+  }
+
+  function readStored(){
+    return normalizeHex(localStorage.getItem('waxColor') || '');
+  }
+
+  const color = readQuery() || readConfigTag() || readDataAttr() || readStored() || '#d9c9a3';
+
+  root.style.setProperty('--wax', color);
+  try{ localStorage.setItem('waxColor', color); }catch(e){}
+
+  // Optional: auto-wire any color input marked for wax syncing
+  const pickers = document.querySelectorAll('input[type="color"][data-sync="wax"], #waxPicker');
+  pickers.forEach(p => {
+    p.value = color;
+    ['input','change'].forEach(ev => p.addEventListener(ev, e=>{
+      const val = normalizeHex(e.target.value);
+      if(val){
+        root.style.setProperty('--wax', val);
+        try{ localStorage.setItem('waxColor', val);}catch(_e){}
+      }
+    }));
+  });
+})();
+</script>
+<style>
+/* Hotfix: remove the ghost triangle/box above the candle top */
+.waxTop{
+  /* Make the highlight fully fade to transparent at the edges */
+  background:
+    conic-gradient(from 0deg at 50% 50%,
+      rgba(255,255,255,.33) 0deg,
+      rgba(255,255,255,.10) 70deg,
+      rgba(0,0,0,0) 180deg,
+      rgba(255,255,255,0) 300deg,
+      rgba(255,255,255,0) 360deg
+    ),
+    radial-gradient(65% 55% at 50% 62%,
+      rgba(255,255,255,.52) 0%,
+      rgba(255,255,255,.12) 60%,
+      transparent 100%
+    ) !important;
+
+  /* Clip the layer to an ellipse so no rectangular corners can show */
+  clip-path: ellipse(70% 55% at 50% 62%) !important;
+
+  /* Extra safety: mask the outside to transparent (supported in modern browsers) */
+  -webkit-mask-image: radial-gradient(75% 60% at 50% 60%, #000 68%, transparent 72%);
+          mask-image: radial-gradient(75% 60% at 50% 60%, #000 68%, transparent 72%);
+}
+
+/* If you’d rather remove the glossy top entirely, uncomment this: */
+/* .waxTop{ background: none !important; } */
+</style>
+<!-- =================================================================== -->
+<!-- ============== START: EXIT-INTENT DONATION POP-UP CODE ============== -->
+<!-- Copy and paste everything from here... -->
+
+<!-- 1. The HTML for the Pop-up Box (Initially Hidden) -->
+<div id="donate-modal-overlay">
+  <div id="donate-modal-content">
+    <span id="close-donate-modal" title="Close">&times;</span>
+    <h2>Enjoying this App?</h2>
+    <p>
+      My name is Anabrata, and I am a 16-year-old developer who built this tool.
+      Your support would help me maintain this project and build even bigger and better things in the future.
+    </p>
+    <p>
+      If you find this useful, please consider making a small donation. Every little bit helps!
+    </p>
+    <!-- IMPORTANT: Change the link below to your actual donation page URL -->
+    <a href="file:///C:/Users/123/Downloads/final_donation_page_with_new_qr.html" target="_blank" id="donate-button">
+      Donate Now
+    </a>
+  </div>
+</div>
+
+<!-- 2. The CSS to Style the Pop-up Box -->
+<style>
+  /* The semi-transparent background overlay */
+  #donate-modal-overlay {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place even when scrolling */
+    z-index: 9999; /* Sit on top of everything else */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Black background with opacity */
+    -webkit-backdrop-filter: blur(5px); /* Optional: blur the background */
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s;
+  }
+
+  /* The pop-up box itself */
+  #donate-modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #2c2c2e; /* Dark background for the box */
+    color: #f2f2f7; /* Light text color */
+    padding: 30px 40px;
+    border: 1px solid #444;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    animation: slideIn 0.4s ease-out;
+  }
+  
+  #donate-modal-content h2 {
+    margin-top: 0;
+    color: #ffffff;
+    font-size: 24px;
+  }
+  
+  #donate-modal-content p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  /* The Close Button (X) */
+  #close-donate-modal {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  #close-donate-modal:hover {
+    color: #fff;
+  }
+
+  /* The Donate Button */
+  #donate-button {
+    display: inline-block;
+    background-color: #007aff; /* A nice blue color */
+    color: white;
+    padding: 12px 30px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  #donate-button:hover {
+    background-color: #0a84ff; /* A slightly lighter blue on hover */
+  }
+  
+  /* Animations for the pop-up */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes slideIn {
+    from { top: 40%; opacity: 0; }
+    to { top: 50%; opacity: 1; }
+  }
+
+</style>
+
+<!-- 3. The JavaScript to Control the Pop-up -->
+<script>
+  (function() {
+    const modal = document.getElementById('donate-modal-overlay');
+    const closeButton = document.getElementById('close-donate-modal');
+    let hasBeenShown = false; // Flag to ensure it only shows once per page visit
+
+    // Function to show the modal
+    function showModal() {
+      if (!hasBeenShown) {
+        modal.style.display = 'block';
+        hasBeenShown = true;
+      }
+    }
+
+    // Function to hide the modal
+    function hideModal() {
+      modal.style.display = 'none';
+    }
+
+    // --- EVENT LISTENERS ---
+
+    // Listen for the mouse leaving the document window (the trigger)
+    document.addEventListener('mouseout', function(e) {
+      // e.toElement === null and e.relatedTarget === null means the mouse left the window
+      if (!e.toElement && !e.relatedTarget) {
+        showModal();
+      }
+    });
+
+    // Hide the modal if the close button (X) is clicked
+    closeButton.addEventListener('click', hideModal);
+
+    // Hide the modal if the user clicks on the dark overlay background
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        hideModal();
+      }
+    });
+
+  })(); // We wrap the script in a function to avoid conflicts with your other code
+</script>
+
+<!-- ...to here, right before your </body> tag -->
+<!-- =============== END: EXIT-INTENT DONATION POP-UP CODE =============== -->
+<!-- ===================================================================== -->
