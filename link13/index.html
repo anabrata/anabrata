@@ -281,16 +281,19 @@
   /* ===== Real Time Mode ===== */
   .real-time-mode {
     display: flex !important;
-    flex-direction: column;
-    align-items: center;
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     justify-content: center;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-    background-image: linear-gradient(var(--bg-angle), var(--bg-c1), var(--bg-c2), var(--bg-c3)) !important;
-    background-attachment: fixed !important;
+    align-items: center;
+    z-index: 1000;
+    background-image: var(--bg-image, initial) !important;
+    background-color: var(--bg-color, initial) !important;
     background-size: cover !important;
     background-position: center !important;
+    background-attachment: fixed !important;
   }
   .real-time-mode #main,
   .real-time-mode #controls,
@@ -298,24 +301,55 @@
     display: none !important;
   }
   .real-time-mode #timer-container {
-    display: block !important;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 100;
+    position: relative !important;
+    transform: none !important;
+    left: auto !important;
+    top: auto !important;
   }
   .real-time-mode #timer {
     display: flex !important;
+    position: relative;
+    z-index: 1001;
   }
   .real-time-mode #simpleTimer {
     display: block !important;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 100;
-    font-size: min(12vw, 160px);
+    position: relative;
+    z-index: 1001;
+  }
+  .real-time-mode #candle-area {
+    display: none !important;
+  }
+  .real-time-mode #todo-panel {
+    display: none !important;
+  }
+  /* Real time clock positioning */
+  #realTimeContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  #realTimeClock {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+  #realTimeDigits {
+    font-size: 10vw;
+    font-weight: 900;
+    letter-spacing: -0.05em;
+  }
+  #realTimeDate {
+    font-size: 2vw;
+    margin-top: 10px;
+    opacity: 0.8;
   }
 </style>
 </head>
@@ -359,7 +393,6 @@
         <label><input type="checkbox" id="showHours"> Show hours</label>
         <label><input type="checkbox" id="showSeconds" checked> Show seconds</label>
         <label><input type="checkbox" id="useFlip" checked> Use flip style</label>
-        <label><input type="checkbox" id="realTimeMode"> Real Time Mode</label>
       </div>
       <div class="row">
         <button id="primaryBtn" class="btn wide">Start</button>
@@ -430,7 +463,15 @@
         <label><input type="checkbox" id="centerClock"> Center clock</label>
         <label><input type="checkbox" id="onlyCandle"> Only candle mode</label>
         <label><input type="checkbox" id="showTodo" checked> Show to‑do list</label>
+        <label><input type="checkbox" id="realTimeMode"> Real time mode</label>
       </div>
+    </div>
+  </div>
+  <!-- Real Time Mode Container -->
+  <div id="realTimeContainer">
+    <div id="realTimeClock">
+      <div id="realTimeDigits">00:00:00</div>
+      <div id="realTimeDate">Wednesday, January 1, 2024</div>
     </div>
   </div>
   <!-- 3-2-1 overlay -->
@@ -603,9 +644,6 @@
   let paused = false;
   let pauseRemainMs = 0;
   let countInActive = false;
-  let realTimeRafId = null;
-  let realTimeModeActive = false;
-
   function safeBuildClock(){
     useFlip = $("#useFlip")?.checked ?? true;
     if (useFlip){
@@ -619,64 +657,6 @@
       renderSimple(0);
     }
   }
-  
-  function updateRealTime() {
-    const now = new Date();
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
-    const seconds = now.getSeconds();
-    
-    const showH = $("#showHours")?.checked ?? false;
-    const showS = $("#showSeconds")?.checked ?? true;
-    
-    if ($("#useFlip")?.checked) {
-      const timeSec = hours * 3600 + minutes * 60 + seconds;
-      tickFlip(flipDigits, timeSec, showH, showS);
-    } else {
-      const timeStr = showH 
-        ? `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
-        : `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-      $("#simpleTimer").textContent = timeStr;
-    }
-    
-    realTimeRafId = requestAnimationFrame(updateRealTime);
-  }
-  
-  function toggleRealTimeMode() {
-    if ($("#realTimeMode")?.checked) {
-      // Enter real time mode
-      document.body.classList.add("real-time-mode");
-      realTimeModeActive = true;
-      
-      // Make sure timer container is visible
-      const timerContainer = $("#timer-container");
-      if (timerContainer) {
-        timerContainer.style.display = "block";
-        timerContainer.style.position = "absolute";
-        timerContainer.style.top = "50%";
-        timerContainer.style.left = "50%";
-        timerContainer.style.transform = "translate(-50%, -50%)";
-        timerContainer.style.zIndex = "100";
-      }
-      
-      // Build clock based on current settings
-      safeBuildClock();
-      
-      // Start updating real time
-      updateRealTime();
-    } else {
-      // Exit real time mode
-      document.body.classList.remove("real-time-mode");
-      realTimeModeActive = false;
-      
-      // Stop real time updates
-      cancelAnimationFrame(realTimeRafId);
-      
-      // Reset to countdown mode display
-      safeBuildClock();
-    }
-  }
-  
   function ensureVisible(){
     if ($("#showTodo")?.checked && !document.body.classList.contains("todo-on")){
       document.body.classList.add("todo-on");
@@ -752,8 +732,6 @@
     startCountdown();
   }
   function togglePrimary(){
-    if (realTimeModeActive) return; // Disable primary button in real time mode
-    
     if (!running && !paused){ startWithCountIn(); return; }
     if (running){
       cancelAnimationFrame(rafId);
@@ -767,16 +745,12 @@
     }
   }
   function resetCountdown(){
-    if (realTimeModeActive) return; // Disable reset in real time mode
-    
     cancelAnimationFrame(rafId); running=false; paused=false; primaryBtn.textContent="Start";
     safeBuildClock(); snapResetCandle(); hideCongrats();
     $("#countOverlay").style.display = "none"; countInActive = false;
     afterNextPaint(ensureVisible);
   }
   function finishNow(){
-    if (realTimeModeActive) return; // Shouldn't happen in real time mode
-    
     cancelAnimationFrame(rafId); running=false; paused=false;
     flameEl.classList.add("off"); candleWrap.classList.add("vanish"); showCongrats(); primaryBtn.textContent="Start";
   }
@@ -888,6 +862,51 @@
       if (hc?.checked){ hc.checked=false; document.body.classList.remove("candle-off"); }
     }
   }
+  // Real time mode functions
+  function updateRealTimeClock() {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const seconds = now.getSeconds().toString().padStart(2, '0');
+    const timeStr = `${hours}:${minutes}:${seconds}`;
+    $("#realTimeDigits").textContent = timeStr;
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const dateStr = now.toLocaleDateString(undefined, options);
+    $("#realTimeDate").textContent = dateStr;
+  }
+  function toggleRealTimeMode() {
+    const useFlip = $("#useFlip")?.checked ?? true;
+    const realTimeContainer = $("#realTimeContainer");
+    if ($("#realTimeMode")?.checked) {
+      // Get current background from body
+      const bodyBg = getComputedStyle(document.body).backgroundImage;
+      const bodyBgColor = getComputedStyle(document.body).backgroundColor;
+      
+      // Apply the same background to real time container
+      realTimeContainer.style.backgroundImage = bodyBg;
+      realTimeContainer.style.backgroundColor = bodyBgColor;
+      realTimeContainer.style.backgroundSize = "cover";
+      realTimeContainer.style.backgroundPosition = "center";
+      realTimeContainer.style.backgroundAttachment = "fixed";
+      
+      // Show real time mode
+      realTimeContainer.style.display = "flex";
+      // Update clock immediately and set interval
+      updateRealTimeClock();
+      window.realTimeInterval = setInterval(updateRealTimeClock, 1000);
+      // Hide everything else
+      document.body.classList.add("real-time-mode");
+    } else {
+      // Hide real time mode
+      realTimeContainer.style.display = "none";
+      if (window.realTimeInterval) {
+        clearInterval(window.realTimeInterval);
+        window.realTimeInterval = null;
+      }
+      // Show everything else
+      document.body.classList.remove("real-time-mode");
+    }
+  }
   function applyLayoutFlags(){
     document.body.classList.toggle("candle-off", $("#hideCandle")?.checked);
     document.body.classList.toggle("center-clock", $("#centerClock")?.checked);
@@ -895,6 +914,10 @@
     document.body.classList.toggle("todo-on", $("#showTodo")?.checked);
     safeBuildClock();
     requestAnimationFrame(()=>{ positionFlame(); ensureVisible(); });
+    // Handle real time mode
+    if ($("#realTimeMode")?.checked) {
+      toggleRealTimeMode();
+    }
   }
   function previewLayout(){
     const sh = $("#showHours")?.checked ?? false;
@@ -909,11 +932,11 @@
   $("#useFlip").addEventListener("change", ()=>{ safeBuildClock(); previewLayout(); });
   $("#showHours").addEventListener("change", previewLayout);
   $("#showSeconds").addEventListener("change", previewLayout);
-  $("#realTimeMode").addEventListener("change", toggleRealTimeMode);
   $("#hideCandle").addEventListener("change", () => applyLayoutFlags());
   $("#centerClock").addEventListener("change", () => applyLayoutFlags());
   $("#onlyCandle").addEventListener("change", e=>{ ensureCandleVisibleWhenOnlyCandle(e.target.checked); applyLayoutFlags(); });
   $("#showTodo").addEventListener("change", () => applyLayoutFlags());
+  $("#realTimeMode").addEventListener("change", () => toggleRealTimeMode());
   ["bgAngle","bgC1","bgC2","bgC3"].forEach(id=> document.getElementById(id)?.addEventListener("input", applyGradient));
   ["clockC1","clockC2","clockC3","textColor","colonColor","simpleColor"].forEach(id=> document.getElementById(id)?.addEventListener("input", restyleClockPanels));
   $("#todoApply").addEventListener("click", () =>{ setTodoBg($("#todoColor").value); $("#todo-panel").classList.remove("todo-clear"); });
@@ -936,6 +959,8 @@
     setWaxHeightByProgress(1);
     // Seed one empty to‑do
     const li=makeTodoItem(""); $("#todoList").appendChild(li);
+    // Initialize real time clock display
+    updateRealTimeClock();
   })();
 </script>
 </body>
@@ -1163,68 +1188,3 @@
 <!-- =============== END: EXIT-INTENT DONATION POP-UP CODE =============== -->
 <!-- ===================================================================== -->
 ```
-<!-- === Real Time Mode — FINAL, NON‑INTRUSIVE === -->
-<style>
-  /* Keep the page layout intact; only hide non‑clock UI in RTM */
-  .real-time-mode #controls,
-  .real-time-mode .brand,
-  .real-time-mode #todo-panel,
-  .real-time-mode #candle-area {
-    display: none !important;
-  }
-
-  /* Do NOT hide #main; keep it present so the timer can render */
-  .real-time-mode #main {
-    display: block !important;
-    min-height: 100vh;
-  }
-
-  /* Center the clock container only while RTM is active */
-  .real-time-mode #timer-container {
-    position: fixed !important;
-    left: 50% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    z-index: 100 !important;
-    display: block !important;
-  }
-</style>
-
-<script>
-  (function () {
-    const rtm = document.getElementById('realTimeMode');
-
-    function toggleRealTimeMode() {
-      const on = !!rtm?.checked;
-
-      if (on) {
-        // Enter Real Time Mode
-        document.body.classList.add('real-time-mode');
-
-        // Do NOT touch other switches or inline styles; just render the clock
-        realTimeModeActive = true;
-        safeBuildClock();
-        cancelAnimationFrame(realTimeRafId);
-        updateRealTime();
-      } else {
-        // Exit Real Time Mode
-        document.body.classList.remove('real-time-mode');
-
-        // Stop real-time loop and restore normal rendering
-        realTimeModeActive = false;
-        cancelAnimationFrame(realTimeRafId);
-        safeBuildClock();
-      }
-    }
-
-    // Rebind to ensure this non-intrusive handler runs
-    if (rtm) {
-      try { rtm.removeEventListener('change', toggleRealTimeMode); } catch (e) {}
-      rtm.addEventListener('change', toggleRealTimeMode);
-
-      // If toggled on before paste/reload, apply immediately
-      if (rtm.checked) toggleRealTimeMode();
-    }
-  })();
-</script>
-<!-- === / Real Time Mode — FINAL, NON‑INTRUSIVE === -->
