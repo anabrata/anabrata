@@ -1,9 +1,308 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="refresh" content="0; URL='https://youtu.be/Jgs5CUlEJ9o?feature=shared'" />
-  </head>
-  <body>
-    <p>If you are not redirected, <a href="https://youtu.be/Jgs5CUlEJ9o?feature=shared">click here</a>.</p>
-  </body>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Anabrata Donations — You’re part of what makes this possible</title>
+  <meta name="description" content="Support Anabrata Donations. If this brought value, a small gesture of support means a lot." />
+  <style>
+    :root{
+      --bg:#0e1116;
+      --card:#141922;
+      --soft:#1b2230;
+      --txt:#e6edf3;
+      --muted:#aeb6c2;
+      --accent:#5dd1ff;
+      --accent2:#7cffc1;
+      --warn:#ffc857;
+      --shadow: 0 20px 50px rgba(0,0,0,.45);
+      --radius: 16px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--txt);
+      background:
+        radial-gradient(1000px 600px at 10% 0%, #1c2332 0%, transparent 65%),
+        radial-gradient(1000px 600px at 90% 0%, #0f3a3a 0%, transparent 65%),
+        linear-gradient(180deg, #0a0d12 0%, #0e1116 100%);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .wrap{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 36px 20px 80px;
+    }
+
+    header{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:16px; margin-bottom: 26px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      font-weight:800; letter-spacing:.2px; font-size: 18px;
+    }
+    .brand-badge{
+      width:34px; height:34px; border-radius:10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 8px 20px rgba(125,255,210,.25);
+    }
+    .mini-nav a{
+      color:var(--muted); text-decoration:none; font-weight:600; margin-left:14px;
+    }
+    .mini-nav a:hover{ color:var(--txt) }
+
+    .hero{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius: calc(var(--radius) + 2px);
+      padding: 28px 22px;
+      box-shadow: var(--shadow);
+    }
+    .hero h1{ margin:0 0 10px 0; font-size: clamp(24px, 4vw, 36px); }
+    .hero p{ margin:0; color:var(--muted); line-height:1.6 }
+
+    .grid{
+      display:grid; gap:22px; margin-top:22px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 900px){
+      .grid{ grid-template-columns: 1.1fr .9fr; }
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .card h2{
+      margin:0; padding:18px 18px 0 18px; font-size: clamp(18px, 2.6vw, 22px);
+    }
+    .card .sub{ color:var(--muted); padding:6px 18px 14px 18px }
+
+    .qrWrap{
+      display:grid; place-items:center;
+      padding: 20px 18px 10px 18px;
+    }
+    .qr{
+      width: 260px; height: 260px;
+      display:grid; place-items:center;
+      border-radius: 12px;
+      background: var(--soft);
+      border:1px solid rgba(255,255,255,.06);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+    .qr img{ width: 220px; height: 220px; object-fit: contain; image-rendering: crisp-edges; }
+
+    .addr{
+      padding: 10px 18px 18px 18px;
+    }
+    .addr label{
+      display:block; color:var(--muted); font-weight:700; letter-spacing:.04em;
+      text-transform: uppercase; font-size: 12px; margin-bottom:8px;
+    }
+    .copyRow{
+      display:flex; gap:8px;
+    }
+    .copyRow input{
+      flex:1; padding:12px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.1);
+      background:#0f141e; color:var(--txt); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 14px;
+    }
+    .btn{
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border:none; color:#0b0f10; font-weight:800; padding: 12px 14px; border-radius:12px; cursor:pointer;
+      box-shadow: 0 10px 24px rgba(125,255,210,.25);
+    }
+    .btn:active{ transform: translateY(1px) }
+
+    .howto{
+      padding: 14px 18px 18px 18px;
+      border-top:1px solid rgba(255,255,255,.06);
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
+    }
+    .howto h3{ margin:0 0 8px 0; font-size: 16px; }
+    .howto ol{ margin: 0 0 0 20px; padding:0; color:var(--muted); line-height:1.7 }
+    .howto li{ margin: 6px 0 }
+
+    .notes{
+      padding: 16px 18px 22px 18px;
+    }
+    .notes textarea{
+      width:100%; min-height: 120px; resize: vertical;
+      background:#0f141e; color:var(--txt);
+      border-radius:12px; border:1px solid rgba(255,255,255,.1);
+      padding:12px; font-size:14px; line-height:1.5;
+    }
+    .optRow{
+      display:flex; align-items:center; gap:8px; color:var(--muted); font-size:14px; margin:10px 0 14px 0;
+    }
+    .feed{
+      padding: 8px 18px 20px 18px;
+      border-top:1px solid rgba(255,255,255,.06);
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
+    }
+    .msg{
+      background: #0f141e;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:12px;
+      padding:12px;
+      margin-top:10px;
+    }
+    .msg .who{ color:var(--muted); font-size: 13px; margin-top:6px }
+
+    footer{
+      margin-top:26px; color:var(--muted); font-size:13px; text-align:center;
+    }
+    a.text{ color:var(--accent); text-decoration:none }
+    a.text:hover{ text-decoration:underline }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="brand-badge" aria-hidden="true"></div>
+        <div>Anabrata Donations</div>
+      </div>
+      <nav class="mini-nav" aria-label="Secondary">
+        <a href="https://anabrata.github.io/anabrata/link13/" class="text">Home</a>
+        <a href="#" class="text" aria-disabled="true">How to?</a>
+        <a href="#" class="text" aria-disabled="true">Share a note</a>
+      </nav>
+    </header>
+
+    <section class="hero" aria-labelledby="hero-title">
+      <h1 id="hero-title">You’re part of what makes this possible</h1>
+      <p>
+        Built to make things a little easier and a little smoother. If this brought value to your day, a small gesture of support means more than you might think. Thank you. 
+      </p>
+    </section>
+
+    <section class="grid" aria-label="Donation content">
+      <!-- Left: QR + Address + How-to -->
+      <article class="card" aria-labelledby="qr-title">
+        <h2 id="qr-title">Donate via QR</h2>
+        <div class="sub">Scan the code with a wallet application, or copy the address below.</div>
+
+        <div class="qrWrap">
+          <div class="qr">
+            <!-- Replace the placeholder URL with the actual QR image URL provided -->
+            <img src="QR_CODE_IMAGE_URL" alt="Donation QR code" />
+          </div>
+        </div>
+
+        <div class="addr">
+          <label for="donation-address">Copy & paste this address</label>
+          <!-- Replace the placeholder address as needed -->
+          <div class="copyRow">
+            <input id="donation-address" value="YOUR_DONATION_ADDRESS_HERE" readonly />
+            <button class="btn" id="copyBtn" type="button">Copy</button>
+          </div>
+        </div>
+
+        <div class="howto" aria-labelledby="howto-title">
+          <h3 id="howto-title">How to donate</h3>
+          <ol>
+            <li>Open a crypto or payment wallet app on a phone or computer.</li>
+            <li>Scan the QR code above, or copy the address and paste it into the wallet.</li>
+            <li>Any amount — big or small — helps keep this project updated, stable, and useful.</li>
+          </ol>
+        </div>
+      </article>
+
+      <!-- Right: Share a note -->
+      <aside class="card" aria-labelledby="note-title">
+        <h2 id="note-title">Share a note</h2>
+        <div class="sub">Whether a donation was made or just a message of encouragement — it’s appreciated.</div>
+
+        <div class="notes">
+          <textarea id="note" placeholder="Write an optional note..."></textarea>
+          <div class="optRow">
+            <input type="checkbox" id="public" />
+            <label for="public">I’m okay with this message being shared publicly</label>
+          </div>
+          <button class="btn" id="shareBtn" type="button">Share your note</button>
+        </div>
+
+        <div class="feed" aria-live="polite">
+          <div class="msg">
+            <div>This project is a lifesaver for my workflow — simple and solid. Thanks for building it!</div>
+            <div class="who">— Emma</div>
+          </div>
+          <div class="msg">
+            <div>Been using this for a while. Just wanted to say thanks — appreciate the work behind it.</div>
+            <div class="who">— Anonymous</div>
+          </div>
+          <div class="msg">
+            <div>Sent a little support. Hope it helps. Great job!</div>
+            <div class="who">— T</div>
+          </div>
+          <div class="msg">
+            <div>Clean, reliable, and does exactly what I need. Keep going.</div>
+            <div class="who">— NoNameButGrateful</div>
+          </div>
+          <div class="msg">
+            <div>One of those quiet tools that just makes life easier.</div>
+            <div class="who">— Anonymous</div>
+          </div>
+          <div class="msg">
+            <div>Use it regularly — it’s become a go‑to. Greetings from Berlin.</div>
+            <div class="who">— Mira</div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <footer>
+      © <span id="year"></span> Anabrata Donations · <a class="text" href="https://anabrata.github.io/anabrata/link13/">Return to site</a>
+    </footer>
+  </div>
+
+  <script>
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Copy address
+    const copyBtn = document.getElementById('copyBtn');
+    const addr = document.getElementById('donation-address');
+    copyBtn.addEventListener('click', async () => {
+      try{
+        await navigator.clipboard.writeText(addr.value);
+        const old = copyBtn.textContent;
+        copyBtn.textContent = 'Copied!';
+        setTimeout(()=> copyBtn.textContent = old, 1400);
+      }catch(e){
+        addr.select(); document.execCommand('copy');
+        const old = copyBtn.textContent;
+        copyBtn.textContent = 'Copied!';
+        setTimeout(()=> copyBtn.textContent = old, 1400);
+      }
+    });
+
+    // Fake share (no backend)
+    document.getElementById('shareBtn').addEventListener('click', () => {
+      const text = document.getElementById('note').value.trim();
+      const pub = document.getElementById('public').checked;
+      if(!text){ alert('Please write a note before sharing.'); return; }
+      const feed = document.querySelector('.feed');
+      const wrap = document.createElement('div');
+      wrap.className = 'msg';
+      const msg = document.createElement('div');
+      msg.textContent = text;
+      const who = document.createElement('div');
+      who.className = 'who';
+      who.textContent = pub ? '— Public Note' : '— Private (not displayed)';
+      wrap.appendChild(msg); wrap.appendChild(who);
+      feed.prepend(wrap);
+      document.getElementById('note').value = '';
+      document.getElementById('public').checked = false;
+    });
+  </script>
+</body>
 </html>
