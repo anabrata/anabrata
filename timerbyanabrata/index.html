@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -939,3 +941,63 @@
 </script>
 </body>
 </html>
+<!-- Candle color config (optional, keep anywhere before the script below) -->
+<script id="wax-config" type="application/json">{"wax":"#fcd474"}</script>
+
+<!-- Auto-apply candle wax color -->
+<script>
+(function(){
+  const root = document.documentElement;
+
+  function normalizeHex(c){
+    if(typeof c !== 'string') return '';
+    c = c.trim();
+    if(!c) return '';
+    if(c[0] !== '#') c = '#' + c;
+    const m = c.match(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/);
+    return m ? c.toLowerCase() : '';
+  }
+
+  function readConfigTag(){
+    const el = document.getElementById('wax-config');
+    if(!el) return '';
+    try{
+      const obj = JSON.parse(el.textContent || '{}');
+      return normalizeHex(obj.wax || obj.color || '');
+    }catch(e){ return ''; }
+  }
+
+  function readQuery(){
+    const u = new URL(window.location.href);
+    const v = u.searchParams.get('wax') || '';
+    const h = new URLSearchParams(u.hash.replace(/^#/, '')).get('wax') || '';
+    return normalizeHex(v || h);
+  }
+
+  function readDataAttr(){
+    return normalizeHex(document.body?.dataset?.wax || '');
+  }
+
+  function readStored(){
+    return normalizeHex(localStorage.getItem('waxColor') || '');
+  }
+
+  const color = readQuery() || readConfigTag() || readDataAttr() || readStored() || '#d9c9a3';
+
+  root.style.setProperty('--wax', color);
+  try{ localStorage.setItem('waxColor', color); }catch(e){}
+
+  // Optional: auto-wire any color input marked for wax syncing
+  const pickers = document.querySelectorAll('input[type="color"][data-sync="wax"], #waxPicker');
+  pickers.forEach(p => {
+    p.value = color;
+    ['input','change'].forEach(ev => p.addEventListener(ev, e=>{
+      const val = normalizeHex(e.target.value);
+      if(val){
+        root.style.setProperty('--wax', val);
+        try{ localStorage.setItem('waxColor', val);}catch(_e){}
+      }
+    }));
+  });
+})();
+</script>
