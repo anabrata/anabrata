@@ -1,228 +1,51 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Donation Page — Fixed QR & Drive Image</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thank You</title>
   <style>
-    /* Basic reset */
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background: linear-gradient(180deg,#f5f7fb,#fff);
-      color:#111;
-      padding:24px;
-      display:flex;
-      align-items:flex-start;
-      justify-content:center;
-      min-height:100vh;
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f8a5a5;
+      color: white;
+      text-align: center;
     }
-
-    .container{
-      width:100%;
-      max-width:980px;
-      background:#fff;
-      border-radius:14px;
-      box-shadow: 0 10px 30px rgba(15,20,40,0.08);
-      overflow:hidden;
-      border: 1px solid rgba(0,0,0,0.04);
-      display:grid;
-      grid-template-columns: 1fr 360px;
-      gap:20px;
-      padding:28px;
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 0.5em;
     }
-
-    .main{
-      padding:10px 8px 18px;
+    p {
+      font-size: 1.2em;
+      margin-bottom: 1em;
     }
-
-    h1{
-      font-size:26px;
-      margin-bottom:8px;
+    .qr-container {
+      background: white;
+      padding: 15px;
+      border-radius: 20px;
+      box-shadow: 0px 4px 20px rgba(0,0,0,0.2);
+      display: inline-block;
     }
-    p.lead{ color:#444; margin-bottom:18px }
-
-    .donation-card{
-      background:linear-gradient(180deg,#ffffff,#fbfdff);
-      border-radius:12px;
-      padding:16px;
-      box-shadow: 0 6px 20px rgba(10,20,40,0.04);
-      border:1px solid rgba(0,0,0,0.03);
-    }
-
-    .drive-image{
-      width:100%;
-      height:220px;
-      object-fit:cover;
-      border-radius:10px;
-      display:block;
-      margin-bottom:12px;
-      transition: transform .45s cubic-bezier(.2,.9,.3,1), box-shadow .3s;
-    }
-    .drive-image:hover{ transform: translateY(-6px); box-shadow: 0 14px 30px rgba(10,20,30,0.08) }
-
-    .info-row{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      margin-bottom:10px;
-    }
-    .badge{
-      background:#f0f8ff;
-      padding:6px 10px;
-      border-radius:10px;
-      font-weight:600;
-      color:#074;
-      font-size:14px;
-    }
-
-    .amounts{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      margin:12px 0;
-    }
-    .btn{
-      background:#0b76ff;
-      color:#fff;
-      padding:10px 14px;
-      border-radius:10px;
-      border:none;
-      cursor:pointer;
-      font-weight:600;
-      transition: transform .15s ease, box-shadow .15s ease;
-    }
-    .btn:hover{ transform: translateY(-3px); box-shadow: 0 8px 20px rgba(11,118,255,0.18) }
-
-    /* right column */
-    .qr-side{
-      padding:8px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      align-items:center;
-      justify-content:flex-start;
-    }
-
-    .qr-box{
-      width:100%;
-      text-align:center;
-      padding:12px;
-      border-radius:10px;
-      border:1px dashed rgba(0,0,0,0.06);
-      background: #fff;
-    }
-    .qr-img{
-      width:200px;
-      height:200px;
-      object-fit:contain;
-      margin:0 auto 8px;
-      display:block;
-    }
-
-    .small{
-      font-size:13px;
-      color:#555;
-    }
-
-    /* responsive */
-    @media (max-width:880px){
-      .container{ grid-template-columns: 1fr; padding:18px }
-      .qr-img{ width:180px; height:180px }
+    .qr-container img {
+      width: 220px;
+      height: 220px;
+      object-fit: contain;
+      border-radius: 12px;
     }
   </style>
 </head>
 <body>
-  <div class="container" id="app">
-    <div class="main">
-      <h1>Support our cause — Donate</h1>
-      <p class="lead">Your support helps us deliver meals and essentials. Scan the QR on the right or use the direct links below.</p>
-
-      <div class="donation-card">
-        <!-- Google Drive image (works if file is public) -->
-        <!-- Replace YOUR_DRIVE_FILE_ID with the actual file id from Google Drive -->
-        <!-- Example Drive view link: https://drive.google.com/file/d/1aBcD_EfGhIJkL/view -->
-        <!-- File ID would be: 1aBcD_EfGhIJkL -->
-        <img id="driveImage" class="drive-image"
-             src="https://drive.google.com/uc?export=view&id=YOUR_DRIVE_FILE_ID"
-             alt="Donation hero image"
-             onerror="onDriveImageError()"
-        />
-
-        <div class="info-row">
-          <div class="badge">Monthly goal ₹50,000</div>
-          <div style="margin-left:auto" class="small">Raised: <strong id="raised">₹23,450</strong></div>
-        </div>
-
-        <div class="small">Quick donate amounts</div>
-        <div class="amounts" id="amountButtons">
-          <button class="btn" data-amt="50">₹50</button>
-          <button class="btn" data-amt="100">₹100</button>
-          <button class="btn" data-amt="250">₹250</button>
-          <button class="btn" data-amt="500">₹500</button>
-          <button class="btn" data-amt="1000">₹1000</button>
-        </div>
-
-        <p class="small">Or use UPI / QR below and add a note: <em>Donation—Food</em></p>
-      </div>
-    </div>
-
-    <aside class="qr-side">
-      <div class="qr-box">
-        <img class="qr-img" id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=UPI%3A%2F%2Fpay%3Fpa%3Dexample%40bank%26pn%3DDonation%26am%3D1" alt="QR code" />
-        <div class="small">Scan this QR with your UPI app</div>
-      </div>
-
-      <div style="width:100%" class="qr-box">
-        <div style="text-align:left; margin-bottom:8px;">
-          <div style="font-weight:700">Other payment options</div>
-          <div class="small">Phone/UPI ID: <strong>example@upi</strong></div>
-          <div class="small">Account: <strong>XXXXXXXXXXXX</strong></div>
-        </div>
-
-        <button class="btn" id="copyUpi">Copy UPI ID</button>
-      </div>
-    </aside>
+  <h1>🙏 Thank You for Your Support!</h1>
+  <p>Your donation helps us continue our mission ❤️</p>
+  <div class="qr-container">
+    <img src="data:image/jpeg;base64,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... (base64 truncated to save space) ..." alt="QR Code" />
   </div>
-
-  <script>
-    // 1) Fix for google drive images:
-    // Make sure your Drive file is shared "Anyone with the link" (Viewer).
-    // Use URL pattern: https://drive.google.com/uc?export=view&id=FILE_ID
-
-    function onDriveImageError(){
-      const img = document.getElementById('driveImage');
-      img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(
-        '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="320" viewBox="0 0 800 320">' +
-        '<rect width="100%" height="100%" fill="#f2f6ff"/>' +
-        '<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="#8aa2ff">' +
-        'Could not load Drive image. Make it "Anyone with the link" and use the file id in the URL.</text></svg>'
-      );
-    }
-
-    // 2) Quick donate button demo (local simulation)
-    document.getElementById('amountButtons').addEventListener('click', function(e){
-      const btn = e.target.closest('button');
-      if(!btn) return;
-      const amt = btn.dataset.amt;
-      if(!amt) return;
-      // In production: redirect to payment gateway or open UPI intent.
-      alert('Simulated donation: ₹' + amt + '. Replace alert with actual payment integration.');
-    });
-
-    // 3) Copy UPI
-    document.getElementById('copyUpi').addEventListener('click', function(){
-      const upi = 'example@upi';
-      navigator.clipboard?.writeText(upi).then(() => {
-        alert('UPI ID copied: ' + upi);
-      }).catch(()=> {
-        prompt('Copy this UPI ID:', upi);
-      });
-    });
-
-    // 4) Optional: programmatically set QR image to encode a real UPI string
-    // Example UPI string: upi://pay?pa=example@upi&pn=NGO&am=500&tn=Donation
-    // To change QR: set qrImage.src = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=' + encodeURIComponent(yourUpiString);
-  </script>
+  <p>Scan the QR code to donate and make a difference ✨</p>
 </body>
 </html>
