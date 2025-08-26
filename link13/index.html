@@ -1031,3 +1031,31 @@
 /* If you’d rather remove the glossy top entirely, uncomment this: */
 /* .waxTop{ background: none !important; } */
 </style>
+<!-- Put this just before </body> -->
+<script>
+(function () {
+  // CHANGE to the path of the provided image (PNG recommended):
+  const ICON = "/icons/site-icon.png";
+
+  const head = document.head || document.getElementsByTagName('head');
+
+  // Remove any existing icons so the new one takes effect
+  document.querySelectorAll('link[rel="icon"],link[rel="apple-touch-icon"],link[rel="shortcut icon"]').forEach(n => n.remove());
+
+  // Helper to add link elements
+  const add = (rel, href, type, sizes) => {
+    const link = document.createElement('link');
+    link.rel = rel; link.href = href;
+    if (type) link.type = type;
+    if (sizes) link.sizes = sizes;
+    head.appendChild(link);
+  };
+
+  // Standard favicon + legacy fallback
+  add('icon', ICON + '?v=1', 'image/png');      // Browser tab/address bar
+  add('shortcut icon', ICON + '?v=1', 'image/png'); // Legacy fallback
+
+  // iOS home‑screen icon (optional but recommended)
+  add('apple-touch-icon', ICON + '?v=1', 'image/png', '180x180');
+})();
+</script>
