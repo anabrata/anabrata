@@ -2,283 +2,295 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Google Drive Viewer (URL-to-Box)</title>
+  <title>Thank You | Donate</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0d0f1a" />
   <style>
-    :root {
-      --bg: #0b1020;
-      --card: #141a2e;
-      --text: #e9ecf1;
-      --muted: #95a1b6;
-      --accent: #6ea8fe;
-      --accent2: #8f9bff;
-      --error: #ff6b6b;
-      --radius: 14px;
+    :root{
+      --bg: #0d0f1a;
+      --glass: rgba(255,255,255,0.08);
+      --border: rgba(255,255,255,0.18);
+      --text: #eef2ff;
+      --muted: #c5cbe3;
+      --accent: #7aa2ff;
+      --accent2: #ff8bd1;
+      --shadow: rgba(0,0,0,0.45);
+      --radius: 16px;
     }
-    html, body {
-      height: 100%;
-      margin: 0;
-      background: radial-gradient(1000px 600px at 20% -10%, #1a213a 0%, transparent 60%),
-                  radial-gradient(800px 500px at 120% 10%, #172037 0%, transparent 55%),
-                  var(--bg);
+    /* Page reset */
+    *{box-sizing:border-box}
+    html,body{
+      height:100%;
+      margin:0;
+      background: var(--bg);
       color: var(--text);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      overflow: hidden; /* Only the image and overlay should be visible */
     }
-    .wrap {
-      max-width: 980px;
-      margin: 40px auto;
-      padding: 0 16px 40px 16px;
+
+    /* Fullscreen background image from Google Drive */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background-image:
+        radial-gradient(1200px 600px at 80% -10%, rgba(10,14,28,0.65), transparent 60%),
+        radial-gradient(900px 500px at -10% 110%, rgba(20,22,40,0.6), transparent 55%),
+        url("https://drive.google.com/uc?export=view&id=1FweVOT2KGkbP_9G24VorvTNqUEKXEkqS");
+      background-size: cover, cover, cover;
+      background-position: center, center, center;
+      background-repeat: no-repeat;
+      filter: saturate(1.05) contrast(1.05) brightness(0.95);
+      transform: translateZ(0);
+      will-change: transform;
     }
-    h1 {
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: 0.2px;
-      margin: 0 0 18px;
-      color: #f4f7ff;
+
+    /* Subtle animated glow over the background for an eye-catching feel */
+    .glow{
+      position:fixed;
+      inset:-20%;
+      pointer-events:none;
+      background:
+        radial-gradient(1000px 700px at 20% 30%, rgba(127, 168, 255, 0.18), transparent 55%),
+        radial-gradient(900px 600px at 80% 70%, rgba(255, 140, 213, 0.14), transparent 60%);
+      animation: floatGlow 16s ease-in-out infinite alternate;
+      mix-blend-mode: screen;
     }
-    .card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-      border: 1px solid rgba(255,255,255,0.08);
+    @keyframes floatGlow{
+      0%{ transform: translate3d(0,0,0) scale(1) }
+      100%{ transform: translate3d(0,-10px,0) scale(1.02) }
+    }
+
+    /* Centered donation overlay card */
+    .wrap{
+      position:relative;
+      z-index:2;
+      height:100%;
+      display:grid;
+      place-items:center;
+      padding: 24px;
+    }
+    .card{
+      width:min(720px, 92vw);
+      background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.06));
+      border:1px solid var(--border);
+      box-shadow: 0 20px 60px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.08);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border-radius: var(--radius);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      padding: 18px;
+      padding: 28px 26px;
     }
-    .row {
-      display: grid;
-      gap: 12px;
-      grid-template-columns: 1fr 160px 120px;
-    }
-    @media (max-width: 820px) {
-      .row { grid-template-columns: 1fr; }
-    }
-    label {
-      font-size: 12px;
-      color: var(--muted);
-      display: block;
-      margin-bottom: 6px;
-      letter-spacing: 0.3px;
-    }
-    input[type="text"], select {
-      width: 100%;
-      padding: 12px 12px;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(16,22,40,0.7);
-      color: var(--text);
-      outline: none;
-      transition: border-color 160ms ease, box-shadow 160ms ease;
-    }
-    input[type="text"]::placeholder { color: rgba(200,210,230,0.5); }
-    input[type="text"]:focus, select:focus {
-      border-color: rgba(129, 177, 255, 0.8);
-      box-shadow: 0 0 0 4px rgba(129, 177, 255, 0.12);
-    }
-    button {
-      align-self: end;
-      padding: 12px 16px;
-      border-radius: 10px;
-      border: 1px solid rgba(129,177,255,0.4);
-      background: linear-gradient(180deg, rgba(129,177,255,0.18), rgba(129,177,255,0.12));
-      color: #eaf1ff;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-      cursor: pointer;
-      transition: transform 90ms ease, box-shadow 160ms ease, background 160ms ease;
-    }
-    button:hover { box-shadow: 0 8px 24px rgba(129,177,255,0.22); }
-    button:active { transform: translateY(1px); }
-    .hint {
-      margin-top: 10px;
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.45;
-    }
-    .viewer {
-      margin-top: 18px;
-      aspect-ratio: 16/9;
-      width: 100%;
-      background: rgba(8,12,24,0.6);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: calc(var(--radius) - 4px);
-      overflow: hidden;
-      position: relative;
-    }
-    .viewer iframe, .viewer img {
-      width: 100%;
-      height: 100%;
-      display: none;
-      border: 0;
-      object-fit: contain;
-      background: #0a0f1f;
-    }
-    .empty {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      color: rgba(220,230,255,0.68);
-      font-size: 14px;
+    .title{
+      margin:0 0 6px;
+      font-size: clamp(22px, 3.6vw, 34px);
+      font-weight: 800;
       letter-spacing: 0.2px;
-      text-align: center;
-      padding: 12px;
+      color: #f6f8ff;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.45);
     }
-    .error {
-      margin-top: 12px;
-      color: var(--error);
-      font-size: 13px;
-      display: none;
-    }
-    .examples {
-      margin-top: 10px;
-      font-size: 12px;
+    .subtitle{
+      margin:0 0 18px;
       color: var(--muted);
+      font-size: clamp(14px, 2.4vw, 16px);
+      line-height: 1.5;
     }
-    .examples code {
-      background: rgba(255,255,255,0.06);
-      padding: 2px 6px;
-      border-radius: 6px;
-      border: 1px solid rgba(255,255,255,0.08);
-      color: #dfe8ff;
+
+    .cta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin: 18px 0 8px;
+    }
+    .btn{
+      appearance:none;
+      border:1px solid rgba(129,177,255,0.45);
+      background: linear-gradient(180deg, rgba(129,177,255,0.22), rgba(129,177,255,0.12));
+      color:#eaf1ff;
+      font-weight:800;
+      letter-spacing:0.3px;
+      padding:12px 16px;
+      border-radius: 12px;
+      cursor:pointer;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      transition: transform 90ms ease, box-shadow 160ms ease, background 160ms ease;
+      box-shadow: 0 10px 28px rgba(129,177,255,0.22);
+    }
+    .btn:hover{ box-shadow: 0 12px 36px rgba(129,177,255,0.30) }
+    .btn:active{ transform: translateY(1px) }
+
+    .btn.alt{
+      border-color: rgba(255,139,209,0.45);
+      background: linear-gradient(180deg, rgba(255,139,209,0.22), rgba(255,139,209,0.12));
+      box-shadow: 0 10px 28px rgba(255,139,209,0.22);
+    }
+
+    .supporters{
+      margin-top:14px;
+      padding-top:10px;
+      border-top: 1px dashed rgba(255,255,255,0.2);
+      color: #e9ecff;
+      font-size: 13px;
+    }
+    .names{
+      margin-top:8px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .chip{
+      padding:6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.1);
+      border:1px solid rgba(255,255,255,0.18);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      color:#f4f7ff;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    /* Floating hearts on click for a celebratory touch */
+    .hearts{
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 3;
+      overflow: hidden;
+    }
+    .heart{
+      position: absolute;
+      font-size: 16px;
+      color: #ff83c6;
+      opacity: 0.9;
+      animation: rise 1800ms ease-out forwards;
+      text-shadow: 0 2px 10px rgba(255, 131, 198, 0.6);
+    }
+    @keyframes rise{
+      0%{ transform: translate(-50%, 10px) scale(0.8); opacity: 0 }
+      15%{ opacity: 1 }
+      100%{ transform: translate(-50%, -90px) scale(1.4); opacity: 0 }
+    }
+
+    /* Small footer hint; nearly invisible to keep focus on image */
+    .foot{
+      position: fixed;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(240,245,255,0.5);
+      font-size: 11px;
+      letter-spacing: 0.3px;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.55);
+      user-select: none;
+      z-index:2;
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Drive URL to Box Viewer</h1>
-    <div class="card">
-      <div class="row">
-        <div>
-          <label for="driveUrl">Google Drive link or file ID</label>
-          <input id="driveUrl" type="text"
-                 value="https://drive.google.com/file/d/1FweVOT2KGkbP_9G24VorvTNqUEKXEkqS/view?usp=drive_link"
-                 placeholder="Paste a share link like https://drive.google.com/file/d/FILE_ID/view or just the FILE_ID" />
+  <!-- Decorative glow over the full-screen Drive image -->
+  <div class="glow" aria-hidden="true"></div>
+
+  <!-- Celebration layer for hearts animation -->
+  <div class="hearts" id="hearts" aria-hidden="true"></div>
+
+  <!-- Donation overlay -->
+  <main class="wrap" role="main">
+    <section class="card" aria-label="Donation Thank You">
+      <h1 class="title">Thank you for your support</h1>
+      <p class="subtitle">
+        Every contribution keeps this mission alive and helps reach more people with kindness and impact. You make a real difference.
+      </p>
+
+      <div class="cta">
+        <!-- Replace YOUR_VPA@bank with your UPI ID (for India) -->
+        <a class="btn" id="btnUPI"
+           href="upi://pay?pa=YOUR_VPA@bank&pn=Your%20Name&cu=INR&am="
+           onclick="celebrate(event)">
+          ❤️ Donate via UPI
+        </a>
+
+        <!-- Replace with your own PayPal / Razorpay / Stripe checkout link -->
+        <a class="btn alt"
+           href="#"
+           onclick="celebrate(event)">
+          ✨ Donate Online
+        </a>
+      </div>
+
+      <div class="supporters" aria-live="polite">
+        With gratitude to our kind supporters:
+        <div class="names">
+          <!-- Replace these sample names as you wish -->
+          <span class="chip">Aarav</span>
+          <span class="chip">Meera</span>
+          <span class="chip">Rahul</span>
+          <span class="chip">Zara</span>
+          <span class="chip">Arjun</span>
+          <span class="chip">Saanvi</span>
         </div>
-        <div>
-          <label for="mode">Display mode</label>
-          <select id="mode">
-            <option value="auto" selected>Auto (iframe preview)</option>
-            <option value="image">Image (<img>)</option>
-          </select>
-        </div>
-        <div>
-          <button id="showBtn" type="button">Show in Box</button>
-        </div>
       </div>
+    </section>
+  </main>
 
-      <div class="hint">
-        Tip: Set the file’s sharing to “Anyone with the link → Viewer” in Google Drive so it can load publicly.  
-      </div>
+  <!-- Subtle footer hint -->
+  <div class="foot">Image served directly from Google Drive</div>
 
-      <div class="examples">
-        Works with typical links: <code>https://drive.google.com/file/d/FILE_ID/view</code>, <code>https://drive.google.com/open?id=FILE_ID</code>, or a raw <code>FILE_ID</code>.  
-      </div>
-
-      <div class="viewer" id="viewer">
-        <div class="empty" id="placeholder">Paste a Google Drive link or ID, pick a mode, then press “Show in Box”.</div>
-        <iframe id="preview" allow="autoplay; fullscreen"></iframe>
-        <img id="image" alt="Drive image preview" />
-      </div>
-
-      <div class="error" id="error"></div>
-    </div>
-  </div>
+  <noscript>
+    This page looks best with JavaScript enabled (for the celebration animation).
+  </noscript>
 
   <script>
-    const input = document.getElementById('driveUrl');
-    const mode = document.getElementById('mode');
-    const btn = document.getElementById('showBtn');
-    const frame = document.getElementById('preview');
-    const img = document.getElementById('image');
-    const placeholder = document.getElementById('placeholder');
-    const errorBox = document.getElementById('error');
-
-    function getIdFromDocsUrl(u) {
-      const mDoc = u.pathname.match(/\/document\/d\/([^/]+)/);
-      const mSheet = u.pathname.match(/\/spreadsheets\/d\/([^/]+)/);
-      const mSlide = u.pathname.match(/\/presentation\/d\/([^/]+)/);
-      if (mDoc) return { type: 'gdoc', id: mDoc[1] };
-      if (mSheet) return { type: 'gsheet', id: mSheet[1] };
-      if (mSlide) return { type: 'gslide', id: mSlide[1] };
-      return null;
-    }
-
-    function extractFileId(raw) {
-      if (!raw) return null;
-      try {
-        const u = new URL(raw);
-        if (u.hostname.includes('docs.google.com')) {
-          const d = getIdFromDocsUrl(u);
-          if (d) return d;
-        }
-        const byPath = u.pathname.match(/\/file\/d\/([^/]+)/);
-        if (byPath) return { type: 'drive', id: byPath[1] };
-        const idParam = u.searchParams.get('id');
-        if (idParam) return { type: 'drive', id: idParam };
-        return null;
-      } catch (e) {
-        const isId = /^[a-zA-Z0-9_-]{20,}$/.test(raw.trim());
-        if (isId) return { type: 'drive', id: raw.trim() };
-        return null;
+    // Tiny celebration animation (floating hearts) when someone clicks a donate button
+    function celebrate(e){
+      const box = document.getElementById('hearts');
+      for(let i=0;i<12;i++){
+        const span = document.createElement('span');
+        span.className = 'heart';
+        span.textContent = '❤';
+        const x = (window.innerWidth * 0.35) + Math.random() * (window.innerWidth * 0.30);
+        const y = (window.innerHeight * 0.45) + Math.random() * 20;
+        span.style.left = x + 'px';
+        span.style.top = y + 'px';
+        span.style.fontSize = (14 + Math.random()*10) + 'px';
+        span.style.animationDuration = (1400 + Math.random()*800) + 'ms';
+        box.appendChild(span);
+        setTimeout(()=> span.remove(), 2200);
       }
     }
 
-    function buildPreviewUrl(info) {
-      if (!info) return null;
-      if (info.type === 'gdoc') return `https://docs.google.com/document/d/${info.id}/preview`;
-      if (info.type === 'gsheet') return `https://docs.google.com/spreadsheets/d/${info.id}/preview`;
-      if (info.type === 'gslide') return `https://docs.google.com/presentation/d/${info.id}/preview`;
-      return `https://drive.google.com/file/d/${info.id}/preview`;
-    }
-
-    function buildImageViewUrl(info) {
-      return `https://drive.google.com/uc?export=view&id=${info.id}`;
-    }
-
-    function showError(msg) {
-      frame.style.display = 'none';
-      img.style.display = 'none';
-      placeholder.style.display = 'none';
-      errorBox.style.display = 'block';
-      errorBox.textContent = msg;
-    }
-
-    function show() {
-      const raw = input.value.trim();
-      const info = extractFileId(raw);
-      if (!info) {
-        showError('Could not find a Google Drive file ID in the input. Paste a full share link or a valid file ID.');
-        return;
-      }
-      if (mode.value === 'image') {
-        const src = buildImageViewUrl(info);
-        img.src = src;
-        img.onload = () => { errorBox.style.display = 'none'; };
-        img.onerror = () => {
-          showError('Image failed to load. Ensure the file is an image and shared with “Anyone with the link → Viewer”.');
-        };
-        frame.style.display = 'none';
-        img.style.display = 'block';
-        placeholder.style.display = 'none';
-      } else {
-        const src = buildPreviewUrl(info);
-        frame.src = src;
-        frame.onload = () => { errorBox.style.display = 'none'; };
-        frame.style.display = 'block';
-        img.style.display = 'none';
-        placeholder.style.display = 'none';
-      }
-    }
-
-    btn.addEventListener('click', show);
-    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') show(); });
-
-    // Auto-load the provided default link on page load
-    window.addEventListener('DOMContentLoaded', () => {
-      mode.value = 'auto';
-      show();
+    // Optional: Copy UPI ID on long-press or right-click
+    document.getElementById('btnUPI').addEventListener('contextmenu', function(ev){
+      ev.preventDefault();
+      const vpa = (this.href.match(/pa=([^&]+)/)||[])[1] || '';
+      if(!vpa) return;
+      const text = decodeURIComponent(vpa);
+      navigator.clipboard?.writeText(text).then(()=>{
+        toast('UPI ID copied: ' + text);
+      });
     });
+
+    function toast(msg){
+      const el = document.createElement('div');
+      el.textContent = msg;
+      el.style.position = 'fixed';
+      el.style.left = '50%';
+      el.style.bottom = '20px';
+      el.style.transform = 'translateX(-50%)';
+      el.style.background = 'rgba(20,24,40,0.8)';
+      el.style.color = '#eaf1ff';
+      el.style.border = '1px solid rgba(255,255,255,0.18)';
+      el.style.padding = '8px 12px';
+      el.style.borderRadius = '10px';
+      el.style.fontSize = '12px';
+      el.style.backdropFilter = 'blur(6px)';
+      el.style.webkitBackdropFilter = 'blur(6px)';
+      el.style.boxShadow = '0 8px 20px rgba(0,0,0,0.4)';
+      el.style.zIndex = 4;
+      document.body.appendChild(el);
+      setTimeout(()=> el.remove(), 2200);
+    }
   </script>
 </body>
 </html>
