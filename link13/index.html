@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,7 +20,7 @@
     --bg-c1: #3a1c71;
     --bg-c2: #d76d77;
     --bg-c3: #ffaf7b;
-    /* Clock colors (with glass overlay) */
+    /* Flip clock colors (with glass overlay) */
     --clock-c1: #ffffff;
     --clock-c2: #ffffff;
     --clock-c3: #ffffff;
@@ -36,10 +37,6 @@
     --candle-offset: 18px;
     /* To‑do base bg (transparent by default) */
     --todo-bg: transparent;
-    /* Mobile-specific adjustments */
-    --mobile-digit-w: 80px;
-    --mobile-digit-h: 110px;
-    --mobile-font-size: 12px;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -48,11 +45,10 @@
     font-family:"Comic Sans MS", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
     background-image: linear-gradient(var(--bg-angle), var(--bg-c1), var(--bg-c2), var(--bg-c3));
     background-attachment: fixed; background-size: cover; background-position: center;
-    overflow-x: hidden;
   }
   .brand{
     position:fixed; left:12px; top:10px; z-index:40; color:#fff;
-    font-weight:800; font-size:11px; letter-spacing:.3px;
+    font-weight:800; font-size:13px; letter-spacing:.3px;
     text-shadow:0 1px 2px rgba(0,0,0,.35); user-select:none;
   }
   /* ===== Main layout: Clock | To‑do | Candle ===== */
@@ -72,7 +68,7 @@
   #todo-panel     { grid-column:2; justify-self:center; align-self:center; }
   #candle-area    { grid-column:3; }
   /* Center Clock: timer centered; To‑do stays LEFT (grid) */
-  .center-clock .main{ grid-template-columns: 1fr max-content 1fr; }
+  .center-clock .main{ grid-template-columns: max-content 1fr max-content; }
   .center-clock #timer-container{
     position:absolute; left:50%; top:50%;
     transform:translate(-50%,-50%); z-index:5; min-width:0; width:auto;
@@ -83,19 +79,19 @@
   }
   /* Hide candle → To‑do occupies RIGHT */
   .candle-off #candle-area{ display:none !important; }
-  .candle-off .main{ grid-template-columns: max-content auto; }
+  .candle-off .main{ grid-template-columns: max-content max-content; }
   .candle-off #todo-panel{
     position:static !important; left:auto !important; top:auto !important; transform:none !important; justify-self:end !important;
   }
   /* Center‑clock + candle‑off → keep To‑do LEFT */
-  .center-clock.candle-off .main{ grid-template-columns: 1fr auto; }
+  .center-clock.candle-off .main{ grid-template-columns: max-content 1fr; }
   .center-clock.candle-off #todo-panel{
     position:static !important; grid-column:1 !important; justify-self:start !important;
     margin-left:min(48px,5vw) !important; z-index:6 !important;
   }
   /* Only candle → center candle, hide clock; To‑do LEFT */
   .only-candle #timer-container{ display:none !important; }
-  .only-candle .main{ grid-template-columns: 1fr 1fr; }
+  .only-candle .main{ grid-template-columns: max-content 1fr; }
   .only-candle #todo-panel{
     position:static; grid-column:1; justify-self:start; align-self:center; margin-left:min(48px,5vw);
     z-index:6;
@@ -108,7 +104,7 @@
   #todo-panel{
     max-width: clamp(220px, 26vw, 420px);
     max-height: 60vh;
-    font-size: 12px;
+    font-size: 13px;
     overflow:auto; padding:10px 12px; border-radius:12px;
     border:1px solid rgba(255,255,255,.18);
     background: var(--todo-bg, transparent);
@@ -122,7 +118,7 @@
     box-shadow: 0 8px 24px rgba(0,0,0,.18), 0 2px 6px rgba(0,0,0,.12) !important;
     backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
   }
-  #todoTitle{ margin:0 0 6px 0; font-size:11.5px; font-weight:900; letter-spacing:.35px; opacity:.95; }
+  #todoTitle{ margin:0 0 6px 0; font-size:12.5px; font-weight:900; letter-spacing:.35px; opacity:.95; }
   #todoList{ margin:0; padding:4px 4px 4px 8px; list-style:none; counter-reset:tdn; font-family:inherit; }
   #todoList li{ counter-increment:tdn; position:relative; padding-left:28px; margin:4px 0; min-height:20px; outline:none; transition: opacity .18s, transform .18s; }
   #todoList li:before{ content: counter(tdn) "."; position:absolute; left:0; top:0; width:22px; text-align:right; padding-right:6px; font-weight:900; opacity:.9; }
@@ -207,95 +203,25 @@
     display:flex; flex-direction:column; gap:8px; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
   }
   .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-  label{ font-size:11px; color:#fff; opacity:.95 }
+  label{ font-size:12px; color:#fff; opacity:.95 }
   input[type="number"],input[type="color"],input[type="file"]{
     width:100%; padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.35); color:#fff; outline:none;
   }
-  input[type="checkbox"]{ transform:scale(1.1) }
-  .btn{ padding:10px 16px; border-radius:10px; border:none; font-weight:800; cursor:pointer; font-family:inherit; background:linear-gradient(135deg,#ffd166,#ff9a00); color:#1b1b1b; box-shadow:0 6px 16px rgba(0,0,0,.18); transition:transform .12s, box-shadow .2s, background .2s; }
+  input[type="checkbox"]{ transform:scale(1.2) }
+  .btn{ padding:12px 18px; border-radius:12px; border:none; font-weight:800; cursor:pointer; font-family:inherit; background:linear-gradient(135deg,#ffd166,#ff9a00); color:#1b1b1b; box-shadow:0 6px 16px rgba(0,0,0,.18); transition:transform .12s, box-shadow .2s, background .2s; }
   .btn:hover{ background:linear-gradient(135deg,#ffe08a,#ffb347); box-shadow:0 10px 24px rgba(0,0,0,.28); }
   .btn:active{ transform: translateY(1px) scale(.99); }
   .btn.alt{ background:linear-gradient(135deg,#a5b4fc,#6366f1); color:#0d0d15; }
   .btn.warn{ background:linear-gradient(135deg,#fca5a5,#ef4444); color:#0d0d15; }
-  .btn.small{ padding:6px 8px; border-radius:8px; font-weight:900; font-size:11px; }
-  .btn.wide{ min-width:90px; }
+  .btn.small{ padding:8px 10px; border-radius:10px; font-weight:900; }
+  .btn.wide{ min-width:110px; }
   @media (max-width:980px){
     :root{ --digit-w:100px; --digit-h:140px; }
     #todo-panel{ max-width:62vw; }
-    .card{ min-height:140px; }
-    .btn{ padding:9px 14px; }
-    .btn.small{ padding:5px 7px; }
   }
   @media (max-width:720px){
     :root{ --digit-w:86px; --digit-h:120px; }
     #todo-panel{ max-width:72vw; }
-    .card{ min-height:130px; }
-    .btn{ padding:8px 12px; font-size:14px; }
-    .btn.small{ padding:4px 6px; font-size:10px; }
-    .row{ gap:6px; }
-    label{ font-size:10px; }
-    input[type="number"],input[type="color"],input[type="file"]{ padding:6px 8px; }
-    #controls{ gap:10px; padding:12px; }
-    .card{ padding:10px; gap:6px; }
-    .brand{ font-size:10px; }
-  }
-  @media (max-width:480px){
-    :root{ --digit-w:70px; --digit-h:100px; --gap: 16px; }
-    .main{ padding:16px 20px; }
-    #timer{ gap:8px; }
-    .digit{ width:var(--digit-w); height:var(--digit-h); }
-    .value{ font-size: calc(var(--digit-h)*.70); }
-    .colon{ width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); }
-    #todo-panel{ max-width:80vw; font-size:11px; padding:8px 10px; }
-    #todoTitle{ font-size:10.5px; }
-    #todoList li{ padding-left:24px; }
-    #todoList li:before{ width:20px; }
-    #controls{ gap:8px; padding:10px; }
-    .card{ padding:8px; gap:4px; min-height:110px; }
-    .row{ gap:4px; }
-    label{ font-size:9px; }
-    input[type="number"],input[type="color"],input[type="file"]{ padding:5px 7px; font-size:11px; }
-    .btn{ padding:7px 10px; font-size:13px; }
-    .btn.small{ padding:4px 6px; font-size:9px; }
-    .btn.wide{ min-width:70px; }
-    .brand{ font-size:9px; left:8px; top:6px; }
-    #candle-area{ height:max(300px,40vh); }
-    .candle-clip{ width:140px; height:300px; }
-    .candle-wrap{ width:140px; height:300px; }
-    .wax{ width:120px; }
-    .waxTop{ width:120px; }
-    .wick{ width:5px; }
-    .flame{ width:40px; height:90px; }
-    .flame-core{ border-radius:50% 50% 38% 38%; }
-  }
-  @media (max-width:360px){
-    :root{ --digit-w:60px; --digit-h:85px; --gap: 12px; }
-    .main{ padding:12px 16px; }
-    #timer{ gap:6px; }
-    .digit{ width:var(--digit-w); height:var(--digit-h); }
-    .value{ font-size: calc(var(--digit-h)*.70); }
-    .colon{ width:calc(var(--digit-w)*.33); height:var(--digit-h); font-size:calc(var(--digit-h)*.6); }
-    #todo-panel{ max-width:85vw; font-size:10px; padding:6px 8px; }
-    #todoTitle{ font-size:9.5px; }
-    #todoList li{ padding-left:20px; margin:3px 0; }
-    #todoList li:before{ width:18px; }
-    #controls{ gap:6px; padding:8px; }
-    .card{ padding:6px; gap:3px; min-height:90px; }
-    .row{ gap:3px; flex-wrap:wrap; }
-    label{ font-size:8px; }
-    input[type="number"],input[type="color"],input[type="file"]{ padding:4px 6px; font-size:10px; }
-    .btn{ padding:6px 8px; font-size:12px; }
-    .btn.small{ padding:3px 5px; font-size:8px; }
-    .btn.wide{ min-width:60px; }
-    .brand{ font-size:8px; left:6px; top:5px; }
-    #candle-area{ height:max(250px,38vh); }
-    .candle-clip{ width:110px; height:250px; }
-    .candle-wrap{ width:110px; height:250px; }
-    .wax{ width:95px; }
-    .waxTop{ width:95px; }
-    .wick{ width:4px; height:25px; }
-    .flame{ width:30px; height:70px; }
-    .flame-core{ border-radius:50% 50% 38% 38%; }
   }
   .no-transitions, .no-transitions *{ transition: none !important; animation: none !important; }
   /* ===== 3-2-1 Count-in Overlay ===== */
@@ -321,28 +247,27 @@
     overflow:hidden;
   }
   #cgCard{
-    position:relative; padding:20px 24px; border-radius:14px;
+    position:relative; padding:28px 32px; border-radius:18px;
     background: rgba(255,255,255,.12); color:#fff; text-align:center;
     border: 1px solid rgba(255,255,255,.25);
     backdrop-filter: blur(8px);
     box-shadow: 0 14px 44px rgba(0,0,0,.35);
   }
-  #cgTitle{ margin:0 0 4px 0; font-size: clamp(20px, 5vw, 36px); font-weight:900; letter-spacing:.4px; }
-  #cgMsg{ margin:0 0 10px 0; opacity:.95; font-size: clamp(12px, 2vw, 16px) }
+  #cgTitle{ margin:0 0 6px 0; font-size: clamp(28px, 6vw, 46px); font-weight:900; letter-spacing:.4px; }
+  #cgMsg{ margin:0 0 14px 0; opacity:.95; font-size: clamp(14px, 2.4vw, 18px) }
   #cgClose{
-    appearance:none; cursor:pointer; border:none; border-radius:10px;
-    padding:8px 12px; font-weight:900; background:#fff; color:#111;
+    appearance:none; cursor:pointer; border:none; border-radius:12px;
+    padding:10px 14px; font-weight:900; background:#fff; color:#111;
     box-shadow:0 6px 16px rgba(0,0,0,.2);
-    font-size:14px;
   }
   .balloon{
-    position:absolute; bottom:-20vh; width:20px; height:26px;
+    position:absolute; bottom:-20vh; width:28px; height:36px;
     border-radius:50% 50% 46% 46%; background: var(--bcol, #ff6b6b);
     box-shadow: inset 0 -8px 14px rgba(0,0,0,.18), 0 10px 24px rgba(0,0,0,.18);
     animation: rise var(--dur, 8s) linear infinite;
   }
   .balloon:after{
-    content:""; position:absolute; left:50%; bottom:-10px; width:2px; height:36px;
+    content:""; position:absolute; left:50%; bottom:-12px; width:2px; height:48px;
     background: rgba(255,255,255,.75); transform:translateX(-50%); opacity:.85;
   }
   @keyframes rise{
@@ -453,96 +378,6 @@
   }
   #backButton::after {
     content: "←";
-  }
-  /* Mobile-specific adjustments for small screens */
-  @media (max-height: 500px) {
-    .main { min-height: 50vh; padding: 16px 20px; }
-    #controls { min-height: 140px; padding: 10px; }
-    .card { min-height: 110px; padding: 8px; }
-    #candle-area { height: max(250px, 35vh); }
-  }
-  @media (max-height: 400px) {
-    .main { min-height: 40vh; padding: 12px 16px; }
-    #controls { min-height: 120px; padding: 8px; }
-    .card { min-height: 90px; padding: 6px; }
-    #candle-area { height: max(200px, 30vh); }
-    .candle-clip, .candle-wrap { height: 200px; }
-  }
-  /* Responsive adjustments for different screen sizes */
-  @media (min-width: 1024px) and (max-width: 1366px) {
-    /* 14-inch laptop and similar */
-    :root {
-      --digit-w: 110px;
-      --digit-h: 150px;
-      --gap: 40px;
-    }
-    .main { padding: 24px 5vw; }
-    #candle-area { height: max(360px, 40vh); }
-    .candle-clip, .candle-wrap { height: 360px; }
-    .wax { height: 95%; }
-  }
-  @media (min-width: 1367px) and (max-width: 1600px) {
-    /* 15-inch laptop and larger screens */
-    :root {
-      --digit-w: 130px;
-      --digit-h: 180px;
-      --gap: 60px;
-    }
-    .main { padding: 30px 6vw; }
-    #candle-area { height: max(400px, 44vh); }
-    .candle-clip, .candle-wrap { height: 400px; }
-    .wax { height: 96%; }
-    .flame { width: 60px; height: 120px; }
-  }
-  @media (min-width: 768px) and (max-width: 1023px) and (orientation: landscape) {
-    /* Tablets in landscape mode */
-    :root {
-      --digit-w: 90px;
-      --digit-h: 125px;
-      --gap: 30px;
-    }
-    #todo-panel { max-width: 300px; }
-    #candle-area { height: max(320px, 40vh); }
-    .candle-clip, .candle-wrap { height: 320px; }
-  }
-  @media (min-width: 768px) and (max-width: 1023px) and (orientation: portrait) {
-    /* Tablets in portrait mode */
-    :root {
-      --digit-w: 80px;
-      --digit-h: 110px;
-      --gap: 24px;
-    }
-    .main { padding: 20px 4vw; }
-    #candle-area { height: max(280px, 38vh); }
-    .candle-clip, .candle-wrap { height: 280px; }
-    .card { min-height: 130px; }
-  }
-  @media (max-width: 767px) and (orientation: portrait) {
-    /* Mobile phones in portrait mode */
-    .main { padding: 16px 4vw; }
-    #candle-area { height: max(260px, 36vh); }
-    .candle-clip, .candle-wrap { height: 260px; }
-    .wax { width: 110px; }
-    .waxTop { width: 110px; }
-    .wick { width: 5px; }
-    .flame { width: 36px; height: 80px; }
-  }
-  /* High DPI/Retina displays */
-  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-    .digit, .colon {
-      image-rendering: -webkit-optimize-contrast;
-      image-rendering: crisp-edges;
-    }
-  }
-  /* Responsive typography */
-  @media (max-width: 1200px) {
-    .brand { font-size: 10px; }
-  }
-  @media (max-width: 800px) {
-    .brand { font-size: 9px; }
-  }
-  @media (max-width: 600px) {
-    .brand { font-size: 8px; }
   }
 </style>
 </head>
@@ -754,6 +589,7 @@
     if (cur === newVal) return;
     const topVal = digitEl.querySelector(".top .value");
     const botVal = digitEl.querySelector(".bottom .value");
+    
     // Create top flip element
     const topFlip = document.createElement("div");
     topFlip.className = "top-flip";
@@ -763,8 +599,10 @@
     topFlip.appendChild(t);
     topVal.textContent = cur;
     botVal.textContent = cur;
+    
     // Append top flip and set up animation end
     digitEl.appendChild(topFlip);
+    
     // Remove any existing flip elements to prevent duplicates
     const existingTopFlips = digitEl.querySelectorAll('.top-flip');
     if (existingTopFlips.length > 1) {
@@ -772,9 +610,11 @@
         existingTopFlips[i].remove();
       }
     }
+    
     topFlip.addEventListener("animationend", () => {
       topVal.textContent = newVal;
       topFlip.remove();
+      
       // Create bottom flip element
       const bottomFlip = document.createElement("div");
       bottomFlip.className = "bottom-flip";
@@ -782,8 +622,10 @@
       b.className = "value";
       b.textContent = newVal;
       bottomFlip.appendChild(b);
+      
       // Append bottom flip
       digitEl.appendChild(bottomFlip);
+      
       // Remove any existing bottom flip elements to prevent duplicates
       const existingBottomFlips = digitEl.querySelectorAll('.bottom-flip');
       if (existingBottomFlips.length > 1) {
@@ -791,6 +633,7 @@
           existingBottomFlips[i].remove();
         }
       }
+      
       bottomFlip.addEventListener("animationend", () => {
         botVal.textContent = newVal;
         digitEl.dataset.value = newVal;
@@ -870,10 +713,12 @@
   let paused = false;
   let pauseRemainMs = 0;
   let countInActive = false;
+  
   function safeBuildClock(){
     useFlip = $("#useFlip")?.checked ?? true;
     const showH = $("#showHours")?.checked ?? false;
     const showS = $("#showSeconds")?.checked ?? true;
+    
     if (useFlip){
       timerFlip.style.display = "flex";
       timerSimple.style.display = "none";
@@ -885,6 +730,7 @@
       renderSimple(0);
     }
   }
+  
   function ensureVisible(){
     if ($("#showTodo")?.checked && !document.body.classList.contains("todo-on")){
       document.body.classList.add("todo-on");
@@ -893,19 +739,23 @@
       safeBuildClock();
     }
   }
+  
   function startCountdown(){
     const h = Math.max(0, parseInt($("#hoursInput")?.value || "0", 10));
     const m = Math.max(0, parseInt($("#minInput")?.value || "0", 10));
     const s = Math.max(0, Math.min(59, parseInt($("#secInput")?.value || "0", 10)));
     totalSec = h * 3600 + m * 60 + s;
+    
     // Reset candle state
     candleWrap.classList.remove("vanish");
     stubEl.style.display = "none";
     flameEl.classList.remove("off");
     setWaxHeightByProgress(1);
     afterNextPaint(positionFlame);
+    
     const showH = $("#showHours")?.checked ?? false;
     const showS = $("#showSeconds")?.checked ?? true;
+    
     // Build the clock display
     if (useFlip){
       flipDigits = buildFlip(timerFlip, showH, showS);
@@ -913,19 +763,23 @@
     }else{
       renderSimple(totalSec);
     }
+    
     // Cancel any existing animation
     if (rafId) {
       cancelAnimationFrame(rafId);
       rafId = null;
     }
+    
     // Reset states
     paused = false;
     running = false;
+    
     // Check if timer is set to zero
     if (totalSec <= 0) { 
       finishNow(); 
       return; 
     }
+    
     // Start the countdown
     endAtMs = performance.now() + totalSec * 1000;
     lastWhole = Math.ceil(totalSec);
@@ -933,10 +787,13 @@
     primaryBtn.textContent = "Stop";
     rafId = requestAnimationFrame(loop);
   }
+  
   function loop(now){
     if (!running) return;
+    
     const remainMs = Math.max(0, endAtMs - now);
     const secWhole = Math.floor(remainMs / 1000);
+    
     // Update display only when seconds change
     if (secWhole !== lastWhole){
       if (useFlip){
@@ -948,17 +805,21 @@
       }
       lastWhole = secWhole;
     }
+    
     // Update candle
     const p = totalSec > 0 ? remainMs / (totalSec * 1000) : 0;
     setWaxHeightByProgress(p);
     positionFlame();
+    
     // Check if countdown is complete
     if (remainMs <= 0) { 
       finishNow(); 
       return; 
     }
+    
     rafId = requestAnimationFrame(loop);
   }
+  
   async function startWithCountIn(){
     if (countInActive) return;
     countInActive = true;
@@ -967,6 +828,7 @@
     const num = $("#countInner");
     ov.style.display = "flex";
     const steps = ["3","2","1","Go!"];
+    
     for (let i=0; i<steps.length; i++){
       num.textContent = steps[i];
       num.classList.remove("pop");
@@ -974,11 +836,13 @@
       num.classList.add("pop");
       await new Promise(r => setTimeout(r, i < steps.length-1 ? 760 : 560));
     }
+    
     ov.style.display = "none";
     primaryBtn.disabled = false;
     countInActive = false;
     startCountdown();
   }
+  
   function togglePrimary(){
     if (!running && !paused) { 
       startWithCountIn(); 
@@ -1006,6 +870,7 @@
       rafId = requestAnimationFrame(loop);
     }
   }
+  
   function resetCountdown(){
     if (rafId) {
       cancelAnimationFrame(rafId);
@@ -1014,13 +879,16 @@
     running = false; 
     paused = false; 
     primaryBtn.textContent = "Start";
+    
     safeBuildClock(); 
     snapResetCandle(); 
     hideCongrats();
     $("#countOverlay").style.display = "none"; 
     countInActive = false;
+    
     afterNextPaint(ensureVisible);
   }
+  
   function finishNow(){
     if (rafId) {
       cancelAnimationFrame(rafId);
@@ -1028,11 +896,13 @@
     }
     running = false; 
     paused = false;
+    
     flameEl.classList.add("off"); 
     candleWrap.classList.add("vanish"); 
     showCongrats(); 
     primaryBtn.textContent = "Start";
   }
+  
   /* ---------- Candle & flame positioning ---------- */
   const area = $("#candle-area");
   const waxEl = $("#wax");
@@ -1042,55 +912,69 @@
   const stubEl = $("#stub");
   const baseWaxHeight = 380;
   const minStub = 58;
+  
   function positionFlame(){
     if (!area || getComputedStyle(area).display === "none") return;
+    
     const a = area.getBoundingClientRect();
     const w = wickEl.getBoundingClientRect();
     const cx = w.left + w.width / 2 - a.left;
     const topAnchor = w.top - a.top;
+    
     flameEl.style.left = `${cx}px`;
     flameEl.style.top = `${topAnchor + 6}px`;
   }
+  
   function setWaxHeightByProgress(progress){
     const usable = baseWaxHeight - minStub;
     const h = minStub + Math.max(0, usable * progress);
     waxEl.style.height = `${h}px`;
   }
+  
   function snapResetCandle(){
     // Add no-transitions class to prevent animation during reset
     candleWrap.classList.add("no-transitions"); 
     waxEl.classList.add("no-transitions");
+    
     // Reset candle state
     candleWrap.classList.remove("vanish"); 
     stubEl.style.display = "none"; 
     flameEl.classList.remove("off");
     setWaxHeightByProgress(1); 
+    
     // Force reflow
     void candleWrap.offsetHeight; 
+    
     // Position flame
     positionFlame();
+    
     // Remove no-transitions class after next frame
     requestAnimationFrame(()=>{
       candleWrap.classList.remove("no-transitions"); 
       waxEl.classList.remove("no-transitions"); 
     });
   }
+  
   // Set up observers for responsive flame positioning
   new ResizeObserver(()=> requestAnimationFrame(()=>positionFlame())).observe(area);
   new MutationObserver(()=> requestAnimationFrame(()=>positionFlame())).observe(document.body,{attributes:true,attributeFilter:["class"]});
   waxEl.addEventListener("transitionend", ()=> requestAnimationFrame(()=>positionFlame()));
   window.addEventListener("resize", () => requestAnimationFrame(() => positionFlame()));
+  
   /* ---------- Congrats overlay ---------- */
   const congrats = $("#congrats");
   $("#cgClose")?.addEventListener("click", () => { 
     if (congrats) congrats.style.display = "none"; 
   });
+  
   function showCongrats(){ 
     if (congrats) congrats.style.display = "flex"; 
   }
+  
   function hideCongrats(){ 
     if (congrats) congrats.style.display = "none"; 
   }
+  
   /* ---------- Fullscreen ---------- */
   async function enterFullscreen(){
     try{
@@ -1104,29 +988,36 @@
       console.warn("Fullscreen error:", e);
     }
   }
+  
   $("#fsBtn").addEventListener("click", enterFullscreen);
   document.addEventListener("fullscreenchange", () => { 
     document.body.classList.toggle("is-fs", !!document.fullscreenElement); 
   });
+  
   /* ---------- To‑do logic ---------- */
   const todoList = $("#todoList");
+  
   function makeTodoItem(text = ""){
     const li = document.createElement("li");
     const label = document.createElement("label"); 
     label.className = "todoItem";
+    
     const chk = document.createElement("input"); 
     chk.type = "checkbox"; 
     chk.className = "todoChk";
+    
     const span = document.createElement("span"); 
     span.className = "todoText"; 
     span.contentEditable = "true"; 
     span.spellcheck = false; 
     span.textContent = text;
+    
     label.appendChild(chk); 
     label.appendChild(span); 
     li.appendChild(label); 
     return li;
   }
+  
   function spanFocus(el){ 
     el.focus(); 
     const r = document.createRange(); 
@@ -1136,6 +1027,7 @@
     s.removeAllRanges(); 
     s.addRange(r); 
   }
+  
   function addEmptyIfNeeded(){ 
     if(!todoList.firstElementChild){ 
       const li = makeTodoItem(""); 
@@ -1143,8 +1035,10 @@
       spanFocus(li.querySelector(".todoText")); 
     } 
   }
+  
   todoList.addEventListener("keydown",(e)=>{
     if(!e.target.classList?.contains("todoText")) return;
+    
     if(e.key === "Enter"){ 
       if(e.shiftKey) return; 
       e.preventDefault(); 
@@ -1153,6 +1047,7 @@
       li.after(n); 
       spanFocus(n.querySelector(".todoText")); 
     }
+    
     if(e.key === "Backspace" && e.target.textContent.trim() === ""){ 
       const li = e.target.closest("li"); 
       const prev = li.previousElementSibling?.querySelector(".todoText"); 
@@ -1164,6 +1059,7 @@
       addEmptyIfNeeded(); 
     }
   });
+  
   todoList.addEventListener("change",(e)=>{ 
     if(!e.target.classList?.contains("todoChk")) return; 
     const li = e.target.closest("li"); 
@@ -1173,32 +1069,39 @@
       addEmptyIfNeeded(); 
     }, 160); 
   });
+  
   /* ---------- Music ---------- */
   const musicFiles = $("#musicFiles");
   const musicNow = $("#musicNow");
   const musicPlayBtn = $("#musicPlay");
   const audio = new Audio(); 
   audio.preload = "metadata";
+  
   let playlist = [], trackIndex = 0; 
   const objectUrls = new Set();
+  
   function updateNow(){ 
     if (musicNow) {
       musicNow.textContent = playlist.length ? `${trackIndex+1}/${playlist.length} • ${playlist[trackIndex].name}` : ""; 
     }
   }
+  
   function loadPlaylist(files){ 
     // Clean up previous URLs
     objectUrls.forEach((u) => URL.revokeObjectURL(u));
     objectUrls.clear(); 
     playlist = [];
     trackIndex = 0; 
+    
     // Create new URLs for files
     for(const f of files){ 
       const url = URL.createObjectURL(f); 
       objectUrls.add(url); 
       playlist.push({name: f.name, url}); 
     } 
+    
     updateNow(); 
+    
     // Set audio source if playlist exists
     if(playlist.length){ 
       audio.src = playlist[trackIndex].url; 
@@ -1206,6 +1109,7 @@
       audio.removeAttribute("src"); 
     }
   }
+  
   function playTrack(i){ 
     if(!playlist.length) return; 
     trackIndex = (i + playlist.length) % playlist.length; 
@@ -1216,6 +1120,7 @@
     updateNow(); 
     if (musicPlayBtn) musicPlayBtn.textContent = "⏸"; 
   }
+  
   function startPlaylist(){ 
     if(!playlist.length) return; 
     if(!audio.src) audio.src = playlist[trackIndex].url; 
@@ -1226,16 +1131,20 @@
     }); 
     updateNow(); 
   }
+  
   function pausePlaylist(){ 
     audio.pause(); 
     if (musicPlayBtn) musicPlayBtn.textContent = "▶"; 
   }
+  
   function nextTrack(){ 
     if(playlist.length) playTrack(trackIndex + 1); 
   }
+  
   function prevTrack(){ 
     if(playlist.length) playTrack(trackIndex - 1); 
   }
+  
   // Audio event listeners
   audio.addEventListener("ended", () => {
     if ($("#musicLoop")?.checked) {
@@ -1244,12 +1153,15 @@
       nextTrack();
     }
   });
+  
   audio.addEventListener("play", () => { 
     if (musicPlayBtn) musicPlayBtn.textContent = "⏸"; 
   });
+  
   audio.addEventListener("pause", () => { 
     if (musicPlayBtn) musicPlayBtn.textContent = "▶"; 
   });
+  
   // Button event listeners
   $("#addMusicBtn")?.addEventListener("click", () => musicFiles?.click());
   musicFiles?.addEventListener("change", (e) => loadPlaylist(e.target.files));
@@ -1257,33 +1169,42 @@
   $("#musicNext")?.addEventListener("click", nextTrack);
   $("#musicPrev")?.addEventListener("click", prevTrack);
   $("#musicLoop")?.addEventListener("change", (e) => audio.loop = !!e.target.checked);
+  
   // Clean up URLs on unload
   window.addEventListener("beforeunload", () => {
     objectUrls.forEach(u => URL.revokeObjectURL(u));
   });
+  
   /* ---------- Custom background image ---------- */
   const bgImageBtn = $("#bgImageBtn"), 
         bgImageFile = $("#bgImageFile"), 
         bgImageClear = $("#bgImageClear"), 
         bgImageName = $("#bgImageName");
+  
   bgImageBtn?.addEventListener("click", () => bgImageFile?.click());
+  
   bgImageFile?.addEventListener("change", (e) => {
     const f = e.target.files?.[0]; 
     if (!f) return;
+    
     // Clean up previous URL
     if (bgObjectUrl){ 
       URL.revokeObjectURL(bgObjectUrl); 
       bgObjectUrl = null; 
     }
+    
     // Create new URL and apply
     bgObjectUrl = URL.createObjectURL(f);
     document.body.style.backgroundImage = `url("${bgObjectUrl}")`;
     document.body.style.backgroundSize = "cover";
     document.body.style.backgroundPosition = "center";
     document.body.style.backgroundAttachment = "fixed";
+    
     if (bgImageName) bgImageName.textContent = f.name;
   });
+  
   bgImageClear?.addEventListener("click", applyGradient);
+  
   /* ---------- Layout flags ---------- */
   function ensureCandleVisibleWhenOnlyCandle(on){
     if (on){
@@ -1294,6 +1215,7 @@
       }
     }
   }
+  
   // Real time mode functions
   function updateRealTimeClock() {
     const now = new Date();
@@ -1302,29 +1224,36 @@
     const seconds = now.getSeconds().toString().padStart(2, '0');
     const timeStr = `${hours}:${minutes}:${seconds}`;
     $("#realTimeDigits").textContent = timeStr;
+    
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     const dateStr = now.toLocaleDateString(undefined, options);
     $("#realTimeDate").textContent = dateStr;
   }
+  
   function toggleRealTimeMode() {
     const realTimeContainer = $("#realTimeContainer");
     const backButton = $("#backButton");
+    
     if ($("#realTimeMode")?.checked) {
       // Get current background from body
       const bodyBg = getComputedStyle(document.body).backgroundImage;
       const bodyBgColor = getComputedStyle(document.body).backgroundColor;
+      
       // Apply the same background to real time container
       realTimeContainer.style.backgroundImage = bodyBg;
       realTimeContainer.style.backgroundColor = bodyBgColor;
       realTimeContainer.style.backgroundSize = "cover";
       realTimeContainer.style.backgroundPosition = "center";
       realTimeContainer.style.backgroundAttachment = "fixed";
+      
       // Show real time mode
       realTimeContainer.style.display = "flex";
       backButton.style.display = "flex";
+      
       // Update clock immediately and set interval
       updateRealTimeClock();
       window.realTimeInterval = setInterval(updateRealTimeClock, 1000);
+      
       // Hide everything else
       document.body.classList.add("real-time-mode");
     } else {
@@ -1339,6 +1268,7 @@
       document.body.classList.remove("real-time-mode");
     }
   }
+  
   // Back button functionality
   $("#backButton")?.addEventListener("click", () => {
     const realTimeModeCheckbox = $("#realTimeMode");
@@ -1347,6 +1277,7 @@
       toggleRealTimeMode();
     }
   });
+  
   // Real time clock color functionality
   function updateRealTimeColor() {
     const color = $("#realTimeColor")?.value || "#ffffff";
@@ -1354,40 +1285,49 @@
     $("#realTimeDigits").style.color = color;
     $("#realTimeDigits").style.textShadow = `0 2px 8px ${shadowColor}`;
   }
+  
   // Apply real time color on change
   $("#realTimeColor")?.addEventListener("input", updateRealTimeColor);
+  
   function applyLayoutFlags(){
     document.body.classList.toggle("candle-off", $("#hideCandle")?.checked);
     document.body.classList.toggle("center-clock", $("#centerClock")?.checked);
     document.body.classList.toggle("only-candle", $("#onlyCandle")?.checked);
     document.body.classList.toggle("todo-on", $("#showTodo")?.checked);
+    
     safeBuildClock();
     requestAnimationFrame(() => { 
       positionFlame(); 
       ensureVisible(); 
     });
+    
     // Handle real time mode
     if ($("#realTimeMode")?.checked) {
       toggleRealTimeMode();
     }
+    
     // Update real time clock color
     updateRealTimeColor();
   }
+  
   function previewLayout(){
     const sh = $("#showHours")?.checked ?? false;
     const ss = $("#showSeconds")?.checked ?? true;
     const uf = $("#useFlip")?.checked ?? true;
+    
     if(uf){ 
       flipDigits = buildFlip(timerFlip, sh, ss); 
       tickFlip(flipDigits, 0, sh, ss); 
     } else { 
       renderSimple(0); 
     }
+    
     requestAnimationFrame(() => { 
       positionFlame(); 
       ensureVisible(); 
     });
   }
+  
   /* ---------- Bindings ---------- */
   $("#primaryBtn").addEventListener("click", togglePrimary);
   $("#resetBtn").addEventListener("click", resetCountdown);
@@ -1405,6 +1345,7 @@
   });
   $("#showTodo").addEventListener("change", () => applyLayoutFlags());
   $("#realTimeMode").addEventListener("change", () => toggleRealTimeMode());
+  
   // Gradient and color controls
   ["bgAngle","bgC1","bgC2","bgC3"].forEach(id => {
     const el = document.getElementById(id);
@@ -1412,54 +1353,69 @@
       el.addEventListener("input", applyGradient);
     }
   });
+  
   ["clockC1","clockC2","clockC3","textColor","colonColor","simpleColor"].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
       el.addEventListener("input", restyleClockPanels);
     }
   });
+  
   // Todo color controls
   $("#todoApply").addEventListener("click", () => { 
     setTodoBg($("#todoColor").value); 
     $("#todo-panel").classList.remove("todo-clear"); 
   });
+  
   $("#todoClear").addEventListener("click", () => { 
     setTodoBg("transparent"); 
     $("#todo-panel").classList.add("todo-clear"); 
   });
+  
   $("#todoGlass").addEventListener("change", (e) => {
     $("#todo-panel").classList.toggle("todo-glass", e.target.checked);
   });
+  
   /* ---------- Init ---------- */
   (function boot(){
     // Apply initial styles
     applyGradient(); 
     restyleClockPanels(); 
+    
     // Apply layout settings
     if ($("#showTodo")?.checked) document.body.classList.add("todo-on");
     if ($("#todoGlass")?.checked) $("#todo-panel").classList.add("todo-glass");
+    
     applyLayoutFlags();
     safeBuildClock();
     previewLayout();
+    
     // Position flame and ensure visibility
     afterNextPaint(() => { 
       positionFlame(); 
       ensureVisible(); 
     });
+    
     setTimeout(() => { 
       positionFlame(); 
       ensureVisible(); 
     }, 150);
+    
     setWaxHeightByProgress(1);
+    
     // Seed one empty to-do item
     const li = makeTodoItem(""); 
     $("#todoList").appendChild(li);
+    
     // Initialize real time clock display
     updateRealTimeClock();
+    
     // Ensure primary button is properly labeled
     primaryBtn.textContent = "Start";
+    
     // Initialize real time clock color
     updateRealTimeColor();
+    
   })();
 </script>
 </body>
@@ -1654,6 +1610,7 @@
     const modal = document.getElementById('donate-modal-overlay');
     const closeButton = document.getElementById('close-donate-modal');
     let hasBeenShown = false; // Flag to ensure it only shows once per page visit
+    
     // Function to show the modal
     function showModal() {
       if (!hasBeenShown) {
@@ -1661,10 +1618,12 @@
         hasBeenShown = true;
       }
     }
+    
     // Function to hide the modal
     function hideModal() {
       modal.style.display = 'none';
     }
+    
     // --- EVENT LISTENERS ---
     // Listen for the mouse leaving the document window (the trigger)
     document.addEventListener('mouseout', function(e) {
@@ -1673,8 +1632,10 @@
         showModal();
       }
     });
+    
     // Hide the modal if the close button (X) is clicked
     closeButton.addEventListener('click', hideModal);
+    
     // Hide the modal if the user clicks on the dark overlay background
     modal.addEventListener('click', function(e) {
       if (e.target === modal) {
@@ -1686,3 +1647,17 @@
 <!-- ...to here, right before your </body> tag -->
 <!-- =============== END: EXIT-INTENT DONATION POP-UP CODE =============== -->
 <!-- ===================================================================== -->
+<script>
+  // Force desktop view on mobile by overriding viewport
+  (function() {
+    var meta = document.querySelector("meta[name=viewport]");
+    if (meta) {
+      meta.setAttribute("content", "width=1024, initial-scale=1.0");
+    } else {
+      meta = document.createElement("meta");
+      meta.name = "viewport";
+      meta.content = "width=1024, initial-scale=1.0";
+      document.head.appendChild(meta);
+    }
+  })();
+</script>
