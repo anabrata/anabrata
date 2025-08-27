@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,139 +7,357 @@
 <title>A4 Portrait • Photos 4×3 cm • 6 per row • Made by ANABRATA</title>
 <meta name="color-scheme" content="light dark" />
 <style>
-  :root{
-    --green:#10b981; --yellow:#fde047; --blue:#3b82f6;
-    --card:#ffffffee; --text:#0b1020; --muted:#4b5563; --ring:rgba(0,0,0,.12);
-    --grad: linear-gradient(135deg, var(--green), var(--blue), var(--yellow));
+  @import url('https://fonts.googleapis.com/css2?family=Comic+Sans+MS:wght@400;700&display=swap');
+  
+  :root {
+    --green: #10b981;
+    --yellow: #fde047;
+    --blue: #3b82f6;
+    --purple: #8b5cf6;
+    --pink: #ec4899;
+    --orange: #f97316;
+    --card: #ffffffee;
+    --text: #0b1020;
+    --muted: #4b5563;
+    --ring: rgba(0,0,0,.12);
   }
-
-  /* Soft animated background */
-  body{
-    margin:0; font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif; color:var(--text);
-    background:
-      radial-gradient(1200px 800px at 10% 10%, rgba(16,185,129,.22), transparent 60%),
-      radial-gradient(1200px 800px at 90% 20%, rgba(59,130,246,.22), transparent 60%),
-      radial-gradient(1200px 800px at 50% 100%, rgba(253,224,71,.22), transparent 60%),
-      linear-gradient(120deg, #e8fdf6, #eef4ff 40%, #fffbe6 80%, #ffffff);
-    background-size:140% 140%; animation:bgShift 18s ease-in-out infinite alternate;
+  
+  body {
+    margin: 0;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    color: var(--text);
+    background: linear-gradient(135deg, #f0fdfa, #f0f9ff, #fffbeb, #fef2f2);
+    background-size: 400% 400%;
+    animation: gradientShift 25s ease infinite;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
   }
-  @keyframes bgShift{
-    0%{ background-position:0% 0%, 100% 0%, 50% 100%, 0% 0% }
-    100%{ background-position:50% 30%, 50% 20%, 60% 70%, 100% 100% }
+  
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
-
-  /* Decorative “trees/flowers” side panels (pure CSS) */
-  .decor{ position:fixed; top:0; bottom:0; width:170px; pointer-events:none; z-index:0; opacity:.9; filter:saturate(1.1) }
-  .decor.left{ left:0;
-    background:
-      radial-gradient(60px 60px at 40% 12%, rgba(16,185,129,.35), transparent 60%),
-      radial-gradient(48px 48px at 70% 28%, rgba(59,130,246,.30), transparent 60%),
-      radial-gradient(56px 56px at 32% 62%, rgba(253,224,71,.35), transparent 60%),
-      conic-gradient(from 0deg at 58% 58%, rgba(16,185,129,.20), rgba(59,130,246,.20), rgba(253,224,71,.20), rgba(16,185,129,.20));
-    mask-image: linear-gradient(90deg, rgba(0,0,0,.85), rgba(0,0,0,.4), transparent);
-    animation: floatL 12s ease-in-out infinite alternate;
+  
+  .wrap {
+    width: min(1200px, 94%);
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    padding: 20px 0;
   }
-  .decor.right{ right:0;
-    background:
-      radial-gradient(58px 58px at 60% 20%, rgba(59,130,246,.32), transparent 60%),
-      radial-gradient(52px 52px at 30% 42%, rgba(16,185,129,.34), transparent 60%),
-      radial-gradient(50px 50px at 68% 74%, rgba(253,224,71,.34), transparent 60%),
-      conic-gradient(from 180deg at 40% 50%, rgba(59,130,246,.20), rgba(16,185,129,.20), rgba(253,224,71,.20), rgba(59,130,246,.20));
-    mask-image: linear-gradient(270deg, rgba(0,0,0,.85), rgba(0,0,0,.4), transparent);
-    animation: floatR 13s ease-in-out infinite alternate;
+  
+  header.hero {
+    min-height: 40vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem 0;
   }
-  @keyframes floatL{ 0%{ transform:translateY(0) } 100%{ transform:translateY(10px) } }
-  @keyframes floatR{ 0%{ transform:translateY(6px) } 100%{ transform:translateY(-4px) } }
-
-  .wrap{ width:min(1200px,94%); margin:0 auto; position:relative; z-index:1 }
-
-  /* Hero */
-  header.hero{ min-height:34vh; display:grid; place-items:center; text-align:center; padding: clamp(1.6rem,6vw,3rem) 0 1rem; }
-  .welcome{
-    font-weight:900; letter-spacing:.06em; line-height:1.1;
-    background:linear-gradient(90deg, var(--green), var(--blue), var(--yellow), var(--green));
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-    background-size:200% 100%;
-    font-size: clamp(1.3rem, 4.2vw, 2.6rem);
-    animation: fadeInOut 8s ease-in-out infinite, hue 14s linear infinite;
+  
+  .welcome {
+    font-weight: 900;
+    letter-spacing: .06em;
+    line-height: 1.1;
+    color: #0b1020;
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+    position: relative;
+    display: inline-block;
   }
-  @keyframes hue{ 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
-  @keyframes fadeInOut{ 0%{opacity:0} 18%{opacity:1} 82%{opacity:1} 100%{opacity:0} }
-  .byline{ margin-top:.5rem; font-weight:800; color:#0b1020; display:inline-block; padding:.4rem .85rem; border-radius:.8rem;
-           background:linear-gradient(90deg, rgba(16,185,129,.18), rgba(59,130,246,.18), rgba(253,224,71,.18));
-           box-shadow:0 6px 22px rgba(16,185,129,.14), 0 4px 16px rgba(59,130,246,.12) }
-
-  /* Shiny centered menu panel (bigger) */
-  .menu-wrap{ display:grid; place-items:center; margin: 0 auto 1.2rem; width:100%; }
-  .shiny-panel{
-    position:relative; width:min(900px, 96%); border-radius:22px; padding:1.6rem;
-    background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.90));
-    border:1px solid rgba(255,255,255,0.7);
-    box-shadow:
-      0 24px 60px rgba(59,130,246,0.28),
-      0 16px 40px rgba(16,185,129,0.24),
-      inset 0 1px 0 rgba(255,255,255,0.7);
-    backdrop-filter: blur(12px);
-    overflow:hidden;
+  
+  .byline {
+    font-weight: 800;
+    color: #0b1020;
+    display: inline-block;
+    padding: .6rem 1.2rem;
+    border-radius: 2rem;
+    background: #f3f4f6;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 1px solid #e5e7eb;
   }
-  .shiny-panel::before{
-    content:""; position:absolute; inset:-60% -40% auto -40%; height:220%; width:180%;
-    background: linear-gradient(120deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.08) 55%, rgba(255,255,255,0) 75%);
-    transform: translateX(-60%) rotate(18deg);
-    animation: sheen 7s linear infinite;
-    pointer-events:none; mix-blend-mode: screen;
+  
+  .menu-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 2rem auto 2rem;
+    width: 100%;
   }
-  @keyframes sheen{ 0%{ transform: translateX(-60%) rotate(18deg) } 100%{ transform: translateX(60%) rotate(18deg) } }
-
-  /* Inner card and controls */
-  .card{ background:var(--card); backdrop-filter:blur(6px); border:1px solid var(--ring); border-radius:14px; padding:1rem; box-shadow:0 10px 28px rgba(0,0,0,.08) }
-  .row{ display:flex; gap:.9rem; align-items:center; flex-wrap:wrap }
-  .btn{
-    background:var(--grad); color:#073b2b; border:0; padding:.9rem 1.2rem; border-radius:1rem; font-weight:900; cursor:pointer;
-    box-shadow:0 8px 22px rgba(16,185,129,.22), 0 4px 14px rgba(59,130,246,.14); font-size:1.02rem
+  
+  .panel {
+    position: relative;
+    width: min(900px, 96%);
+    border-radius: 20px;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
   }
-  .btn.ghost{ background:linear-gradient(135deg, rgba(16,185,129,.12), rgba(59,130,246,.12)); color:#0b1020; border:1px solid var(--ring) }
-  .field{ position:relative; display:flex; align-items:center; gap:.6rem; background:#f8fafc; border:1px solid #e5e7eb; border-radius:.9rem; padding:.55rem .75rem }
-  .field input{ border:0; background:transparent; outline:none; font:inherit; color:inherit; padding:.4rem .25rem; min-width:6ch; font-size:1rem }
-
-  /* Dropzone centered inside panel (bigger) */
-  .dropzone{
-    position:relative; display:grid; place-items:center; text-align:center; padding:1.6rem; border-radius:1.1rem;
-    border:2px dashed #cbd5e1; background:linear-gradient(135deg, rgba(16,185,129,.08), rgba(59,130,246,.08), rgba(253,224,71,.08));
+  
+  .dropzone {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem;
+    border-radius: 1.5rem;
+    border: 3px dashed #cbd5e1;
+    background: rgba(249, 250, 251, 0.8);
+    transition: all 0.3s ease;
+    cursor: pointer;
   }
-  #file{ display:none }
-  .thumb{ margin-top:.9rem; display:flex; gap:.7rem; align-items:center; justify-content:center }
-  .thumb img{ width:112px; height:84px; object-fit:cover; border-radius:.7rem; border:1px solid #e5e7eb; background:#fff } /* 4×3 preview */
-
-  /* Layout area */
-  .grid{ display:grid; gap:1rem; grid-template-columns:1.2fr .8fr; align-items:start; margin:1rem 0 2rem }
-  @media (max-width:980px){ .grid{ grid-template-columns:1fr } }
-  canvas{ width:100%; background:#fff; border-radius:10px; border:1px solid #e5e7eb }
-  .muted{ color:#4b5563 }
-  .info{ text-align:center; color:#111827; opacity:.9; margin:1.2rem 0 2.2rem }
+  
+  .dropzone:hover {
+    border-color: #3b82f6;
+    background: rgba(239, 246, 255, 0.8);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+  }
+  
+  #file {
+    display: none;
+  }
+  
+  .thumb {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+  }
+  
+  .thumb img {
+    width: 140px;
+    height: 105px;
+    object-fit: cover;
+    border-radius: 1.2rem;
+    border: 3px solid #e5e7eb;
+    background: #fff;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  }
+  
+  .row {
+    display: flex;
+    gap: 1.2rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 1.5rem 0;
+    justify-content: center;
+  }
+  
+  .btn {
+    background: #3b82f6;
+    color: white;
+    border: 0;
+    padding: 1.1rem 1.8rem;
+    border-radius: 1.5rem;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+    font-size: 1.1rem;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    transition: all 0.3s ease;
+    min-width: 140px;
+  }
+  
+  .btn:hover {
+    background: #2563eb;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(59, 130, 246, 0.4);
+  }
+  
+  .btn:active {
+    transform: translateY(1px);
+  }
+  
+  .btn.ghost {
+    background: transparent;
+    color: #3b82f6;
+    border: 2px solid #3b82f6;
+    box-shadow: none;
+  }
+  
+  .btn.ghost:hover {
+    background: rgba(59, 130, 246, 0.1);
+  }
+  
+  .field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    background: #f8fafc;
+    border: 2px solid #e5e7eb;
+    border-radius: 1.3rem;
+    padding: .7rem 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .field:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 6px 18px rgba(59, 130, 246, 0.15);
+  }
+  
+  .field input {
+    border: 0;
+    background: transparent;
+    outline: none;
+    font: inherit;
+    color: inherit;
+    padding: .5rem .3rem;
+    min-width: 8ch;
+    font-size: 1.1rem;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+  }
+  
+  .card {
+    background: var(--card);
+    backdrop-filter: blur(10px);
+    border: 2px solid transparent;
+    border-radius: 20px;
+    padding: 1.8rem;
+    box-shadow: 0 15px 35px rgba(0,0,0,.12);
+    position: relative;
+    margin: 1.5rem 0;
+  }
+  
+  .grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: 1.2fr .8fr;
+    align-items: start;
+    margin: 1.5rem 0 2.5rem;
+  }
+  
+  canvas {
+    width: 100%;
+    height: auto;
+    background: #fff;
+    border-radius: 15px;
+    border: 2px solid #e5e7eb;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+  
+  h3 {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-weight: bold;
+    color: #0b1020;
+    font-size: 1.5rem;
+    margin: 0.5rem 0 1.2rem;
+    text-align: center;
+  }
+  
+  .muted {
+    color: #4b5563;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+  }
+  
+  ul {
+    margin: 0.5rem 0 0;
+    padding-left: 1.5rem;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+  }
+  
+  li {
+    margin: 0.6rem 0;
+    line-height: 1.5;
+  }
+  
+  progress {
+    width: 100%;
+    height: 12px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #e5e7eb;
+    background: #f8fafc;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1) inset;
+  }
+  
+  progress::-webkit-progress-bar {
+    background: #f8fafc;
+    border-radius: 10px;
+  }
+  
+  progress::-webkit-progress-value {
+    background: #3b82f6;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  
+  #note {
+    margin-top: 0.6rem;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-weight: bold;
+    text-align: center;
+    min-height: 1.5rem;
+    color: #3b82f6;
+  }
+  
+  .info {
+    text-align: center;
+    color: #111827;
+    opacity: .9;
+    margin: 2rem 0 3rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+  }
+  
+  @media (max-width: 980px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .welcome {
+      font-size: clamp(1.8rem, 8vw, 3rem);
+    }
+    
+    .panel {
+      padding: 1.5rem;
+      width: 98%;
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .btn {
+      padding: 1rem 1.4rem;
+      font-size: 1rem;
+    }
+    
+    .field {
+      flex-direction: column;
+      padding: 1rem;
+    }
+    
+    .dropzone {
+      padding: 1.8rem;
+    }
+  }
 </style>
 </head>
 <body>
-  <!-- Decorative sides -->
-  <div class="decor left"></div>
-  <div class="decor right"></div>
-
   <header class="hero">
     <div class="wrap">
       <div class="welcome">WELCOME TO THE WORLD OF PHOTOS</div>
       <div class="byline">Made by ANABRATA</div>
     </div>
   </header>
-
+  
   <main class="wrap">
-    <!-- Centered shiny Choose-one-photo menu -->
     <section class="menu-wrap">
-      <div class="shiny-panel">
-        <div class="dropzone">
+      <div class="panel">
+        <div class="dropzone" id="dropzone">
           <div>
-            <div style="font-weight:900; font-size:1.15rem">Choose one photo</div>
-            <div class="muted" style="font-size:1rem">Default copies: 6 • Each tile prints 4 × 3 cm • 6 per row</div>
-            <div class="row" style="justify-content:center; margin-top:.8rem">
+            <div style="font-weight:900; font-size:1.4rem; margin-bottom: 0.5rem; color: #0b1020;">Choose one photo</div>
+            <div class="muted" style="font-size:1.1rem; margin-bottom: 1.2rem;">Default copies: 6 • Each tile prints 4 × 3 cm • 6 per row</div>
+            <div class="row">
               <button class="btn" id="chooseBtn" type="button">Choose photo</button>
               <button class="btn ghost" id="arrange" type="button">Arrange → PDF</button>
               <a id="downloadPdf" class="btn ghost" download="photos_a4_portrait_4x3cm_6cols.pdf" href="#" aria-disabled="true">Download PDF</a>
@@ -152,228 +371,488 @@
         </div>
       </div>
     </section>
-
+    
     <section class="card">
       <div class="row">
-        <div class="field"><span>Number of photos</span><input id="copies" type="number" value="6" min="1" step="1"></div>
+        <div class="field">
+          <span>Number of photos</span>
+          <input id="copies" type="number" value="6" min="1" step="1">
+        </div>
       </div>
-      <div style="margin-top:.6rem">
+      <div class="row" style="margin-top: 0.8rem;">
+        <div class="field">
+          <span>Starting row (0 = first row)</span>
+          <input id="startRow" type="number" value="0" min="0" step="1">
+        </div>
+        <div class="field">
+          <span>Starting column (0 = first column)</span>
+          <input id="startCol" type="number" value="0" min="0" max="5" step="1">
+        </div>
+      </div>
+      <div style="margin-top:.8rem">
         <progress id="prog" value="0" max="100" hidden></progress>
-        <div id="note" class="muted" style="margin-top:.35rem"></div>
+        <div id="note" class="muted" style="margin-top:.5rem"></div>
       </div>
     </section>
-
+    
     <section class="grid">
       <div class="card">
-        <h3 style="margin:.2rem 0 .8rem">Preview (scaled)</h3>
-        <!-- A4 portrait preview -->
+        <h3>Preview (scaled)</h3>
         <canvas id="preview" width="840" height="1188" aria-label="Preview canvas"></canvas>
-        <p class="muted" style="margin:.5rem 0 0">Print at 100% (no “Fit to page”). Each tile = 40 × 30 mm. Starts at 10 mm top/left margin.</p>
+        <p class="muted" style="margin:.8rem 0 0; text-align: center;">Print at 100% (no "Fit to page"). Each tile = 40 × 30 mm. Starts at 10 mm top/left margin.</p>
       </div>
       <div class="card">
-        <h3 style="margin:.2rem 0 .8rem">Layout details</h3>
-        <ul class="muted" style="margin:.2rem 0 0; padding-left:1rem; list-style:disc">
+        <h3>Layout details</h3>
+        <ul class="muted" style="margin:.5rem 0 0; padding-left:1.8rem;">
           <li>A4 portrait: 210 × 297 mm</li>
           <li>Top-left origin inside a 10 mm printer-safe margin</li>
           <li>6 columns fixed; small built‑in spacing keeps rows readable</li>
           <li>Rows paginate to new A4 pages if needed</li>
+          <li>Use "Starting row/column" to continue from previous print job</li>
+          <li>Row/column numbering starts at 0 (top-left = 0,0)</li>
         </ul>
       </div>
     </section>
-
+    
     <div class="info">© <span id="year"></span> Made by ANABRATA</div>
   </main>
-
+  
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-
   <script>
-  // Year
-  document.getElementById('year').textContent = new Date().getFullYear();
-
-  // A4 portrait constants
-  const PAGE_W_MM = 210, PAGE_H_MM = 297;
-  const MARGIN_MM = 10;          // start top-left inside 10 mm margin
-  const GAP_MM    = 2;           // fixed small spacing (option removed)
-  // Base tile: 4×3 cm (40×30). If 6 across won’t fit, silently rotate to 3×4 (30×40) to keep 6 columns.
-  const TILE_W_4x3 = 40, TILE_H_4x3 = 30;
-  const TILE_W_3x4 = 30, TILE_H_3x4 = 40;
-  const COLS = 6;
-
-  // Elements
-  const $ = id => document.getElementById(id);
-  const fileEl = $('file');
-  const chooseBtn = $('chooseBtn');
-  const thumb = $('thumb');
-  const thumbImg = $('thumbImg');
-  const fileNote = $('fileNote');
-  const copiesInput = $('copies');
-  const arrangeBtn = $('arrange');
-  const downloadPdf = $('downloadPdf');
-  const note = $('note');
-  const prog = $('prog');
-  const canvas = $('preview');
-  const ctx = canvas.getContext('2d');
-
-  // File select
-  chooseBtn.addEventListener('click', () => fileEl.click());
-  fileEl.addEventListener('change', () => {
-    if (fileEl.files && fileEl.files[0]){
-      const f = fileEl.files[0];
-      fileNote.textContent = f.name;
-      thumbImg.src = URL.createObjectURL(f);
-      thumb.style.display = '';
-    } else { thumb.style.display = 'none'; thumbImg.removeAttribute('src'); fileNote.textContent = ''; }
-  });
-
-  // Helpers
-  function blobToImage(blob){
-    return new Promise((res, rej) => {
-      const url = URL.createObjectURL(blob);
-      const img = new Image();
-      img.onload = () => { URL.revokeObjectURL(url); res(img); };
-      img.onerror = rej;
-      img.src = url;
+    // A4 portrait constants - CRITICAL: Must be defined globally
+    const PAGE_W_MM = 210;
+    const PAGE_H_MM = 297;
+    const MARGIN_MM = 10;
+    const GAP_MM = 2;
+    const COLS = 6;
+    const TILE_W_4x3 = 40;
+    const TILE_H_4x3 = 30;
+    const TILE_W_3x4 = 30;
+    const TILE_H_3x4 = 40;
+    
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+    
+    // Add click event to entire dropzone
+    const dropzone = document.getElementById('dropzone');
+    const fileEl = document.getElementById('file');
+    const chooseBtn = document.getElementById('chooseBtn');
+    const arrangeBtn = document.getElementById('arrange');
+    
+    // Only make dropzone open file picker when clicked on the main area, not buttons
+    dropzone.addEventListener('click', (e) => {
+      const isClickOnDropzone = e.target === dropzone || 
+                               e.target.closest('.dropzone') === dropzone && 
+                               !e.target.closest('.row') &&
+                               !e.target.closest('.thumb');
+      
+      if (isClickOnDropzone) {
+        fileEl.click();
+      }
     });
-  }
-  function drawImageCover(ctx, img, dx, dy, dW, dH){
-    const iw = img.naturalWidth || img.width;
-    const ih = img.naturalHeight || img.height;
-    const ir = iw / ih, dr = dW / dH;
-    let sx, sy, sw, sh;
-    if (ir > dr){ sh = ih; sw = ih * dr; sx = (iw - sw)/2; sy = 0; }
-    else       { sw = iw; sh = iw / dr; sx = 0; sy = (ih - sh)/2; }
-    ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dW, dH);
-  }
-
-  // Hidden auto-rotate to keep 6 across on portrait
-  function pickTileSize(){
-    const availW = PAGE_W_MM - 2*MARGIN_MM;
-    const maxGX_4x3 = (availW - COLS*TILE_W_4x3) / (COLS - 1);
-    const maxGX_3x4 = (availW - COLS*TILE_W_3x4) / (COLS - 1);
-    if (maxGX_4x3 >= 0){ return { tw: TILE_W_4x3, th: TILE_H_4x3, maxGX: Math.max(0, maxGX_4x3) }; }
-    return { tw: TILE_W_3x4, th: TILE_H_3x4, maxGX: Math.max(0, maxGX_3x4) };
-  }
-
-  function rowsPerPage(tileH, gapY){
-    const availH = PAGE_H_MM - 2*MARGIN_MM;
-    return Math.max(1, Math.floor((availH + gapY) / (tileH + gapY)));
-  }
-
-  function planLayout(copies){
-    const { tw, th, maxGX } = pickTileSize();
-    const gapX = Math.min(GAP_MM, maxGX); // clamp horizontally to keep 6 across
-    const gapY = GAP_MM;                  // fixed vertical spacing
-    const rpp  = rowsPerPage(th, gapY);   // rows per page
-    const capacityPerPage = COLS * rpp;
-    return { tw, th, gapX, gapY, rpp, capacityPerPage };
-  }
-
-  // Preview (first page), origin at top-left margin
-  async function previewLayout(img, copies){
-    const p = planLayout(copies);
-    const { tw, th, gapX, gapY, rpp } = p;
-
-    const pxPerMM = canvas.width / PAGE_W_MM;
-    const pageWpx = Math.round(PAGE_W_MM * pxPerMM);
-    const pageHpx = Math.round(PAGE_H_MM * pxPerMM);
-    const tileWpx = Math.round(tw * pxPerMM);
-    const tileHpx = Math.round(th * pxPerMM);
-    const gapXpx  = Math.round(gapX * pxPerMM);
-    const gapYpx  = Math.round(gapY * pxPerMM);
-    const marginPx = Math.round(MARGIN_MM * pxPerMM);
-
-    ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,pageWpx,pageHpx);
-    ctx.strokeStyle = '#d1d5db'; ctx.lineWidth = 1;
-    ctx.strokeRect(marginPx + .5, marginPx + .5, pageWpx - 2*marginPx - 1, pageHpx - 2*marginPx - 1);
-
-    const ox = marginPx, oy = marginPx; // start at top-left
-    let i = 0, placed = Math.min(copies, COLS * rpp);
-    for (let r=0; r<rpp && i<placed; r++){
-      for (let c=0; c<COLS && i<placed; c++){
-        const x = ox + c * (tileWpx + gapXpx);
-        const y = oy + r * (tileHpx + gapYpx);
-        drawImageCover(ctx, img, x, y, tileWpx, tileHpx);
-        i++;
+    
+    // Choose photo button should only open file picker
+    chooseBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      fileEl.click();
+    });
+    
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropzone.addEventListener(eventName, preventDefaults, false);
+      document.body.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    // Highlight drop zone when item is dragged over it
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropzone.addEventListener(eventName, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropzone.addEventListener(eventName, unhighlight, false);
+    });
+    
+    function highlight() {
+      dropzone.style.borderColor = '#3b82f6';
+      dropzone.style.background = 'rgba(239, 246, 255, 0.8)';
+      dropzone.style.transform = 'translateY(-2px)';
+    }
+    
+    function unhighlight() {
+      dropzone.style.borderColor = '#cbd5e1';
+      dropzone.style.background = 'rgba(249, 250, 251, 0.8)';
+      dropzone.style.transform = 'translateY(0)';
+    }
+    
+    // Handle dropped files
+    dropzone.addEventListener('drop', handleDrop, false);
+    
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files.length > 0) {
+        fileEl.files = files;
+        const event = new Event('change', { bubbles: true });
+        fileEl.dispatchEvent(event);
       }
     }
-
-    const { maxGX } = pickTileSize();
-    $('note').textContent = (GAP_MM > maxGX)
-      ? `Horizontal spacing auto‑reduced to ${gapX.toFixed(2)} mm to keep 6 across.`
-      : '';
-    return p;
-  }
-
-  // PDF builder (multi-page), origin at top-left margin
-  async function buildPdf(img, copies){
-    const { jsPDF } = window.jspdf;
-    const p = planLayout(copies);
-    const { tw, th, gapX, gapY, rpp } = p;
-
-    const doc = new jsPDF({ unit:'mm', format:[PAGE_W_MM, PAGE_H_MM] }); // portrait
-
-    // Prepare high‑quality tile once
-    const pxPerMM = 10; // ~254 dpi
-    const off = document.createElement('canvas');
-    off.width  = Math.round(tw * pxPerMM);
-    off.height = Math.round(th * pxPerMM);
-    const oc = off.getContext('2d');
-    oc.fillStyle = '#ffffff'; oc.fillRect(0,0,off.width,off.height);
-    drawImageCover(oc, img, 0, 0, off.width, off.height);
-    const tileURL = off.toDataURL('image/jpeg', 0.92);
-
-    const ox = MARGIN_MM, oy = MARGIN_MM;
-
-    let remaining = copies;
-    let first = true;
-    while (remaining > 0){
-      if (!first) doc.addPage([PAGE_W_MM, PAGE_H_MM], 'portrait');
-      first = false;
-
-      for (let r=0; r<rpp && remaining>0; r++){
-        for (let c=0; c<COLS && remaining>0; c++){
-          const x = ox + c * (tw + gapX);
-          const y = oy + r * (th + gapY);
-          doc.addImage(tileURL, 'JPEG', x, y, tw, th);
-          remaining--;
+    
+    // File select
+    fileEl.addEventListener('change', () => {
+      if (fileEl.files && fileEl.files[0]){
+        const f = fileEl.files[0];
+        const fileNote = document.getElementById('fileNote');
+        fileNote.textContent = f.name;
+        
+        const thumbImg = document.getElementById('thumbImg');
+        thumbImg.src = URL.createObjectURL(f);
+        
+        const thumb = document.getElementById('thumb');
+        thumb.style.display = 'flex';
+      } else { 
+        const thumb = document.getElementById('thumb');
+        thumb.style.display = 'none'; 
+        document.getElementById('thumbImg').removeAttribute('src'); 
+        document.getElementById('fileNote').textContent = ''; 
+      }
+    });
+    
+    // Helpers
+    function blobToImage(blob){
+      return new Promise((res, rej) => {
+        const url = URL.createObjectURL(blob);
+        const img = new Image();
+        img.onload = () => { 
+          URL.revokeObjectURL(url); 
+          res(img); 
+        };
+        img.onerror = rej;
+        img.src = url;
+      });
+    }
+    
+    function drawImageCover(ctx, img, dx, dy, dW, dH){
+      const iw = img.naturalWidth || img.width;
+      const ih = img.naturalHeight || img.height;
+      const ir = iw / ih;
+      const dr = dW / dH;
+      
+      let sx, sy, sw, sh;
+      if (ir > dr) {
+        sh = ih;
+        sw = ih * dr;
+        sx = (iw - sw) / 2;
+        sy = 0;
+      } else {
+        sw = iw;
+        sh = iw / dr;
+        sx = 0;
+        sy = (ih - sh) / 2;
+      }
+      
+      ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dW, dH);
+    }
+    
+    // Hidden auto-rotate to keep 6 across on portrait
+    function pickTileSize() {
+      const availW = PAGE_W_MM - 2 * MARGIN_MM;
+      const maxGX_4x3 = (availW - COLS * TILE_W_4x3) / (COLS - 1);
+      const maxGX_3x4 = (availW - COLS * TILE_W_3x4) / (COLS - 1);
+      
+      if (maxGX_4x3 >= 0) {
+        return {
+          tw: TILE_W_4x3,
+          th: TILE_H_4x3,
+          maxGX: Math.max(0, maxGX_4x3)
+        };
+      }
+      return {
+        tw: TILE_W_3x4,
+        th: TILE_H_3x4,
+        maxGX: Math.max(0, maxGX_3x4)
+      };
+    }
+    
+    function rowsPerPage(tileH, gapY) {
+      const availH = PAGE_H_MM - 2 * MARGIN_MM;
+      return Math.max(1, Math.floor((availH + gapY) / (tileH + gapY)));
+    }
+    
+    function planLayout(copies) {
+      const { tw, th, maxGX } = pickTileSize();
+      const gapX = Math.min(GAP_MM, maxGX);
+      const gapY = GAP_MM;
+      const rpp = rowsPerPage(th, gapY);
+      const capacityPerPage = COLS * rpp;
+      return {
+        tw,
+        th,
+        gapX,
+        gapY,
+        rpp,
+        capacityPerPage,
+        maxStartRow: rpp - 1,
+        maxStartCol: COLS - 1
+      };
+    }
+    
+    // Preview (first page), origin at top-left margin
+    async function previewLayout(img, copies) {
+      const p = planLayout(copies);
+      const { tw, th, gapX, gapY, rpp, capacityPerPage, maxStartRow, maxStartCol } = p;
+      
+      // Get and validate starting position
+      const startRowInput = document.getElementById('startRow');
+      const startColInput = document.getElementById('startCol');
+      
+      let startRow = parseInt(startRowInput.value || '0');
+      let startCol = parseInt(startColInput.value || '0');
+      
+      // Validate inputs
+      if (startRow > maxStartRow) {
+        startRow = maxStartRow;
+        startRowInput.value = maxStartRow;
+      }
+      
+      if (startCol > maxStartCol) {
+        startCol = maxStartCol;
+        startColInput.value = maxStartCol;
+      }
+      
+      const startPosition = startRow * COLS + startCol;
+      
+      const canvas = document.getElementById('preview');
+      const ctx = canvas.getContext('2d');
+      
+      // Calculate proper dimensions
+      const pxPerMM = canvas.width / PAGE_W_MM;
+      const pageWpx = Math.round(PAGE_W_MM * pxPerMM);
+      const pageHpx = Math.round(PAGE_H_MM * pxPerMM);
+      const tileWpx = Math.round(tw * pxPerMM);
+      const tileHpx = Math.round(th * pxPerMM);
+      const gapXpx = Math.round(gapX * pxPerMM);
+      const gapYpx = Math.round(gapY * pxPerMM);
+      const marginPx = Math.round(MARGIN_MM * pxPerMM);
+      
+      // Clear and reset canvas
+      canvas.width = pageWpx;
+      canvas.height = pageHpx;
+      ctx.clearRect(0, 0, pageWpx, pageHpx);
+      
+      // Draw background
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, pageWpx, pageHpx);
+      
+      // Draw margin border
+      ctx.strokeStyle = '#d1d5db';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(marginPx + 0.5, marginPx + 0.5, pageWpx - 2 * marginPx - 1, pageHpx - 2 * marginPx - 1);
+      
+      const ox = marginPx;
+      const oy = marginPx;
+      let i = 0;
+      const placed = Math.min(copies, capacityPerPage - startPosition);
+      
+      // Draw grid lines
+      ctx.strokeStyle = 'rgba(209, 213, 219, 0.5)';
+      ctx.lineWidth = 1;
+      
+      // Vertical lines
+      for (let c = 1; c < COLS; c++) {
+        const x = ox + c * (tileWpx + gapXpx) - gapXpx / 2;
+        ctx.beginPath();
+        ctx.moveTo(x, oy);
+        ctx.lineTo(x, oy + rpp * (tileHpx + gapYpx) - gapYpx);
+        ctx.stroke();
+      }
+      
+      // Horizontal lines
+      for (let r = 1; r < rpp; r++) {
+        const y = oy + r * (tileHpx + gapYpx) - gapYpx / 2;
+        ctx.beginPath();
+        ctx.moveTo(ox, y);
+        ctx.lineTo(ox + COLS * (tileWpx + gapXpx) - gapXpx, y);
+        ctx.stroke();
+      }
+      
+      // Draw images starting from the specified position
+      for (let r = 0; r < rpp; r++) {
+        for (let c = 0; c < COLS; c++) {
+          // Skip positions before the starting position
+          if (r * COLS + c < startPosition) {
+            continue;
+          }
+          
+          // Stop if we've placed enough images
+          if (i >= placed) {
+            break;
+          }
+          
+          const x = ox + c * (tileWpx + gapXpx);
+          const y = oy + r * (tileHpx + gapYpx);
+          
+          // Add subtle shadow
+          ctx.shadowColor = 'rgba(0,0,0,0.1)';
+          ctx.shadowBlur = 3;
+          ctx.shadowOffsetX = 1;
+          ctx.shadowOffsetY = 1;
+          
+          drawImageCover(ctx, img, x, y, tileWpx, tileHpx);
+          
+          // Reset shadow
+          ctx.shadowColor = 'transparent';
+          ctx.shadowBlur = 0;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 0;
+          
+          i++;
         }
       }
+      
+      const {
+        maxGX
+      } = pickTileSize();
+      const note = document.getElementById('note');
+      note.textContent = `Starting at row ${startRow} (position ${startRow + 1}), column ${startCol} (position ${startCol + 1}). ` +
+        ((GAP_MM > maxGX) ?
+        `Horizontal spacing auto‑reduced to ${gapX.toFixed(2)} mm to keep 6 across.` :
+        '');
+      
+      return p;
     }
-    return doc.output('blob');
-  }
-
-  // Arrange → PDF
-  $('arrange').onclick = async () => {
-    try{
-      $('note').textContent = "Reading photo…";
-      $('prog').hidden = false; $('prog').value = 10;
-
-      if (!fileEl.files || !fileEl.files[0]){
-        $('note').textContent = "No photo selected. Click ‘Choose photo’.";
-        $('prog').hidden = true; return;
+    
+    // PDF builder (multi-page), origin at top-left margin
+    async function buildPdf(img, copies) {
+      const p = planLayout(copies);
+      const { tw, th, gapX, gapY, rpp, capacityPerPage, maxStartRow, maxStartCol } = p;
+      
+      // Get and validate starting position
+      const startRowInput = document.getElementById('startRow');
+      const startColInput = document.getElementById('startCol');
+      
+      let startRow = parseInt(startRowInput.value || '0');
+      let startCol = parseInt(startColInput.value || '0');
+      
+      // Validate inputs
+      if (startRow > maxStartRow) {
+        startRow = maxStartRow;
+        startRowInput.value = maxStartRow;
       }
-      const img = await blobToImage(fileEl.files[0]);
-
-      const copies = Math.max(1, parseInt($('copies').value || '6', 10));
-
-      $('prog').value = 35; $('note').textContent = "Arranging preview…";
-      await previewLayout(img, copies);
-
-      $('prog').value = 60; $('note').textContent = "Building PDF…";
-      const blob = await buildPdf(img, copies);
-
-      const url = URL.createObjectURL(blob);
-      $('downloadPdf').href = url;
-      $('downloadPdf').setAttribute('aria-disabled','false');
-
-      $('prog').value = 100; $('note').textContent = "PDF ready. Print at 100% scale (no fit).";
-      setTimeout(() => $('prog').hidden = true, 400);
-    } catch(e){
-      console.error(e);
-      $('note').textContent = "Error: " + e.message;
-      $('prog').hidden = true;
+      
+      if (startCol > maxStartCol) {
+        startCol = maxStartCol;
+        startColInput.value = maxStartCol;
+      }
+      
+      const startPosition = startRow * COLS + startCol;
+      
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({
+        unit: 'mm',
+        format: [PAGE_W_MM, PAGE_H_MM]
+      });
+      
+      // Prepare high-quality tile once
+      const pxPerMM = 10;
+      const off = document.createElement('canvas');
+      off.width = Math.round(tw * pxPerMM);
+      off.height = Math.round(th * pxPerMM);
+      const oc = off.getContext('2d');
+      oc.fillStyle = '#ffffff';
+      oc.fillRect(0, 0, off.width, off.height);
+      drawImageCover(oc, img, 0, 0, off.width, off.height);
+      const tileURL = off.toDataURL('image/jpeg', 0.92);
+      
+      const ox = MARGIN_MM;
+      const oy = MARGIN_MM;
+      let remaining = copies;
+      let page = 0;
+      
+      while (remaining > 0) {
+        if (page > 0) {
+          doc.addPage([PAGE_W_MM, PAGE_H_MM], 'portrait');
+        }
+        
+        // On the first page, skip the specified number of positions
+        const skipPositions = (page === 0) ? startPosition : 0;
+        let position = 0;
+        
+        for (let r = 0; r < rpp && remaining > 0; r++) {
+          for (let c = 0; c < COLS && remaining > 0; c++) {
+            // Skip positions at the beginning of the first page
+            if (position < skipPositions) {
+              position++;
+              continue;
+            }
+            
+            const x = ox + c * (tw + gapX);
+            const y = oy + r * (th + gapY);
+            doc.addImage(tileURL, 'JPEG', x, y, tw, th);
+            remaining--;
+            position++;
+          }
+        }
+        
+        page++;
+      }
+      
+      return doc.output('blob');
     }
-  };
+    
+    // Arrange → PDF button click handler - fixed to not trigger file picker
+    document.getElementById('arrange').addEventListener('click', async (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      
+      try {
+        const note = document.getElementById('note');
+        const prog = document.getElementById('prog');
+        
+        note.textContent = "Reading photo…";
+        prog.hidden = false;
+        prog.value = 10;
+        
+        if (!fileEl.files || !fileEl.files[0]) {
+          note.textContent = "No photo selected. Click 'Choose photo'.";
+          prog.hidden = true;
+          return;
+        }
+        
+        const img = await blobToImage(fileEl.files[0]);
+        const copies = Math.max(1, parseInt(document.getElementById('copies').value || '6', 10));
+        
+        prog.value = 35;
+        note.textContent = "Arranging preview…";
+        await previewLayout(img, copies);
+        
+        prog.value = 60;
+        note.textContent = "Building PDF…";
+        const blob = await buildPdf(img, copies);
+        const url = URL.createObjectURL(blob);
+        
+        const downloadPdf = document.getElementById('downloadPdf');
+        downloadPdf.href = url;
+        downloadPdf.setAttribute('aria-disabled', 'false');
+        
+        prog.value = 100;
+        note.textContent = "PDF ready! Print at 100% scale (no fit).";
+        
+        setTimeout(() => {
+          prog.hidden = true;
+        }, 800);
+        
+      } catch (e) {
+        console.error(e);
+        document.getElementById('note').textContent = "Error: " + e.message;
+        document.getElementById('prog').hidden = true;
+      }
+    });
   </script>
 </body>
 </html>
+```
