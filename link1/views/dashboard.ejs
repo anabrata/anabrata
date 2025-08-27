@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head><title>Dashboard</title></head>
+<body>
+<h2>My QR Codes</h2>
+<form method="post" action="/generate">
+  <input type="text" name="url" placeholder="Enter URL" required>
+  <button type="submit">Generate QR</button>
+</form>
+<ul>
+  <% qrcodes.forEach(qr => { %>
+    <li>
+      <a href="/qr/<%= qr.short %>" target="_blank">View QR</a> | 
+      <a href="/edit/<%= qr.id %>">Edit</a> | 
+      <a href="/delete/<%= qr.id %>">Delete</a> |
+      Short URL: <a href="/r/<%= qr.short %>" target="_blank">/r/<%= qr.short %></a>
+    </li>
+  <% }) %>
+</ul>
+<a href="/logout">Logout</a>
+</body>
+</html>
