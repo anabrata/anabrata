@@ -1,188 +1,812 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>QR Arranger (A4 only) • Made by ANABRATA</title>
+<title>QR Arranger • Welcome To The World of QRs</title>
 <meta name="color-scheme" content="light dark" />
+<meta name="description" content="Beautiful QR code arrangement tool for A4 printing with stunning animations and vibrant colors" />
 <style>
-  :root{
-    --green:#10b981; --yellow:#fde047; --blue:#3b82f6; --white:#ffffff;
-    --card:#ffffffee; --text:#0b1020; --muted:#4b5563; --ring:rgba(0,0,0,.12);
-    --grad: linear-gradient(135deg, var(--green), var(--blue), var(--yellow));
-    --field-bg:#f8fafc; --field-bd:#e5e7eb; --field-focus:#93c5fd;
+  :root {
+    --green: #059669; --green-light: #10b981; --green-dark: #047857;
+    --blue: #2563eb; --blue-light: #3b82f6; --blue-dark: #1d4ed8;
+    --yellow: #d97706; --yellow-light: #fde047; --yellow-dark: #ca8a04;
+    --purple: #7c3aed; --purple-light: #a78bfa; --purple-dark: #6d28d9;
+    --pink: #db2777; --pink-light: #f472b6; --pink-dark: #be185d;
+    --orange: #ea580c; --orange-light: #fb923c; --orange-dark: #c2410c;
+    --red: #dc2626; --red-light: #ef4444; --red-dark: #b91c1c;
+    --white: #ffffff; --white-light: #f9fafb; --white-dark: #f3f4f6;
+    --gray: #6b7280; --gray-light: #9ca3af; --gray-dark: #4b5563; --gray-darker: #374151;
+    --black: #0b1020; --black-light: #1f2937;
+    --card: #ffffffee; --card-dark: #111827; --text: #0b1020; --text-light: #1f2937;
+    --muted: #4b5563; --muted-light: #6b7280;
+    --ring: rgba(0,0,0,.12); --ring-light: rgba(0,0,0,.08);
+    --shadow: rgba(0,0,0,.08); --shadow-light: rgba(0,0,0,.05);
+    --field-bg: #f8fafc; --field-bd: #e5e7eb; --field-focus: #93c5fd;
+    --grad: linear-gradient(135deg, var(--green-light), var(--blue-light), var(--yellow-light), var(--purple-light));
+    --grad-soft: linear-gradient(135deg, rgba(16,185,129,.18), rgba(59,130,246,.18), rgba(253,224,71,.18), rgba(167,139,250,.18));
+    --field-shadow: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
+    --btn-shadow: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -1px rgba(0,0,0,.06);
+    --btn-shadow-hover: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05);
+    --card-shadow: 0 10px 25px -5px rgba(0,0,0,.1), 0 8px 10px -6px rgba(0,0,0,.1);
+    --card-shadow-hover: 0 20px 25px -5px rgba(0,0,0,.1), 0 10px 10px -5px rgba(0,0,0,.04);
+    --animation-slow: 20s; --animation-fast: 12s;
   }
+
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --card: #111827; --text: #f9fafb; --text-light: #e5e7eb;
+      --muted: #9ca3af; --muted-light: #d1d5db;
+      --field-bg: #1f2937; --field-bd: #374151;
+      --ring: rgba(255,255,255,.12);
+      --shadow: rgba(255,255,255,.08);
+      --field-shadow: 0 1px 3px rgba(255,255,255,.1), 0 1px 2px rgba(255,255,255,.06);
+      --btn-shadow: 0 4px 6px -1px rgba(255,255,255,.1), 0 2px 4px -1px rgba(255,255,255,.06);
+      --btn-shadow-hover: 0 10px 15px -3px rgba(255,255,255,.1), 0 4px 6px -2px rgba(255,255,255,.05);
+      --card-shadow: 0 10px 25px -5px rgba(255,255,255,.1), 0 8px 10px -6px rgba(255,255,255,.1);
+      --card-shadow-hover: 0 20px 25px -5px rgba(255,255,255,.1), 0 10px 10px -5px rgba(255,255,255,.04);
+    }
+  }
+
   /* Animated multi-color background */
-  body{
-    margin:0; font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif; color:var(--text);
-    background:
-      radial-gradient(1200px 800px at 10% 10%, rgba(16,185,129,.25), transparent 60%),
-      radial-gradient(1200px 800px at 90% 20%, rgba(59,130,246,.25), transparent 60%),
-      radial-gradient(1200px 800px at 50% 100%, rgba(253,224,71,.25), transparent 60%),
-      linear-gradient(120deg, #e8fdf6, #eef4ff 40%, #fffbe6 80%, #ffffff);
-    background-size:140% 140%; animation:bgShift 18s ease-in-out infinite alternate;
-  }
-  @keyframes bgShift{
-    0%{ background-position:0% 0%, 100% 0%, 50% 100%, 0% 0% }
-    100%{ background-position:50% 30%, 50% 20%, 60% 70%, 100% 100% }
-  }
-  .wrap{ width:min(1120px,94%); margin:0 auto; }
-
-  /* Hero with slower FADE welcome */
-  header.hero{ min-height:42vh; display:grid; place-items:center; text-align:center; padding: clamp(2rem,6vw,4rem) 0 1rem; }
-  .welcome{
-    font-weight:900; letter-spacing:.06em; line-height:1.1;
-    background:linear-gradient(90deg, var(--green), var(--blue), var(--yellow), var(--green));
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-    background-size:200% 100%;
-    font-size: clamp(1.4rem, 4.5vw, 2.8rem);
-    animation: fadeInOut 8s ease-in-out infinite, hue 14s linear infinite; /* slower now */
-  }
-  @keyframes hue{ 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
-  @keyframes fadeInOut{
-    0%   { opacity: 0 }
-    18%  { opacity: 1 }
-    82%  { opacity: 1 }
-    100% { opacity: 0 }
-  }
-  .byline{
-    margin-top:.6rem; font-weight:800; color:#0b1020; display:inline-block; padding:.4rem .8rem; border-radius:.7rem;
-    background:linear-gradient(90deg, rgba(16,185,129,.18), rgba(59,130,246,.18), rgba(253,224,71,.18));
-    box-shadow:0 6px 22px rgba(16,185,129,.14), 0 4px 16px rgba(59,130,246,.12);
+  body {
+    margin: 0; 
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: var(--text);
+    background: 
+      radial-gradient(1200px 800px at 10% 10%, rgba(16,185,129,.15), transparent 60%),
+      radial-gradient(1200px 800px at 90% 20%, rgba(59,130,246,.15), transparent 60%),
+      radial-gradient(1200px 800px at 50% 100%, rgba(253,224,71,.15), transparent 60%),
+      radial-gradient(1200px 800px at 30% 80%, rgba(167,139,250,.15), transparent 60%),
+      radial-gradient(1200px 800px at 70% 40%, rgba(244,114,182,.15), transparent 60%),
+      linear-gradient(120deg, #e8fdf6, #eef4ff 30%, #fffbe6 60%, #f5f3ff 80%, #fef2f2 100%);
+    background-size: 140% 140%;
+    animation: bgShift var(--animation-slow) ease-in-out infinite alternate;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
   }
 
-  /* Cards and UI */
-  .card{ background:var(--card); backdrop-filter:blur(6px); border:1px solid var(--ring); border-radius:14px; padding:1rem; box-shadow:0 10px 28px rgba(0,0,0,.08) }
-  .pill{ display:inline-block; padding:.28rem .6rem; border:1px solid var(--ring); border-radius:999px; font-size:.85rem; color:var(--muted);
-         background: linear-gradient(135deg, rgba(16,185,129,.08), rgba(59,130,246,.08), rgba(253,224,71,.08)); }
-  .row{ display:flex; gap:.8rem; align-items:center; flex-wrap:wrap }
-  .controls{ display:grid; gap:1rem; grid-template-columns:1fr }
-
-  .btn{
-    background:var(--grad); color:#073b2b; border:0; padding:.76rem 1.05rem; border-radius:.8rem; font-weight:900; cursor:pointer;
-    box-shadow:0 6px 18px rgba(16,185,129,.22), 0 3px 12px rgba(59,130,246,.14); transition:transform .12s ease, filter .2s ease;
-  }
-  .btn:hover{ transform:translateY(-1px); filter:brightness(1.05) }
-  .btn.ghost{ background:linear-gradient(135deg, rgba(16,185,129,.12), rgba(59,130,246,.12)); color:#0b1020; border:1px solid var(--ring) }
-  .muted{ color:var(--muted) }
-  progress{ width:100% }
-
-  /* Fancy fields */
-  .field{ position:relative; display:flex; align-items:center; gap:.5rem; background:var(--field-bg);
-          border:1px solid var(--field-bd); border-radius:.8rem; padding:.45rem .65rem }
-  .field:focus-within{ outline:2px solid var(--field-focus); outline-offset:2px; border-color:transparent; background:#fff }
-  .field input[type="number"], .field input[type="text"]{
-    border:0; background:transparent; outline:none; font:inherit; color:inherit; padding:.35rem .2rem; min-width:6ch
+  @keyframes bgShift {
+    0% { 
+      background-position: 0% 0%, 100% 0%, 50% 100%, 30% 80%, 70% 40%, 0% 0%;
+      background-size: 140% 140%;
+    }
+    100% { 
+      background-position: 50% 30%, 50% 20%, 60% 70%, 80% 60%, 20% 40%, 100% 100%;
+      background-size: 140% 140%;
+    }
   }
 
-  /* Dropzone (fix: input no longer overlays buttons) */
-  .dropzone{
-    position:relative; display:grid; place-items:center; text-align:center; padding:1.2rem; border-radius:1rem;
-    border:2px dashed #cbd5e1; background:linear-gradient(135deg, rgba(16,185,129,.08), rgba(59,130,246,.08), rgba(253,224,71,.08));
-    transition:border-color .2s, background .2s;
+  .wrap { 
+    width: min(1200px, 94%); 
+    margin: 0 auto; 
+    position: relative;
+    z-index: 1;
   }
-  .dropzone.drag{ border-color:#60a5fa; background:linear-gradient(135deg, rgba(16,185,129,.12), rgba(59,130,246,.12), rgba(253,224,71,.12)); }
-  .dz-title{ font-weight:800 }
-  .dz-sub{ color:var(--muted); font-size:.95rem }
-  .dz-actions{ margin-top:.7rem; display:flex; gap:.6rem; justify-content:center; flex-wrap:wrap }
-  #files{ display:none } /* input is hidden; chooseBtn triggers it */
 
-  /* Layout */
-  .grid{ display:grid; gap:1rem; grid-template-columns:1.1fr .9fr; align-items:start; margin:1rem 0 2rem }
-  @media (max-width: 980px){ .grid{ grid-template-columns:1fr } }
+  /* Hero section */
+  header.hero {
+    min-height: 42vh; 
+    display: grid; 
+    place-items: center; 
+    text-align: center; 
+    padding: clamp(2rem, 6vw, 4rem) 0 1rem;
+    position: relative;
+  }
 
-  canvas{ width:100%; background:#fff; border-radius:10px; border:1px solid #e5e7eb }
+  header.hero::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,0,0,.1), transparent);
+    opacity: 0.5;
+  }
 
-  .info{ margin:1.2rem 0 2.2rem; text-align:center; color:#111827; opacity:.9 }
+  /* Welcome text with colorful gradient */
+  .welcome {
+    font-weight: 900; 
+    letter-spacing: .08em; 
+    line-height: 1.1;
+    background: linear-gradient(90deg, var(--green-light), var(--blue-light), var(--yellow-light), var(--purple-light), var(--pink-light), var(--orange-light), var(--green-light));
+    -webkit-background-clip: text; 
+    background-clip: text; 
+    color: transparent;
+    background-size: 300% 100%;
+    font-size: clamp(1.6rem, 5vw, 3.2rem);
+    animation: gradientShift var(--animation-fast) linear infinite, fadeInOut 10s ease-in-out infinite;
+    text-shadow: 0 2px 4px rgba(0,0,0,.1);
+    position: relative;
+    display: inline-block;
+    padding: 0.2em 0;
+  }
+
+  @keyframes gradientShift {
+    0% { background-position: 0% 50% }
+    100% { background-position: 300% 50% }
+  }
+
+  @keyframes fadeInOut {
+    0%, 100% { opacity: 0.6; transform: translateY(0px) }
+    10%, 90% { opacity: 1; transform: translateY(-5px) }
+    20%, 80% { opacity: 1; transform: translateY(0px) }
+    50% { opacity: 1; transform: translateY(2px) }
+  }
+
+  /* Byline */
+  .byline {
+    margin-top: 1rem; 
+    font-weight: 800; 
+    color: var(--text);
+    display: inline-block; 
+    padding: 0.5rem 1.2rem; 
+    border-radius: 999px;
+    background: var(--grad-soft);
+    box-shadow: 0 6px 22px rgba(16,185,129,.14), 0 4px 16px rgba(59,130,246,.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,.2);
+    font-size: 0.95rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--card); 
+    backdrop-filter: blur(16px); 
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--ring); 
+    border-radius: 16px; 
+    padding: 1.5rem; 
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent, rgba(255,255,255,.03));
+    pointer-events: none;
+    border-radius: 16px;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--card-shadow-hover);
+  }
+
+  /* Pill design */
+  .pill {
+    display: inline-block; 
+    padding: 0.35rem 0.8rem; 
+    border: 1px solid var(--ring); 
+    border-radius: 999px; 
+    font-size: 0.85rem; 
+    color: var(--muted);
+    background: var(--grad-soft);
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .pill:hover {
+    background: var(--grad-soft);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.1);
+  }
+
+  /* Row layout */
+  .row {
+    display: flex; 
+    gap: 1rem; 
+    align-items: center; 
+    flex-wrap: wrap;
+    margin: 0.5rem 0;
+  }
+
+  /* Controls layout */
+  .controls {
+    display: grid; 
+    gap: 1.5rem; 
+    grid-template-columns: 1fr;
+    margin: 1.5rem 0;
+  }
+
+  /* Button design */
+  .btn {
+    background: var(--grad); 
+    color: #073b2b; 
+    border: 0; 
+    padding: 0.85rem 1.25rem; 
+    border-radius: 1rem; 
+    font-weight: 800; 
+    cursor: pointer;
+    box-shadow: var(--btn-shadow);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.95rem;
+    letter-spacing: 0.025em;
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+  }
+
+  .btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,.2), rgba(255,255,255,.05));
+    pointer-events: none;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--btn-shadow-hover);
+    filter: brightness(1.08);
+  }
+
+  .btn:active {
+    transform: translateY(0);
+    box-shadow: var(--btn-shadow);
+  }
+
+  .btn.ghost {
+    background: var(--grad-soft); 
+    color: var(--text); 
+    border: 1px solid var(--ring);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .btn.ghost::after {
+    background: linear-gradient(135deg, rgba(255,255,255,.15), rgba(255,255,255,.03));
+  }
+
+  .btn.ghost:hover {
+    background: var(--grad);
+    color: #073b2b;
+    transform: translateY(-2px);
+    box-shadow: var(--btn-shadow-hover);
+  }
+
+  .btn svg {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.2s ease;
+  }
+
+  .btn:hover svg {
+    transform: translateX(2px);
+  }
+
+  /* Muted text */
+  .muted {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .muted-light {
+    color: var(--muted-light);
+  }
+
+  /* Progress bar */
+  progress {
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid var(--ring);
+    background: var(--field-bg);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+  }
+
+  progress::-webkit-progress-bar {
+    background: var(--field-bg);
+    border-radius: 999px;
+  }
+
+  progress::-webkit-progress-value {
+    background: var(--grad);
+    border-radius: 999px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.2);
+  }
+
+  progress::-moz-progress-bar {
+    background: var(--grad);
+    border-radius: 999px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.2);
+  }
+
+  /* Field design */
+  .field {
+    position: relative; 
+    display: flex; 
+    align-items: center; 
+    gap: 0.75rem; 
+    background: var(--field-bg);
+    border: 1px solid var(--field-bd); 
+    border-radius: 1rem; 
+    padding: 0.55rem 0.85rem;
+    box-shadow: var(--field-shadow);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .field:focus-within {
+    outline: 2px solid var(--field-focus); 
+    outline-offset: 2px; 
+    border-color: transparent; 
+    background: var(--white);
+    box-shadow: 0 8px 25px rgba(59,130,246,.15);
+    transform: translateY(-1px);
+  }
+
+  .field input[type="number"], 
+  .field input[type="text"] {
+    border: 0; 
+    background: transparent; 
+    outline: none; 
+    font: inherit; 
+    color: inherit; 
+    padding: 0.4rem 0.3rem; 
+    min-width: 6ch;
+    flex: 1;
+    font-weight: 500;
+  }
+
+  .field label {
+    font-weight: 600;
+    color: var(--text-light);
+    font-size: 0.9rem;
+  }
+
+  /* Dropzone design */
+  .dropzone {
+    position: relative; 
+    display: grid; 
+    place-items: center; 
+    text-align: center; 
+    padding: 1.8rem; 
+    border-radius: 1.2rem;
+    border: 2px dashed var(--field-bd); 
+    background: var(--grad-soft);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    border-style: dashed;
+    border-color: var(--field-bd);
+    box-shadow: 0 4px 20px rgba(0,0,0,.05);
+  }
+
+  .dropzone:hover {
+    border-color: var(--blue-light);
+    background: var(--grad-soft);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59,130,246,.1);
+  }
+
+  .dropzone.drag {
+    border-color: var(--blue-light); 
+    background: var(--grad-soft);
+    box-shadow: 0 8px 25px rgba(59,130,246,.15);
+  }
+
+  .dz-title {
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--text);
+    margin-bottom: 0.3rem;
+  }
+
+  .dz-sub {
+    color: var(--muted); 
+    font-size: 0.95rem;
+    max-width: 400px;
+    line-height: 1.5;
+  }
+
+  .dz-actions {
+    margin-top: 1rem; 
+    display: flex; 
+    gap: 0.8rem; 
+    justify-content: center; 
+    flex-wrap: wrap;
+  }
+
+  #files {
+    display: none;
+  }
+
+  /* Layout grid */
+  .grid {
+    display: grid; 
+    gap: 1.5rem; 
+    grid-template-columns: 1.1fr .9fr; 
+    align-items: start; 
+    margin: 1.5rem 0 2.5rem;
+  }
+
+  /* Canvas design */
+  canvas {
+    width: 100%; 
+    background: var(--white); 
+    border-radius: 12px; 
+    border: 1px solid var(--field-bd);
+    box-shadow: 0 4px 20px rgba(0,0,0,.08);
+    transition: all 0.3s ease;
+  }
+
+  canvas:hover {
+    box-shadow: 0 8px 30px rgba(0,0,0,.12);
+    transform: translateY(-2px);
+  }
+
+  /* Info section */
+  .info {
+    margin: 2rem 0 3rem; 
+    text-align: center; 
+    color: var(--text-light); 
+    opacity: 0.8;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.025em;
+  }
+
+  .info a {
+    color: var(--blue);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+  }
+
+  .info a:hover {
+    color: var(--blue-light);
+    text-decoration: underline;
+  }
+
+  /* Features */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0 2rem;
+  }
+
+  .feature {
+    background: var(--grad-soft);
+    border: 1px solid var(--ring);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .feature:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0,0,0,.1);
+  }
+
+  .feature svg {
+    width: 28px;
+    height: 28px;
+    margin-bottom: 0.5rem;
+    color: var(--blue);
+  }
+
+  /* Responsive design */
+  @media (max-width: 980px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .welcome {
+      font-size: clamp(1.4rem, 6vw, 2.8rem);
+    }
+    
+    .byline {
+      font-size: 0.85rem;
+      padding: 0.4rem 1rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .controls {
+      gap: 1.2rem;
+    }
+    
+    .row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .dz-actions {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  /* Animation classes */
+  .loading {
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-2px); }
+    100% { transform: translateY(0px); }
+  }
+
+  /* Download animation */
+  @keyframes downloadPulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .download-animation {
+    animation: downloadPulse 0.6s ease-in-out;
+  }
+
+  /* Checkmark animation */
+  @keyframes checkmark {
+    0% { stroke-dashoffset: 100; opacity: 0; }
+    50% { stroke-dashoffset: 0; opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 1; }
+  }
+
+  .checkmark-line {
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    animation: checkmark 1.2s ease-in-out forwards;
+  }
+
+  /* Tooltip */
+  .tooltip {
+    position: relative;
+    display: inline-block;
+  }
+
+  .tooltip .tooltip-text {
+    visibility: hidden;
+    width: 200px;
+    background-color: var(--black);
+    color: var(--white);
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.85rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,.2);
+  }
+
+  .tooltip .tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--black) transparent transparent transparent;
+  }
+
+  .tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+  }
 </style>
 </head>
 <body>
   <header class="hero">
     <div class="wrap">
-      <div class="welcome" id="welcomeText">WELCOME TO THE WORLD OF QR CODEs</div>
-      <div class="byline">Made by ANABRATA</div>
+      <div class="welcome" id="welcomeText">WELCOME TO THE WORLD OF QRs</div>
+      <div class="byline">QR Arranger • Made by ANABRATA</div>
     </div>
   </header>
-
   <main class="wrap">
     <section class="card">
-      <div class="row" style="justify-content:space-between">
+      <div class="row" style="justify-content:space-between; margin-bottom: 1rem;">
         <div class="row">
-          <span class="pill">Page: A4 (210 × 297 mm)</span>
-          <span class="pill">Margins: 20 mm each side</span>
+          <span class="pill">📄 Page: A4 (210 × 297 mm)</span>
+          <span class="pill">📏 Margins: 20 mm each side</span>
+          <span class="pill">⚡ Instant Preview</span>
         </div>
       </div>
-
+      
+      <div class="features">
+        <div class="feature">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          <div>Drag & Drop</div>
+        </div>
+        <div class="feature">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="3" y1="9" x2="21" y2="9"></line>
+            <line x1="9" y1="21" x2="9" y2="9"></line>
+          </svg>
+          <div>Precise Layout</div>
+        </div>
+        <div class="feature">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <div>Auto-Fit</div>
+        </div>
+        <div class="feature">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <div>PDF Export</div>
+        </div>
+      </div>
+      
       <div class="controls">
-        <!-- Fancy file input / dropzone -->
+        <!-- File input / dropzone -->
         <div class="dropzone" id="dropzone">
           <div>
-            <div class="dz-title">Choose or drop your QR images</div>
-            <div class="dz-sub">ZIP or multiple images. Trimming removes outer white borders.</div>
+            <div class="dz-title">Upload Your QR Images</div>
+            <div class="dz-sub">Supports ZIP files and individual images. Trimming removes outer white borders for precise gaps.</div>
             <div class="dz-actions">
-              <button class="btn" id="chooseBtn" type="button">Choose files</button>
-              <button class="btn ghost" id="arrange" type="button">Arrange → PDF</button>
-              <a id="downloadPdf" class="btn ghost" download="qr_a4_layout.pdf" href="#" aria-disabled="true">Download PDF</a>
+              <button class="btn" id="chooseBtn" type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                Choose Files
+              </button>
+              <button class="btn ghost" id="arrange" type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="16 12 12 8 8 12"></polyline>
+                  <line x1="12" y1="16" x2="12" y2="8"></line>
+                </svg>
+                Arrange → PDF
+              </button>
+              <a id="downloadPdf" class="btn ghost" download="qr_a4_layout.pdf" href="#" aria-disabled="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Download PDF
+              </a>
             </div>
           </div>
           <input id="files" type="file" accept=".zip,image/*" multiple />
         </div>
         <div class="muted" id="fileNote"></div>
-
+        
         <!-- Sizing + options -->
         <div class="row">
-          <div class="field"><span>QR tile (mm)</span><input id="qrSize" type="number" value="15" step="0.1" min="3"></div>
-          <div class="field"><span>Gap (mm)</span><input id="gap" type="number" value="5" step="0.1" min="0"></div>
-          <label class="field" style="gap:.5rem"><input id="autoFit" type="checkbox" checked> <span>Auto‑fit to one page</span></label>
+          <div class="field tooltip">
+            <span>📏 QR Size (mm)</span>
+            <input id="qrSize" type="number" value="15" step="0.1" min="3">
+            <span class="tooltip-text">Size of each QR code tile in millimeters</span>
+          </div>
+          <div class="field tooltip">
+            <span>↔️ Gap (mm)</span>
+            <input id="gap" type="number" value="5" step="0.1" min="0">
+            <span class="tooltip-text">Spacing between QR codes</span>
+          </div>
+          <label class="field" style="gap:.75rem">
+            <input id="autoFit" type="checkbox" checked> 
+            <span>🎯 Auto-fit to one page</span>
+          </label>
         </div>
-
         <div class="row">
-          <label class="field" style="gap:.5rem"><input id="trim" type="checkbox" checked> <span>Trim outer white/transparent border</span></label>
-          <div class="field"><span>Inner padding (mm)</span><input id="pad" type="number" value="0" step="0.1" min="0"></div>
-          <label class="field" style="gap:.5rem"><input id="rulers" type="checkbox"> <span>Add 100 mm rulers</span></label>
+          <label class="field tooltip" style="gap:.75rem">
+            <input id="trim" type="checkbox" checked> 
+            <span>✂️ Trim outer white/transparent border</span>
+            <span class="tooltip-text">Remove excess whitespace around QR codes for precise spacing</span>
+          </label>
+          <div class="field tooltip">
+            <span>⊞ Padding (mm)</span>
+            <input id="pad" type="number" value="0" step="0.1" min="0">
+            <span class="tooltip-text">Inner padding within each QR code tile</span>
+          </div>
+          <label class="field tooltip" style="gap:.75rem">
+            <input id="rulers" type="checkbox"> 
+            <span>📏 Add 100 mm rulers</span>
+            <span class="tooltip-text">Include measurement rulers on the PDF for reference</span>
+          </label>
         </div>
-
         <div>
           <progress id="prog" value="0" max="100" hidden></progress>
-          <div id="note" class="muted" style="margin-top:.35rem"></div>
+          <div id="note" class="muted" style="margin-top:.5rem"></div>
         </div>
       </div>
     </section>
-
     <section class="grid">
       <div class="card">
-        <h3 style="margin:.2rem 0 .8rem">Preview (scaled)</h3>
+        <h3 style="margin:.2rem 0 .8rem; font-weight: 700; color: var(--text-light);">Preview (scaled)</h3>
         <canvas id="preview" width="840" height="1188" aria-label="Preview canvas"></canvas>
-        <p class="muted" style="margin:.5rem 0 0">
-          Tip: For a true 0.5 cm gap, set Gap = 5 mm, keep Trim ON, Padding = 0, and print the PDF at 100% (no fit/scaling).
+        <p class="muted" style="margin:.75rem 0 0">
+          <strong>Pro Tip:</strong> For a true 0.5 cm gap, set Gap = 5 mm, keep Trim ON, Padding = 0, and print the PDF at 100% (no fit/scaling).
         </p>
       </div>
       <div class="card">
-        <h3 style="margin:.2rem 0 .8rem">Quick notes</h3>
-        <ul class="muted" style="margin:.2rem 0 0; padding-left:1rem; list-style:disc">
-          <li>Use ZIP for many images</li>
-          <li>2 cm margins ensure printers don’t clip</li>
-          <li>Auto‑fit shrinks tiles so everything fits on one page</li>
-          <li>A4 is 210 × 297 mm; layout and PDF use precise millimeters</li>
+        <h3 style="margin:.2rem 0 .8rem; font-weight: 700; color: var(--text-light);">Features</h3>
+        <ul class="muted" style="margin:.2rem 0 0; padding-left:1.2rem; list-style:disc; line-height: 1.6;">
+          <li>Supports ZIP files for bulk uploads</li>
+          <li>2 cm margins ensure printers don't clip content</li>
+          <li>Auto-fit intelligently shrinks tiles to fit all QR codes on one page</li>
+          <li>Precision A4 layout (210 × 297 mm) with exact millimeter measurements</li>
+          <li>Trim feature removes white borders for consistent, professional spacing</li>
+          <li>Optional rulers for accurate measurement verification</li>
         </ul>
       </div>
     </section>
-
-    <div class="info">© <span id="year"></span> Made by ANABRATA</div>
+    <div class="info">© <span id="year"></span> QR Arranger • <a href="https://anabrata.com" target="_blank">Made by ANABRATA</a></div>
   </main>
-
+  
   <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-
   <script>
-  // Year
-  document.getElementById('year').textContent = new Date().getFullYear();
+  // Initialize
+  document.addEventListener('DOMContentLoaded', function() {
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+    
+    // Add subtle entrance animations
+    setTimeout(() => {
+      const cards = document.querySelectorAll('.card');
+      cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, 200 + index * 150);
+      });
+    }, 300);
+  });
 
   // Constants
   const PAGE_W_MM = 210, PAGE_H_MM = 297; // A4
   const MARGIN_MM = 20; // 2 cm
-  const MAX_IMAGES = 200; // performance cap (not displayed)
+  const MAX_IMAGES = 200; // performance cap
+  const CANVAS_SCALE = 4; // Higher resolution for preview
 
   // Elements
   const $ = id => document.getElementById(id);
@@ -190,14 +814,12 @@
   const chooseBtn = $('chooseBtn');
   const dz = $('dropzone');
   const fileNote = $('fileNote');
-
   const arrangeBtn = $('arrange');
   const downloadPdf = $('downloadPdf');
   const note = $('note');
   const prog = $('prog');
   const canvas = $('preview');
   const ctx = canvas.getContext('2d');
-
   const qrSizeInput = $('qrSize');
   const gapInput = $('gap');
   const autoFitInput = $('autoFit');
@@ -205,19 +827,45 @@
   const padInput = $('pad');
   const rulersInput = $('rulers');
 
-  // --- Dropzone interactions (input is hidden; it won't block buttons) ---
+  // --- Dropzone interactions ---
   chooseBtn.addEventListener('click', () => filesEl.click());
-  dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('drag'); });
-  dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+  
+  dz.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dz.classList.add('drag');
+    dz.style.transform = 'translateY(-2px)';
+    dz.style.boxShadow = '0 8px 25px rgba(59,130,246,.15)';
+  });
+  
+  dz.addEventListener('dragleave', () => {
+    dz.classList.remove('drag');
+    dz.style.transform = '';
+    dz.style.boxShadow = '';
+  });
+  
   dz.addEventListener('drop', (e) => {
-    e.preventDefault(); dz.classList.remove('drag');
+    e.preventDefault();
+    dz.classList.remove('drag');
+    dz.style.transform = '';
+    dz.style.boxShadow = '';
     filesEl.files = e.dataTransfer.files;
     updateFileNote();
   });
+  
   filesEl.addEventListener('change', updateFileNote);
+
   function updateFileNote(){
     const n = filesEl.files?.length || 0;
-    fileNote.textContent = n ? `${n} file(s) selected` : '';
+    if (n === 0) {
+      fileNote.textContent = '';
+    } else {
+      fileNote.textContent = `${n} file${n > 1 ? 's' : ''} selected`;
+      fileNote.style.opacity = '0';
+      setTimeout(() => {
+        fileNote.style.transition = 'opacity 0.3s ease';
+        fileNote.style.opacity = '1';
+      }, 50);
+    }
   }
 
   // --- File reading helpers ---
@@ -225,37 +873,57 @@
     return new Promise((res, rej) => {
       const url = URL.createObjectURL(blob);
       const img = new Image();
-      img.onload = () => { URL.revokeObjectURL(url); res(img); };
-      img.onerror = rej;
+      img.onload = () => { 
+        URL.revokeObjectURL(url); 
+        res(img); 
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        rej(new Error('Failed to load image'));
+      };
       img.src = url;
     });
   }
+  
   async function readAllImagesFromInput(fileList){
     const imgs = [];
     const files = Array.from(fileList || []);
     const zips = files.filter(f => f.name.toLowerCase().endsWith('.zip'));
     const singles = files.filter(f => !f.name.toLowerCase().endsWith('.zip'));
-
+    
+    // Process ZIP files first
     for (const zf of zips){
-      const zip = await JSZip.loadAsync(zf);
-      const entries = Object.values(zip.files).filter(f => !f.dir && /\.(png|jpe?g|webp|bmp|gif|svg)$/i.test(f.name));
-      for (const entry of entries){
-        const blob = await entry.async("blob");
-        const img = await blobToImage(blob);
+      try {
+        const zip = await JSZip.loadAsync(zf);
+        const entries = Object.values(zip.files).filter(f => !f.dir && /\.(png|jpe?g|webp|bmp|gif|svg)$/i.test(f.name));
+        
+        for (const entry of entries){
+          const blob = await entry.async("blob");
+          const img = await blobToImage(blob);
+          imgs.push(img);
+          if (imgs.length >= MAX_IMAGES) break;
+        }
+        if (imgs.length >= MAX_IMAGES) break;
+      } catch (error) {
+        console.warn(`Failed to process ZIP file ${zf.name}:`, error);
+      }
+    }
+    
+    // Process individual image files
+    for (const f of singles){
+      try {
+        const img = await blobToImage(f);
         imgs.push(img);
         if (imgs.length >= MAX_IMAGES) break;
+      } catch (error) {
+        console.warn(`Failed to process image file ${f.name}:`, error);
       }
-      if (imgs.length >= MAX_IMAGES) break;
     }
-    for (const f of singles){
-      const img = await blobToImage(f);
-      imgs.push(img);
-      if (imgs.length >= MAX_IMAGES) break;
-    }
+    
     return imgs.slice(0, MAX_IMAGES);
   }
 
-  // --- Trimming (to ensure visible gap is exact) ---
+  // --- Trimming ---
   function trimToContentCanvas(img, threshold = 250){
     const w = img.naturalWidth || img.width;
     const h = img.naturalHeight || img.height;
@@ -264,15 +932,20 @@
     const c = t.getContext('2d');
     c.drawImage(img, 0, 0, w, h);
     const { data } = c.getImageData(0, 0, w, h);
-
+    
     let minX = w, minY = h, maxX = -1, maxY = -1;
-    for (let y=0; y<h; y++){
-      for (let x=0; x<w; x++){
-        const i = (y*w + x) * 4;
+    
+    // Scan for content pixels
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const i = (y * w + x) * 4;
         const r = data[i], g = data[i+1], b = data[i+2], a = data[i+3];
+        
+        // Consider pixel as content if it's not fully transparent and not too close to white
         const opaque = a > 10;
         const notWhite = (r < threshold || g < threshold || b < threshold);
-        if ((opaque && notWhite) || (!opaque && (r+g+b) < 3)){
+        
+        if ((opaque && notWhite) || (!opaque && (r + g + b) < 3)) {
           if (x < minX) minX = x;
           if (y < minY) minY = y;
           if (x > maxX) maxX = x;
@@ -280,14 +953,20 @@
         }
       }
     }
+    
+    // Handle edge cases
     if (maxX < minX || maxY < minY) return t;
+    
     const tw = Math.max(1, maxX - minX + 1);
     const th = Math.max(1, maxY - minY + 1);
+    
     const out = document.createElement('canvas');
     out.width = tw; out.height = th;
     out.getContext('2d').drawImage(t, minX, minY, tw, th, 0, 0, tw, th);
+    
     return out;
   }
+  
   function imageToCanvas(img){
     const w = img.naturalWidth || img.width;
     const h = img.naturalHeight || img.height;
@@ -296,153 +975,269 @@
     t.getContext('2d').drawImage(img, 0, 0, w, h);
     return t;
   }
+  
   function prepareImages(imgs, doTrim){
     return imgs.map(img => doTrim ? trimToContentCanvas(img) : imageToCanvas(img));
   }
-  function canvasToJpegDataURL(cv, q=0.9){ return cv.toDataURL('image/jpeg', q); }
+  
+  function canvasToJpegDataURL(cv, q=0.9){ 
+    return cv.toDataURL('image/jpeg', q); 
+  }
 
-  // --- Preview layout (scaled to A4 width) ---
+  // --- Preview layout ---
   function previewLayout(prepared, tileMM, gapMM, padMM, showRulers){
     const pageWmm = PAGE_W_MM, pageHmm = PAGE_H_MM;
-    const pxPerMM = canvas.width / pageWmm;
-    const pageWpx = Math.round(pageWmm * pxPerMM);
-    const pageHpx = Math.round(pageHmm * pxPerMM);
-    const marginPx = Math.round(MARGIN_MM * pxPerMM);
+    const pxPerMM = (canvas.width / CANVAS_SCALE) / pageWmm;
+    const pageWpx = Math.round(pageWmm * pxPerMM * CANVAS_SCALE);
+    const pageHpx = Math.round(pageHmm * pxPerMM * CANVAS_SCALE);
+    const marginPx = Math.round(MARGIN_MM * pxPerMM * CANVAS_SCALE);
     const availW = pageWpx - 2*marginPx;
     const availH = pageHpx - 2*marginPx;
-
-    let tilePx = Math.max(1, Math.round(tileMM * pxPerMM));
-    let gapPx  = Math.max(0, Math.round(gapMM  * pxPerMM));
-    let padPx  = Math.max(0, Math.round(padMM  * pxPerMM));
-
+    
+    let tilePx = Math.max(1, Math.round(tileMM * pxPerMM * CANVAS_SCALE));
+    let gapPx  = Math.max(0, Math.round(gapMM  * pxPerMM * CANVAS_SCALE));
+    let padPx  = Math.max(0, Math.round(padMM  * pxPerMM * CANVAS_SCALE));
+    
     function fit(tile, gap){
       const cols = Math.max(1, Math.floor((availW + gap) / (tile + gap)));
       const rows = Math.max(1, Math.floor((availH + gap) / (tile + gap)));
       return { cols, rows, capacity: cols * rows };
     }
+    
     let { cols, rows, capacity } = fit(tilePx, gapPx);
+    
+    // Auto-fit logic
     if (capacity < prepared.length && autoFitInput.checked){
       while (capacity < prepared.length && tilePx > 3){
         tilePx -= 1;
         ({ cols, rows, capacity } = fit(tilePx, gapPx));
       }
     }
-
-    // Paint page + margin guide
-    ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,pageWpx,pageHpx);
-    ctx.strokeStyle = '#d1d5db'; ctx.lineWidth = 1;
+    
+    // Clear canvas with high resolution
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, pageWpx, pageHpx);
+    
+    // Draw page border
+    ctx.strokeStyle = '#d1d5db';
+    ctx.lineWidth = 1;
     ctx.strokeRect(marginPx + .5, marginPx + .5, availW - 1, availH - 1);
-
+    
     // Optional rulers (100 mm)
     if (showRulers){
-      ctx.strokeStyle = '#9ca3af'; ctx.lineWidth = 1;
+      ctx.strokeStyle = '#9ca3af';
+      ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.moveTo(marginPx, marginPx + Math.round(10 * pxPerMM));
-      ctx.lineTo(marginPx + Math.round(100 * pxPerMM), marginPx + Math.round(10 * pxPerMM));
-      ctx.moveTo(marginPx + Math.round(10 * pxPerMM), marginPx);
-      ctx.lineTo(marginPx + Math.round(10 * pxPerMM), marginPx + Math.round(100 * pxPerMM));
+      ctx.moveTo(marginPx, marginPx + Math.round(10 * pxPerMM * CANVAS_SCALE));
+      ctx.lineTo(marginPx + Math.round(100 * pxPerMM * CANVAS_SCALE), marginPx + Math.round(10 * pxPerMM * CANVAS_SCALE));
+      ctx.moveTo(marginPx + Math.round(10 * pxPerMM * CANVAS_SCALE), marginPx);
+      ctx.lineTo(marginPx + Math.round(10 * pxPerMM * CANVAS_SCALE), marginPx + Math.round(100 * pxPerMM * CANVAS_SCALE));
       ctx.stroke();
     }
-
-    // Draw tiles
+    
+    // Draw tiles with high quality
     let i = 0;
-    for (let r=0; r<rows && i<prepared.length; r++){
-      for (let c=0; c<cols && i<prepared.length; c++){
+    for (let r = 0; r < rows && i < prepared.length; r++){
+      for (let c = 0; c < cols && i < prepared.length; c++){
         const x = marginPx + c * (tilePx + gapPx);
         const y = marginPx + r * (tilePx + gapPx);
         const inner = prepared[i];
         const w = Math.max(1, tilePx - 2*padPx);
+        
+        // Use high-quality interpolation
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        
         ctx.drawImage(inner, x + padPx, y + padPx, w, w);
         i++;
       }
     }
+    
     return { placed: Math.min(prepared.length, capacity), cols, rows };
   }
 
-  // --- PDF builder (A4 mm accurate) ---
+  // --- PDF builder ---
   async function buildPdf(prepared, tileMM, gapMM, padMM, showRulers){
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit: 'mm', format: [PAGE_W_MM, PAGE_H_MM] });
-
+    const doc = new jsPDF({ 
+      unit: 'mm', 
+      format: [PAGE_W_MM, PAGE_H_MM],
+      putOnlyUsedFonts: true,
+      floatPrecision: 16
+    });
+    
     const availW = PAGE_W_MM - 2*MARGIN_MM;
     const availH = PAGE_H_MM - 2*MARGIN_MM;
-
+    
     function fit(tile, gap){
       const cols = Math.max(1, Math.floor((availW + gap) / (tile + gap)));
       const rows = Math.max(1, Math.floor((availH + gap) / (tile + gap)));
       return { cols, rows, capacity: cols * rows };
     }
-
+    
     let tile = tileMM, gap = gapMM, pad = padMM;
     let { cols, rows, capacity } = fit(tile, gap);
+    
+    // Auto-fit logic with finer adjustments
     if (capacity < prepared.length && autoFitInput.checked){
-      for (let k=0; k<800 && capacity < prepared.length; k++){
-        tile = Math.max(3, Math.round((tile - 0.2) * 10) / 10);
+      for (let k = 0; k < 800 && capacity < prepared.length; k++){
+        tile = Math.max(3, Math.round((tile - 0.1) * 10) / 10);
         ({ cols, rows, capacity } = fit(tile, gap));
         if (tile <= 3) break;
       }
     }
-
-    // Optional rulers
+    
+    // Optional rulers with professional styling
     if (showRulers){
-      doc.setDrawColor(180);
+      doc.setDrawColor(150, 160, 170);
+      doc.setLineWidth(0.3);
       doc.line(MARGIN_MM, MARGIN_MM + 10, MARGIN_MM + 100, MARGIN_MM + 10);
       doc.line(MARGIN_MM + 10, MARGIN_MM, MARGIN_MM + 10, MARGIN_MM + 100);
+      
+      // Add ruler markings
+      doc.setLineWidth(0.2);
+      for (let i = 1; i <= 10; i++) {
+        doc.line(MARGIN_MM + i * 10, MARGIN_MM + 8, MARGIN_MM + i * 10, MARGIN_MM + 12);
+        doc.line(MARGIN_MM + 8, MARGIN_MM + i * 10, MARGIN_MM + 12, MARGIN_MM + i * 10);
+      }
+      
       doc.setDrawColor(0);
     }
-
+    
+    // Draw tiles with high quality
     let i = 0;
-    for (let r=0; r<rows && i<prepared.length; r++){
-      for (let c=0; c<cols && i<prepared.length; c++){
+    for (let r = 0; r < rows && i < prepared.length; r++){
+      for (let c = 0; c < cols && i < prepared.length; c++){
         const x = MARGIN_MM + c * (tile + gap);
         const y = MARGIN_MM + r * (tile + gap);
         const inner = prepared[i];
         const w = Math.max(0.1, tile - 2*pad);
-        const dataUrl = canvasToJpegDataURL(inner, 0.9);
-        doc.addImage(dataUrl, 'JPEG', x + pad, y + pad, w, w);
+        
+        // Convert canvas to high-quality JPEG
+        const dataUrl = canvasToJpegDataURL(inner, 0.95);
+        
+        // Add image with high resolution
+        doc.addImage(dataUrl, 'JPEG', x + pad, y + pad, w, w, undefined, 'FAST', 0);
         i++;
       }
     }
+    
     return doc.output('blob');
   }
 
-  // --- Arrange → PDF ---
+  // --- Arrange → PDF with animations ---
   arrangeBtn.onclick = async () => {
-    try{
-      note.textContent = "Reading files…";
-      prog.hidden = false; prog.value = 5;
-
+    try {
+      // Reset UI state
+      note.textContent = "";
+      prog.hidden = false;
+      prog.value = 0;
+      
+      // Add loading animation
+      arrangeBtn.classList.add('loading');
+      
+      // Step 1: Reading files
+      note.textContent = "🔍 Reading files...";
+      prog.value = 10;
+      
       const imgs = await readAllImagesFromInput(filesEl.files);
-      if (!imgs.length){ note.textContent = "No images found. Choose or drop your QR images first."; prog.hidden = true; return; }
-      if (imgs.length > MAX_IMAGES) imgs.length = MAX_IMAGES;
-      fileNote.textContent = `${imgs.length} image(s) loaded`;
-
-      prog.value = 25; note.textContent = "Preparing images…";
+      
+      if (!imgs.length) { 
+        note.textContent = "❌ No images found. Choose or drop your QR images first.";
+        prog.hidden = true; 
+        arrangeBtn.classList.remove('loading');
+        return; 
+      }
+      
+      if (imgs.length > MAX_IMAGES) {
+        imgs.length = MAX_IMAGES;
+        note.textContent = `⚠️ Too many images. Using first ${MAX_IMAGES}.`;
+        setTimeout(() => {
+          note.textContent = `✅ ${MAX_IMAGES} images loaded`;
+        }, 1000);
+      } else {
+        note.textContent = `✅ ${imgs.length} image(s) loaded`;
+      }
+      
+      fileNote.textContent = `${imgs.length} image${imgs.length > 1 ? 's' : ''} loaded`;
+      
+      // Step 2: Preparing images
+      prog.value = 30;
+      note.textContent = "🛠 Preparing images...";
+      
+      const startTime = performance.now();
       const prepared = prepareImages(imgs, !!trimInput.checked);
-
+      const processingTime = performance.now() - startTime;
+      
+      // Only show processing time if it was significant
+      if (processingTime > 200) {
+        setTimeout(() => {
+          note.textContent = `⚡ Images optimized in ${processingTime.toFixed(0)}ms`;
+        }, 500);
+      }
+      
+      // Step 3: Arranging layout
+      prog.value = 50;
+      note.textContent = "📐 Arranging on page...";
+      
       const tileMM = parseFloat(qrSizeInput.value) || 15;
-      const gapMM  = parseFloat(gapInput.value) || 5;
-      const padMM  = Math.max(0, parseFloat(padInput.value) || 0);
+      const gapMM = parseFloat(gapInput.value) || 5;
+      const padMM = Math.max(0, parseFloat(padInput.value) || 0);
       const showRulers = !!rulersInput.checked;
-
-      prog.value = 45; note.textContent = "Arranging on page…";
-      previewLayout(prepared, tileMM, gapMM, padMM, showRulers);
-
-      prog.value = 70; note.textContent = "Building PDF… (this can take a moment)";
+      
+      const layout = previewLayout(prepared, tileMM, gapMM, padMM, showRulers);
+      
+      // Update note with layout information
+      setTimeout(() => {
+        note.textContent = `📋 Arranged ${layout.placed}/${imgs.length} codes in ${layout.cols}×${layout.rows} grid`;
+      }, 300);
+      
+      // Step 4: Building PDF
+      prog.value = 75;
+      note.textContent = "📄 Building PDF... (this may take a moment)";
+      
+      const pdfStartTime = performance.now();
       const blob = await buildPdf(prepared, tileMM, gapMM, padMM, showRulers);
-
+      const pdfTime = performance.now() - pdfStartTime;
+      
+      // Step 5: Finalizing
       const url = URL.createObjectURL(blob);
       downloadPdf.href = url;
-      downloadPdf.setAttribute('aria-disabled','false');
-
-      prog.value = 100; note.textContent = "PDF ready. Download and print at 100% scale.";
-      setTimeout(() => prog.hidden = true, 400);
-    } catch(e){
-      console.error(e);
-      note.textContent = "Error: " + e.message;
+      downloadPdf.setAttribute('aria-disabled', 'false');
+      
+      prog.value = 100;
+      
+      // Final message with performance info
+      setTimeout(() => {
+        note.textContent = `✅ PDF ready in ${pdfTime.toFixed(0)}ms! Download and print at 100% scale.`;
+        prog.hidden = true;
+        arrangeBtn.classList.remove('loading');
+      }, 600);
+      
+    } catch(e) {
+      console.error('Error in arrange process:', e);
+      note.textContent = `❌ Error: ${e.message || 'An unknown error occurred'}`;
       prog.hidden = true;
+      arrangeBtn.classList.remove('loading');
     }
   };
+
+  // Download animation
+  downloadPdf.addEventListener('click', function(e) {
+    if (this.getAttribute('aria-disabled') === 'true') {
+      e.preventDefault();
+      return;
+    }
+    
+    // Add animation class
+    this.classList.add('download-animation');
+    
+    // Remove animation class after animation completes
+    setTimeout(() => {
+      this.classList.remove('download-animation');
+    }, 600);
+  });
   </script>
 </body>
 </html>
