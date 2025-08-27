@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head><title>Edit QR</title></head>
+<body>
+<h2>Edit QR</h2>
+<form method="post" action="/edit/<%= qr.id %>">
+  <input type="text" name="url" value="<%= qr.url %>" required>
+  <button type="submit">Update</button>
+</form>
+<a href="/">Back</a>
+</body>
+</html>
