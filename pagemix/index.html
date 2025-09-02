@@ -26,10 +26,10 @@
       --glass-border: rgba(255,255,255,0.25);
       --text:#e9ecf5;
       --muted:#a8b1c2;
-      --brand1:#6EE7B7; /* mint */
-      --brand2:#60A5FA; /* sky */
-      --brand3:#8b5cf6; /* violet */
-      --accent:#22d3ee; /* cyan */
+      --brand1:#6EE7B7;
+      --brand2:#60A5FA;
+      --brand3:#8b5cf6;
+      --accent:#22d3ee;
       --danger:#ff7a7a;
       --success:#34d399;
       --shadow: 0 10px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
@@ -45,9 +45,7 @@
         radial-gradient(900px 600px at 90% 0%, rgba(96,165,250,0.20), transparent 60%),
         linear-gradient(180deg, var(--bg1), var(--bg2));
     }
-    .bg-orbs{
-      position:fixed;inset:0;pointer-events:none;z-index:-1;overflow:hidden;
-    }
+    .bg-orbs{position:fixed;inset:0;pointer-events:none;z-index:-1;overflow:hidden;}
     .orb{position:absolute;filter:blur(60px);opacity:0.4;mix-blend:screen}
     .orb.one{background:linear-gradient(120deg,#22d3ee,#8b5cf6);width:420px;height:420px;left:-140px;top:-100px;border-radius:50%}
     .orb.two{background:linear-gradient(120deg,#6EE7B7,#60A5FA);width:520px;height:520px;right:-180px;top:-60px;border-radius:50%}
@@ -55,12 +53,8 @@
 
     .wrap{max-width:1200px;margin:34px auto;padding:20px}
 
-    header{
-      display:flex;align-items:center;justify-content:space-between;gap:18px
-    }
-    .brand{
-      display:flex;align-items:center;gap:14px
-    }
+    header{display:flex;align-items:center;justify-content:space-between;gap:18px}
+    .brand{display:flex;align-items:center;gap:14px}
     .logo{
       width:56px;height:56px;border-radius:14px;
       background:linear-gradient(135deg,var(--brand2),var(--brand3));
@@ -71,9 +65,7 @@
     .title h1{margin:0;font-size:1.8rem;line-height:1.2}
     .title .sub{color:var(--muted);font-size:0.98rem;margin-top:4px}
 
-    .top-actions{
-      display:flex;gap:10px;align-items:center
-    }
+    .top-actions{display:flex;gap:10px;align-items:center}
     .chip{
       padding:8px 12px;border-radius:999px;border:1px solid var(--glass-border);
       background:linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.04));
@@ -118,9 +110,8 @@
     .btn:active{transform: translateY(0)}
     .btn:disabled{opacity:0.6;cursor:default}
     .btn.secondary{background: linear-gradient(90deg, #22d3ee, #6EE7B7); color:#0c1329}
-    .btn.ghost{
-      background: transparent; border:1px solid var(--glass-border); color:var(--text)
-    }
+    .btn.ghost{background: transparent; border:1px solid var(--glass-border); color:var(--text)}
+    .btn.small{padding:8px 12px;border-radius:10px;font-weight:600;font-size:0.9rem}
 
     .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     .label{font-size:0.92rem;color:var(--muted);min-width:110px}
@@ -158,10 +149,8 @@
       box-shadow:var(--shadow-soft); background:rgba(0,0,0,0.08)
     }
 
-    /* Facts row (pill factboxes) */
-    .facts{
-      margin-top:16px;display:flex;flex-wrap:wrap;gap:10px
-    }
+    /* Facts row */
+    .facts{margin-top:16px;display:flex;flex-wrap:wrap;gap:10px}
     .fact{
       display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:999px;
       background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
@@ -171,6 +160,47 @@
 
     .note{margin-top:12px;color:var(--muted); font-size:0.95rem}
 
+    /* Modal (page picker) */
+    .modal{position:fixed;inset:0;display:none;z-index:60}
+    .modal.open{display:grid;place-items:center}
+    .modal .overlay{position:absolute;inset:0;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px)}
+    .modal .panel{
+      position:relative; width:min(1100px,94vw); max-height:86vh; display:flex; flex-direction:column; gap:10px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
+      border:1px solid var(--glass-border); border-radius:18px; box-shadow: var(--shadow); padding:14px;
+      color:var(--text);
+    }
+    .modal .header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .modal .title{font-weight:700;font-size:1.1rem}
+    .modal .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .modal .info{color:var(--muted);font-size:0.92rem}
+    .page-grid{
+      display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+      gap:10px; overflow:auto; padding:4px; border-radius:12px; border:1px solid var(--glass-border);
+      background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03)); max-height:60vh;
+    }
+    .thumb{
+      position:relative; padding:8px; border-radius:12px; background:rgba(0,0,0,0.25);
+      border:1px solid rgba(255,255,255,0.18); cursor:pointer; box-shadow:var(--shadow-soft); transition:transform .08s ease, box-shadow .2s ease, filter .2s ease;
+    }
+    .thumb:hover{transform:translateY(-2px)}
+    .thumb .thumb-img{display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.06);border-radius:8px;overflow:hidden}
+    .thumb img{width:100%;height:auto;display:block}
+    .thumb .badge{
+      position:absolute; top:6px; left:6px; padding:3px 8px; border-radius:999px; font-size:0.78rem;
+      background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.28);
+    }
+    .thumb.excluded{filter:grayscale(0.4) brightness(0.8)}
+    .thumb.excluded::before, .thumb.excluded::after{
+      content:""; position:absolute; left:6px; right:6px; top:50%; height:2px; background:linear-gradient(90deg, #ff7a7a, #ffb3b3);
+      transform-origin:center; pointer-events:none; box-shadow:0 0 10px rgba(255,122,122,0.6)
+    }
+    .thumb.excluded::before{ transform:rotate(45deg) }
+    .thumb.excluded::after{ transform:rotate(-45deg) }
+
+    .modal .actions{display:flex;justify-content:space-between;gap:10px;margin-top:6px}
+    .actions .left, .actions .right{display:flex;gap:8px;flex-wrap:wrap}
+
     /* Accessibility focus */
     :focus-visible{outline: 2px solid var(--accent); outline-offset: 2px}
 
@@ -179,6 +209,7 @@
       .controls{flex-direction:column;align-items:stretch}
       .top-actions{align-self:stretch}
       .progress{width:100%}
+      .modal .panel{width:94vw}
     }
   </style>
 </head>
@@ -279,6 +310,35 @@
     </div>
   </div>
 
+  <!-- Page Picker Modal -->
+  <div id="pickerModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="overlay" id="pickerOverlay"></div>
+    <div class="panel">
+      <div class="header">
+        <div class="title">Select pages to remove</div>
+        <div class="info" id="pickerInfo">Loading pages…</div>
+      </div>
+      <div class="toolbar">
+        <span class="info">Mark to remove:</span>
+        <button class="btn small ghost" id="pickNoneBtn" type="button">None</button>
+        <button class="btn small ghost" id="pickAllBtn" type="button">All</button>
+        <button class="btn small ghost" id="pickInvertBtn" type="button">Invert</button>
+        <button class="btn small ghost" id="pickEvenBtn" type="button">Even</button>
+        <button class="btn small ghost" id="pickOddBtn" type="button">Odd</button>
+      </div>
+      <div id="pageGrid" class="page-grid" tabindex="0"></div>
+      <div class="actions">
+        <div class="left">
+          <button class="btn small ghost" id="pickerCloseBtn" type="button">Cancel</button>
+        </div>
+        <div class="right">
+          <div class="info" id="pickerCount">0 pages marked</div>
+          <button class="btn small secondary" id="pickerApplyBtn" type="button">Continue</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     const upload = document.getElementById('upload');
     const dropLabel = document.getElementById('dropLabel');
@@ -296,8 +356,28 @@
     const fileNameEl = document.getElementById('fileName');
     const fileSizeEl = document.getElementById('fileSize');
 
+    // Modal elements
+    const pickerModal = document.getElementById('pickerModal');
+    const pickerOverlay = document.getElementById('pickerOverlay');
+    const pickerInfo = document.getElementById('pickerInfo');
+    const pageGrid = document.getElementById('pageGrid');
+    const pickerCloseBtn = document.getElementById('pickerCloseBtn');
+    const pickerApplyBtn = document.getElementById('pickerApplyBtn');
+    const pickNoneBtn = document.getElementById('pickNoneBtn');
+    const pickAllBtn = document.getElementById('pickAllBtn');
+    const pickInvertBtn = document.getElementById('pickInvertBtn');
+    const pickEvenBtn = document.getElementById('pickEvenBtn');
+    const pickOddBtn = document.getElementById('pickOddBtn');
+    const pickerCount = document.getElementById('pickerCount');
+
     let selectedFile = null;
     let currentBlobUrl = null;
+    let currentFileId = null;
+    let cachedPdfBytes = null; // Uint8Array
+    let cachedThumbsReadyForId = null;
+    let cachedPageCount = 0;
+
+    const excludedPages = new Set(); // 1-based page numbers (UI-friendly)
 
     function formatBytes(bytes){
       if(!bytes && bytes !== 0) return '';
@@ -317,6 +397,7 @@
       if(state==='warn'){ statusDot.style.background = '#f59e0b' }
       if(state==='err'){ statusDot.style.background = 'var(--danger)' }
     }
+    function fileId(file){ return `${file.name}|${file.size}|${file.lastModified}`; }
 
     // Prevent browser from opening file on accidental outside drop
     window.addEventListener('dragover', e => e.preventDefault());
@@ -337,13 +418,35 @@
         dropLabel.style.borderColor = 'rgba(255,255,255,0.22)';
         if (evt === 'drop') {
           const f = e.dataTransfer.files && e.dataTransfer.files[0];
-          if (f) { selectedFile = f; dropText.textContent = f.name; setFileMetaChips(); }
+          if (f) {
+            selectedFile = f;
+            dropText.textContent = f.name;
+            setFileMetaChips();
+            if (currentFileId !== fileId(f)) {
+              currentFileId = fileId(f);
+              cachedPdfBytes = null;
+              cachedThumbsReadyForId = null;
+              cachedPageCount = 0;
+              excludedPages.clear();
+            }
+          }
         }
       });
     });
 
     upload.addEventListener('change', () => {
-      if (upload.files[0]) { selectedFile = upload.files[0]; dropText.textContent = upload.files[0].name; setFileMetaChips(); }
+      if (upload.files[0]) {
+        selectedFile = upload.files[0];
+        dropText.textContent = upload.files[0].name;
+        setFileMetaChips();
+        if (currentFileId !== fileId(selectedFile)) {
+          currentFileId = fileId(selectedFile);
+          cachedPdfBytes = null;
+          cachedThumbsReadyForId = null;
+          cachedPageCount = 0;
+          excludedPages.clear();
+        }
+      }
     });
 
     scaleInput.addEventListener('input', () => { scaleVal.textContent = scaleInput.value + 'x'; });
@@ -358,9 +461,173 @@
       downloadLink.style.display = 'none';
       if (currentBlobUrl) { URL.revokeObjectURL(currentBlobUrl); currentBlobUrl = null; }
       setStatus('Idle','info');
+      excludedPages.clear();
+      cachedPdfBytes = null;
+      cachedThumbsReadyForId = null;
+      cachedPageCount = 0;
     });
 
+    // Modal helpers
+    function openPicker(){
+      pickerModal.classList.add('open');
+      pickerModal.setAttribute('aria-hidden', 'false');
+    }
+    function closePicker(){
+      pickerModal.classList.remove('open');
+      pickerModal.setAttribute('aria-hidden', 'true');
+    }
+    function updatePickerCount(){
+      const count = excludedPages.size;
+      pickerCount.textContent = `${count} page${count===1?'':'s'} marked`;
+    }
+
+    pickerOverlay.addEventListener('click', closePicker);
+    pickerCloseBtn.addEventListener('click', closePicker);
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && pickerModal.classList.contains('open')) closePicker();
+    });
+
+    // Build page picker thumbnails (cached per file)
+    async function ensureThumbnails(){
+      if (!selectedFile) return;
+
+      if (!cachedPdfBytes) {
+        pickerInfo.textContent = 'Loading PDF…';
+        cachedPdfBytes = new Uint8Array(await selectedFile.arrayBuffer());
+      }
+
+      // If thumbs already rendered for this file, just re-mark selections
+      if (cachedThumbsReadyForId === currentFileId) {
+        // Re-apply excluded marks
+        pageGrid.querySelectorAll('.thumb').forEach(el => {
+          const p = parseInt(el.getAttribute('data-page'), 10);
+          if (excludedPages.has(p)) el.classList.add('excluded'); else el.classList.remove('excluded');
+        });
+        updatePickerCount();
+        pickerInfo.textContent = `${cachedPageCount} pages • Click pages to mark for removal`;
+        return;
+      }
+
+      // Fresh render
+      pageGrid.innerHTML = '';
+      pickerInfo.textContent = 'Rendering thumbnails…';
+
+      const loadingTask = pdfjsLib.getDocument({ data: cachedPdfBytes });
+      const pdf = await loadingTask.promise;
+      const total = pdf.numPages;
+      cachedPageCount = total;
+
+      for (let i = 1; i <= total; i++) {
+        const page = await pdf.getPage(i);
+        const vp1 = page.getViewport({ scale: 1 });
+        const targetW = 140;
+        const scale = targetW / vp1.width;
+        const viewport = page.getViewport({ scale });
+
+        const c = document.createElement('canvas');
+        c.width = Math.floor(viewport.width);
+        c.height = Math.floor(viewport.height);
+        await page.render({ canvasContext: c.getContext('2d'), viewport }).promise;
+
+        const img = new Image();
+        img.src = c.toDataURL('image/png');
+
+        const thumb = document.createElement('div');
+        thumb.className = 'thumb';
+        thumb.setAttribute('data-page', String(i));
+        thumb.setAttribute('tabindex', '0');
+        thumb.innerHTML = `
+          <div class="thumb-img"><img alt="Page ${i}" /></div>
+          <div class="badge">#${i}</div>
+        `;
+        thumb.querySelector('img').src = img.src;
+
+        if (excludedPages.has(i)) thumb.classList.add('excluded');
+
+        pageGrid.appendChild(thumb);
+
+        if (i % 10 === 0) { // yield to UI occasionally
+          await new Promise(r => setTimeout(r, 0));
+        }
+      }
+
+      // Toggle handler (click / keyboard)
+      pageGrid.addEventListener('click', e => {
+        const thumb = e.target.closest('.thumb');
+        if (!thumb) return;
+        const p = parseInt(thumb.getAttribute('data-page'), 10);
+        if (excludedPages.has(p)) excludedPages.delete(p); else excludedPages.add(p);
+        thumb.classList.toggle('excluded');
+        updatePickerCount();
+      });
+      pageGrid.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          const thumb = e.target.closest('.thumb');
+          if (!thumb) return;
+          e.preventDefault();
+          const p = parseInt(thumb.getAttribute('data-page'), 10);
+          if (excludedPages.has(p)) excludedPages.delete(p); else excludedPages.add(p);
+          thumb.classList.toggle('excluded');
+          updatePickerCount();
+        }
+      });
+
+      pickerInfo.textContent = `${total} pages • Click pages to mark for removal`;
+      updatePickerCount();
+      cachedThumbsReadyForId = currentFileId;
+    }
+
+    // Picker bulk actions
+    pickNoneBtn.addEventListener('click', () => {
+      excludedPages.clear();
+      pageGrid.querySelectorAll('.thumb').forEach(el => el.classList.remove('excluded'));
+      updatePickerCount();
+    });
+    pickAllBtn.addEventListener('click', () => {
+      excludedPages.clear();
+      pageGrid.querySelectorAll('.thumb').forEach(el => {
+        el.classList.add('excluded');
+        excludedPages.add(parseInt(el.getAttribute('data-page'), 10));
+      });
+      updatePickerCount();
+    });
+    pickInvertBtn.addEventListener('click', () => {
+      pageGrid.querySelectorAll('.thumb').forEach(el => {
+        const p = parseInt(el.getAttribute('data-page'), 10);
+        const ex = excludedPages.has(p);
+        if (ex) { excludedPages.delete(p); el.classList.remove('excluded'); }
+        else { excludedPages.add(p); el.classList.add('excluded'); }
+      });
+      updatePickerCount();
+    });
+    pickEvenBtn.addEventListener('click', () => {
+      pageGrid.querySelectorAll('.thumb').forEach(el => {
+        const p = parseInt(el.getAttribute('data-page'), 10);
+        if (p % 2 === 0) { excludedPages.add(p); el.classList.add('excluded'); }
+      });
+      updatePickerCount();
+    });
+    pickOddBtn.addEventListener('click', () => {
+      pageGrid.querySelectorAll('.thumb').forEach(el => {
+        const p = parseInt(el.getAttribute('data-page'), 10);
+        if (p % 2 === 1) { excludedPages.add(p); el.classList.add('excluded'); }
+      });
+      updatePickerCount();
+    });
+
+    // Main flow
     convertBtn.addEventListener('click', async () => {
+      if (!selectedFile) { alert('Please choose a PDF file first.'); return; }
+      openPicker();
+      await ensureThumbnails();
+    });
+
+    pickerApplyBtn.addEventListener('click', async () => {
+      closePicker();
+      await generateWithExclusions();
+    });
+
+    async function generateWithExclusions(){
       if (!selectedFile) { alert('Please choose a PDF file first.'); return; }
 
       // Reset old download link if any
@@ -369,24 +636,36 @@
       if (currentBlobUrl) { URL.revokeObjectURL(currentBlobUrl); currentBlobUrl = null; }
 
       convertBtn.disabled = true;
-      setStatus('Building lossless spreads...','info');
+      setStatus('Building lossless spreads...', 'info');
       progBar.style.width = '0%';
       progBar.style.display = 'block';
 
       try {
-        const pdfBytes = await selectedFile.arrayBuffer();
+        if (!cachedPdfBytes) cachedPdfBytes = new Uint8Array(await selectedFile.arrayBuffer());
 
         // 1) Build the output PDF losslessly with pdf-lib
         const { PDFDocument, rgb } = PDFLib;
-        const srcDoc = await PDFDocument.load(pdfBytes);
+        const srcDoc = await PDFDocument.load(cachedPdfBytes);
         const outDoc = await PDFDocument.create();
 
         const total = srcDoc.getPageCount();
-        const spreadCount = Math.ceil(total / 2);
 
-        for (let i = 0; i < total; i += 2) {
-          const leftPage = srcDoc.getPage(i);
-          const rightPage = (i + 1 < total) ? srcDoc.getPage(i + 1) : null;
+        // Build include list (0-based indices)
+        const exclude0 = new Set(Array.from(excludedPages).map(n => n - 1));
+        const includeIdx = [];
+        for (let i = 0; i < total; i++) {
+          if (!exclude0.has(i)) includeIdx.push(i);
+        }
+        if (includeIdx.length === 0) throw new Error('All pages are excluded. Please include at least one page.');
+
+        const spreadCount = Math.ceil(includeIdx.length / 2);
+
+        for (let s = 0; s < includeIdx.length; s += 2) {
+          const li = includeIdx[s];
+          const ri = (s + 1 < includeIdx.length) ? includeIdx[s + 1] : null;
+
+          const leftPage = srcDoc.getPage(li);
+          const rightPage = (ri !== null) ? srcDoc.getPage(ri) : null;
 
           const { width: lw, height: lh } = leftPage.getSize();
           const { width: rw, height: rh } = rightPage ? rightPage.getSize() : { width: lw, height: lh };
@@ -397,9 +676,9 @@
           const page = outDoc.addPage([newW, newH]);
 
           // Embed original pages (no rasterization)
-          const embeds = await outDoc.embedPages(rightPage ? [leftPage, rightPage] : [leftPage]);
-          const embLeft = embeds[0];
-          const embRight = rightPage ? embeds[1] : null;
+          const embLeft = await outDoc.embedPage(leftPage);
+          let embRight = null;
+          if (rightPage) embRight = await outDoc.embedPage(rightPage);
 
           // Center vertically if heights differ
           const leftY = (newH - lh) / 2;
@@ -412,10 +691,10 @@
           page.drawRectangle({ x: lw - 0.25, y: 0, width: 0.5, height: newH, color: rgb(0.13, 0.13, 0.13), opacity: 0.35 });
 
           // Progress (first 70%)
-          const spreadIndex = Math.floor(i / 2);
+          const spreadIndex = Math.floor(s / 2);
           const p = Math.round(((spreadIndex + 1) / spreadCount) * 70);
           progBar.style.width = p + '%';
-          setStatus(`Combining spreads ${spreadIndex + 1} / ${spreadCount}`,'info');
+          setStatus(`Combining spreads ${spreadIndex + 1} / ${spreadCount}`, 'info');
           await new Promise(r => setTimeout(r, 0)); // yield to UI
         }
 
@@ -428,22 +707,24 @@
         downloadLink.download = (selectedFile.name ? selectedFile.name.replace(/\.pdf$/i,'') : 'converted') + '-book-spread.pdf';
         downloadLink.style.display = 'inline-flex';
 
-        // 2) Build lightweight preview of the first N spreads using pdf.js (preview only)
-        setStatus('Preparing preview...','info');
+        // 2) Build preview using the include list (pdf.js) — preview only
+        setStatus('Preparing preview...', 'info');
         progBar.style.width = '80%';
         previewContainer.innerHTML = '';
 
-        const previewCount = Math.max(1, Math.min(12, parseInt(previewCountInput.value || '4', 10)));
-        const previewSpreads = Math.min(previewCount, spreadCount);
-
-        const loadingTask = pdfjsLib.getDocument({ data: pdfBytes });
+        const loadingTask = pdfjsLib.getDocument({ data: cachedPdfBytes });
         const pdf = await loadingTask.promise;
 
+        const include1 = includeIdx.map(i => i + 1); // 1-based for pdf.js
+        const previewCount = Math.max(1, Math.min(12, parseInt(previewCountInput.value || '4', 10)));
+        const previewSpreads = Math.min(previewCount, Math.ceil(include1.length / 2));
         const scale = parseFloat(scaleInput.value) || 1.5;
 
         for (let s = 0; s < previewSpreads; s++) {
-          const leftIndex = (s * 2) + 1;     // 1-based for pdf.js
-          const rightIndex = leftIndex + 1;
+          const leftIndex = include1[s * 2];
+          const rightIndex = include1[s * 2 + 1];
+
+          if (!leftIndex) break;
 
           // Render left page
           const leftPage = await pdf.getPage(leftIndex);
@@ -455,7 +736,7 @@
 
           // Render right if exists
           let rightCanvas = null;
-          if (rightIndex <= pdf.numPages) {
+          if (rightIndex && rightIndex <= pdf.numPages) {
             const rightPage = await pdf.getPage(rightIndex);
             const rightViewport = rightPage.getViewport({ scale });
             rightCanvas = document.createElement('canvas');
@@ -464,7 +745,7 @@
             await rightPage.render({ canvasContext: rightCanvas.getContext('2d'), viewport: rightViewport }).promise;
           }
 
-          // Combine into a spread canvas (for preview only)
+          // Combine into spread canvas (for preview)
           const spreadW = leftCanvas.width + (rightCanvas ? rightCanvas.width : leftCanvas.width);
           const spreadH = Math.max(leftCanvas.height, rightCanvas ? rightCanvas.height : leftCanvas.height);
           const spreadCanvas = document.createElement('canvas');
@@ -483,24 +764,23 @@
           previewContainer.appendChild(img);
 
           // Progress (last 20%)
-          const p2 = 80 + Math.round(((s + 1) / previewSpreads) * 20);
+          const p2 = 80 + Math.round(((s + 1) / (previewSpreads || 1)) * 20);
           progBar.style.width = p2 + '%';
           await new Promise(r => setTimeout(r, 0));
         }
 
-        setStatus('Done — preview ready. Click Download.','ok');
+        setStatus('Done — preview ready. Click Download.', 'ok');
         progBar.style.width = '100%';
 
       } catch (err) {
         console.error(err);
         alert('Conversion failed: ' + (err && err.message ? err.message : err));
-        setStatus('Error during conversion','err');
+        setStatus('Error during conversion', 'err');
         progBar.style.width = '0%';
       } finally {
         convertBtn.disabled = false;
       }
-    });
-
+    }
     // Initial state
     setFileMetaChips();
     setStatus('Idle','info');
