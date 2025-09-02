@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Realtime Notes (by Code)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --bg:#0b1020; --panel:#141a34; --text:#eaf0ff; --muted:#95a1c4; --accent:#7c9cff; --line:#283259; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji"; background: var(--bg); color: var(--text); }
+    header { padding: 18px 20px; border-bottom: 1px solid var(--line); display:flex; align-items:center; justify-content:space-between; }
+    header h1 { margin:0; font-size: 18px; }
+    .app { max-width: 900px; margin: 22px auto; padding: 0 16px; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+    .row { display:flex; gap:10px; flex-wrap: wrap; align-items: center; }
+    input[type="text"] { background:#0e1430; color:var(--text); border:1px solid var(--line); border-radius:8px; padding:10px 12px; outline:none; min-width: 200px; }
+    button { background: var(--accent); color: #0b1020; border:0; border-radius:8px; padding:10px 14px; font-weight:600; cursor:pointer; }
+    button.secondary { background: transparent; color: var(--text); border:1px solid var(--line); }
+    button:disabled { opacity:.6; cursor:not-allowed; }
+    textarea { width:100%; min-height: 55vh; background:#0e1430; color: var(--text); border:1px solid var(--line); border-radius:12px; padding:14px; resize: vertical; line-height:1.5; }
+    .meta { font-size: 13px; color: var(--muted); margin-top: 10px; display:flex; gap:12px; align-items:center; }
+    .code-badge { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; background:#0e1430; border:1px dashed var(--line); color: var(--text); padding:6px 10px; border-radius: 8px; letter-spacing:1px; }
+    .spacer { height: 14px; }
+    a.link { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Realtime Notes</h1>
+    <div class="meta"><span id="presence">Offline</span></div>
+  </header>
+
+  <div class="app">
+    <div id="setup" class="card">
+      <div class="row">
+        <button id="createBtn">Create new note</button>
+        <span style="color:var(--muted)">or</span>
+        <input id="codeInput" type="text" placeholder="Enter room code (e.g., AB3F7P)" />
+        <button id="joinBtn" class="secondary">Join</button>
+      </div>
+      <div class="meta">Tip: you can also open with ?room=YOURCODE in the URL.</div>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div id="editorCard" class="card" style="display:none;">
+      <div class="row" style="justify-content:space-between; align-items:center;">
+        <div>
+          <div class="meta">Room code</div>
+          <div class="code-badge" id="roomCode">------</div>
+        </div>
+        <div>
+          <button id="copyCodeBtn" class="secondary">Copy code</button>
+          <button id="copyLinkBtn">Copy share link</button>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+
+      <textarea id="note" placeholder="Start typing... anyone in this room will see updates in real-time."></textarea>
+      <div class="meta" id="status">Ready</div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io({ transports: ['websocket', 'polling'] });
+
+    const el = (id) => document.getElementById(id);
+    const setup = el('setup');
+    const editorCard = el('editorCard');
+    const createBtn = el('createBtn');
+    const joinBtn = el('joinBtn');
+    const codeInput = el('codeInput');
+    const roomCode = el('roomCode');
+    const note = el('note');
+    const presence = el('presence');
+    const status = el('status');
+    const copyCodeBtn = el('copyCodeBtn');
+    const copyLinkBtn = el('copyLinkBtn');
+
+    let currentRoom = null;
+    let connected = false;
+
+    function setPresence() {
+      presence.textContent = connected ? 'Online' : 'Offline';
+    }
+    socket.on('connect', () => { connected = true; setPresence(); });
+    socket.on('disconnect', () => { connected = false; setPresence(); });
+
+    // Presence indicators (optional)
+    socket.on('presence:join', () => flashStatus('Someone joined.'));
+    socket.on('presence:leave', () => flashStatus('Someone left.'));
+
+    function showEditor(code, content) {
+      currentRoom = code;
+      roomCode.textContent = code;
+      note.value = content || '';
+      setup.style.display = 'none';
+      editorCard.style.display = '';
+      flashStatus('Connected to room ' + code);
+    }
+
+    function flashStatus(text) {
+      status.textContent = text;
+      clearTimeout(flashStatus._t);
+      flashStatus._t = setTimeout(() => {
+        status.textContent = 'Ready';
+      }, 1500);
+    }
+
+    // Debounce helper
+    function debounce(fn, ms) {
+      let t;
+      return (...args) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn(...args), ms);
+      };
+    }
+
+    // Create or join handlers
+    createBtn.onclick = () => {
+      socket.emit('room:create', (res) => {
+        if (!res?.ok) return alert('Failed to create room');
+        showEditor(res.code, res.content);
+        history.replaceState({}, '', `?room=${res.code}`);
+      });
+    };
+
+    joinBtn.onclick = () => {
+      const code = (codeInput.value || '').toUpperCase().trim();
+      if (!/^[A-Z0-9]{6}$/.test(code)) {
+        return alert('Enter a valid 6-character code (e.g., AB3F7P)');
+      }
+      socket.emit('room:join', code, (res) => {
+        if (!res?.ok) return alert('Room not found');
+        showEditor(res.code, res.content);
+        history.replaceState({}, '', `?room=${res.code}`);
+      });
+    };
+
+    // Share buttons
+    copyCodeBtn.onclick = async () => {
+      if (!currentRoom) return;
+      await navigator.clipboard.writeText(currentRoom);
+      flashStatus('Code copied');
+    };
+    copyLinkBtn.onclick = async () => {
+      if (!currentRoom) return;
+      const link = `${location.origin}${location.pathname}?room=${currentRoom}`;
+      await navigator.clipboard.writeText(link);
+      flashStatus('Share link copied');
+    };
+
+    // Realtime note syncing
+    const sendUpdate = debounce(() => {
+      if (!currentRoom) return;
+      socket.emit('note:update', { code: currentRoom, content: note.value });
+      status.textContent = 'Synced';
+    }, 250);
+
+    note.addEventListener('input', () => {
+      status.textContent = 'Typing...';
+      sendUpdate();
+    });
+
+    // When others update the note
+    socket.on('note:remote', (content) => {
+      // This will not trigger another 'input' event
+      note.value = content;
+      flashStatus('Updated');
+    });
+
+    // Auto-join from URL ?room=XXXXXX if present
+    const params = new URLSearchParams(location.search);
+    const initial = (params.get('room') || '').toUpperCase();
+    if (/^[A-Z0-9]{6}$/.test(initial)) {
+      codeInput.value = initial;
+      joinBtn.click();
+    }
+  </script>
+</body>
+</html>
