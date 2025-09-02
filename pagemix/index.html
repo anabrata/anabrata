@@ -3,85 +3,279 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>PDF → Book Spread Converter (Lossless)</title>
+  <title>PDF → Book Spread Converter (Pro Theme)</title>
+
   <!-- pdf.js for preview -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
   </script>
+
   <!-- pdf-lib for lossless PDF manipulation -->
   <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 
+  <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
   <style>
-    :root{ --accent1:#6EE7B7; --accent2:#60A5FA; --card:#ffffff; --muted:#778899 }
+    :root{
+      --bg1:#0f1123;
+      --bg2:#151a33;
+      --glass: rgba(255,255,255,0.10);
+      --glass-strong: rgba(255,255,255,0.18);
+      --glass-border: rgba(255,255,255,0.25);
+      --text:#e9ecf5;
+      --muted:#a8b1c2;
+      --brand1:#6EE7B7; /* mint */
+      --brand2:#60A5FA; /* sky */
+      --brand3:#8b5cf6; /* violet */
+      --accent:#22d3ee; /* cyan */
+      --danger:#ff7a7a;
+      --success:#34d399;
+      --shadow: 0 10px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+      --shadow-soft: 0 10px 30px rgba(0,0,0,0.25);
+    }
     *{box-sizing:border-box}
-    body{font-family:Poppins,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial; margin:0; min-height:100vh; background:linear-gradient(135deg,#f6d365 0%,#fda085 100%); color:#123;}
-    .wrap{max-width:1100px;margin:28px auto;padding:20px}
-    header{display:flex;align-items:center;gap:18px}
-    header h1{margin:0;font-size:1.6rem}
-    .card{background:var(--card);border-radius:14px;padding:18px; box-shadow: 0 10px 30px rgba(0,0,0,0.08)}
-    .controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-    .file-drop{flex:1;min-width:220px;border:2px dashed rgba(0,0,0,0.08);padding:12px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.6),rgba(255,255,255,0.9));cursor:pointer;text-align:center}
+    html,body{margin:0;padding:0;min-height:100%}
+    body{
+      font-family:Poppins,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1000px 600px at 10% -10%, rgba(139,92,246,0.25), transparent 60%),
+        radial-gradient(900px 600px at 90% 0%, rgba(96,165,250,0.20), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+    }
+    .bg-orbs{
+      position:fixed;inset:0;pointer-events:none;z-index:-1;overflow:hidden;
+    }
+    .orb{position:absolute;filter:blur(60px);opacity:0.4;mix-blend:screen}
+    .orb.one{background:linear-gradient(120deg,#22d3ee,#8b5cf6);width:420px;height:420px;left:-140px;top:-100px;border-radius:50%}
+    .orb.two{background:linear-gradient(120deg,#6EE7B7,#60A5FA);width:520px;height:520px;right:-180px;top:-60px;border-radius:50%}
+    .orb.three{background:linear-gradient(120deg,#f59e0b,#f43f5e);width:360px;height:360px;left:30%;bottom:-140px;border-radius:50%}
+
+    .wrap{max-width:1200px;margin:34px auto;padding:20px}
+
+    header{
+      display:flex;align-items:center;justify-content:space-between;gap:18px
+    }
+    .brand{
+      display:flex;align-items:center;gap:14px
+    }
+    .logo{
+      width:56px;height:56px;border-radius:14px;
+      background:linear-gradient(135deg,var(--brand2),var(--brand3));
+      display:flex;align-items:center;justify-content:center;
+      font-weight:800;color:#fff;letter-spacing:0.5px;
+      box-shadow: var(--shadow-soft);
+    }
+    .title h1{margin:0;font-size:1.8rem;line-height:1.2}
+    .title .sub{color:var(--muted);font-size:0.98rem;margin-top:4px}
+
+    .top-actions{
+      display:flex;gap:10px;align-items:center
+    }
+    .chip{
+      padding:8px 12px;border-radius:999px;border:1px solid var(--glass-border);
+      background:linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.04));
+      box-shadow:var(--shadow); color:var(--text); font-size:0.9rem; display:flex; gap:8px; align-items:center;
+    }
+    .chip .dot{width:8px;height:8px;border-radius:50%;}
+    .dot.success{background:var(--success)} .dot.warn{background:#f59e0b} .dot.info{background:var(--accent)}
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.06));
+      border:1px solid var(--glass-border);
+      border-radius:20px;padding:18px; box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .controls{display:flex;gap:14px;flex-wrap:wrap;align-items:stretch}
+
+    .file-drop{
+      flex:1;min-width:280px;border:2px dashed rgba(255,255,255,0.22);
+      padding:16px;border-radius:16px;
+      background:linear-gradient(180deg,rgba(255,255,255,0.10),rgba(255,255,255,0.04));
+      cursor:pointer;text-align:center; transition: all .25s ease; position:relative; overflow:hidden;
+    }
+    .file-drop:hover{border-color:rgba(255,255,255,0.45); box-shadow: 0 12px 32px rgba(0,0,0,0.25)}
+    .file-drop:after{
+      content:""; position:absolute; inset:-2px; border-radius:18px; pointer-events:none;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+      transform: translateX(-100%); animation: shine 2.8s infinite;
+    }
+    @keyframes shine{ 0%{transform:translateX(-100%)} 60%{transform:translateX(100%)} 100%{transform:translateX(100%)} }
     input[type=file]{display:none}
-    .btn{background:linear-gradient(90deg,var(--accent2),#8b5cf6);color:white;border:none;padding:10px 16px;border-radius:10px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block}
+
+    .stack{display:flex;flex-direction:column;gap:10px;min-width:280px}
+
+    .btn{
+      background: linear-gradient(90deg, var(--brand2), var(--brand3));
+      color:white;border:none;padding:12px 18px;border-radius:12px;
+      font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;gap:10px;align-items:center;
+      box-shadow: var(--shadow-soft); transition: transform .08s ease, box-shadow .2s ease;
+    }
+    .btn:hover{transform: translateY(-1px)}
+    .btn:active{transform: translateY(0)}
     .btn:disabled{opacity:0.6;cursor:default}
-    .small{font-size:0.9rem;color:var(--muted)}
-    #preview-container{margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-    #preview-container img{width:100%;height:auto;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.06);border:1px solid #eee}
-    .footer{margin-top:12px;display:flex;gap:8px;align-items:center}
-    label{display:block}
-    .progress{height:8px;background:#eee;border-radius:999px;overflow:hidden;width:220px}
-    .progress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent1),var(--accent2));}
-    .note{margin-top:12px;color:#333a; font-size:0.95rem}
-    @media (max-width:640px){header{flex-direction:column;align-items:flex-start} .controls{flex-direction:column;align-items:stretch}}
+    .btn.secondary{background: linear-gradient(90deg, #22d3ee, #6EE7B7); color:#0c1329}
+    .btn.ghost{
+      background: transparent; border:1px solid var(--glass-border); color:var(--text)
+    }
+
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .label{font-size:0.92rem;color:var(--muted);min-width:110px}
+
+    input[type=number]{
+      width:80px;padding:10px 12px;border-radius:10px;border:1px solid var(--glass-border);
+      background: rgba(255,255,255,0.08); color: var(--text); outline:none;
+    }
+
+    /* Range styling */
+    input[type=range]{appearance:none;height:8px;background:rgba(255,255,255,0.14);border-radius:99px;outline:none;border:1px solid rgba(255,255,255,0.18)}
+    input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;border-radius:50%;background:linear-gradient(90deg,var(--brand1),var(--accent));border:2px solid rgba(255,255,255,0.6);box-shadow:0 4px 12px rgba(0,0,0,0.3)}
+    input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:linear-gradient(90deg,var(--brand1),var(--accent));border:2px solid rgba(255,255,255,0.6);box-shadow:0 4px 12px rgba(0,0,0,0.3)}
+
+    /* Progress */
+    .footer{margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .progress{height:12px;background:rgba(255,255,255,0.10);border-radius:999px;overflow:hidden;width:280px;border:1px solid var(--glass-border)}
+    .progress>i{
+      display:block;height:100%;width:0;
+      background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.35) 0 10px, rgba(255,255,255,0.15) 10px 20px), linear-gradient(90deg,var(--brand1),var(--brand2),var(--brand3));
+      background-size: 24px 24px, 100% 100%;
+      animation: progressStripes 1.2s linear infinite;
+    }
+    @keyframes progressStripes{
+      from { background-position: 0 0, 0 0 }
+      to { background-position: 24px 0, 0 0 }
+    }
+    .status{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:0.95rem}
+    .status .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px rgba(34,211,238,0.7)}
+
+    /* Preview grid */
+    #preview-container{margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+    #preview-container img{
+      width:100%;height:auto;border-radius:14px;border:1px solid var(--glass-border);
+      box-shadow:var(--shadow-soft); background:rgba(0,0,0,0.08)
+    }
+
+    /* Facts row (pill factboxes) */
+    .facts{
+      margin-top:16px;display:flex;flex-wrap:wrap;gap:10px
+    }
+    .fact{
+      display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:999px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
+      border:1px solid var(--glass-border); color:var(--text); box-shadow: var(--shadow-soft); font-size:0.92rem;
+    }
+    .fact svg{width:16px;height:16px;opacity:0.95}
+
+    .note{margin-top:12px;color:var(--muted); font-size:0.95rem}
+
+    /* Accessibility focus */
+    :focus-visible{outline: 2px solid var(--accent); outline-offset: 2px}
+
+    @media (max-width:740px){
+      header{flex-direction:column;align-items:flex-start}
+      .controls{flex-direction:column;align-items:stretch}
+      .top-actions{align-self:stretch}
+      .progress{width:100%}
+    }
   </style>
 </head>
 <body>
+  <div class="bg-orbs">
+    <div class="orb one"></div>
+    <div class="orb two"></div>
+    <div class="orb three"></div>
+  </div>
+
   <div class="wrap">
     <header>
-      <div style="width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff">PDF</div>
-      <div>
-        <h1>PDF → Book Spread Converter</h1>
-        <div class="small">Uploads a PDF and combines two pages into one landscape spread (book style). Preview & download.</div>
+      <div class="brand">
+        <div class="logo">PDF</div>
+        <div class="title">
+          <h1>PDF → Book Spread Converter</h1>
+          <div class="sub">Combine two pages into a landscape spread. Lossless output. Local processing.</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <div class="chip"><span class="dot success"></span> Online • Ready</div>
+        <div class="chip" id="fileChip">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+          <span id="fileName">No file</span><span style="opacity:.6">•</span><span id="fileSize">0 B</span>
+        </div>
       </div>
     </header>
+
     <div style="height:18px"></div>
 
     <div class="card">
       <div class="controls">
-        <label class="file-drop" id="dropLabel">
+        <label class="file-drop" id="dropLabel" title="Click or drop a PDF">
           <input id="upload" type="file" accept="application/pdf">
           <div id="dropText">Click to select a PDF or drag & drop here</div>
         </label>
 
-        <div style="display:flex;flex-direction:column;gap:8px;min-width:200px">
-          <div style="display:flex;gap:8px;align-items:center">
-            <button class="btn" id="convertBtn">Convert to Book</button>
-            <a id="downloadLink" class="btn" style="display:none" download>Download PDF</a>
+        <div class="stack">
+          <div class="row">
+            <button class="btn" id="convertBtn" type="button" title="Convert to lossless spreads">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M20 21H4"/></svg>
+              Convert to Book
+            </button>
+            <a id="downloadLink" class="btn secondary" style="display:none" download>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M20 21H4"/></svg>
+              Download PDF
+            </a>
+            <button class="btn ghost" type="button" id="resetBtn" title="Reset">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M4 4v6h6M20 20v-6h-6"/><path d="M20 9A8 8 0 0 0 5.3 5.3M4 15a8 8 0 0 0 14.7 3.7"/></svg>
+              Reset
+            </button>
           </div>
 
-          <div style="display:flex;gap:8px;align-items:center">
-            <div class="small">Preview scale</div>
+          <div class="row">
+            <div class="label">Preview scale</div>
             <input id="scale" type="range" min="0.6" max="2.5" step="0.1" value="1.5">
-            <div class="small" id="scaleVal">1.5x</div>
+            <div class="chip"><span id="scaleVal">1.5x</span></div>
           </div>
 
-          <div style="display:flex;gap:8px;align-items:center">
-            <div class="small">Preview pages</div>
-            <input id="previewCount" type="number" min="1" max="12" value="4" style="width:68px;padding:6px;border-radius:6px;border:1px solid #eee">
+          <div class="row">
+            <div class="label">Preview pages</div>
+            <input id="previewCount" type="number" min="1" max="12" value="4">
+            <div class="chip">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/></svg>
+              Faster preview at lower count
+            </div>
           </div>
+        </div>
+      </div>
+
+      <div class="facts">
+        <div class="fact">
+          <svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6" stroke="currentColor" fill="none" stroke-width="2"/></svg>
+          Lossless — vectors & text preserved
+        </div>
+        <div class="fact">
+          <svg viewBox="0 0 24 24"><path d="M3 12l2-2 4 4 10-10 2 2-12 12z" fill="currentColor"/></svg>
+          All processing happens locally
+        </div>
+        <div class="fact">
+          <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h12" stroke="currentColor" fill="none" stroke-width="2"/></svg>
+          Handles odd page counts
+        </div>
+        <div class="fact">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M12 6v6l4 2" stroke="#0f1123" stroke-width="2" fill="none"/></svg>
+          Quick preview
         </div>
       </div>
 
       <div class="footer">
         <div class="progress" title="progress"><i id="progBar"></i></div>
-        <div class="small" id="status">Idle</div>
+        <div class="status"><span class="dot" id="statusDot"></span><span id="status">Idle</span></div>
       </div>
 
       <div id="preview-container"></div>
 
-      <div class="note">Notes: Output PDF is built losslessly (vectors/text preserved). Preview scale does not affect final quality.</div>
+      <div class="note">Tip: Preview scale affects only on-screen previews. The downloaded PDF stays sharp and print‑ready.</div>
     </div>
   </div>
 
@@ -91,41 +285,80 @@
     const dropText = document.getElementById('dropText');
     const convertBtn = document.getElementById('convertBtn');
     const downloadLink = document.getElementById('downloadLink');
+    const resetBtn = document.getElementById('resetBtn');
     const previewContainer = document.getElementById('preview-container');
     const scaleInput = document.getElementById('scale');
     const scaleVal = document.getElementById('scaleVal');
     const progBar = document.getElementById('progBar');
     const status = document.getElementById('status');
+    const statusDot = document.getElementById('statusDot');
     const previewCountInput = document.getElementById('previewCount');
+    const fileNameEl = document.getElementById('fileName');
+    const fileSizeEl = document.getElementById('fileSize');
 
     let selectedFile = null;
     let currentBlobUrl = null;
 
+    function formatBytes(bytes){
+      if(!bytes && bytes !== 0) return '';
+      const sizes = ['B','KB','MB','GB','TB'];
+      if(bytes === 0) return '0 B';
+      const i = Math.floor(Math.log(bytes)/Math.log(1024));
+      return `${(bytes/Math.pow(1024,i)).toFixed(i ? 1 : 0)} ${sizes[i]}`;
+    }
+    function setFileMetaChips(){
+      fileNameEl.textContent = selectedFile ? selectedFile.name : 'No file';
+      fileSizeEl.textContent = selectedFile ? formatBytes(selectedFile.size) : '0 B';
+    }
+    function setStatus(text, state='info'){
+      status.textContent = text;
+      if(state==='info'){ statusDot.style.background = 'var(--accent)' }
+      if(state==='ok'){ statusDot.style.background = 'var(--success)' }
+      if(state==='warn'){ statusDot.style.background = '#f59e0b' }
+      if(state==='err'){ statusDot.style.background = 'var(--danger)' }
+    }
+
+    // Prevent browser from opening file on accidental outside drop
+    window.addEventListener('dragover', e => e.preventDefault());
+    window.addEventListener('drop', e => { if (!dropLabel.contains(e.target)) e.preventDefault(); });
+
     // Drag & drop UX
-    ['dragenter','dragover'].forEach(evt => {
+    ;['dragenter','dragover'].forEach(evt => {
       dropLabel.addEventListener(evt, e => {
         e.preventDefault(); e.stopPropagation();
         if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
-        dropLabel.style.borderColor = '#aaa';
+        dropLabel.style.borderColor = 'rgba(255,255,255,0.6)';
         dropText.textContent = 'Drop PDF to start';
       });
     });
-    ['dragleave','drop'].forEach(evt => {
+    ;['dragleave','drop'].forEach(evt => {
       dropLabel.addEventListener(evt, e => {
         e.preventDefault(); e.stopPropagation();
-        dropLabel.style.borderColor = 'transparent';
+        dropLabel.style.borderColor = 'rgba(255,255,255,0.22)';
         if (evt === 'drop') {
           const f = e.dataTransfer.files && e.dataTransfer.files[0];
-          if (f) { selectedFile = f; dropText.textContent = f.name; }
+          if (f) { selectedFile = f; dropText.textContent = f.name; setFileMetaChips(); }
         }
       });
     });
 
     upload.addEventListener('change', () => {
-      if (upload.files[0]) { selectedFile = upload.files[0]; dropText.textContent = upload.files[0].name; }
+      if (upload.files[0]) { selectedFile = upload.files[0]; dropText.textContent = upload.files[0].name; setFileMetaChips(); }
     });
 
     scaleInput.addEventListener('input', () => { scaleVal.textContent = scaleInput.value + 'x'; });
+
+    resetBtn.addEventListener('click', () => {
+      selectedFile = null;
+      upload.value = '';
+      dropText.textContent = 'Click to select a PDF or drag & drop here';
+      setFileMetaChips();
+      previewContainer.innerHTML = '';
+      progBar.style.width = '0%';
+      downloadLink.style.display = 'none';
+      if (currentBlobUrl) { URL.revokeObjectURL(currentBlobUrl); currentBlobUrl = null; }
+      setStatus('Idle','info');
+    });
 
     convertBtn.addEventListener('click', async () => {
       if (!selectedFile) { alert('Please choose a PDF file first.'); return; }
@@ -136,7 +369,7 @@
       if (currentBlobUrl) { URL.revokeObjectURL(currentBlobUrl); currentBlobUrl = null; }
 
       convertBtn.disabled = true;
-      status.textContent = 'Building lossless spreads...';
+      setStatus('Building lossless spreads...','info');
       progBar.style.width = '0%';
       progBar.style.display = 'block';
 
@@ -168,20 +401,21 @@
           const embLeft = embeds[0];
           const embRight = rightPage ? embeds[1] : null;
 
-          // Draw left page at original size
-          page.drawPage(embLeft, { x: 0, y: 0, width: lw, height: lh });
+          // Center vertically if heights differ
+          const leftY = (newH - lh) / 2;
+          const rightY = (newH - rh) / 2;
 
-          // Draw right page if present
-          if (embRight) page.drawPage(embRight, { x: lw, y: 0, width: rw, height: rh });
+          page.drawPage(embLeft, { x: 0, y: leftY, width: lw, height: lh });
+          if (embRight) page.drawPage(embRight, { x: lw, y: rightY, width: rw, height: rh });
 
-          // Optional thin separator line
+          // Optional thin center separator
           page.drawRectangle({ x: lw - 0.25, y: 0, width: 0.5, height: newH, color: rgb(0.13, 0.13, 0.13), opacity: 0.35 });
 
           // Progress (first 70%)
           const spreadIndex = Math.floor(i / 2);
           const p = Math.round(((spreadIndex + 1) / spreadCount) * 70);
           progBar.style.width = p + '%';
-          status.textContent = `Building spreads ${spreadIndex + 1} / ${spreadCount}`;
+          setStatus(`Combining spreads ${spreadIndex + 1} / ${spreadCount}`,'info');
           await new Promise(r => setTimeout(r, 0)); // yield to UI
         }
 
@@ -192,10 +426,10 @@
 
         downloadLink.href = url;
         downloadLink.download = (selectedFile.name ? selectedFile.name.replace(/\.pdf$/i,'') : 'converted') + '-book-spread.pdf';
-        downloadLink.style.display = 'inline-block';
+        downloadLink.style.display = 'inline-flex';
 
-        // 2) Build lightweight preview of the first N spreads using pdf.js (does not affect output quality)
-        status.textContent = 'Preparing preview...';
+        // 2) Build lightweight preview of the first N spreads using pdf.js (preview only)
+        setStatus('Preparing preview...','info');
         progBar.style.width = '80%';
         previewContainer.innerHTML = '';
 
@@ -254,18 +488,22 @@
           await new Promise(r => setTimeout(r, 0));
         }
 
-        status.textContent = 'Done — preview shown. Click Download to save.';
+        setStatus('Done — preview ready. Click Download.','ok');
         progBar.style.width = '100%';
 
       } catch (err) {
         console.error(err);
         alert('Conversion failed: ' + (err && err.message ? err.message : err));
-        status.textContent = 'Error';
+        setStatus('Error during conversion','err');
         progBar.style.width = '0%';
       } finally {
         convertBtn.disabled = false;
       }
     });
+
+    // Initial state
+    setFileMetaChips();
+    setStatus('Idle','info');
   </script>
 </body>
 </html>
