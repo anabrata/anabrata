@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PDF → Book Spread Converter (Lossless)</title>
+  <!-- pdf.js for preview -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+  </script>
+  <!-- pdf-lib for lossless PDF manipulation -->
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{ --accent1:#6EE7B7; --accent2:#60A5FA; --card:#ffffff; --muted:#778899 }
+    *{box-sizing:border-box}
+    body{font-family:Poppins,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial; margin:0; min-height:100vh; background:linear-gradient(135deg,#f6d365 0%,#fda085 100%); color:#123;}
+    .wrap{max-width:1100px;margin:28px auto;padding:20px}
+    header{display:flex;align-items:center;gap:18px}
+    header h1{margin:0;font-size:1.6rem}
+    .card{background:var(--card);border-radius:14px;padding:18px; box-shadow: 0 10px 30px rgba(0,0,0,0.08)}
+    .controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+    .file-drop{flex:1;min-width:220px;border:2px dashed rgba(0,0,0,0.08);padding:12px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.6),rgba(255,255,255,0.9));cursor:pointer;text-align:center}
+    input[type=file]{display:none}
+    .btn{background:linear-gradient(90deg,var(--accent2),#8b5cf6);color:white;border:none;padding:10px 16px;border-radius:10px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block}
+    .btn:disabled{opacity:0.6;cursor:default}
+    .small{font-size:0.9rem;color:var(--muted)}
+    #preview-container{margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+    #preview-container img{width:100%;height:auto;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.06);border:1px solid #eee}
+    .footer{margin-top:12px;display:flex;gap:8px;align-items:center}
+    label{display:block}
+    .progress{height:8px;background:#eee;border-radius:999px;overflow:hidden;width:220px}
+    .progress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent1),var(--accent2));}
+    .note{margin-top:12px;color:#333a; font-size:0.95rem}
+    @media (max-width:640px){header{flex-direction:column;align-items:flex-start} .controls{flex-direction:column;align-items:stretch}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div style="width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff">PDF</div>
+      <div>
+        <h1>PDF → Book Spread Converter</h1>
+        <div class="small">Uploads a PDF and combines two pages into one landscape spread (book style). Preview & download.</div>
+      </div>
+    </header>
+    <div style="height:18px"></div>
+
+    <div class="card">
+      <div class="controls">
+        <label class="file-drop" id="dropLabel">
+          <input id="upload" type="file" accept="application/pdf">
+          <div id="dropText">Click to select a PDF or drag & drop here</div>
+        </label>
+
+        <div style="display:flex;flex-direction:column;gap:8px;min-width:200px">
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn" id="convertBtn">Convert to Book</button>
+            <a id="downloadLink" class="btn" style="display:none" download>Download PDF</a>
+          </div>
+
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="small">Preview scale</div>
+            <input id="scale" type="range" min="0.6" max="2.5" step="0.1" value="1.5">
+            <div class="small" id="scaleVal">1.5x</div>
+          </div>
+
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="small">Preview pages</div>
+            <input id="previewCount" type="number" min="1" max="12" value="4" style="width:68px;padding:6px;border-radius:6px;border:1px solid #eee">
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div class="progress" title="progress"><i id="progBar"></i></div>
+        <div class="small" id="status">Idle</div>
+      </div>
+
+      <div id="preview-container"></div>
+
+      <div class="note">Notes: Output PDF is built losslessly (vectors/text preserved). Preview scale does not affect final quality.</div>
+    </div>
+  </div>
+
+  <script>
+    const upload = document.getElementById('upload');
+    const dropLabel = document.getElementById('dropLabel');
+    const dropText = document.getElementById('dropText');
+    const convertBtn = document.getElementById('convertBtn');
+    const downloadLink = document.getElementById('downloadLink');
+    const previewContainer = document.getElementById('preview-container');
+    const scaleInput = document.getElementById('scale');
+    const scaleVal = document.getElementById('scaleVal');
+    const progBar = document.getElementById('progBar');
+    const status = document.getElementById('status');
+    const previewCountInput = document.getElementById('previewCount');
+
+    let selectedFile = null;
+    let currentBlobUrl = null;
+
+    // Drag & drop UX
+    ['dragenter','dragover'].forEach(evt => {
+      dropLabel.addEventListener(evt, e => {
+        e.preventDefault(); e.stopPropagation();
+        if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+        dropLabel.style.borderColor = '#aaa';
+        dropText.textContent = 'Drop PDF to start';
+      });
+    });
+    ['dragleave','drop'].forEach(evt => {
+      dropLabel.addEventListener(evt, e => {
+        e.preventDefault(); e.stopPropagation();
+        dropLabel.style.borderColor = 'transparent';
+        if (evt === 'drop') {
+          const f = e.dataTransfer.files && e.dataTransfer.files[0];
+          if (f) { selectedFile = f; dropText.textContent = f.name; }
+        }
+      });
+    });
+
+    upload.addEventListener('change', () => {
+      if (upload.files[0]) { selectedFile = upload.files[0]; dropText.textContent = upload.files[0].name; }
+    });
+
+    scaleInput.addEventListener('input', () => { scaleVal.textContent = scaleInput.value + 'x'; });
+
+    convertBtn.addEventListener('click', async () => {
+      if (!selectedFile) { alert('Please choose a PDF file first.'); return; }
+
+      // Reset old download link if any
+      downloadLink.style.display = 'none';
+      downloadLink.removeAttribute('href');
+      if (currentBlobUrl) { URL.revokeObjectURL(currentBlobUrl); currentBlobUrl = null; }
+
+      convertBtn.disabled = true;
+      status.textContent = 'Building lossless spreads...';
+      progBar.style.width = '0%';
+      progBar.style.display = 'block';
+
+      try {
+        const pdfBytes = await selectedFile.arrayBuffer();
+
+        // 1) Build the output PDF losslessly with pdf-lib
+        const { PDFDocument, rgb } = PDFLib;
+        const srcDoc = await PDFDocument.load(pdfBytes);
+        const outDoc = await PDFDocument.create();
+
+        const total = srcDoc.getPageCount();
+        const spreadCount = Math.ceil(total / 2);
+
+        for (let i = 0; i < total; i += 2) {
+          const leftPage = srcDoc.getPage(i);
+          const rightPage = (i + 1 < total) ? srcDoc.getPage(i + 1) : null;
+
+          const { width: lw, height: lh } = leftPage.getSize();
+          const { width: rw, height: rh } = rightPage ? rightPage.getSize() : { width: lw, height: lh };
+
+          const newW = lw + (rightPage ? rw : lw);
+          const newH = Math.max(lh, rh);
+
+          const page = outDoc.addPage([newW, newH]);
+
+          // Embed original pages (no rasterization)
+          const embeds = await outDoc.embedPages(rightPage ? [leftPage, rightPage] : [leftPage]);
+          const embLeft = embeds[0];
+          const embRight = rightPage ? embeds[1] : null;
+
+          // Draw left page at original size
+          page.drawPage(embLeft, { x: 0, y: 0, width: lw, height: lh });
+
+          // Draw right page if present
+          if (embRight) page.drawPage(embRight, { x: lw, y: 0, width: rw, height: rh });
+
+          // Optional thin separator line
+          page.drawRectangle({ x: lw - 0.25, y: 0, width: 0.5, height: newH, color: rgb(0.13, 0.13, 0.13), opacity: 0.35 });
+
+          // Progress (first 70%)
+          const spreadIndex = Math.floor(i / 2);
+          const p = Math.round(((spreadIndex + 1) / spreadCount) * 70);
+          progBar.style.width = p + '%';
+          status.textContent = `Building spreads ${spreadIndex + 1} / ${spreadCount}`;
+          await new Promise(r => setTimeout(r, 0)); // yield to UI
+        }
+
+        const outBytes = await outDoc.save({ useObjectStreams: true });
+        const blob = new Blob([outBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        currentBlobUrl = url;
+
+        downloadLink.href = url;
+        downloadLink.download = (selectedFile.name ? selectedFile.name.replace(/\.pdf$/i,'') : 'converted') + '-book-spread.pdf';
+        downloadLink.style.display = 'inline-block';
+
+        // 2) Build lightweight preview of the first N spreads using pdf.js (does not affect output quality)
+        status.textContent = 'Preparing preview...';
+        progBar.style.width = '80%';
+        previewContainer.innerHTML = '';
+
+        const previewCount = Math.max(1, Math.min(12, parseInt(previewCountInput.value || '4', 10)));
+        const previewSpreads = Math.min(previewCount, spreadCount);
+
+        const loadingTask = pdfjsLib.getDocument({ data: pdfBytes });
+        const pdf = await loadingTask.promise;
+
+        const scale = parseFloat(scaleInput.value) || 1.5;
+
+        for (let s = 0; s < previewSpreads; s++) {
+          const leftIndex = (s * 2) + 1;     // 1-based for pdf.js
+          const rightIndex = leftIndex + 1;
+
+          // Render left page
+          const leftPage = await pdf.getPage(leftIndex);
+          const leftViewport = leftPage.getViewport({ scale });
+          const leftCanvas = document.createElement('canvas');
+          leftCanvas.width = Math.floor(leftViewport.width);
+          leftCanvas.height = Math.floor(leftViewport.height);
+          await leftPage.render({ canvasContext: leftCanvas.getContext('2d'), viewport: leftViewport }).promise;
+
+          // Render right if exists
+          let rightCanvas = null;
+          if (rightIndex <= pdf.numPages) {
+            const rightPage = await pdf.getPage(rightIndex);
+            const rightViewport = rightPage.getViewport({ scale });
+            rightCanvas = document.createElement('canvas');
+            rightCanvas.width = Math.floor(rightViewport.width);
+            rightCanvas.height = Math.floor(rightViewport.height);
+            await rightPage.render({ canvasContext: rightCanvas.getContext('2d'), viewport: rightViewport }).promise;
+          }
+
+          // Combine into a spread canvas (for preview only)
+          const spreadW = leftCanvas.width + (rightCanvas ? rightCanvas.width : leftCanvas.width);
+          const spreadH = Math.max(leftCanvas.height, rightCanvas ? rightCanvas.height : leftCanvas.height);
+          const spreadCanvas = document.createElement('canvas');
+          spreadCanvas.width = spreadW;
+          spreadCanvas.height = spreadH;
+          const ctx = spreadCanvas.getContext('2d');
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, spreadW, spreadH);
+          ctx.drawImage(leftCanvas, 0, 0);
+          if (rightCanvas) ctx.drawImage(rightCanvas, leftCanvas.width, 0);
+          ctx.fillStyle = '#222';
+          ctx.fillRect(Math.max(0, leftCanvas.width - 0.5), 0, 1, spreadH);
+
+          const img = new Image();
+          img.src = spreadCanvas.toDataURL('image/png');
+          previewContainer.appendChild(img);
+
+          // Progress (last 20%)
+          const p2 = 80 + Math.round(((s + 1) / previewSpreads) * 20);
+          progBar.style.width = p2 + '%';
+          await new Promise(r => setTimeout(r, 0));
+        }
+
+        status.textContent = 'Done — preview shown. Click Download to save.';
+        progBar.style.width = '100%';
+
+      } catch (err) {
+        console.error(err);
+        alert('Conversion failed: ' + (err && err.message ? err.message : err));
+        status.textContent = 'Error';
+        progBar.style.width = '0%';
+      } finally {
+        convertBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
