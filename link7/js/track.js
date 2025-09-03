@@ -24,3 +24,4 @@ export function initTrack(scene, world){
 
   return { spawn: path.getPoint(0) };
 }
+
