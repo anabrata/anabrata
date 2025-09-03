@@ -20,3 +20,5 @@ function loop(){
   updateUI(bike);
   renderer.render(scene, camera);
 }
+
+
