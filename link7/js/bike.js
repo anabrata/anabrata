@@ -37,3 +37,4 @@ export function updateBike(bike, dt){
   bike.lapTime += dt;
   if(body.position.length()<5 && bike.lapTime>3){ bike.lap++; bike.lapTime=0; }
 }
+
