@@ -2,269 +2,473 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Milk Tracker — Shared (Firestore)</title>
+  <title>Milk Tracker</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    :root{ --bg:#eaf6ff; --card:#ffffff; --accent:#0ea5e9; --danger:#ef4444; }
-    body{ margin:0; font-family:Inter, system-ui, Arial, sans-serif; background:var(--bg); color:#07203a; }
-    .wrap{ max-width:1100px; margin:18px auto; padding:18px; }
-    header{ display:flex; align-items:center; gap:12px; }
-    header h1{ margin:0; font-size:20px; }
-    .status{ margin:10px 0; color:#09374a; font-weight:600; }
-    .error{ color:var(--danger); font-weight:700; margin:8px 0; }
-    #total{ font-size:18px; margin:12px 0; }
-    .calendar{ display:grid; grid-template-columns: repeat(7, 1fr); gap:8px; }
-    .day{ background:var(--card); border-radius:10px; min-height:72px; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer; box-shadow:0 6px 16px rgba(2,6,23,0.06); }
-    .day h3{ margin:0; font-size:18px; }
-    .day .w{ margin-top:6px; font-size:12px; color:#475569; }
-    .day.skipped{ background:#fff5f5; border:1px dashed rgba(239,68,68,0.3); text-decoration:line-through; color:#9b1c1c; }
-    .controls{ margin:12px 0; display:flex; gap:8px; flex-wrap:wrap; }
-    button{ background:var(--accent); color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700; }
-    button.secondary{ background:#a5b4fc; color:#07203a; }
-    .history{ margin-top:18px; }
-    .history-item{ background:#fff; padding:10px; border-radius:10px; margin-bottom:8px; box-shadow:0 6px 18px rgba(2,6,23,0.04); }
-    .small{ font-size:13px; color:#475569; }
-    footer{ margin-top:18px; font-size:13px; color:#334155; }
-    @media(max-width:720px){ .calendar{ grid-template-columns: repeat(7, minmax(36px, 1fr)); } .day{ min-height:64px } }
+    :root{
+      --bg1:#0ea5e9; /* sky-500 */
+      --bg2:#22d3ee; /* cyan-400 */
+      --glass-bg: rgba(255,255,255,0.16);
+      --glass-brd: rgba(255,255,255,0.22);
+      --text:#0b1020;
+      --muted:#334155;
+      --ok:#22c55e;
+      --bad:#ef4444;
+      --accent:#f59e0b;
+      --card-shadow: 0 10px 30px rgba(2,6,23,0.25);
+      --price-shadow: 0 12px 20px rgba(2,6,23,0.25);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      color:var(--text);
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding:24px;
+    }
+
+    .app{
+      width: min(1100px, 100%);
+      display:grid;
+      gap:16px;
+    }
+
+    /* Milk animation header */
+    .hero{
+      position:relative;
+      overflow:hidden;
+      border-radius:20px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-brd);
+      backdrop-filter: blur(16px) saturate(160%);
+      -webkit-backdrop-filter: blur(16px) saturate(160%);
+      padding: 22px 22px 18px 22px;
+      box-shadow: var(--card-shadow);
+    }
+    .hero-top{
+      display:flex; gap:16px; align-items:center; justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .title{
+      display:flex; align-items:center; gap:14px;
+    }
+    .title h1{
+      margin:0; font-size:22px; letter-spacing:0.2px;
+    }
+    .subtitle{
+      color:var(--muted); font-size:14px;
+    }
+
+    /* Glass of milk animation */
+    .glass{
+      position:relative;
+      width:86px; height:110px;
+      border:3px solid rgba(255,255,255,0.75);
+      border-bottom-width:6px;
+      border-radius:14px 14px 10px 10px;
+      overflow:hidden;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,0.15);
+      background: radial-gradient(120px 50px at 50% 120%, rgba(255,255,255,0.25), transparent 55%);
+    }
+    .milk{
+      position:absolute; inset:auto 0 0 0; height:70%;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      transform: translateX(0);
+      animation: slosh 4s ease-in-out infinite;
+    }
+    .milk::before, .milk::after{
+      content:""; position:absolute; top:-18px; width:140%; height:36px; left:-20%;
+      background: #ffffff;
+      border-radius: 50%;
+      filter: blur(0.2px);
+      opacity:0.95;
+      animation: wave 4s ease-in-out infinite;
+    }
+    .milk::after{ top:-12px; opacity:0.9; animation-delay:-1.2s }
+    /* pouring drop */
+    .pour{
+      position:absolute; top:-30px; left:50%; width:10px; height:30px; transform:translateX(-50%);
+      background: linear-gradient(180deg, #fff, #e2e8f0);
+      border-radius:10px;
+      filter: drop-shadow(0 4px 4px rgba(0,0,0,0.12));
+      animation: pour 2.8s ease-in-out infinite;
+      opacity:0.85;
+    }
+    @keyframes slosh{
+      0%,100%{ transform: translateX(0) }
+      50%    { transform: translateX(-6%) }
+    }
+    @keyframes wave{
+      0%  { transform: translateX(-6%) rotate(0.6deg) }
+      50% { transform: translateX(6%)  rotate(-0.6deg) }
+      100%{ transform: translateX(-6%) rotate(0.6deg) }
+    }
+    @keyframes pour{
+      0%,20%{ transform: translate(-50%, -20px); opacity:0 }
+      30%   { transform: translate(-50%, 0); opacity:0.9 }
+      60%   { transform: translate(-50%, 80px); opacity:0 }
+      100%  { transform: translate(-50%, 80px); opacity:0 }
+    }
+
+    /* Controls row */
+    .controls{
+      display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+      margin-top:12px;
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 12px; border-radius:999px;
+      background: rgba(255,255,255,0.26);
+      border:1px solid rgba(255,255,255,0.38);
+      backdrop-filter: blur(10px) saturate(160%);
+      -webkit-backdrop-filter: blur(10px) saturate(160%);
+      font-size:14px;
+    }
+    .btn{
+      cursor:pointer; border:none; padding:10px 14px; border-radius:12px;
+      background: linear-gradient(135deg, #fcd34d, #f59e0b);
+      color:#111827; font-weight:600; box-shadow: var(--card-shadow);
+      transition: transform .08s ease, filter .2s ease;
+    }
+    .btn:active{ transform: translateY(1px) }
+    .btn.secondary{
+      background: linear-gradient(135deg, #e9efff, #a5b4fc);
+    }
+
+    /* Total bar */
+    .total-bar{
+      position:sticky; top:12px; z-index:5;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:14px 16px;
+      border-radius:16px;
+      background: rgba(255,255,255,0.28);
+      border: 1px solid rgba(255,255,255,0.42);
+      backdrop-filter: blur(14px) saturate(160%);
+      -webkit-backdrop-filter: blur(14px) saturate(160%);
+      box-shadow: var(--price-shadow);
+    }
+    .total-amount{
+      font-size:20px; font-weight:800; letter-spacing:0.3px;
+    }
+    .month-label{ color:#0f172a; opacity:0.9; font-weight:600 }
+
+    /* Calendar card */
+    .card{
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-brd);
+      border-radius: 20px;
+      padding: 14px;
+      backdrop-filter: blur(14px) saturate(160%);
+      -webkit-backdrop-filter: blur(14px) saturate(160%);
+      box-shadow: var(--card-shadow);
+    }
+    .card h2{
+      margin: 4px 4px 12px 4px;
+      font-size:16px; color:#0f172a; opacity:0.9;
+    }
+
+    .calendar{
+      display:grid; gap:10px;
+      grid-template-columns: repeat(7, 1fr);
+    }
+    .weekday-head{
+      text-align:center; font-size:12px; color:#0b1020; opacity:0.8; font-weight:700;
+      padding:6px 0;
+    }
+    .day{
+      position:relative;
+      min-height:84px;
+      background: rgba(255,255,255,0.8);
+      border: 1px solid rgba(17,24,39,0.08);
+      border-radius:14px;
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+      cursor:pointer;
+      transition: transform .06s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+      user-select:none;
+    }
+    .day:hover{ transform: translateY(-1px); box-shadow: 0 6px 16px rgba(2,6,23,0.12) }
+    .day .date{ font-size:18px; font-weight:800 }
+    .day .wday{ font-size:12px; color: var(--muted); letter-spacing:0.2px }
+    .dot{
+      width:8px; height:8px; border-radius:50%;
+      background: var(--ok); box-shadow:0 0 0 2px rgba(34,197,94,0.18) inset;
+    }
+    .day.skipped{
+      background: rgba(255,255,255,0.6);
+      border-color: rgba(239,68,68,0.35);
+      outline: 2px dashed rgba(239,68,68,0.35);
+      outline-offset: -6px;
+    }
+    .day.skipped .dot{ background: var(--bad); box-shadow:0 0 0 2px rgba(239,68,68,0.18) inset }
+    .cross{
+      position:absolute; top:6px; right:8px;
+      width:22px; height:22px; display:grid; place-items:center;
+      font-weight:900; color:#ef4444; opacity:0; transition:opacity .15s ease;
+    }
+    .day.skipped .cross{ opacity:1 }
+
+    /* History */
+    .history{
+      display:grid; gap:10px;
+    }
+    details{
+      background: rgba(255,255,255,0.22);
+      border: 1px solid rgba(255,255,255,0.36);
+      border-radius:14px;
+      padding:10px 12px;
+      backdrop-filter: blur(10px) saturate(160%);
+      -webkit-backdrop-filter: blur(10px) saturate(160%);
+    }
+    summary{
+      cursor:pointer; font-weight:700;
+    }
+    .history-list{ margin:10px 2px 4px 2px; display:grid; gap:8px }
+    .history-item{
+      display:flex; justify-content:space-between; gap:10px; align-items:center;
+      background: rgba(255,255,255,0.86);
+      border: 1px solid rgba(17,24,39,0.08);
+      border-radius:12px; padding:10px 12px;
+    }
+    .meta{ color:var(--muted); font-size:12px }
+
+    @media (max-width:720px){
+      .calendar{ grid-template-columns: repeat(7, minmax(36px, 1fr)) }
+      .day{ min-height:76px }
+      .glass{ display:none }
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24'%3E%3Cpath fill='%23072b3b' d='M12 2C9.79 2 8 4 8 4s-1.79-2-4-2-4 2-4 5c0 2.8 1 6 3 9 1.81 3.01 5.22 5 9 5s7.19-1.99 9-5c2-3 3-6.2 3-9 0-3-1.79-5-4-5s-4 2-4 2s-1.79-2-4-2z'/%3E%3C/svg%3E" alt="milk" />
-      <h1>Milk Tracker</h1>
-    </header>
-
-    <div id="status" class="status">Initializing…</div>
-    <div id="error" class="error" style="display:none;"></div>
-
-    <div class="controls">
-      <button id="markAllDelivered">Mark all delivered</button>
-      <button class="secondary" id="markAllSkipped">Mark all skipped</button>
-      <button class="secondary" id="resetMonth">Reset month</button>
-    </div>
-
-    <div id="total">Loading...</div>
-    <div id="calendar" class="calendar" aria-live="polite"></div>
-
-    <section class="history">
-      <h3>History</h3>
-      <div id="historyList" class="small">Loading history…</div>
+  <main class="app" id="app">
+    <section class="hero">
+      <div class="hero-top">
+        <div class="title">
+          <div class="glass">
+            <div class="pour"></div>
+            <div class="milk"></div>
+          </div>
+          <div>
+            <h1>Milk Tracker</h1>
+            <div class="subtitle">Track daily milk, toggle skips, and keep monthly history.</div>
+          </div>
+          <div class="pill" id="pricePill">Price/Day: ₹25</div>
+        </div>
+        <div class="controls">
+          <button class="btn" id="toggleAllDelivered">Mark all delivered</button>
+          <button class="btn secondary" id="toggleAllSkipped">Mark all skipped</button>
+          <button class="btn secondary" id="resetMonth">Reset month</button>
+        </div>
+      </div>
     </section>
 
-    <footer>
-      <div class="small">Notes: This file uses Firestore. If you see permission errors open Firebase Console → Firestore → Rules and allow read/write for testing (see instructions below).</div>
-    </footer>
-  </div>
+    <section class="total-bar">
+      <div class="month-label" id="monthLabel">Month YYYY</div>
+      <div class="total-amount" id="totalAmount">₹0</div>
+    </section>
 
-  <!-- Firebase compat scripts (works in single HTML files) -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <section class="card">
+      <h2>Calendar</h2>
+      <div class="calendar" id="calendar"></div>
+    </section>
+
+    <section class="card">
+      <h2>History</h2>
+      <div class="history">
+        <details open>
+          <summary>Past months</summary>
+          <div class="history-list" id="historyList"></div>
+        </details>
+      </div>
+    </section>
+  </main>
+
   <script>
-  (function(){
-    // ---------- your firebase config (from Firebase console) ----------
-    const firebaseConfig = {
-      apiKey: "AIzaSyBgZ2EmnVErmFw41aIIvWqU46OVlHIfFL8",
-      authDomain: "milktracker-e4afe.firebaseapp.com",
-      projectId: "milktracker-e4afe",
-      storageBucket: "milktracker-e4afe.firebasestorage.app",
-      messagingSenderId: "698978386100",
-      appId: "1:698978386100:web:18b2aad6e6456955b617e1",
-      measurementId: "G-Q8NPFFS27K"
-    };
-    // ------------------------------------------------------------------
-
-    // init
-    try {
-      firebase.initializeApp(firebaseConfig);
-    } catch(e) {
-      console.error("Firebase init error:", e);
-      showError("Firebase initialization failed. Check console.");
-      return;
-    }
-    const db = firebase.firestore();
-
-    // Shared key prefix: all devices use same shared doc for multi-device sync.
-    const SHARED_PREFIX = "shared"; // change this string if you want another shared workspace
+    // Constants
     const PRICE_PER_DAY = 25;
+    const STORAGE_KEY = 'milkTracker.current';
+    const HISTORY_KEY  = 'milkTracker.history';
 
-    // helpers
-    const statusEl = document.getElementById('status');
-    const errorEl = document.getElementById('error');
-    const totalEl = document.getElementById('total');
+    // Utilities
+    function daysInMonth(y, m){ // m: 0-11
+      return new Date(y, m+1, 0).getDate();
+    }
+    function monthName(y, m){
+      return new Date(y, m, 1).toLocaleString(undefined, { month:'long' });
+    }
+    function weekdayShort(y, m, d){
+      return new Date(y, m, d).toLocaleString(undefined, { weekday:'short' });
+    }
+
+    function loadJSON(key, fallback){
+      try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+      catch(e){ return fallback; }
+    }
+    function saveJSON(key, value){
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    // Data model
+    function newMonthData(y, m){
+      const n = daysInMonth(y, m);
+      return {
+        year: y, month: m, pricePerDay: PRICE_PER_DAY,
+        // Default: all delivered; click to mark skipped
+        days: Array.from({length:n}, () => true),
+        createdAt: Date.now()
+      };
+    }
+    function summarize(data){
+      const delivered = data.days.filter(Boolean).length;
+      const skipped   = data.days.length - delivered;
+      const total     = delivered * data.pricePerDay;
+      return { year:data.year, month:data.month, delivered, skipped, total, days:data.days.slice(), closedAt: Date.now() };
+    }
+
+    function finalizePreviousIfNeeded(nowY, nowM){
+      const cur = loadJSON(STORAGE_KEY, null);
+      if (!cur) return; // nothing to finalize
+
+      if (cur.year !== nowY || cur.month !== nowM){
+        const history = loadJSON(HISTORY_KEY, []);
+        history.unshift(summarize(cur));
+        saveJSON(HISTORY_KEY, history);
+        // create new current for the new month
+        const fresh = newMonthData(nowY, nowM);
+        saveJSON(STORAGE_KEY, fresh);
+      }
+    }
+
+    function ensureCurrent(){
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = now.getMonth();
+      // finalize old month if app was closed across boundary
+      finalizePreviousIfNeeded(y, m);
+      let cur = loadJSON(STORAGE_KEY, null);
+      if (!cur || cur.year !== y || cur.month !== m){
+        cur = newMonthData(y, m);
+        saveJSON(STORAGE_KEY, cur);
+      }
+      return cur;
+    }
+
+    // Rendering
     const calendarEl = document.getElementById('calendar');
+    const totalEl = document.getElementById('totalAmount');
+    const monthLabelEl = document.getElementById('monthLabel');
     const historyListEl = document.getElementById('historyList');
 
-    function showStatus(msg){ statusEl.textContent = msg; }
-    function showError(msg){ errorEl.style.display = 'block'; errorEl.textContent = msg; }
-    function hideError(){ errorEl.style.display = 'none'; errorEl.textContent = ''; }
-
-    const now = new Date();
-    const year = now.getFullYear();
-    const monthIndex = now.getMonth(); // 0-11
-    const monthNumber = monthIndex + 1; // human 1-12
-    const monthName = now.toLocaleString(undefined, { month: 'long' });
-
-    const docId = `${SHARED_PREFIX}_${year}_${monthNumber}`; // shared document id e.g. "shared_2025_8"
-    const colRef = db.collection('milkData');
-    const docRef = colRef.doc(docId);
-
-    function daysInMonth(y, m1to12) {
-      return new Date(y, m1to12, 0).getDate();
+    function formatINR(n){
+      // simple, explicit format
+      return '₹' + n.toString();
     }
-    const daysCount = daysInMonth(year, monthNumber);
 
-    // Render functions
-    function renderCalendar(data) {
-      hideError();
-      calendarEl.innerHTML = '';
-      let delivered = 0;
-      const days = data.days || Array(daysCount).fill(true);
+    function renderTotal(cur){
+      const delivered = cur.days.filter(Boolean).length;
+      const total = delivered * cur.pricePerDay;
+      totalEl.textContent = formatINR(total);
+      monthLabelEl.textContent = `${monthName(cur.year, cur.month)} ${cur.year}`;
+    }
 
-      // build headers (Sun..Sat)
-      const wk = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-      for (let h=0; h<7; h++){
-        const hd = document.createElement('div');
-        hd.className = 'small';
-        hd.style.textAlign = 'center';
-        hd.style.padding = '6px 2px';
-        hd.textContent = wk[h];
-        calendarEl.appendChild(hd);
-      }
+    function renderCalendar(cur){
+      const y = cur.year, m = cur.month;
+      const n = cur.days.length;
 
-      for (let d=1; d<=daysCount; d++){
+      // build weekday headers
+      const weekdays = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      calendarEl.innerHTML = weekdays.map(w => `<div class="weekday-head">${w}</div>`).join('');
+
+      // create day nodes
+      for (let d = 1; d <= n; d++){
+        const wday = weekdayShort(y, m, d);
         const idx = d-1;
-        const isDelivered = (days[idx] === undefined) ? true : !!days[idx];
-        if (isDelivered) delivered++;
-        const cell = document.createElement('div');
-        cell.className = 'day' + (isDelivered ? '' : ' skipped');
-        const h3 = document.createElement('h3');
-        h3.textContent = d;
-        const wd = new Date(year, monthIndex, d).toLocaleString(undefined, { weekday: 'short' });
-        const w = document.createElement('div');
-        w.className = 'w';
-        w.textContent = wd;
-        cell.appendChild(h3);
-        cell.appendChild(w);
-
-        cell.onclick = async () => {
-          // toggle and save
-          try {
-            days[idx] = !isDelivered;
-            await docRef.set({ year, month: monthNumber, days }, { merge: true });
-            renderCalendar({ days });
-            renderTotal(days);
-          } catch (err) {
-            console.error("Save error:", err);
-            showError("Failed to save — check Firestore rules or console.");
-          }
-        };
-        calendarEl.appendChild(cell);
-      }
-      renderTotal(days);
-    }
-
-    function renderTotal(days){
-      const delivered = (days || []).filter(Boolean).length;
-      const total = delivered * PRICE_PER_DAY;
-      totalEl.textContent = `${monthName} ${year} — Total: ₹${total} (${delivered}/${daysCount} delivered)`;
-    }
-
-    async function loadMonth() {
-      showStatus('Loading month data from Firestore...');
-      try {
-        const snap = await docRef.get();
-        if (snap.exists) {
-          const data = snap.data();
-          renderCalendar(data);
-          showStatus('Loaded (synced from Firestore).');
-        } else {
-          // create default doc
-          const defaultDays = Array(daysCount).fill(true);
-          await docRef.set({ year, month: monthNumber, days: defaultDays, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-          renderCalendar({ days: defaultDays });
-          showStatus('New month created (saved to Firestore).');
-        }
-      } catch (err) {
-        console.error("Load month error:", err);
-        showError("Unable to read month data. Possible causes: Firestore not enabled or rules blocking read. See instructions below.");
-        showStatus('Error: check console and Firestore rules.');
-      }
-    }
-
-    // controls
-    document.getElementById('markAllDelivered').onclick = async () => {
-      try {
-        const days = Array(daysCount).fill(true);
-        await docRef.set({ year, month: monthNumber, days }, { merge: true });
-        renderCalendar({ days });
-      } catch (err) { console.error(err); showError("Failed to update."); }
-    };
-    document.getElementById('markAllSkipped').onclick = async () => {
-      try {
-        const days = Array(daysCount).fill(false);
-        await docRef.set({ year, month: monthNumber, days }, { merge: true });
-        renderCalendar({ days });
-      } catch (err) { console.error(err); showError("Failed to update."); }
-    };
-    document.getElementById('resetMonth').onclick = async () => {
-      try {
-        const days = Array(daysCount).fill(true);
-        await docRef.set({ year, month: monthNumber, days }, { merge: true });
-        renderCalendar({ days });
-      } catch (err) { console.error(err); showError("Failed to reset."); }
-    };
-
-    // history listing (all docs in 'milkData' except current)
-    async function loadHistory() {
-      historyListEl.textContent = 'Loading history…';
-      try {
-        const snap = await colRef.orderBy('createdAt', 'desc').get();
-        historyListEl.innerHTML = '';
-        let found = false;
-        snap.forEach(doc => {
-          const id = doc.id;
-          if (id === docId) return; // skip current month
-          const d = doc.data();
-          const days = d.days || [];
-          const delivered = days.filter(Boolean).length;
-          const skipped = days.length - delivered;
-          const total = delivered * PRICE_PER_DAY;
-          const el = document.createElement('div');
-          el.className = 'history-item';
-          el.innerHTML = `<strong>${d.month || 'M'} / ${d.year || 'Y'}</strong> <div class="small">${delivered} delivered • ${skipped} skipped • Total ₹${total}</div>`;
-          historyListEl.appendChild(el);
-          found = true;
+        const div = document.createElement('div');
+        div.className = 'day' + (cur.days[idx] ? '' : ' skipped');
+        div.dataset.index = idx;
+        div.innerHTML = `
+          <div class="cross">✖</div>
+          <div class="date">${d}</div>
+          <div class="wday">${wday}</div>
+          <div class="dot"></div>
+        `;
+        div.addEventListener('click', () => {
+          const data = loadJSON(STORAGE_KEY, cur);
+          data.days[idx] = !data.days[idx];
+          saveJSON(STORAGE_KEY, data);
+          // update UI
+          div.classList.toggle('skipped', !data.days[idx]);
+          renderTotal(data);
         });
-        if (!found) historyListEl.textContent = 'No past months yet.';
-      } catch (err) {
-        console.error("Load history error:", err);
-        historyListEl.textContent = 'History load failed (check console).';
+        calendarEl.appendChild(div);
       }
     }
 
-    // start
-    loadMonth();
-    loadHistory();
-
-    // ---------- helpful console hint ----------
-    console.log("Milk Tracker ready. Document id:", docId);
-    showStatus("Ready. Use the calendar. Changes sync to Firestore.");
-    // -----------------------------------------------------
-
-    // ---------- quick dev tips to show on-screen if permission denied ----------
-    // You can ignore this block; it's informative in the console.
-    setTimeout(async () => {
-      // quick permissions check
-      try {
-        await docRef.get();
-      } catch(e) {
-        // likely permission denied
-        console.warn("Permission check failed — you may need to adjust Firestore rules.");
+    function renderHistory(){
+      const history = loadJSON(HISTORY_KEY, []);
+      historyListEl.innerHTML = '';
+      if (history.length === 0){
+        const empty = document.createElement('div');
+        empty.className = 'meta';
+        empty.textContent = 'No past months yet. Finish a month to see it here.';
+        historyListEl.appendChild(empty);
+        return;
       }
-    }, 3000);
+      history.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'history-item';
+        const left = document.createElement('div');
+        left.innerHTML = `<strong>${monthName(item.year, item.month)} ${item.year}</strong><div class="meta">${item.delivered} delivered • ${item.skipped} skipped</div>`;
+        const right = document.createElement('div');
+        right.innerHTML = `<strong>${formatINR(item.total)}</strong>`;
+        row.appendChild(left); row.appendChild(right);
+        historyListEl.appendChild(row);
+      });
+    }
 
-  })();
+    function bindControls(cur){
+      document.getElementById('pricePill').textContent = `Price/Day: ₹${cur.pricePerDay}`;
+      document.getElementById('toggleAllDelivered').onclick = () => {
+        const data = loadJSON(STORAGE_KEY, cur);
+        data.days = data.days.map(() => true);
+        saveJSON(STORAGE_KEY, data);
+        // re-render calendar quickly
+        calendarEl.querySelectorAll('.day').forEach(el => el.classList.remove('skipped'));
+        renderTotal(data);
+      };
+      document.getElementById('toggleAllSkipped').onclick = () => {
+        const data = loadJSON(STORAGE_KEY, cur);
+        data.days = data.days.map(() => false);
+        saveJSON(STORAGE_KEY, data);
+        calendarEl.querySelectorAll('.day').forEach(el => el.classList.add('skipped'));
+        renderTotal(data);
+      };
+      document.getElementById('resetMonth').onclick = () => {
+        const now = new Date();
+        const fresh = newMonthData(now.getFullYear(), now.getMonth());
+        saveJSON(STORAGE_KEY, fresh);
+        // rebuild UI
+        calendarEl.innerHTML = '';
+        renderTotal(fresh);
+        renderCalendar(fresh);
+        bindControls(fresh);
+      };
+    }
+
+    // Init
+    (function init(){
+      const cur = ensureCurrent();
+      // Build a fresh grid
+      calendarEl.innerHTML = '';
+      renderTotal(cur);
+      renderCalendar(cur);
+      renderHistory();
+      bindControls(cur);
+    })();
   </script>
 </body>
 </html>
