@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Milk Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg1:#0ea5e9; /* sky-500 */
+      --bg2:#22d3ee; /* cyan-400 */
+      --glass-bg: rgba(255,255,255,0.16);
+      --glass-brd: rgba(255,255,255,0.22);
+      --text:#0b1020;
+      --muted:#334155;
+      --ok:#22c55e;
+      --bad:#ef4444;
+      --accent:#f59e0b;
+      --card-shadow: 0 10px 30px rgba(2,6,23,0.25);
+      --price-shadow: 0 12px 20px rgba(2,6,23,0.25);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      color:var(--text);
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding:24px;
+    }
+
+    .app{
+      width: min(1100px, 100%);
+      display:grid;
+      gap:16px;
+    }
+
+    /* Milk animation header */
+    .hero{
+      position:relative;
+      overflow:hidden;
+      border-radius:20px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-brd);
+      backdrop-filter: blur(16px) saturate(160%);
+      -webkit-backdrop-filter: blur(16px) saturate(160%);
+      padding: 22px 22px 18px 22px;
+      box-shadow: var(--card-shadow);
+    }
+    .hero-top{
+      display:flex; gap:16px; align-items:center; justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .title{
+      display:flex; align-items:center; gap:14px;
+    }
+    .title h1{
+      margin:0; font-size:22px; letter-spacing:0.2px;
+    }
+    .subtitle{
+      color:var(--muted); font-size:14px;
+    }
+
+    /* Glass of milk animation */
+    .glass{
+      position:relative;
+      width:86px; height:110px;
+      border:3px solid rgba(255,255,255,0.75);
+      border-bottom-width:6px;
+      border-radius:14px 14px 10px 10px;
+      overflow:hidden;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,0.15);
+      background: radial-gradient(120px 50px at 50% 120%, rgba(255,255,255,0.25), transparent 55%);
+    }
+    .milk{
+      position:absolute; inset:auto 0 0 0; height:70%;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      transform: translateX(0);
+      animation: slosh 4s ease-in-out infinite;
+    }
+    .milk::before, .milk::after{
+      content:""; position:absolute; top:-18px; width:140%; height:36px; left:-20%;
+      background: #ffffff;
+      border-radius: 50%;
+      filter: blur(0.2px);
+      opacity:0.95;
+      animation: wave 4s ease-in-out infinite;
+    }
+    .milk::after{ top:-12px; opacity:0.9; animation-delay:-1.2s }
+    /* pouring drop */
+    .pour{
+      position:absolute; top:-30px; left:50%; width:10px; height:30px; transform:translateX(-50%);
+      background: linear-gradient(180deg, #fff, #e2e8f0);
+      border-radius:10px;
+      filter: drop-shadow(0 4px 4px rgba(0,0,0,0.12));
+      animation: pour 2.8s ease-in-out infinite;
+      opacity:0.85;
+    }
+    @keyframes slosh{
+      0%,100%{ transform: translateX(0) }
+      50%    { transform: translateX(-6%) }
+    }
+    @keyframes wave{
+      0%  { transform: translateX(-6%) rotate(0.6deg) }
+      50% { transform: translateX(6%)  rotate(-0.6deg) }
+      100%{ transform: translateX(-6%) rotate(0.6deg) }
+    }
+    @keyframes pour{
+      0%,20%{ transform: translate(-50%, -20px); opacity:0 }
+      30%   { transform: translate(-50%, 0); opacity:0.9 }
+      60%   { transform: translate(-50%, 80px); opacity:0 }
+      100%  { transform: translate(-50%, 80px); opacity:0 }
+    }
+
+    /* Controls row */
+    .controls{
+      display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+      margin-top:12px;
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 12px; border-radius:999px;
+      background: rgba(255,255,255,0.26);
+      border:1px solid rgba(255,255,255,0.38);
+      backdrop-filter: blur(10px) saturate(160%);
+      -webkit-backdrop-filter: blur(10px) saturate(160%);
+      font-size:14px;
+    }
+    .btn{
+      cursor:pointer; border:none; padding:10px 14px; border-radius:12px;
+      background: linear-gradient(135deg, #fcd34d, #f59e0b);
+      color:#111827; font-weight:600; box-shadow: var(--card-shadow);
+      transition: transform .08s ease, filter .2s ease;
+    }
+    .btn:active{ transform: translateY(1px) }
+    .btn.secondary{
+      background: linear-gradient(135deg, #e9efff, #a5b4fc);
+    }
+
+    /* Total bar */
+    .total-bar{
+      position:sticky; top:12px; z-index:5;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:14px 16px;
+      border-radius:16px;
+      background: rgba(255,255,255,0.28);
+      border: 1px solid rgba(255,255,255,0.42);
+      backdrop-filter: blur(14px) saturate(160%);
+      -webkit-backdrop-filter: blur(14px) saturate(160%);
+      box-shadow: var(--price-shadow);
+    }
+    .total-amount{
+      font-size:20px; font-weight:800; letter-spacing:0.3px;
+    }
+    .month-label{ color:#0f172a; opacity:0.9; font-weight:600 }
+
+    /* Calendar card */
+    .card{
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-brd);
+      border-radius: 20px;
+      padding: 14px;
+      backdrop-filter: blur(14px) saturate(160%);
+      -webkit-backdrop-filter: blur(14px) saturate(160%);
+      box-shadow: var(--card-shadow);
+    }
+    .card h2{
+      margin: 4px 4px 12px 4px;
+      font-size:16px; color:#0f172a; opacity:0.9;
+    }
+
+    .calendar{
+      display:grid; gap:10px;
+      grid-template-columns: repeat(7, 1fr);
+    }
+    .weekday-head{
+      text-align:center; font-size:12px; color:#0b1020; opacity:0.8; font-weight:700;
+      padding:6px 0;
+    }
+    .day{
+      position:relative;
+      min-height:84px;
+      background: rgba(255,255,255,0.8);
+      border: 1px solid rgba(17,24,39,0.08);
+      border-radius:14px;
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+      cursor:pointer;
+      transition: transform .06s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+      user-select:none;
+    }
+    .day:hover{ transform: translateY(-1px); box-shadow: 0 6px 16px rgba(2,6,23,0.12) }
+    .day .date{ font-size:18px; font-weight:800 }
+    .day .wday{ font-size:12px; color: var(--muted); letter-spacing:0.2px }
+    .dot{
+      width:8px; height:8px; border-radius:50%;
+      background: var(--ok); box-shadow:0 0 0 2px rgba(34,197,94,0.18) inset;
+    }
+    .day.skipped{
+      background: rgba(255,255,255,0.6);
+      border-color: rgba(239,68,68,0.35);
+      outline: 2px dashed rgba(239,68,68,0.35);
+      outline-offset: -6px;
+    }
+    .day.skipped .dot{ background: var(--bad); box-shadow:0 0 0 2px rgba(239,68,68,0.18) inset }
+    .cross{
+      position:absolute; top:6px; right:8px;
+      width:22px; height:22px; display:grid; place-items:center;
+      font-weight:900; color:#ef4444; opacity:0; transition:opacity .15s ease;
+    }
+    .day.skipped .cross{ opacity:1 }
+
+    /* History */
+    .history{
+      display:grid; gap:10px;
+    }
+    details{
+      background: rgba(255,255,255,0.22);
+      border: 1px solid rgba(255,255,255,0.36);
+      border-radius:14px;
+      padding:10px 12px;
+      backdrop-filter: blur(10px) saturate(160%);
+      -webkit-backdrop-filter: blur(10px) saturate(160%);
+    }
+    summary{
+      cursor:pointer; font-weight:700;
+    }
+    .history-list{ margin:10px 2px 4px 2px; display:grid; gap:8px }
+    .history-item{
+      display:flex; justify-content:space-between; gap:10px; align-items:center;
+      background: rgba(255,255,255,0.86);
+      border: 1px solid rgba(17,24,39,0.08);
+      border-radius:12px; padding:10px 12px;
+    }
+    .meta{ color:var(--muted); font-size:12px }
+
+    @media (max-width:720px){
+      .calendar{ grid-template-columns: repeat(7, minmax(36px, 1fr)) }
+      .day{ min-height:76px }
+      .glass{ display:none }
+    }
+  </style>
+</head>
+<body>
+  <main class="app" id="app">
+    <section class="hero">
+      <div class="hero-top">
+        <div class="title">
+          <div class="glass">
+            <div class="pour"></div>
+            <div class="milk"></div>
+          </div>
+          <div>
+            <h1>Milk Tracker</h1>
+            <div class="subtitle">Track daily milk, toggle skips, and keep monthly history.</div>
+          </div>
+          <div class="pill" id="pricePill">Price/Day: ₹25</div>
+        </div>
+        <div class="controls">
+          <button class="btn" id="toggleAllDelivered">Mark all delivered</button>
+          <button class="btn secondary" id="toggleAllSkipped">Mark all skipped</button>
+          <button class="btn secondary" id="resetMonth">Reset month</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="total-bar">
+      <div class="month-label" id="monthLabel">Month YYYY</div>
+      <div class="total-amount" id="totalAmount">₹0</div>
+    </section>
+
+    <section class="card">
+      <h2>Calendar</h2>
+      <div class="calendar" id="calendar"></div>
+    </section>
+
+    <section class="card">
+      <h2>History</h2>
+      <div class="history">
+        <details open>
+          <summary>Past months</summary>
+          <div class="history-list" id="historyList"></div>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Constants
+    const PRICE_PER_DAY = 25;
+    const STORAGE_KEY = 'milkTracker.current';
+    const HISTORY_KEY  = 'milkTracker.history';
+
+    // Utilities
+    function daysInMonth(y, m){ // m: 0-11
+      return new Date(y, m+1, 0).getDate();
+    }
+    function monthName(y, m){
+      return new Date(y, m, 1).toLocaleString(undefined, { month:'long' });
+    }
+    function weekdayShort(y, m, d){
+      return new Date(y, m, d).toLocaleString(undefined, { weekday:'short' });
+    }
+
+    function loadJSON(key, fallback){
+      try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+      catch(e){ return fallback; }
+    }
+    function saveJSON(key, value){
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    // Data model
+    function newMonthData(y, m){
+      const n = daysInMonth(y, m);
+      return {
+        year: y, month: m, pricePerDay: PRICE_PER_DAY,
+        // Default: all delivered; click to mark skipped
+        days: Array.from({length:n}, () => true),
+        createdAt: Date.now()
+      };
+    }
+    function summarize(data){
+      const delivered = data.days.filter(Boolean).length;
+      const skipped   = data.days.length - delivered;
+      const total     = delivered * data.pricePerDay;
+      return { year:data.year, month:data.month, delivered, skipped, total, days:data.days.slice(), closedAt: Date.now() };
+    }
+
+    function finalizePreviousIfNeeded(nowY, nowM){
+      const cur = loadJSON(STORAGE_KEY, null);
+      if (!cur) return; // nothing to finalize
+
+      if (cur.year !== nowY || cur.month !== nowM){
+        const history = loadJSON(HISTORY_KEY, []);
+        history.unshift(summarize(cur));
+        saveJSON(HISTORY_KEY, history);
+        // create new current for the new month
+        const fresh = newMonthData(nowY, nowM);
+        saveJSON(STORAGE_KEY, fresh);
+      }
+    }
+
+    function ensureCurrent(){
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = now.getMonth();
+      // finalize old month if app was closed across boundary
+      finalizePreviousIfNeeded(y, m);
+      let cur = loadJSON(STORAGE_KEY, null);
+      if (!cur || cur.year !== y || cur.month !== m){
+        cur = newMonthData(y, m);
+        saveJSON(STORAGE_KEY, cur);
+      }
+      return cur;
+    }
+
+    // Rendering
+    const calendarEl = document.getElementById('calendar');
+    const totalEl = document.getElementById('totalAmount');
+    const monthLabelEl = document.getElementById('monthLabel');
+    const historyListEl = document.getElementById('historyList');
+
+    function formatINR(n){
+      // simple, explicit format
+      return '₹' + n.toString();
+    }
+
+    function renderTotal(cur){
+      const delivered = cur.days.filter(Boolean).length;
+      const total = delivered * cur.pricePerDay;
+      totalEl.textContent = formatINR(total);
+      monthLabelEl.textContent = `${monthName(cur.year, cur.month)} ${cur.year}`;
+    }
+
+    function renderCalendar(cur){
+      const y = cur.year, m = cur.month;
+      const n = cur.days.length;
+
+      // build weekday headers
+      const weekdays = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      calendarEl.innerHTML = weekdays.map(w => `<div class="weekday-head">${w}</div>`).join('');
+
+      // create day nodes
+      for (let d = 1; d <= n; d++){
+        const wday = weekdayShort(y, m, d);
+        const idx = d-1;
+        const div = document.createElement('div');
+        div.className = 'day' + (cur.days[idx] ? '' : ' skipped');
+        div.dataset.index = idx;
+        div.innerHTML = `
+          <div class="cross">✖</div>
+          <div class="date">${d}</div>
+          <div class="wday">${wday}</div>
+          <div class="dot"></div>
+        `;
+        div.addEventListener('click', () => {
+          const data = loadJSON(STORAGE_KEY, cur);
+          data.days[idx] = !data.days[idx];
+          saveJSON(STORAGE_KEY, data);
+          // update UI
+          div.classList.toggle('skipped', !data.days[idx]);
+          renderTotal(data);
+        });
+        calendarEl.appendChild(div);
+      }
+    }
+
+    function renderHistory(){
+      const history = loadJSON(HISTORY_KEY, []);
+      historyListEl.innerHTML = '';
+      if (history.length === 0){
+        const empty = document.createElement('div');
+        empty.className = 'meta';
+        empty.textContent = 'No past months yet. Finish a month to see it here.';
+        historyListEl.appendChild(empty);
+        return;
+      }
+      history.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'history-item';
+        const left = document.createElement('div');
+        left.innerHTML = `<strong>${monthName(item.year, item.month)} ${item.year}</strong><div class="meta">${item.delivered} delivered • ${item.skipped} skipped</div>`;
+        const right = document.createElement('div');
+        right.innerHTML = `<strong>${formatINR(item.total)}</strong>`;
+        row.appendChild(left); row.appendChild(right);
+        historyListEl.appendChild(row);
+      });
+    }
+
+    function bindControls(cur){
+      document.getElementById('pricePill').textContent = `Price/Day: ₹${cur.pricePerDay}`;
+      document.getElementById('toggleAllDelivered').onclick = () => {
+        const data = loadJSON(STORAGE_KEY, cur);
+        data.days = data.days.map(() => true);
+        saveJSON(STORAGE_KEY, data);
+        // re-render calendar quickly
+        calendarEl.querySelectorAll('.day').forEach(el => el.classList.remove('skipped'));
+        renderTotal(data);
+      };
+      document.getElementById('toggleAllSkipped').onclick = () => {
+        const data = loadJSON(STORAGE_KEY, cur);
+        data.days = data.days.map(() => false);
+        saveJSON(STORAGE_KEY, data);
+        calendarEl.querySelectorAll('.day').forEach(el => el.classList.add('skipped'));
+        renderTotal(data);
+      };
+      document.getElementById('resetMonth').onclick = () => {
+        const now = new Date();
+        const fresh = newMonthData(now.getFullYear(), now.getMonth());
+        saveJSON(STORAGE_KEY, fresh);
+        // rebuild UI
+        calendarEl.innerHTML = '';
+        renderTotal(fresh);
+        renderCalendar(fresh);
+        bindControls(fresh);
+      };
+    }
+
+    // Init
+    (function init(){
+      const cur = ensureCurrent();
+      // Build a fresh grid
+      calendarEl.innerHTML = '';
+      renderTotal(cur);
+      renderCalendar(cur);
+      renderHistory();
+      bindControls(cur);
+    })();
+  </script>
+</body>
+</html>
