@@ -2,31 +2,67 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Milk Tracker (Firebase)</title>
+  <title>Milk Tracker — Shared (Firestore)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background:#f0f9ff; }
-    h1 { margin: 0 0 20px; }
-    .calendar { display:grid; grid-template-columns: repeat(7,1fr); gap:6px; }
-    .day { background:#fff; border:1px solid #ccc; border-radius:6px; padding:10px; text-align:center; cursor:pointer; }
-    .day.skipped { background:#fee2e2; border-color:#f87171; text-decoration: line-through; }
-    .total { margin:20px 0; font-size:18px; font-weight:bold; }
-    .history { margin-top:30px; }
-    .history-item { background:#fff; border:1px solid #ddd; margin:6px 0; padding:10px; border-radius:6px; }
+    :root{ --bg:#eaf6ff; --card:#ffffff; --accent:#0ea5e9; --danger:#ef4444; }
+    body{ margin:0; font-family:Inter, system-ui, Arial, sans-serif; background:var(--bg); color:#07203a; }
+    .wrap{ max-width:1100px; margin:18px auto; padding:18px; }
+    header{ display:flex; align-items:center; gap:12px; }
+    header h1{ margin:0; font-size:20px; }
+    .status{ margin:10px 0; color:#09374a; font-weight:600; }
+    .error{ color:var(--danger); font-weight:700; margin:8px 0; }
+    #total{ font-size:18px; margin:12px 0; }
+    .calendar{ display:grid; grid-template-columns: repeat(7, 1fr); gap:8px; }
+    .day{ background:var(--card); border-radius:10px; min-height:72px; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer; box-shadow:0 6px 16px rgba(2,6,23,0.06); }
+    .day h3{ margin:0; font-size:18px; }
+    .day .w{ margin-top:6px; font-size:12px; color:#475569; }
+    .day.skipped{ background:#fff5f5; border:1px dashed rgba(239,68,68,0.3); text-decoration:line-through; color:#9b1c1c; }
+    .controls{ margin:12px 0; display:flex; gap:8px; flex-wrap:wrap; }
+    button{ background:var(--accent); color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700; }
+    button.secondary{ background:#a5b4fc; color:#07203a; }
+    .history{ margin-top:18px; }
+    .history-item{ background:#fff; padding:10px; border-radius:10px; margin-bottom:8px; box-shadow:0 6px 18px rgba(2,6,23,0.04); }
+    .small{ font-size:13px; color:#475569; }
+    footer{ margin-top:18px; font-size:13px; color:#334155; }
+    @media(max-width:720px){ .calendar{ grid-template-columns: repeat(7, minmax(36px, 1fr)); } .day{ min-height:64px } }
   </style>
 </head>
 <body>
-  <h1>🥛 Milk Tracker</h1>
-  <div class="total" id="totalAmount">Loading...</div>
-  <div class="calendar" id="calendar"></div>
-  <div class="history" id="historyList"></div>
+  <div class="wrap">
+    <header>
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24'%3E%3Cpath fill='%23072b3b' d='M12 2C9.79 2 8 4 8 4s-1.79-2-4-2-4 2-4 5c0 2.8 1 6 3 9 1.81 3.01 5.22 5 9 5s7.19-1.99 9-5c2-3 3-6.2 3-9 0-3-1.79-5-4-5s-4 2-4 2s-1.79-2-4-2z'/%3E%3C/svg%3E" alt="milk" />
+      <h1>Milk Tracker</h1>
+    </header>
 
-  <!-- Firebase -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    <div id="status" class="status">Initializing…</div>
+    <div id="error" class="error" style="display:none;"></div>
 
-    // ✅ Your Firebase config (from Google)
+    <div class="controls">
+      <button id="markAllDelivered">Mark all delivered</button>
+      <button class="secondary" id="markAllSkipped">Mark all skipped</button>
+      <button class="secondary" id="resetMonth">Reset month</button>
+    </div>
+
+    <div id="total">Loading...</div>
+    <div id="calendar" class="calendar" aria-live="polite"></div>
+
+    <section class="history">
+      <h3>History</h3>
+      <div id="historyList" class="small">Loading history…</div>
+    </section>
+
+    <footer>
+      <div class="small">Notes: This file uses Firestore. If you see permission errors open Firebase Console → Firestore → Rules and allow read/write for testing (see instructions below).</div>
+    </footer>
+  </div>
+
+  <!-- Firebase compat scripts (works in single HTML files) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script>
+  (function(){
+    // ---------- your firebase config (from Firebase console) ----------
     const firebaseConfig = {
       apiKey: "AIzaSyBgZ2EmnVErmFw41aIIvWqU46OVlHIfFL8",
       authDomain: "milktracker-e4afe.firebaseapp.com",
@@ -36,80 +72,199 @@
       appId: "1:698978386100:web:18b2aad6e6456955b617e1",
       measurementId: "G-Q8NPFFS27K"
     };
+    // ------------------------------------------------------------------
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    // init
+    try {
+      firebase.initializeApp(firebaseConfig);
+    } catch(e) {
+      console.error("Firebase init error:", e);
+      showError("Firebase initialization failed. Check console.");
+      return;
+    }
+    const db = firebase.firestore();
 
+    // Shared key prefix: all devices use same shared doc for multi-device sync.
+    const SHARED_PREFIX = "shared"; // change this string if you want another shared workspace
     const PRICE_PER_DAY = 25;
-    const userId = "defaultUser"; // later you can replace with Firebase Auth
 
-    function daysInMonth(y, m) { return new Date(y, m+1, 0).getDate(); }
-    function monthName(y, m) { return new Date(y,m,1).toLocaleString(undefined,{month:"long"}); }
+    // helpers
+    const statusEl = document.getElementById('status');
+    const errorEl = document.getElementById('error');
+    const totalEl = document.getElementById('total');
+    const calendarEl = document.getElementById('calendar');
+    const historyListEl = document.getElementById('historyList');
+
+    function showStatus(msg){ statusEl.textContent = msg; }
+    function showError(msg){ errorEl.style.display = 'block'; errorEl.textContent = msg; }
+    function hideError(){ errorEl.style.display = 'none'; errorEl.textContent = ''; }
 
     const now = new Date();
     const year = now.getFullYear();
-    const month = now.getMonth();
-    const daysCount = daysInMonth(year, month);
+    const monthIndex = now.getMonth(); // 0-11
+    const monthNumber = monthIndex + 1; // human 1-12
+    const monthName = now.toLocaleString(undefined, { month: 'long' });
 
-    const monthKey = `${userId}_${year}_${month}`;
+    const docId = `${SHARED_PREFIX}_${year}_${monthNumber}`; // shared document id e.g. "shared_2025_8"
+    const colRef = db.collection('milkData');
+    const docRef = colRef.doc(docId);
 
-    async function loadMonth(){
-      const ref = doc(db, "milkData", monthKey);
-      const snap = await getDoc(ref);
-      if (snap.exists()) return snap.data();
-      const data = { year, month, days: Array(daysCount).fill(true), createdAt: Date.now() };
-      await setDoc(ref, data);
-      return data;
+    function daysInMonth(y, m1to12) {
+      return new Date(y, m1to12, 0).getDate();
     }
+    const daysCount = daysInMonth(year, monthNumber);
 
-    async function saveMonth(data){
-      await setDoc(doc(db,"milkData",monthKey), data);
-    }
+    // Render functions
+    function renderCalendar(data) {
+      hideError();
+      calendarEl.innerHTML = '';
+      let delivered = 0;
+      const days = data.days || Array(daysCount).fill(true);
 
-    function render(data){
-      const calendarEl = document.getElementById("calendar");
-      const totalEl = document.getElementById("totalAmount");
-      calendarEl.innerHTML = "";
-      const delivered = data.days.filter(Boolean).length;
-      const total = delivered * PRICE_PER_DAY;
-      totalEl.textContent = `${monthName(year,month)} ${year} • Total: ₹${total}`;
+      // build headers (Sun..Sat)
+      const wk = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      for (let h=0; h<7; h++){
+        const hd = document.createElement('div');
+        hd.className = 'small';
+        hd.style.textAlign = 'center';
+        hd.style.padding = '6px 2px';
+        hd.textContent = wk[h];
+        calendarEl.appendChild(hd);
+      }
 
-      for(let d=1; d<=daysCount; d++){
+      for (let d=1; d<=daysCount; d++){
         const idx = d-1;
-        const div = document.createElement("div");
-        div.className = "day" + (data.days[idx] ? "" : " skipped");
-        div.textContent = d;
-        div.onclick = async ()=>{
-          data.days[idx] = !data.days[idx];
-          await saveMonth(data);
-          render(data);
+        const isDelivered = (days[idx] === undefined) ? true : !!days[idx];
+        if (isDelivered) delivered++;
+        const cell = document.createElement('div');
+        cell.className = 'day' + (isDelivered ? '' : ' skipped');
+        const h3 = document.createElement('h3');
+        h3.textContent = d;
+        const wd = new Date(year, monthIndex, d).toLocaleString(undefined, { weekday: 'short' });
+        const w = document.createElement('div');
+        w.className = 'w';
+        w.textContent = wd;
+        cell.appendChild(h3);
+        cell.appendChild(w);
+
+        cell.onclick = async () => {
+          // toggle and save
+          try {
+            days[idx] = !isDelivered;
+            await docRef.set({ year, month: monthNumber, days }, { merge: true });
+            renderCalendar({ days });
+            renderTotal(days);
+          } catch (err) {
+            console.error("Save error:", err);
+            showError("Failed to save — check Firestore rules or console.");
+          }
         };
-        calendarEl.appendChild(div);
+        calendarEl.appendChild(cell);
+      }
+      renderTotal(days);
+    }
+
+    function renderTotal(days){
+      const delivered = (days || []).filter(Boolean).length;
+      const total = delivered * PRICE_PER_DAY;
+      totalEl.textContent = `${monthName} ${year} — Total: ₹${total} (${delivered}/${daysCount} delivered)`;
+    }
+
+    async function loadMonth() {
+      showStatus('Loading month data from Firestore...');
+      try {
+        const snap = await docRef.get();
+        if (snap.exists) {
+          const data = snap.data();
+          renderCalendar(data);
+          showStatus('Loaded (synced from Firestore).');
+        } else {
+          // create default doc
+          const defaultDays = Array(daysCount).fill(true);
+          await docRef.set({ year, month: monthNumber, days: defaultDays, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+          renderCalendar({ days: defaultDays });
+          showStatus('New month created (saved to Firestore).');
+        }
+      } catch (err) {
+        console.error("Load month error:", err);
+        showError("Unable to read month data. Possible causes: Firestore not enabled or rules blocking read. See instructions below.");
+        showStatus('Error: check console and Firestore rules.');
       }
     }
 
-    async function renderHistory(){
-      const listEl = document.getElementById("historyList");
-      listEl.innerHTML = "<h2>History</h2>";
-      const snap = await getDocs(collection(db,"milkData"));
-      snap.forEach(docSnap => {
-        const d = docSnap.data();
-        if(d.year===year && d.month===month) return; // skip current month
-        const delivered = d.days.filter(Boolean).length;
-        const skipped = d.days.length - delivered;
-        const total = delivered * PRICE_PER_DAY;
-        const item = document.createElement("div");
-        item.className = "history-item";
-        item.textContent = `${monthName(d.year,d.month)} ${d.year} → Delivered: ${delivered}, Skipped: ${skipped}, Total: ₹${total}`;
-        listEl.appendChild(item);
-      });
+    // controls
+    document.getElementById('markAllDelivered').onclick = async () => {
+      try {
+        const days = Array(daysCount).fill(true);
+        await docRef.set({ year, month: monthNumber, days }, { merge: true });
+        renderCalendar({ days });
+      } catch (err) { console.error(err); showError("Failed to update."); }
+    };
+    document.getElementById('markAllSkipped').onclick = async () => {
+      try {
+        const days = Array(daysCount).fill(false);
+        await docRef.set({ year, month: monthNumber, days }, { merge: true });
+        renderCalendar({ days });
+      } catch (err) { console.error(err); showError("Failed to update."); }
+    };
+    document.getElementById('resetMonth').onclick = async () => {
+      try {
+        const days = Array(daysCount).fill(true);
+        await docRef.set({ year, month: monthNumber, days }, { merge: true });
+        renderCalendar({ days });
+      } catch (err) { console.error(err); showError("Failed to reset."); }
+    };
+
+    // history listing (all docs in 'milkData' except current)
+    async function loadHistory() {
+      historyListEl.textContent = 'Loading history…';
+      try {
+        const snap = await colRef.orderBy('createdAt', 'desc').get();
+        historyListEl.innerHTML = '';
+        let found = false;
+        snap.forEach(doc => {
+          const id = doc.id;
+          if (id === docId) return; // skip current month
+          const d = doc.data();
+          const days = d.days || [];
+          const delivered = days.filter(Boolean).length;
+          const skipped = days.length - delivered;
+          const total = delivered * PRICE_PER_DAY;
+          const el = document.createElement('div');
+          el.className = 'history-item';
+          el.innerHTML = `<strong>${d.month || 'M'} / ${d.year || 'Y'}</strong> <div class="small">${delivered} delivered • ${skipped} skipped • Total ₹${total}</div>`;
+          historyListEl.appendChild(el);
+          found = true;
+        });
+        if (!found) historyListEl.textContent = 'No past months yet.';
+      } catch (err) {
+        console.error("Load history error:", err);
+        historyListEl.textContent = 'History load failed (check console).';
+      }
     }
 
-    (async ()=>{
-      const cur = await loadMonth();
-      render(cur);
-      renderHistory();
-    })();
+    // start
+    loadMonth();
+    loadHistory();
+
+    // ---------- helpful console hint ----------
+    console.log("Milk Tracker ready. Document id:", docId);
+    showStatus("Ready. Use the calendar. Changes sync to Firestore.");
+    // -----------------------------------------------------
+
+    // ---------- quick dev tips to show on-screen if permission denied ----------
+    // You can ignore this block; it's informative in the console.
+    setTimeout(async () => {
+      // quick permissions check
+      try {
+        await docRef.get();
+      } catch(e) {
+        // likely permission denied
+        console.warn("Permission check failed — you may need to adjust Firestore rules.");
+      }
+    }, 3000);
+
+  })();
   </script>
 </body>
 </html>
