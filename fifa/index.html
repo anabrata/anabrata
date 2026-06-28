@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch FIFA 2026 FREE 🏆</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&family=Exo+2:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0a0a0a;
+            overflow-x: hidden;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        /* Stadium background */
+        .stadium-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: 
+                radial-gradient(ellipse at 50% 0%, rgba(34, 197, 94, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 100%, rgba(220, 38, 38, 0.1) 0%, transparent 60%),
+                radial-gradient(circle at 20% 50%, rgba(255, 215, 0, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 40%);
+            z-index: 0;
+        }
+
+        /* Field lines */
+        .field-overlay {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80vw; height: 80vh;
+            border: 1px solid rgba(34, 197, 94, 0.08);
+            border-radius: 50%;
+            z-index: 0;
+        }
+        .field-overlay::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%; height: 1px;
+            background: rgba(34, 197, 94, 0.08);
+        }
+        .field-center {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 15vw; height: 15vw;
+            border: 1px solid rgba(34, 197, 94, 0.08);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        /* Floating particles */
+        .particle {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            animation: floatParticle linear infinite;
+        }
+
+        @keyframes floatParticle {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Glowing ball */
+        .soccer-ball {
+            position: fixed;
+            width: 30px; height: 30px;
+            font-size: 30px;
+            z-index: 1;
+            pointer-events: none;
+            animation: floatBall ease-in-out infinite;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
+        }
+
+        @keyframes floatBall {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-30px) rotate(90deg); }
+            50% { transform: translateY(-10px) rotate(180deg); }
+            75% { transform: translateY(-40px) rotate(270deg); }
+        }
+
+        /* Main container */
+        .main-container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        /* FIFA badge */
+        .fifa-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.2), rgba(255, 215, 0, 0.2));
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 50px;
+            padding: 8px 24px;
+            margin-bottom: 1.5rem;
+            animation: badgePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.1); }
+            50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.3); }
+        }
+
+        .fifa-badge span {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #fbbf24, #f59e0b, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 3px;
+        }
+
+        /* Main title */
+        .main-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            text-align: center;
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        .main-title .watch {
+            display: block;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 700;
+            color: #94a3b8;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+        }
+
+        .main-title .fifa {
+            display: block;
+            background: linear-gradient(135deg, #dc2626, #ff6b6b, #fbbf24, #dc2626);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 4s ease infinite;
+            filter: drop-shadow(0 0 30px rgba(220, 38, 38, 0.5));
+        }
+
+        .main-title .year {
+            display: block;
+            font-size: clamp(3rem, 10vw, 6rem);
+            background: linear-gradient(135deg, #fbbf24, #f59e0b, #fcd34d, #fbbf24);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 4s ease infinite;
+            filter: drop-shadow(0 0 30px rgba(251, 191, 36, 0.4));
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes titleGlow {
+            from { filter: drop-shadow(0 0 20px rgba(220, 38, 38, 0.3)); }
+            to { filter: drop-shadow(0 0 40px rgba(220, 38, 38, 0.6)); }
+        }
+
+        /* FREE badge */
+        .free-badge {
+            display: inline-block;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            color: #22c55e;
+            text-shadow: 0 0 20px rgba(34, 197, 94, 0.5), 0 0 40px rgba(34, 197, 94, 0.3), 0 0 80px rgba(34, 197, 94, 0.2);
+            animation: freePulse 1.5s ease-in-out infinite;
+            margin: 0.5rem 0 1rem;
+            letter-spacing: 10px;
+        }
+
+        @keyframes freePulse {
+            0%, 100% { transform: scale(1); text-shadow: 0 0 20px rgba(34, 197, 94, 0.5), 0 0 40px rgba(34, 197, 94, 0.3); }
+            50% { transform: scale(1.05); text-shadow: 0 0 30px rgba(34, 197, 94, 0.8), 0 0 60px rgba(34, 197, 94, 0.5), 0 0 100px rgba(34, 197, 94, 0.3); }
+        }
+
+        /* No VPN banner */
+        .no-vpn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(34, 197, 94, 0.05));
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            border-radius: 12px;
+            padding: 12px 28px;
+            margin-bottom: 2.5rem;
+            animation: vpnGlow 2s ease-in-out infinite alternate;
+        }
+
+        .no-vpn-icon {
+            font-size: 1.8rem;
+            animation: shieldBounce 2s ease-in-out infinite;
+        }
+
+        @keyframes shieldBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .no-vpn-text {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #22c55e;
+            letter-spacing: 3px;
+        }
+
+        @keyframes vpnGlow {
+            from { box-shadow: 0 0 15px rgba(34, 197, 94, 0.1); }
+            to { box-shadow: 0 0 30px rgba(34, 197, 94, 0.3); }
+        }
+
+        /* Links section */
+        .links-section {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 2.5rem;
+        }
+
+        .links-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: #fbbf24;
+            text-align: center;
+            letter-spacing: 5px;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .links-title::before,
+        .links-title::after {
+            content: '⚽';
+            margin: 0 10px;
+        }
+
+        .link-card {
+            display: block;
+            text-decoration: none;
+            margin-bottom: 1.2rem;
+            padding: 20px 28px;
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+
+        .link-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 200%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .link-card-extension {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15));
+            border: 1px solid rgba(59, 130, 246, 0.4);
+        }
+
+        .link-card-extension:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.3), 0 0 0 1px rgba(59, 130, 246, 0.6);
+            border-color: rgba(59, 130, 246, 0.8);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(139, 92, 246, 0.25));
+        }
+
+        .link-card-secret {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.15), rgba(249, 115, 22, 0.15));
+            border: 1px solid rgba(220, 38, 38, 0.4);
+            position: relative;
+        }
+
+        .link-card-secret:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 10px 40px rgba(220, 38, 38, 0.3), 0 0 0 1px rgba(220, 38, 38, 0.6);
+            border-color: rgba(220, 38, 38, 0.8);
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.25), rgba(249, 115, 22, 0.25));
+        }
+
+        .link-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .link-icon {
+            font-size: 1.5rem;
+        }
+
+        .link-type {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .link-card-extension .link-type { color: #60a5fa; }
+        .link-card-secret .link-type { color: #f87171; }
+
+        .secret-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #dc2626, #f97316);
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.6rem;
+            font-weight: 900;
+            padding: 3px 10px;
+            border-radius: 20px;
+            letter-spacing: 2px;
+            animation: secretPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes secretPulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(220, 38, 38, 0.3); }
+            50% { box-shadow: 0 0 25px rgba(220, 38, 38, 0.6); }
+        }
+
+        .link-url {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.7);
+            word-break: break-all;
+            transition: color 0.3s;
+        }
+
+        .link-card:hover .link-url {
+            color: rgba(255, 255, 255, 1);
+        }
+
+        .link-arrow {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%) translateX(0);
+            font-size: 1.5rem;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .link-card:hover .link-arrow {
+            opacity: 1;
+            transform: translateY(-50%) translateX(0);
+            animation: arrowBounce 0.6s ease-in-out infinite alternate;
+        }
+
+        @keyframes arrowBounce {
+            from { transform: translateY(-50%) translateX(0); }
+            to { transform: translateY(-50%) translateX(6px); }
+        }
+
+        /* Divider */
+        .divider {
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(251, 191, 36, 0.5), transparent);
+            margin: 0.5rem auto 2rem;
+        }
+
+        /* Support section */
+        .support-section {
+            max-width: 550px;
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 28px 24px;
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(220, 38, 38, 0.08));
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .support-section::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(251, 191, 36, 0.03), transparent, rgba(220, 38, 38, 0.03), transparent);
+            animation: rotateBg 10s linear infinite;
+        }
+
+        @keyframes rotateBg {
+            to { transform: rotate(360deg); }
+        }
+
+        .support-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .support-emojis {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            animation: emojiDance 2s ease-in-out infinite;
+        }
+
+        @keyframes emojiDance {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.1) rotate(-5deg); }
+            75% { transform: scale(1.1) rotate(5deg); }
+        }
+
+        .support-text {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 500;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.7;
+        }
+
+        .support-highlight {
+            color: #fbbf24;
+            font-weight: 700;
+        }
+
+        .subscribe-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 1.2rem;
+            padding: 12px 32px;
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 3px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            animation: subPulse 2s ease-in-out infinite;
+        }
+
+        .subscribe-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 8px 30px rgba(220, 38, 38, 0.5);
+        }
+
+        @keyframes subPulse {
+            0%, 100% { box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3); }
+            50% { box-shadow: 0 4px 25px rgba(220, 38, 38, 0.6); }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            width: 100%;
+        }
+
+        .footer-text {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .footer-link {
+            color: #f87171;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .footer-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px; left: 0;
+            width: 0%; height: 2px;
+            background: #f87171;
+            transition: width 0.3s;
+        }
+
+        .footer-link:hover {
+            color: #fbbf24;
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+        }
+
+        .footer-link:hover::after {
+            width: 100%;
+            background: #fbbf24;
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            top: -10px;
+            z-index: 1;
+            pointer-events: none;
+            animation: confettiFall linear forwards;
+        }
+
+        @keyframes confettiFall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Scanline effect */
+        .scanline {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.02) 2px,
+                rgba(0, 0, 0, 0.02) 4px
+            );
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .link-arrow { display: none; }
+            .link-card { padding: 16px 20px; }
+            .no-vpn { padding: 10px 20px; }
+        }
+
+        /* Countdown-like ticker */
+        .ticker {
+            width: 100%;
+            overflow: hidden;
+            background: linear-gradient(90deg, rgba(220, 38, 38, 0.1), rgba(251, 191, 36, 0.1), rgba(34, 197, 94, 0.1));
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 10px 0;
+            margin-bottom: 2rem;
+        }
+
+        .ticker-content {
+            display: flex;
+            white-space: nowrap;
+            animation: tickerScroll 20s linear infinite;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.3);
+        }
+
+        @keyframes tickerScroll {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
+        .ticker-item {
+            margin: 0 40px;
+        }
+
+        .ticker-item .highlight {
+            color: #fbbf24;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background effects -->
+    <div class="stadium-bg"></div>
+    <div class="field-overlay"></div>
+    <div class="field-center"></div>
+    <div class="scanline"></div>
+
+    <!-- Main content -->
+    <div class="main-container">
+
+        <!-- FIFA Badge -->
+        <div class="fifa-badge">
+            <span>⚽</span>
+            <span>FIFA WORLD CUP</span>
+            <span>🏆</span>
+        </div>
+
+        <!-- Main Title -->
+        <h1 class="main-title">
+            <span class="watch">WATCH</span>
+            <span class="fifa">FIFA</span>
+            <span class="year">2026</span>
+        </h1>
+
+        <!-- FREE Badge -->
+        <div class="free-badge">FREE</div>
+
+        <!-- No VPN -->
+        <div class="no-vpn">
+            <span class="no-vpn-icon">🛡️</span>
+            <span class="no-vpn-text">NO VPN NEEDED</span>
+            <span class="no-vpn-icon">🛡️</span>
+        </div>
+
+        <!-- Ticker -->
+        <div class="ticker">
+            <div class="ticker-content" id="ticker">
+                <span class="ticker-item">⚽ <span class="highlight">FIFA 2026</span> LIVE STREAM</span>
+                <span class="ticker-item">🔥 100% FREE</span>
+                <span class="ticker-item">🌐 NO VPN REQUIRED</span>
+                <span class="ticker-item">📺 HD QUALITY</span>
+                <span class="ticker-item">⚡ INSTANT ACCESS</span>
+                <span class="ticker-item">🏆 <span class="highlight">WORLD CUP</span> 2026</span>
+                <span class="ticker-item">⚽ <span class="highlight">FIFA 2026</span> LIVE STREAM</span>
+                <span class="ticker-item">🔥 100% FREE</span>
+                <span class="ticker-item">🌐 NO VPN REQUIRED</span>
+                <span class="ticker-item">📺 HD QUALITY</span>
+                <span class="ticker-item">⚡ INSTANT ACCESS</span>
+                <span class="ticker-item">🏆 <span class="highlight">WORLD CUP</span> 2026</span>
+            </div>
+        </div>
+
+        <!-- Links Section -->
+        <div class="links-section">
+            <div class="links-title">🔗 LINKS 🔗</div>
+
+            <!-- Extension Link -->
+            <a href="https://lnk.ink/Extensionana01" target="_blank" rel="noopener noreferrer" class="link-card link-card-extension">
+                <div class="link-label">
+                    <span class="link-icon">🧩</span>
+                    <span class="link-type">Extension Link</span>
+                </div>
+                <div class="link-url">https://lnk.ink/Extensionana01</div>
+                <span class="link-arrow">➜</span>
+            </a>
+
+            <!-- Secret Link -->
+            <a href="https://lnk.ink/sportsfifa01" target="_blank" rel="noopener noreferrer" class="link-card link-card-secret">
+                <div class="link-label">
+                    <span class="link-icon">🔐</span>
+                    <span class="link-type">Secret Link</span>
+                    <span class="secret-tag">CLASSIFIED</span>
+                </div>
+                <div class="link-url">https://lnk.ink/sportsfifa01</div>
+                <span class="link-arrow">➜</span>
+            </a>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Support Section -->
+        <div class="support-section">
+            <div class="support-content">
+                <div class="support-emojis">🥺🙏</div>
+                <p class="support-text">
+                    Hope you like this so much! Please <span class="support-highlight">subscribe</span> to my channel and <span class="support-highlight">support</span> me so I can give more effort and more content which is <span class="support-highlight">never taught on YouTube</span> 🥺🙏
+                </p>
+                <a href="https://youtube.com/@glitches_in_science?si=70CBUOEDEpxRq4pc" target="_blank" rel="noopener noreferrer" class="subscribe-btn">
+                    🔔 SUBSCRIBE NOW
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p class="footer-text">
+                Made with ❤️ by 
+                <a href="https://www.youtube.com/@Glitches_in_Science" target="_blank" rel="noopener noreferrer" class="footer-link">
+                    @Glitches_in_Science
+                </a>
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const colors = ['#dc2626', '#fbbf24', '#22c55e', '#3b82f6', '#f97316', '#a855f7'];
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                const size = Math.random() * 4 + 2;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.animationDuration = (Math.random() * 15 + 10) + 's';
+                particle.style.animationDelay = (Math.random() * 15) + 's';
+                particle.style.boxShadow = `0 0 ${size * 2}px ${particle.style.background}`;
+                document.body.appendChild(particle);
+            }
+        }
+
+        // Create floating soccer balls
+        function createSoccerBalls() {
+            for (let i = 0; i < 5; i++) {
+                const ball = document.createElement('div');
+                ball.className = 'soccer-ball';
+                ball.textContent = '⚽';
+                ball.style.left = Math.random() * 90 + 5 + 'vw';
+                ball.style.top = Math.random() * 90 + 5 + 'vh';
+                ball.style.animationDuration = (Math.random() * 4 + 3) + 's';
+                ball.style.animationDelay = (Math.random() * 3) + 's';
+                ball.style.opacity = 0.15 + Math.random() * 0.15;
+                document.body.appendChild(ball);
+            }
+        }
+
+        // Confetti burst on link click
+        document.querySelectorAll('.link-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                for (let i = 0; i < 20; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    const colors = ['#dc2626', '#fbbf24', '#22c55e', '#3b82f6', '#f97316', '#ffffff'];
+                    confetti.style.left = e.clientX + (Math.random() - 0.5) * 100 + 'px';
+                    confetti.style.width = (Math.random() * 8 + 4) + 'px';
+                    confetti.style.height = (Math.random() * 8 + 4) + 'px';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                    confetti.style.animationDuration = (Math.random() * 2 + 1) + 's';
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 3000);
+                }
+            });
+        });
+
+        // Mouse trail effect
+        document.addEventListener('mousemove', (e) => {
+            const trail = document.createElement('div');
+            trail.style.position = 'fixed';
+            trail.style.left = e.clientX + 'px';
+            trail.style.top = e.clientY + 'px';
+            trail.style.width = '6px';
+            trail.style.height = '6px';
+            trail.style.borderRadius = '50%';
+            trail.style.pointerEvents = 'none';
+            trail.style.zIndex = '999';
+            const colors = ['#dc2626', '#fbbf24', '#22c55e'];
+            trail.style.background = colors[Math.floor(Math.random() * colors.length)];
+            trail.style.boxShadow = '0 0 6px ' + trail.style.background;
+            trail.style.transition = 'all 0.8s ease-out';
+            document.body.appendChild(trail);
+            requestAnimationFrame(() => {
+                trail.style.transform = 'scale(0)';
+                trail.style.opacity = '0';
+            });
+            setTimeout(() => trail.remove(), 800);
+        });
+
+        // Initial confetti burst
+        function initialConfetti() {
+            for (let i = 0; i < 40; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    const colors = ['#dc2626', '#fbbf24', '#22c55e', '#3b82f6', '#f97316', '#ffffff'];
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.width = (Math.random() * 10 + 5) + 'px';
+                    confetti.style.height = (Math.random() * 10 + 5) + 'px';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                    confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 5000);
+                }, i * 80);
+            }
+        }
+
+        // Init
+        createParticles();
+        createSoccerBalls();
+        initialConfetti();
+    </script>
+
+</body>
+</html>
