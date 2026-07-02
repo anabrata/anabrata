@@ -17,94 +17,128 @@
     
     <style>
         :root {
-            --bg-workspace: #f0f4f8;
-            --bg-sidebar: #ffffff;
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --text-main: #1f2937;
-            --text-muted: #4b5563;
-            --border-color: #e5e7eb;
-            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-            --sheet-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --bg-workspace: #0f172a;
+            --bg-workspace-gradient: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+            --header-glass: rgba(15, 23, 42, 0.65);
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --sheet-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* Workspace Layout styling */
         body {
             font-family: 'Inter', 'Noto Sans Bengali', sans-serif;
-            background-color: var(--bg-workspace);
+            background: var(--bg-workspace-gradient);
             color: var(--text-main);
             margin: 0;
             padding: 0;
             display: flex;
+            flex-direction: column;
             min-height: 100vh;
             overflow-x: hidden;
         }
 
-        /* Control Panel / Sidebar */
-        .workspace-sidebar {
-            width: 320px;
-            background-color: var(--bg-sidebar);
-            border-right: 1px solid var(--border-color);
-            padding: 30px 24px;
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.6);
+        }
+
+        /* Professional Header Bar */
+        .workspace-header {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 1200px;
+            background: var(--header-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 14px 28px;
             box-sizing: border-box;
             display: flex;
-            flex-direction: column;
-            gap: 24px;
-            flex-shrink: 0;
-            z-index: 10;
-            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.02);
-            transition: var(--transition);
+            align-items: center;
+            justify-content: space-between;
+            z-index: 100;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+            animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translate(-50%, -40px);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
         }
 
         .brand-container {
             display: flex;
             align-items: center;
             gap: 12px;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 20px;
         }
 
         .brand-icon {
-            background: linear-gradient(135deg, #4f46e5, #818cf8);
-            width: 40px;
-            height: 40px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            width: 38px;
+            height: 38px;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: 700;
-            font-size: 20px;
-            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+            font-size: 18px;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+            animation: pulseGlow 3s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 15px rgba(99, 102, 241, 0.3); }
+            100% { box-shadow: 0 0 25px rgba(168, 85, 247, 0.6); }
         }
 
         .brand-title h2 {
             margin: 0;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
             letter-spacing: -0.5px;
+            background: linear-gradient(to right, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .brand-title p {
-            margin: 2px 0 0 0;
-            font-size: 12px;
+            margin: 1px 0 0 0;
+            font-size: 11px;
             color: var(--text-muted);
         }
 
-        .sidebar-section {
+        /* Controls Section inside Header */
+        .controls-group {
             display: flex;
-            flex-direction: column;
+            align-items: center;
             gap: 12px;
-        }
-
-        .section-label {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 4px;
         }
 
         /* Premium Buttons */
@@ -112,105 +146,89 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            padding: 12px 20px;
-            font-size: 14px;
+            gap: 8px;
+            padding: 10px 18px;
+            font-size: 13px;
             font-weight: 600;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             border: 1px solid transparent;
             transition: var(--transition);
-            width: 100%;
-            box-sizing: border-box;
         }
 
         .btn-primary {
-            background-color: var(--primary);
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
             color: white;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
         }
         .btn-primary:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
         }
 
         .btn-secondary {
-            background-color: #f3f4f6;
-            color: #374151;
-            border-color: #e5e7eb;
+            background: rgba(255, 255, 255, 0.05);
+            color: #f1f5f9;
+            border-color: rgba(255, 255, 255, 0.1);
         }
         .btn-secondary:hover {
-            background-color: #e5e7eb;
-            transform: translateY(-1px);
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
         }
 
         .btn:active {
             transform: translateY(1px);
         }
 
-        /* Color Customizer Option */
-        .color-picker {
-            display: flex;
-            gap: 8px;
-            margin-top: 4px;
-        }
-
-        .color-dot {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: var(--transition);
-        }
-        .color-dot.active {
-            border-color: #1f2937;
-            transform: scale(1.1);
-        }
-
-        /* Workspace Preview Container - Multi-page stacked vertically */
+        /* Workspace Preview Area */
         .workspace-preview {
             flex-grow: 1;
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            padding: 40px;
-            overflow-y: auto;
-            overflow-x: hidden;
-            max-height: 100vh;
+            padding: 130px 20px 60px 20px;
             box-sizing: border-box;
+            width: 100vw;
+            min-height: 100vh;
         }
 
         .pages-container {
             display: flex;
             flex-direction: column;
-            gap: 30px;
+            gap: 40px;
             align-items: center;
-            transition: transform 0.2s ease-out;
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* The Printable Sheet (A4 size exact constraints) */
+        /* Fixed Pixel A4 constraints to guarantee perfect mobile rendering/PDF */
         .worksheet-page {
-            width: 210mm;
-            height: 297mm;
+            width: 793px !important;     /* Fixed pixel equivalent of 210mm */
+            height: 1122px !important;   /* Fixed pixel equivalent of 297mm */
+            min-width: 793px !important;
+            min-height: 1122px !important;
             background-color: #ffffff;
             box-sizing: border-box;
-            padding: 10mm 15mm;
+            padding: 40px 55px !important;
             position: relative;
             box-shadow: var(--sheet-shadow);
-            border: 1px solid var(--border-color);
+            border-radius: 4px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
             font-family: 'Noto Sans Bengali', Arial, sans-serif;
             color: #000000;
+            transition: transform 0.3s ease;
+        }
+
+        .worksheet-page:hover {
+            transform: translateY(-2px);
         }
 
         /* Title and Student Info header */
         .sheet-header {
             border-bottom: 2px solid #000;
             padding-bottom: 6px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             display: flex;
             flex-direction: column;
             gap: 4px;
@@ -222,6 +240,7 @@
             font-weight: 700;
             margin: 0;
             color: #000;
+            font-family: 'Noto Sans Bengali', sans-serif;
         }
 
         .student-info-grid {
@@ -230,6 +249,7 @@
             font-size: 11px;
             font-weight: 600;
             margin-top: 4px;
+            font-family: 'Noto Sans Bengali', sans-serif;
         }
 
         .info-field {
@@ -255,6 +275,7 @@
             padding-bottom: 2px;
             display: flex;
             justify-content: space-between;
+            font-family: 'Noto Sans Bengali', sans-serif;
         }
 
         .section-title span.sub-title {
@@ -278,8 +299,11 @@
             flex-direction: column;
             align-items: flex-end;
             position: relative;
-            width: 100%;
+            width: 58px; /* Fixed width to prevent shrinking */
+            margin-left: auto;
             box-sizing: border-box;
+            font-variant-numeric: tabular-nums;
+            font-family: 'Noto Sans Bengali', sans-serif;
         }
 
         .row-top {
@@ -297,7 +321,7 @@
             padding-bottom: 2px;
             margin-bottom: 25px; /* Space for answer writing */
             line-height: 1.1;
-            width: 80%;
+            width: 100%;
             height: 20px;
         }
 
@@ -315,12 +339,14 @@
             font-weight: 600;
             display: flex;
             align-items: flex-end;
+            justify-content: flex-end;
             position: relative;
             width: 100%;
             height: 40px;
             box-sizing: border-box;
             margin-top: 10px; /* Space above for writing quotient */
             margin-bottom: 25px; /* Align with others */
+            font-family: 'Noto Sans Bengali', sans-serif;
         }
 
         .divisor {
@@ -345,51 +371,88 @@
             color: #666;
             border-top: 1px solid #ccc;
             padding-top: 4px;
+            font-family: 'Noto Sans Bengali', sans-serif;
         }
 
-        /* Mobile Friendly Adjustments */
-        @media (max-width: 900px) {
-            body {
-                flex-direction: column;
+        /* Loading overlay styling */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(99, 102, 241, 0.2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s infinite linear;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .loading-subtext {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .workspace-header {
+                width: 95%;
+                padding: 10px 16px;
+                border-radius: 12px;
+                top: 10px;
             }
 
-            .workspace-sidebar {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px solid var(--border-color);
-                padding: 20px;
-                gap: 16px;
+            .brand-title p {
+                display: none;
             }
 
-            .brand-container {
-                padding-bottom: 12px;
-            }
-
-            .sidebar-section {
-                gap: 8px;
-            }
-
-            .color-picker {
-                justify-content: flex-start;
+            .btn {
+                padding: 8px 12px;
+                font-size: 12px;
             }
 
             .workspace-preview {
-                padding: 16px 8px;
-                max-height: none;
-                overflow-y: visible;
-            }
-
-            .pages-container {
-                gap: 16px;
+                padding: 90px 10px 30px 10px;
             }
         }
 
         /* Print styles */
         @media print {
             body {
-                background-color: #ffffff;
+                background: #ffffff !important;
             }
-            .workspace-sidebar {
+            .workspace-header {
                 display: none !important;
             }
             .workspace-preview {
@@ -418,35 +481,23 @@
 </head>
 <body>
 
-    <!-- Sidebar Control Panel -->
-    <div class="workspace-sidebar">
+    <!-- Professional Glassmorphism Header Bar -->
+    <div class="workspace-header">
         <div class="brand-container">
             <div class="brand-icon">∑</div>
             <div class="brand-title">
-                <h2>ওয়ার্কশিট জেনারেটর</h2>
-                <p>Math Practice Creator</p>
+                <h2>গণিতপত্র.ai</h2>
+                <p>MathPractice Worksheet Creator</p>
             </div>
         </div>
 
-        <!-- Customizations Section -->
-        <div class="sidebar-section">
-            <div class="section-label">থিম পরিবর্তন (Theme Color)</div>
-            <div class="color-picker">
-                <div class="color-dot active" style="background-color: #4f46e5;" onclick="changeTheme('#4f46e5', this)"></div>
-                <div class="color-dot" style="background-color: #10b981;" onclick="changeTheme('#10b981', this)"></div>
-                <div class="color-dot" style="background-color: #8b5cf6;" onclick="changeTheme('#8b5cf6', this)"></div>
-                <div class="color-dot" style="background-color: #ef4444;" onclick="changeTheme('#ef4444', this)"></div>
-                <div class="color-dot" style="background-color: #374151;" onclick="changeTheme('#374151', this)"></div>
-            </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="sidebar-section" style="margin-top: auto; gap: 10px;">
+        <!-- Controls -->
+        <div class="controls-group">
             <button id="genBtn" class="btn btn-primary" onclick="generateSheet()">
-                🔄 নতুন সংখ্যা তৈরি করুন
+                🔄 নতুন ওয়ার্কশিট
             </button>
             <button id="dlBtn" class="btn btn-secondary" onclick="downloadPDF()">
-                ⬇️ PDF ডাউনলোড করুন
+                ⬇️ PDF ডাউনলোড
             </button>
             <button class="btn btn-secondary" onclick="window.print()">
                 🖨️ প্রিন্ট করুন
@@ -454,11 +505,18 @@
         </div>
     </div>
 
-    <!-- Workspace Area where the paper is shown -->
+    <!-- Workspace Preview Area containing fixed size A4 containers -->
     <div class="workspace-preview">
         <div class="pages-container" id="pages-container">
             <!-- Dynamically populated page divs -->
         </div>
+    </div>
+
+    <!-- Loading Animation Screen -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loadingText">ওয়ার্কশিট তৈরি হচ্ছে...</div>
+        <div class="loading-subtext" id="loadingSubtext">অনুগ্রহ করে কিছুক্ষণ অপেক্ষা করুন</div>
     </div>
 
     <script>
@@ -582,7 +640,7 @@
             const container = document.getElementById('pages-container');
             if (!preview || !container) return;
             
-            // 793px is the pixel equivalent of 210mm A4 width
+            // Fixed base dimensions (width of A4 page is exactly 793px)
             const targetWidth = 793; 
             const previewWidth = preview.clientWidth - 16; // subtract padding
             
@@ -592,8 +650,8 @@
                 container.style.transformOrigin = 'top center';
                 
                 // Set the wrapper container height dynamically to prevent empty scrolling space
-                // A4 height is 297mm (1122px). 2 pages + 30px gap = 2274px
-                const unscaledHeight = 2274;
+                // A4 height is 1122px. 2 pages + 40px gap = 2284px
+                const unscaledHeight = 2284;
                 container.style.height = `${unscaledHeight * scale}px`;
             } else {
                 container.style.transform = 'none';
@@ -601,94 +659,101 @@
             }
         }
 
-        // Generate the 2 A4 pages
-        function generateSheet() {
-            const pagesContainer = document.getElementById('pages-container');
-            pagesContainer.innerHTML = '';
-
-            for (let pageNum = 1; pageNum <= 2; pageNum++) {
-                const pageDiv = document.createElement('div');
-                pageDiv.className = 'worksheet-page';
-                pageDiv.id = `page-${pageNum}`;
-
-                pageDiv.innerHTML = `
-                    <!-- Header -->
-                    <div class="sheet-header">
-                        <h1 class="sheet-title">গণিত অনুশীলন ওয়ার্কশিট (পৃষ্ঠা - ${toBengali(pageNum)})</h1>
-                        <div class="student-info-grid">
-                            <div class="info-field">নাম (Name): ________________________________________</div>
-                            <div class="info-field">রোল (Roll): ________________</div>
-                            <div class="info-field">তারিখ (Date): ______________</div>
-                        </div>
-                    </div>
-
-                    <!-- Operations -->
-                    <div class="sections-container">
-                        <!-- 1. Multiplication Section (गुण) -->
-                        <div class="worksheet-section">
-                            <div class="section-title">
-                                ১. গুণ করো (Multiplication)
-                                <span class="sub-title">১, ২ ও ৩-অংকের গুণ (1-digit, 2-digit & 3-digit multiplication)</span>
-                            </div>
-                            <div class="problem-grid">
-                                ${generateMultiplicationProblems()}
-                            </div>
-                        </div>
-
-                        <!-- 2. Addition Section (যোগ) -->
-                        <div class="worksheet-section">
-                            <div class="section-title">
-                                ২. যোগ করো (Addition)
-                                <span class="sub-title">২-অংক ও ৩-অংকের যোগ (2-digit & 3-digit addition)</span>
-                            </div>
-                            <div class="problem-grid">
-                                ${generateAdditionProblems()}
-                            </div>
-                        </div>
-
-                        <!-- 3. Subtraction Section (বিয়োগ) -->
-                        <div class="worksheet-section">
-                            <div class="section-title">
-                                ৩. বিয়োগ করো (Subtraction)
-                                <span class="sub-title">২-অংক ও ৩-অংকের বিয়োগ (2-digit & 3-digit subtraction)</span>
-                            </div>
-                            <div class="problem-grid">
-                                ${generateSubtractionProblems()}
-                            </div>
-                        </div>
-
-                        <!-- 4. Division Section (ভাগ) -->
-                        <div class="worksheet-section">
-                            <div class="section-title">
-                                ৪. ভাগ করো (Division)
-                                <span class="sub-title">২-অংক ও ৩-অংকের ভাগ (2-digit & 3-digit division)</span>
-                            </div>
-                            <div class="problem-grid">
-                                ${generateDivisionProblems()}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Footer -->
-                    <div class="sheet-footer">
-                        স্বাক্ষর (Signature): _____________________ &nbsp;|&nbsp; © গণিত অনুশীলন পত্র
-                    </div>
-                `;
-
-                pagesContainer.appendChild(pageDiv);
+        // Show/Hide Loading Screen
+        function toggleLoading(show, title = '', subtitle = '') {
+            const overlay = document.getElementById('loadingOverlay');
+            if (show) {
+                if (title) document.getElementById('loadingText').innerText = title;
+                if (subtitle) document.getElementById('loadingSubtext').innerText = subtitle;
+                overlay.classList.add('active');
+            } else {
+                overlay.classList.remove('active');
             }
-
-            // Adjust scaling on load/regenerate
-            setTimeout(adjustScale, 50);
         }
 
-        // Change sidebar theme color
-        function changeTheme(color, el) {
-            document.documentElement.style.setProperty('--primary', color);
-            document.documentElement.style.setProperty('--primary-hover', color + 'ee');
+        // Generate the 2 A4 pages
+        function generateSheet() {
+            toggleLoading(true, "ওয়ার্কশিট তৈরি হচ্ছে...", "অনুগ্রহ করে কিছুক্ষণ অপেক্ষা করুন");
             
-            document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('active'));
-            el.classList.add('active');
+            setTimeout(() => {
+                const pagesContainer = document.getElementById('pages-container');
+                pagesContainer.innerHTML = '';
+
+                for (let pageNum = 1; pageNum <= 2; pageNum++) {
+                    const pageDiv = document.createElement('div');
+                    pageDiv.className = 'worksheet-page';
+                    pageDiv.id = `page-${pageNum}`;
+
+                    pageDiv.innerHTML = `
+                        <!-- Header -->
+                        <div class="sheet-header">
+                            <h1 class="sheet-title">গণিত অনুশীলন ওয়ার্কশিট (পৃষ্ঠা - ${toBengali(pageNum)})</h1>
+                            <div class="student-info-grid">
+                                <div class="info-field">নাম (Name): ________________________________________</div>
+                                <div class="info-field">রোল (Roll): ________________</div>
+                                <div class="info-field">তারিখ (Date): ______________</div>
+                            </div>
+                        </div>
+
+                        <!-- Operations -->
+                        <div class="sections-container">
+                            <!-- 1. Multiplication Section (গুণ) -->
+                            <div class="worksheet-section">
+                                <div class="section-title">
+                                    ১. গুণ করো (Multiplication)
+                                    <span class="sub-title">১, ২ ও ৩-অংকের গুণ (1-digit, 2-digit & 3-digit multiplication)</span>
+                                </div>
+                                <div class="problem-grid">
+                                    ${generateMultiplicationProblems()}
+                                </div>
+                            </div>
+
+                            <!-- 2. Addition Section (যোগ) -->
+                            <div class="worksheet-section">
+                                <div class="section-title">
+                                    ২. যোগ করো (Addition)
+                                    <span class="sub-title">২-অংক ও ৩-অংকের যোগ (2-digit & 3-digit addition)</span>
+                                </div>
+                                <div class="problem-grid">
+                                    ${generateAdditionProblems()}
+                                </div>
+                            </div>
+
+                            <!-- 3. Subtraction Section (বিয়োগ) -->
+                            <div class="worksheet-section">
+                                <div class="section-title">
+                                    ৩. বিয়োগ করো (Subtraction)
+                                    <span class="sub-title">২-অংক ও ৩-অংকের বিয়োগ (2-digit & 3-digit subtraction)</span>
+                                </div>
+                                <div class="problem-grid">
+                                    ${generateSubtractionProblems()}
+                                </div>
+                            </div>
+
+                            <!-- 4. Division Section (ভাগ) -->
+                            <div class="worksheet-section">
+                                <div class="section-title">
+                                    ৪. ভাগ করো (Division)
+                                    <span class="sub-title">২-অংক ও ৩-অংকের ভাগ (2-digit & 3-digit division)</span>
+                                </div>
+                                <div class="problem-grid">
+                                    ${generateDivisionProblems()}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="sheet-footer">
+                            স্বাক্ষর (Signature): _____________________ &nbsp;|&nbsp; © গণিত অনুশীলন পত্র
+                        </div>
+                    `;
+
+                    pagesContainer.appendChild(pageDiv);
+                }
+
+                adjustScale();
+                toggleLoading(false);
+            }, 300);
         }
 
         // Download both pages as a single compressed 2-page PDF
@@ -696,10 +761,7 @@
             const { jsPDF } = window.jspdf;
             const pages = document.querySelectorAll('.worksheet-page');
             
-            const dlBtn = document.getElementById('dlBtn');
-            const originalText = dlBtn.innerHTML;
-            dlBtn.innerHTML = '⏳ তৈরি হচ্ছে...';
-            dlBtn.disabled = true;
+            toggleLoading(true, "পিডিএফ তৈরি হচ্ছে...", "হাই-কোয়ালিটি ফাইল সংক্ষেপণ করা হচ্ছে");
 
             const pdf = new jsPDF({
                 orientation: 'portrait',
@@ -712,41 +774,39 @@
             pages.forEach((pageElement, index) => {
                 promiseChain = promiseChain.then(() => {
                     const originalShadow = pageElement.style.boxShadow;
-                    const originalBorder = pageElement.style.border;
                     pageElement.style.boxShadow = 'none';
-                    pageElement.style.border = 'none';
 
-                    // html2canvas rendering
+                    // html2canvas rendering at exact pixel dimensions
                     return html2canvas(pageElement, { 
-                        scale: 2.5, // Perfect balance for sharpness and canvas size
+                        scale: 2.5, // High resolution crisp text scale
                         useCORS: true,
-                        logging: false
+                        logging: false,
+                        width: 793,
+                        height: 1122
                     }).then(canvas => {
-                        // High quality JPEG compression (0.8 quality value drops file size by ~90% with zero visible quality loss)
+                        // JPEG format with 0.8 quality compression reduces file sizes significantly
                         const imgData = canvas.toDataURL('image/jpeg', 0.8);
                         
                         if (index > 0) {
                             pdf.addPage();
                         }
                         
-                        // Add compressed image to document
+                        // Add image to pdf sheet
                         pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
                         
-                        // Restore page design styling
+                        // Restore page box shadow
                         pageElement.style.boxShadow = originalShadow;
-                        pageElement.style.border = originalBorder;
                     });
                 });
             });
 
             promiseChain.then(() => {
                 pdf.save('bengali-math-worksheet.pdf');
-                dlBtn.innerHTML = originalText;
-                dlBtn.disabled = false;
+                toggleLoading(false);
             }).catch(err => {
                 console.error(err);
-                dlBtn.innerHTML = '❌ ত্রুটি ঘটেছে';
-                dlBtn.disabled = false;
+                toggleLoading(false);
+                alert("PDF তৈরি করতে একটি সমস্যা হয়েছে।");
             });
         }
 
