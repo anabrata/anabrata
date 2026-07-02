@@ -1163,7 +1163,7 @@
         }
     </style>
 </head>
-<body data-theme="aurora">
+<body data-theme="aurora" style="overflow: hidden;">
 
     <!-- ===== LOADING SCREEN ===== -->
     <div class="loading-screen hidden" id="loadingScreen">
@@ -1183,7 +1183,7 @@
     <div id="qr-float" style="opacity: 0; transform: translate(812px, 194px);"><img id="qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&amp;data=https%3A%2F%2Fwww.ilovepdf.com%2Fmerge_pdf" alt="QR Code"></div>
 
     <!-- ===== TOAST CONTAINER ===== -->
-    <div class="toast-container" id="toastContainer"><div class="toast">✨ Flash card created!</div></div>
+    <div class="toast-container" id="toastContainer"><div class="toast toast-out">💾 Notes saved!</div></div>
 
     <!-- ===== HEADER ===== -->
     <header id="mainHeader" class="">
@@ -2177,6 +2177,17 @@
                             <span class="fc-card-logo-emoji" style="display:none;">🃏</span>
                         </div>
                         <div class="fc-card-name">Joytify</div>
+                    </div></div><div class="fc-card fc-card-animated" style="animation-delay: 0.24s;">
+                    <div class="fc-card-bg" style="background-image: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22260%22%3E%3Crect%20width%3D%22200%22%20height%3D%22260%22%20fill%3D%22%232ec4b6%22%2F%3E%3Cpath%20d%3D%22M0%2C15%20Q50%2C-3%20100%2C15%20Q150%2C33%20200%2C15%22%20stroke%3D%22%23e71d36%22%20fill%3D%22none%22%20stroke-width%3D%222.5%22%20opacity%3D%220.25%22%2F%3E%3Cpath%20d%3D%22M0%2C45%20Q50%2C27%20100%2C45%20Q150%2C63%20200%2C45%22%20stroke%3D%22%23ff9f1c%22%20fill%3D%22none%22%20stroke-width%3D%222.5%22%20opacity%3D%220.25%22%2F%3E%3Cpath%20d%3D%22M0%2C75%20Q50%2C57%20100%2C75%20Q150%2C93%20200%2C75%22%20stroke%3D%22%232ec4b6%22%20fill%3D%22none%22%20stroke-width%3D%222.5%22%20opacity%3D%220.25%22%2F%3E%3Cpath%20d%3D%22M0%2C105%20Q50%2C87%20100%2C105%20Q150%2C123%20200%2C105%22%20stroke%3D%22%23e71d36%22%20fill%3D%22none%22%20stroke-width%3D%222.5%22%20opacity%3D%220.25%22%2F%3E%3Cpath%20d%3D%22M0%2C135%20Q50%2C117%20100%2C135%20Q150%2C153%20200%2C135%22%20stroke%3D%22%23ff9f1c%22%20fill%3D%22none%22%20stroke-width%3D%222.5%22%20opacity%3D%220.25%22%2F%3E%3Cpath%20d%3D%22M0%2C165%20Q50%2C147%20100%2C165%20Q150%2C183%20200%2C165%22%20stroke%3D%22%232ec4b6%22%20fill%3D%22none%22%20stroke-width%3D%222.5%22%20opacity%3D%220.25%22%2F%3E%3Cpath%20d%3D%22M0%2C195%20Q50%2C177%20100%2C195%20Q150%2C213%20200%2C195%22%20stroke%3D%22%23e71d36%22%20fill%3D%22none%22%20stroke-width%3D%222.5%22%20opacity%3D%220.25%22%2F%3E%3Cpath%20d%3D%22M0%2C225%20Q50%2C207%20100%2C225%20Q150%2C243%20200%2C225%22%20stroke%3D%22%23ff9f1c%22%20fill%3D%22none%22%20stroke-width%3D%222.5%22%20opacity%3D%220.25%22%2F%3E%3Cpath%20d%3D%22M0%2C255%20Q50%2C237%20100%2C255%20Q150%2C273%20200%2C255%22%20stroke%3D%22%232ec4b6%22%20fill%3D%22none%22%20stroke-width%3D%222.5%22%20opacity%3D%220.25%22%2F%3E%3C%2Fsvg%3E'); background-size: cover;"></div>
+                    <div class="fc-card-overlay"></div>
+                    <div class="fc-card-delete" onclick="deleteFlashCard(4, event)">✕</div>
+                    
+                    <div class="fc-card-content">
+                        <div class="fc-card-logo">
+                            <img src="https://i.postimg.cc/crcmrpn5/image.png" crossorigin="anonymous" referrerpolicy="no-referrer" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='block';" onload="this.style.display='block'; if(this.nextElementSibling) this.nextElementSibling.style.display='none';" alt="Music Player" loading="lazy" style="display: block;">
+                            <span class="fc-card-logo-emoji" style="display:none;">🃏</span>
+                        </div>
+                        <div class="fc-card-name">Music Player</div>
                     </div></div></div></div>
         </div>
     </div>
@@ -2249,7 +2260,7 @@
                     Supports direct image links (.png, .jpg) and PostImg page links (postimg.cc/xxxxx)
                 </p>
                 <div class="modal-image-preview" id="fcImagePreview">
-                    <img id="fcPreviewImg" src="https://i.postimg.cc/RWMgdSBj/image.png" alt="Preview" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" onload="this.style.display='block'; this.nextElementSibling.style.display='none';" style="display: block;">
+                    <img id="fcPreviewImg" src="https://i.postimg.cc/crcmrpn5/image.png" alt="Preview" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" onload="this.style.display='block'; this.nextElementSibling.style.display='none';" style="display: block;">
                     <span class="preview-error" style="display: none;">Could not load image</span>
                 </div>
             </div>
@@ -2282,19 +2293,21 @@
         <div class="notepad-container">
             <div class="notepad-header">
                 <div class="notepad-header-left">
-                    <div class="notepad-header-logo" id="notepadLogo"><img src="" alt=""></div>
-                    <div class="notepad-header-title" id="notepadTitle">Untitled</div>
+                    <div class="notepad-header-logo" id="notepadLogo"><img src="https://i.postimg.cc/YvYt6xtz/image.png" alt=""></div>
+                    <div class="notepad-header-title" id="notepadTitle">Simp Music</div>
                 </div>
                 <div class="notepad-header-actions">
                     <button class="notepad-action-btn" id="notepadEditBtn" onclick="toggleNotepadEdit()" title="Edit">✏️</button>
                 </div>
             </div>
-            <div class="notepad-body notepad-lined" id="notepadBody"></div>
+            <div class="notepad-body notepad-lined" id="notepadBody"><div class="notepad-display">The Simp Music enable us to play the music with the help of youtube api at Max to max 270kbps 
+the link of the Simp Music is 👇👇👇
+https://github.com/maxrave-dev/SimpMusic</div></div>
             <div class="notepad-footer">
-                <div class="notepad-footer-info" id="notepadCharCount">0 characters</div>
+                <div class="notepad-footer-info" id="notepadCharCount">172 chars · 29 words</div>
                 <div class="notepad-footer-btns">
                     <button class="notepad-close-btn" onclick="closeNotepad()">Close</button>
-                    <button class="notepad-save-btn" id="notepadSaveBtn" onclick="saveNotepadContent()">Save</button>
+                    <button class="notepad-save-btn" id="notepadSaveBtn" onclick="saveNotepadContent()" style="display: none;">Save</button>
                 </div>
             </div>
         </div>
@@ -2988,7 +3001,7 @@
         // ============================================================
         // STATE
         // ============================================================
-        const buildTimestamp = "2026-07-02T08:13:51.205Z";
+        const buildTimestamp = "2026-07-02T08:18:18.889Z";
         const defaultFlashCards = [];
 
         // Check if server HTML has a newer build than our local storage
