@@ -1,1 +1,2449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0a1a" id="meta-theme-color">
+    <meta name="description" content="ANABRATA's Ultimate Dashboard - A premium bookmark manager and flash card organizer with stunning animations.">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Ultimate Dashboard v19 - By ANABRATA</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================================
+           ROOT DESIGN TOKENS  
+           ============================================================ */
+        :root {
+            --bg-primary: #0a0a1a;
+            --bg-secondary: #0f0f2a;
+            --bg-tertiary: #141430;
+            --glass-bg: rgba(255, 255, 255, 0.04);
+            --glass-bg-strong: rgba(255, 255, 255, 0.08);
+            --glass-bg-hover: rgba(255, 255, 255, 0.12);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-border-hover: rgba(255, 255, 255, 0.18);
+            --glass-border-active: rgba(255, 255, 255, 0.28);
+            --text-main: #e8e8f0;
+            --text-sub: rgba(255, 255, 255, 0.5);
+            --text-muted: rgba(255, 255, 255, 0.3);
+            --text-dim: rgba(255, 255, 255, 0.15);
+            --accent-1: #6c63ff;
+            --accent-2: #ff6b9d;
+            --accent-3: #4ecdc4;
+            --accent-gradient: linear-gradient(135deg, #6c63ff 0%, #ff6b9d 50%, #4ecdc4 100%);
+            --accent-gradient-r: linear-gradient(135deg, #4ecdc4 0%, #ff6b9d 50%, #6c63ff 100%);
+            --accent-glow: rgba(108, 99, 255, 0.3);
+            --accent-glow-2: rgba(255, 107, 157, 0.2);
+            --success: #4ade80;
+            --warning: #fbbf24;
+            --delete-color: #ff4757;
+            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --card-shadow-hover: 0 20px 60px rgba(108, 99, 255, 0.15);
+            --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+            --dock-bg: rgba(15, 15, 40, 0.88);
+            --radius-xs: 8px;
+            --radius-sm: 12px;
+            --radius-md: 18px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --transition-spring: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --safe-bottom: max(20px, env(safe-area-inset-bottom));
+        }
+
+        /* --- THEME: AURORA (Default) --- */
+        [data-theme="aurora"] {
+            --bg-primary: #0a0a1a;
+            --bg-secondary: #0f0f2a;
+            --bg-tertiary: #141430;
+            --accent-1: #6c63ff;
+            --accent-2: #ff6b9d;
+            --accent-3: #4ecdc4;
+            --accent-gradient: linear-gradient(135deg, #6c63ff, #ff6b9d, #4ecdc4);
+            --accent-glow: rgba(108, 99, 255, 0.3);
+        }
+
+        /* --- THEME: OCEAN --- */
+        [data-theme="ocean"] {
+            --bg-primary: #0b1628;
+            --bg-secondary: #0d1f3c;
+            --bg-tertiary: #102a4a;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-bg-strong: rgba(255, 255, 255, 0.09);
+            --accent-1: #00b4d8;
+            --accent-2: #0077b6;
+            --accent-3: #90e0ef;
+            --accent-gradient: linear-gradient(135deg, #00b4d8, #0077b6, #90e0ef);
+            --accent-glow: rgba(0, 180, 216, 0.3);
+            --dock-bg: rgba(11, 22, 40, 0.92);
+        }
+
+        /* --- THEME: SUNSET --- */
+        [data-theme="sunset"] {
+            --bg-primary: #1a0a0a;
+            --bg-secondary: #2a0f0f;
+            --bg-tertiary: #351515;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-bg-strong: rgba(255, 255, 255, 0.09);
+            --accent-1: #ff6b35;
+            --accent-2: #f72585;
+            --accent-3: #ffd60a;
+            --accent-gradient: linear-gradient(135deg, #ff6b35, #f72585, #ffd60a);
+            --accent-glow: rgba(255, 107, 53, 0.3);
+            --dock-bg: rgba(26, 10, 10, 0.92);
+        }
+
+        /* --- THEME: NEON --- */
+        [data-theme="neon"] {
+            --bg-primary: #050510;
+            --bg-secondary: #0a0a15;
+            --bg-tertiary: #0f0f1a;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-bg-strong: rgba(255, 255, 255, 0.06);
+            --accent-1: #39ff14;
+            --accent-2: #ff073a;
+            --accent-3: #00fff5;
+            --accent-gradient: linear-gradient(135deg, #39ff14, #ff073a, #00fff5);
+            --accent-glow: rgba(57, 255, 20, 0.25);
+            --dock-bg: rgba(5, 5, 10, 0.95);
+        }
+
+        /* --- THEME: CYBERPUNK --- */
+        [data-theme="cyberpunk"] {
+            --bg-primary: #0d0221;
+            --bg-secondary: #150535;
+            --bg-tertiary: #1a0940;
+            --glass-bg: rgba(255, 255, 255, 0.04);
+            --glass-bg-strong: rgba(255, 255, 255, 0.08);
+            --accent-1: #f800ff;
+            --accent-2: #00f0ff;
+            --accent-3: #ffe600;
+            --accent-gradient: linear-gradient(135deg, #f800ff, #00f0ff, #ffe600);
+            --accent-glow: rgba(248, 0, 255, 0.3);
+            --dock-bg: rgba(13, 2, 33, 0.92);
+        }
+
+        /* ============================================================
+           GLOBAL RESET & BASE
+           ============================================================ */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        html, body { scrollbar-width: none; -ms-overflow-style: none; }
+        html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg-primary);
+            color: var(--text-main);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: calc(100px + var(--safe-bottom));
+            transition: background var(--transition-smooth);
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Selection */
+        ::selection {
+            background: var(--accent-1);
+            color: white;
+        }
+
+        /* ============================================================
+           ANIMATED BACKGROUND - MESH GRADIENT + PARTICLES (FLICKER FREE)
+           ============================================================ */
+        .bg-layer, .mesh-gradient, .grid-overlay {
+            transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+            perspective: 1000;
+            will-change: transform, opacity;
+        }
+
+        .bg-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; pointer-events: none; overflow: hidden;
+        }
+
+        .mesh-gradient {
+            position: absolute; width: 100%; height: 100%; top: 0; left: 0;
+            background:
+                radial-gradient(ellipse 80% 50% at 20% 40%, rgba(108, 99, 255, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 20%, rgba(255, 107, 157, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse 50% 60% at 50% 80%, rgba(78, 205, 196, 0.06) 0%, transparent 50%);
+            animation: meshFade 12s ease-in-out infinite alternate;
+        }
+        @keyframes meshFade {
+            0% { opacity: 0.85; }
+            100% { opacity: 1; }
+        }
+
+        .grid-overlay {
+            position: absolute; width: 100%; height: 100%;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridPan 100s linear infinite;
+        }
+        @keyframes gridPan { from { transform: translate(0,0); } to { transform: translate(50px,50px); } }
+
+        #particleCanvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; pointer-events: none;
+        }
+
+        /* ============================================================
+           LOADING SCREEN
+           ============================================================ */
+        .loading-screen {
+            position: fixed; inset: 0; z-index: 10000;
+            background: var(--bg-primary);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+        .loading-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .loading-screen.hidden * { animation: none !important; }
+
+        .loading-logo {
+            width: 70px; height: 70px; border-radius: 20px;
+            background: var(--accent-gradient);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; font-weight: 900; color: white;
+            animation: loadingPulse 1.5s ease-in-out infinite;
+            box-shadow: 0 0 50px var(--accent-glow);
+            margin-bottom: 24px;
+        }
+        @keyframes loadingPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 50px var(--accent-glow); }
+            50% { transform: scale(1.08); box-shadow: 0 0 80px var(--accent-glow); }
+        }
+
+        .loading-bar {
+            width: 200px; height: 3px; background: var(--glass-bg-strong);
+            border-radius: 10px; overflow: hidden;
+        }
+        .loading-bar-fill {
+            height: 100%; width: 0%; background: var(--accent-gradient);
+            border-radius: 10px;
+            animation: loadFill 1.2s ease-out forwards;
+        }
+        @keyframes loadFill {
+            0% { width: 0%; }
+            60% { width: 70%; }
+            100% { width: 100%; }
+        }
+
+        .loading-text {
+            margin-top: 16px; font-size: 0.8rem; color: var(--text-muted);
+            letter-spacing: 3px; text-transform: uppercase;
+            animation: loadTextPulse 1.5s ease-in-out infinite;
+        }
+        @keyframes loadTextPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        /* ============================================================
+           HEADER - FROSTED GLASS NAVIGATION
+           ============================================================ */
+        header {
+            position: sticky; top: 0; z-index: 100;
+            width: 100%;
+            background: rgba(10, 10, 26, 0.75);
+            backdrop-filter: blur(30px) saturate(1.8);
+            -webkit-backdrop-filter: blur(30px) saturate(1.8);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 14px 24px;
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 16px;
+            animation: headerReveal 0.8s ease-out;
+            transition: padding var(--transition-fast), box-shadow var(--transition-fast);
+        }
+        header.scrolled {
+            padding: 8px 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        @keyframes headerReveal {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo-area {
+            display: flex; align-items: center; gap: 12px;
+            flex-shrink: 0;
+        }
+        .logo-icon {
+            width: 36px; height: 36px; border-radius: 11px;
+            background: var(--accent-gradient);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; font-weight: 900; color: white;
+            box-shadow: 0 4px 20px var(--accent-glow);
+            animation: logoPulse 4s ease-in-out infinite;
+            position: relative; overflow: hidden;
+        }
+        .logo-icon::after {
+            content: ''; position: absolute; inset: -100%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%);
+            animation: logoShimmer 3s ease-in-out infinite;
+        }
+        @keyframes logoShimmer {
+            0%, 100% { transform: translateX(-100%) rotate(45deg); }
+            50% { transform: translateX(100%) rotate(45deg); }
+        }
+        @keyframes logoPulse {
+            0%, 100% { box-shadow: 0 4px 20px var(--accent-glow); }
+            50% { box-shadow: 0 4px 35px var(--accent-glow), 0 0 50px rgba(108,99,255,0.15); }
+        }
+        .logo-text {
+            font-size: 1.15rem; font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; white-space: nowrap;
+        }
+
+        .search-container {
+            position: relative; width: 100%; max-width: 340px;
+            flex-shrink: 1;
+        }
+        .search-icon {
+            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+            width: 15px; height: 15px; stroke: var(--text-muted); fill: none; stroke-width: 2.5;
+            transition: stroke var(--transition-fast);
+        }
+        .search-container:focus-within .search-icon { stroke: var(--accent-1); }
+
+        .search-input {
+            width: 100%; padding: 10px 16px 10px 40px;
+            background: var(--glass-bg-strong);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px; color: var(--text-main);
+            font-size: 0.88rem; font-family: var(--font-main);
+            outline: none; transition: var(--transition-fast);
+        }
+        .search-input::placeholder { color: var(--text-muted); }
+        .search-input:focus {
+            border-color: var(--accent-1);
+            background: rgba(255,255,255,0.07);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.12);
+        }
+
+        /* ============================================================
+           TAB NAVIGATION
+           ============================================================ */
+        .tab-nav-wrapper {
+            position: relative; z-index: 10;
+            max-width: 1400px; margin: 20px auto 0; padding: 0 20px;
+            animation: fadeUp 0.6s ease-out 0.2s both;
+        }
+        .tab-nav {
+            display: inline-flex;
+            background: var(--glass-bg-strong);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px; padding: 4px;
+            gap: 3px; position: relative;
+        }
+        .tab-slider {
+            position: absolute; height: calc(100% - 8px); top: 4px;
+            background: var(--accent-gradient);
+            border-radius: 11px;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 0;
+            box-shadow: 0 2px 12px var(--accent-glow);
+        }
+        .tab-btn {
+            padding: 9px 24px; border-radius: 11px; border: none;
+            background: transparent; color: var(--text-sub);
+            font-family: var(--font-main); font-size: 0.9rem; font-weight: 600;
+            cursor: pointer; transition: color var(--transition-fast);
+            position: relative; z-index: 1;
+            white-space: nowrap;
+        }
+        .tab-btn:hover { color: var(--text-main); }
+        .tab-btn.active { color: white; }
+
+        /* ============================================================
+           MAIN CONTAINER
+           ============================================================ */
+        .main-container {
+            position: relative; z-index: 1;
+            max-width: 1400px; margin: 0 auto; padding: 16px 20px;
+        }
+
+        .tab-content {
+            display: none;
+            opacity: 0;
+            will-change: opacity;
+        }
+        .tab-content.active {
+            display: block;
+            animation: tabReveal 0.25s ease-out forwards;
+        }
+        @keyframes tabReveal {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* ============================================================
+           SECTION GROUPS
+           ============================================================ */
+        .section-group {
+            margin-bottom: 32px;
+            opacity: 0; animation: sectionReveal 0.5s ease-out forwards;
+            will-change: transform, opacity;
+        }
+        @keyframes sectionReveal {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 14px; padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+        }
+        .section-header::after {
+            content: ''; position: absolute; bottom: -1px; left: 0;
+            width: 60px; height: 2px;
+            background: var(--accent-gradient);
+            border-radius: 2px;
+            transition: width var(--transition-smooth);
+        }
+        .section-group:hover .section-header::after { width: 120px; }
+
+        .section-title {
+            font-size: 0.95rem; font-weight: 700; color: var(--text-main);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .section-title-icon {
+            width: 4px; height: 18px;
+            background: var(--accent-gradient); border-radius: 4px;
+            flex-shrink: 0;
+        }
+        .section-count {
+            font-size: 0.7rem; font-weight: 500; color: var(--text-muted);
+            background: var(--glass-bg-strong); padding: 2px 9px; border-radius: 20px;
+            margin-left: 6px; font-variant-numeric: tabular-nums;
+        }
+        .btn-add-section {
+            width: 30px; height: 30px; border-radius: 9px;
+            background: var(--glass-bg-strong); border: 1px solid var(--glass-border);
+            color: var(--accent-1); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; font-weight: 300;
+            transition: all var(--transition-bounce);
+        }
+        .btn-add-section:hover {
+            background: var(--accent-1); color: white;
+            transform: rotate(90deg) scale(1.1);
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        /* ============================================================
+           CARD GRID - ALL LAYOUTS
+           ============================================================ */
+        .grid {
+            display: grid; gap: 12px;
+            transition: gap var(--transition-smooth);
+        }
+        .grid[data-layout="classic"] { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+        .grid[data-layout="list"]    { grid-template-columns: 1fr; }
+        .grid[data-layout="app"]     { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 16px; }
+        .grid[data-layout="minimal"] { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 6px; }
+        .grid[data-layout="boxy"]    { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+
+        /* Card Base */
+        .card {
+            text-decoration: none; position: relative;
+            transition: all var(--transition-smooth);
+            color: var(--text-main); cursor: pointer; z-index: 1;
+            will-change: transform, opacity;
+        }
+
+        /* Classic / List / Minimal shared */
+        .grid[data-layout="classic"] .card,
+        .grid[data-layout="list"] .card,
+        .grid[data-layout="minimal"] .card {
+            display: flex; align-items: center; padding: 12px 14px;
+            border-radius: var(--radius-md);
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        }
+        .grid[data-layout="classic"] .card:hover,
+        .grid[data-layout="list"] .card:hover,
+        .grid[data-layout="minimal"] .card:hover {
+            background: var(--glass-bg-strong);
+            border-color: var(--glass-border-hover);
+            transform: translateY(-3px);
+            box-shadow: var(--card-shadow-hover);
+        }
+        .grid[data-layout="classic"] .card:active,
+        .grid[data-layout="list"] .card:active,
+        .grid[data-layout="minimal"] .card:active {
+            transform: translateY(-1px) scale(0.99);
+        }
+        .grid[data-layout="list"] .card { padding: 10px 16px; border-radius: var(--radius-sm); }
+        .grid[data-layout="minimal"] .card { padding: 7px 12px; border-radius: 24px; }
+
+        /* App Grid */
+        .grid[data-layout="app"] .card {
+            display: flex; flex-direction: column; align-items: center;
+            text-align: center; background: transparent; border: none;
+            padding: 6px 0;
+        }
+        .grid[data-layout="app"] .card:hover { transform: translateY(-5px) scale(1.06); }
+        .grid[data-layout="app"] .card:active { transform: scale(0.95); }
+        .grid[data-layout="app"] .card-icon-wrap {
+            width: 58px; height: 58px; margin: 0 0 6px 0; border-radius: 16px;
+            background: var(--glass-bg-strong); border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+        }
+        .grid[data-layout="app"] .card-desc { display: none; }
+        .grid[data-layout="app"] .card-title { font-size: 0.72rem; }
+
+        /* Boxy */
+        .grid[data-layout="boxy"] .card {
+            display: flex; flex-direction: column; align-items: flex-start;
+            padding: 16px; border-radius: 6px;
+            background: var(--glass-bg-strong);
+            border: 2px solid var(--glass-border);
+            box-shadow: 3px 3px 0px var(--accent-1);
+        }
+        .grid[data-layout="boxy"] .card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0px var(--accent-2);
+            border-color: var(--accent-2);
+        }
+
+        /* Card internals - Optimized animations */
+        .card-icon-wrap {
+            width: 40px; height: 40px; border-radius: 11px;
+            background: var(--glass-bg-strong); padding: 7px; margin-right: 12px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; transition: transform var(--transition-bounce);
+            position: relative; z-index: 5; overflow: hidden;
+        }
+        .card-icon-wrap::after {
+            content: ''; position: absolute; inset: -50%;
+            background: conic-gradient(from 0deg, transparent, rgba(108,99,255,0.2), transparent);
+            opacity: 0;
+            transition: opacity var(--transition-fast);
+        }
+        .card:hover .card-icon-wrap::after {
+            opacity: 1;
+            animation: iconShine 4s linear infinite;
+        }
+        @keyframes iconShine { to { transform: rotate(360deg); } }
+        .card-icon-wrap:hover { transform: scale(1.12) rotate(-2deg); }
+        .grid[data-layout="minimal"] .card-icon-wrap { width: 24px; height: 24px; padding: 3px; margin-right: 8px; border-radius: 7px; }
+        .card-icon { width: 100%; height: 100%; object-fit: contain; pointer-events: none; position: relative; z-index: 1; border-radius: 3px; }
+        .card-emoji { font-size: 18px; line-height: 1; display: none; position: relative; z-index: 1; }
+        .card-content { flex: 1; min-width: 0; pointer-events: none; }
+        .card-title { font-weight: 600; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-desc { font-size: 0.72rem; color: var(--text-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+
+        /* Delete mode */
+        body.delete-mode .card { animation: cardShake 0.25s infinite ease-in-out alternate; }
+        body.delete-mode .fc-card { animation: cardShake 0.25s infinite ease-in-out alternate; }
+        @keyframes cardShake { from { transform: rotate(-0.5deg); } to { transform: rotate(0.5deg); } }
+        .delete-btn {
+            position: absolute; top: -7px; right: -7px;
+            width: 20px; height: 20px; background: var(--delete-color);
+            color: white; border-radius: 50%; display: none;
+            align-items: center; justify-content: center;
+            font-weight: bold; font-size: 10px; z-index: 10; cursor: pointer;
+            box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4);
+            border: 2px solid var(--bg-primary);
+            transition: transform var(--transition-fast);
+        }
+        .delete-btn:hover { transform: scale(1.2); }
+        .delete-btn:active { transform: scale(0.9); }
+        body.delete-mode .delete-btn { display: flex; animation: popBounce 0.3s; }
+        @keyframes popBounce {
+            0% { transform: scale(0) rotate(-45deg); }
+            60% { transform: scale(1.2) rotate(5deg); }
+            100% { transform: scale(1) rotate(0); }
+        }
+
+        /* ============================================================
+           FLOATING QR (PC ONLY)
+           ============================================================ */
+        #qr-float {
+            position: fixed; width: 140px; height: 140px;
+            background: rgba(15, 15, 40, 0.85); backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border-hover); border-radius: var(--radius-lg);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5); z-index: 9998;
+            pointer-events: none; display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.15s ease; padding: 10px; top: 0; left: 0;
+        }
+        #qr-float img { width: 100%; height: 100%; border-radius: 12px; object-fit: contain; }
+
+        /* ============================================================
+           FLASH CARDS SECTION
+           ============================================================ */
+        .flashcards-empty {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; padding: 60px 20px; text-align: center;
+        }
+        .empty-icon-container {
+            position: relative; margin-bottom: 28px;
+        }
+        .empty-icon {
+            width: 100px; height: 100px; border-radius: 28px;
+            background: var(--glass-bg-strong); border: 2px dashed var(--glass-border-hover);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem;
+            animation: emptyFloat 4s ease-in-out infinite;
+            position: relative; z-index: 1;
+        }
+        .empty-icon-ring {
+            position: absolute; inset: -12px;
+            border: 1px solid var(--glass-border);
+            border-radius: 34px;
+            animation: emptyRing 6s linear infinite;
+        }
+        @keyframes emptyRing { to { transform: rotate(360deg); } }
+        @keyframes emptyFloat {
+            0%, 100% { transform: translateY(0) rotate(0); }
+            25% { transform: translateY(-8px) rotate(2deg); }
+            75% { transform: translateY(4px) rotate(-1deg); }
+        }
+        .empty-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; }
+        .empty-desc { color: var(--text-sub); font-size: 0.85rem; max-width: 380px; margin-bottom: 28px; line-height: 1.7; }
+
+        /* Flash Cards Grid */
+        .fc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 16px;
+        }
+
+        .fc-add-btn {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 200px; border-radius: var(--radius-lg);
+            background: var(--glass-bg); border: 2px dashed var(--glass-border-hover);
+            cursor: pointer; transition: all var(--transition-bounce);
+            color: var(--text-sub);
+        }
+        .fc-add-btn:hover {
+            background: var(--glass-bg-strong); border-color: var(--accent-1);
+            color: var(--accent-1); transform: translateY(-4px);
+            box-shadow: 0 12px 40px var(--accent-glow);
+        }
+        .fc-add-btn:active { transform: translateY(-2px) scale(0.98); }
+        .fc-add-btn .plus-icon {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: var(--glass-bg-strong); border: 1px solid var(--glass-border);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem; font-weight: 300; margin-bottom: 10px;
+            transition: all var(--transition-bounce);
+        }
+        .fc-add-btn:hover .plus-icon {
+            background: var(--accent-1); color: white;
+            transform: rotate(90deg) scale(1.1);
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+        .fc-add-btn p { font-size: 0.8rem; font-weight: 600; }
+
+        /* Individual Flash Card */
+        .fc-card {
+            position: relative; min-height: 200px; border-radius: var(--radius-lg);
+            overflow: hidden; cursor: pointer;
+            transition: all var(--transition-bounce);
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; text-align: center; padding: 20px 14px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .fc-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            border-color: rgba(255,255,255,0.15);
+        }
+        .fc-card:active { transform: translateY(-2px) scale(0.98); }
+        .fc-card-bg {
+            position: absolute; inset: 0; z-index: 0; opacity: 0.7;
+            transition: opacity var(--transition-fast), transform var(--transition-smooth);
+            background-size: cover; background-position: center;
+        }
+        .fc-card:hover .fc-card-bg { opacity: 0.9; transform: scale(1.05); }
+        .fc-card-overlay {
+            position: absolute; inset: 0; z-index: 1;
+            background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.55) 100%);
+        }
+        .fc-card-content { position: relative; z-index: 2; }
+        .fc-card-logo {
+            width: 56px; height: 56px; border-radius: 16px;
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.2); padding: 8px;
+            margin: 0 auto 12px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+            transition: transform var(--transition-bounce);
+            overflow: hidden;
+        }
+        .fc-card:hover .fc-card-logo { transform: scale(1.1) rotate(-3deg); }
+        .fc-card-logo img {
+            width: 100%; height: 100%; object-fit: contain; border-radius: 7px;
+            display: block;
+        }
+        .fc-card-logo-emoji {
+            font-size: 1.5rem; line-height: 1;
+        }
+        .fc-card-name {
+            font-size: 0.88rem; font-weight: 700; color: white;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .fc-card-note-indicator {
+            position: absolute; top: 10px; left: 10px; z-index: 3;
+            width: 22px; height: 22px; border-radius: 6px;
+            background: rgba(255,255,255,0.2); backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.6rem; opacity: 0.8;
+        }
+        .fc-card-delete {
+            position: absolute; top: 8px; right: 8px; z-index: 10;
+            width: 24px; height: 24px; border-radius: 8px;
+            background: rgba(255, 71, 87, 0.85); backdrop-filter: blur(8px);
+            color: white; font-size: 0.65rem; cursor: pointer;
+            display: none; align-items: center; justify-content: center;
+            transition: var(--transition-fast); border: 1px solid rgba(255,255,255,0.2);
+        }
+        body.delete-mode .fc-card-delete { display: flex; animation: popBounce 0.3s; }
+        .fc-card-delete:hover { background: var(--delete-color); transform: scale(1.15); }
+
+        /* Flash card appear animation */
+        .fc-card-animated {
+            opacity: 0; animation: fcCardPop 0.5s ease-out forwards;
+        }
+
+        @keyframes fcCardPop {
+            0% { opacity: 0; transform: translateY(20px) scale(0.9); }
+            60% { transform: translateY(-4px) scale(1.02); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* ============================================================
+           NOTEPAD OVERLAY - Full Featured
+           ============================================================ */
+        .notepad-overlay {
+            position: fixed; inset: 0; z-index: 3000;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            display: none; justify-content: center; align-items: flex-end;
+            padding: 0;
+        }
+        .notepad-overlay.active { display: flex; animation: fadeIn 0.25s ease-out; }
+
+        .notepad-container {
+            width: 100%; max-width: 680px; height: 90vh; height: 90dvh;
+            background: var(--bg-secondary);
+            border: 1px solid var(--glass-border-hover);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            box-shadow: 0 -20px 80px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            animation: notepadSlideUp 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes notepadSlideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .notepad-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 20px; min-height: 60px;
+            border-bottom: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            flex-shrink: 0;
+        }
+        .notepad-header-left {
+            display: flex; align-items: center; gap: 10px;
+            min-width: 0; flex: 1;
+        }
+        .notepad-header-logo {
+            width: 32px; height: 32px; border-radius: 9px;
+            overflow: hidden; background: var(--glass-bg-strong);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .notepad-header-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .notepad-header-title {
+            font-size: 0.95rem; font-weight: 700;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        .notepad-header-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .notepad-action-btn {
+            width: 34px; height: 34px; border-radius: 9px;
+            background: var(--glass-bg-strong); border: 1px solid var(--glass-border);
+            color: var(--text-sub); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; transition: var(--transition-fast);
+        }
+        .notepad-action-btn:hover { color: var(--accent-1); border-color: var(--accent-1); background: rgba(108,99,255,0.08); }
+        .notepad-action-btn:active { transform: scale(0.92); }
+        .notepad-action-btn.active {
+            background: var(--accent-1); color: white; border-color: var(--accent-1);
+            box-shadow: 0 2px 12px var(--accent-glow);
+        }
+
+        .notepad-body {
+            flex: 1; padding: 20px; overflow-y: auto; position: relative;
+            scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent;
+            -webkit-overflow-scrolling: touch;
+        }
+        .notepad-body::-webkit-scrollbar { width: 4px; }
+        .notepad-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; }
+
+        .notepad-lined {
+            background-image: repeating-linear-gradient(
+                transparent, transparent 31px, rgba(255,255,255,0.03) 31px, rgba(255,255,255,0.03) 32px
+            );
+            background-size: 100% 32px;
+        }
+
+        .notepad-textarea {
+            width: 100%; min-height: 100%; background: transparent;
+            border: none; outline: none; resize: none;
+            color: var(--text-main); font-family: var(--font-mono);
+            font-size: 0.88rem; line-height: 32px;
+            caret-color: var(--accent-1);
+        }
+        .notepad-textarea::placeholder { color: var(--text-muted); }
+
+        .notepad-display {
+            font-family: var(--font-mono); font-size: 0.88rem;
+            line-height: 32px; color: var(--text-main);
+            white-space: pre-wrap; word-break: break-word;
+            min-height: 100%;
+        }
+        .notepad-display.empty-note {
+            color: var(--text-muted); font-style: italic;
+        }
+
+        .notepad-footer {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 20px;
+            padding-bottom: calc(12px + env(safe-area-inset-bottom));
+            border-top: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            flex-shrink: 0; gap: 10px;
+        }
+        .notepad-footer-info {
+            font-size: 0.7rem; color: var(--text-muted);
+            font-family: var(--font-mono); white-space: nowrap;
+        }
+        .notepad-footer-btns { display: flex; gap: 8px; flex-shrink: 0; }
+        .notepad-save-btn {
+            padding: 9px 22px; border-radius: 10px; border: none;
+            background: var(--accent-gradient); color: white;
+            font-family: var(--font-main); font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; transition: var(--transition-fast);
+            box-shadow: 0 3px 15px var(--accent-glow);
+        }
+        .notepad-save-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 25px var(--accent-glow); }
+        .notepad-save-btn:active { transform: scale(0.97); }
+
+        .notepad-close-btn {
+            padding: 9px 18px; border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg-strong); color: var(--text-sub);
+            font-family: var(--font-main); font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; transition: var(--transition-fast);
+        }
+        .notepad-close-btn:hover { border-color: var(--text-sub); color: var(--text-main); }
+
+        /* ============================================================
+           DOCK (BOTTOM BAR)
+           ============================================================ */
+        .retainer-dock {
+            position: fixed;
+            bottom: var(--safe-bottom);
+            left: 50%; transform: translateX(-50%);
+            background: var(--dock-bg);
+            backdrop-filter: blur(40px) saturate(1.8);
+            -webkit-backdrop-filter: blur(40px) saturate(1.8);
+            border: 1px solid var(--glass-border);
+            padding: 6px 14px; border-radius: 20px;
+            display: flex; align-items: center; justify-content: center; gap: 4px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.45);
+            z-index: 1000;
+            animation: dockReveal 0.7s ease-out 0.4s both;
+        }
+        @keyframes dockReveal {
+            from { transform: translate(-50%, 80px); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+
+        .dock-btn {
+            position: relative; padding: 9px 14px; border-radius: 12px;
+            font-size: 0.82rem; font-weight: 600; color: var(--text-sub);
+            cursor: pointer; transition: all var(--transition-fast);
+            display: flex; align-items: center; gap: 6px; white-space: nowrap;
+            border: none; background: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .dock-btn:hover { color: var(--text-main); background: var(--glass-bg-strong); }
+        .dock-btn:active { transform: scale(0.94); }
+        .dock-btn.active {
+            background: var(--accent-gradient); color: white;
+            box-shadow: 0 3px 15px var(--accent-glow);
+        }
+        .dock-divider { width: 1px; height: 20px; background: var(--glass-border); flex-shrink: 0; }
+
+        /* Menus */
+        .menu-popup {
+            position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%) scale(0.92);
+            background: var(--bg-secondary); border: 1px solid var(--glass-border-hover);
+            border-radius: var(--radius-md); padding: 6px;
+            display: flex; flex-direction: column; gap: 2px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            min-width: 160px; z-index: 1001; opacity: 0; pointer-events: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .menu-popup.active { opacity: 1; pointer-events: auto; transform: translateX(-50%) scale(1); bottom: 140%; }
+        .menu-item {
+            padding: 9px 12px; border-radius: 9px; cursor: pointer;
+            font-size: 0.82rem; transition: var(--transition-fast);
+            display: flex; align-items: center; gap: 8px; color: var(--text-sub);
+        }
+        .menu-item:hover { background: var(--glass-bg-strong); color: var(--text-main); }
+        .menu-item:active { transform: scale(0.97); }
+
+        /* ============================================================
+           MODALS - Polished
+           ============================================================ */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.55); backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 2000; display: none; justify-content: center; align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.active { display: flex; animation: fadeIn 0.2s; }
+        .modal {
+            background: var(--bg-secondary); border: 1px solid var(--glass-border-hover);
+            padding: 24px; border-radius: var(--radius-xl);
+            width: 100%; max-width: 400px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+            animation: modalPop 0.35s var(--transition-spring);
+        }
+        @keyframes modalPop {
+            from { transform: scale(0.92) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .modal h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+        .modal .modal-subtitle { font-size: 0.82rem; color: var(--text-sub); margin-bottom: 18px; }
+        .modal-input-group { margin-bottom: 12px; }
+        .modal-input-group label {
+            display: block; font-size: 0.72rem; font-weight: 600;
+            color: var(--text-sub); margin-bottom: 5px; text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .modal-input {
+            width: 100%; padding: 12px 14px;
+            background: var(--glass-bg-strong); border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm); color: var(--text-main);
+            font-family: var(--font-main); font-size: 0.88rem;
+            outline: none; transition: var(--transition-fast);
+        }
+        .modal-input::placeholder { color: var(--text-muted); }
+        .modal-input:focus {
+            border-color: var(--accent-1); box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.12);
+        }
+        .modal-input-hint {
+            font-size: 0.68rem; color: var(--text-muted); margin-top: 4px;
+            line-height: 1.4;
+        }
+
+        .modal-image-preview {
+            width: 100%; height: 80px; border-radius: var(--radius-sm);
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            margin-top: 8px; display: none; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+        .modal-image-preview.visible { display: flex; }
+        .modal-image-preview img {
+            max-width: 100%; max-height: 100%; object-fit: contain;
+        }
+        .modal-image-preview .preview-error {
+            font-size: 0.75rem; color: var(--delete-color);
+        }
+
+        .modal-btns { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+        .btn-modal {
+            padding: 11px 22px; border-radius: var(--radius-sm); border: none;
+            cursor: pointer; font-weight: 600; font-size: 0.88rem;
+            font-family: var(--font-main); transition: all var(--transition-fast);
+        }
+        .btn-cancel {
+            background: var(--glass-bg-strong); color: var(--text-sub);
+            border: 1px solid var(--glass-border);
+        }
+        .btn-cancel:hover { color: var(--text-main); border-color: var(--glass-border-hover); }
+        .btn-primary {
+            background: var(--accent-gradient); color: white;
+            box-shadow: 0 3px 15px var(--accent-glow);
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 5px 25px var(--accent-glow); }
+        .btn-primary:active { transform: scale(0.97); }
+
+        /* ============================================================
+           SECRET EXPORT BUTTON
+           ============================================================ */
+        .secret-btn {
+            position: fixed; bottom: 6px; right: 6px;
+            width: 16px; height: 16px; opacity: 0.06; cursor: pointer;
+            z-index: 9999; background: var(--text-main); border-radius: 3px;
+            transition: all var(--transition-fast);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--bg-primary); font-size: 8px; border: none;
+        }
+        .secret-btn:hover { opacity: 0.8; transform: scale(1.5); }
+
+        /* ============================================================
+           TOAST NOTIFICATIONS
+           ============================================================ */
+        .toast-container {
+            position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+            z-index: 5000; display: flex; flex-direction: column; gap: 8px;
+            align-items: center; pointer-events: none; width: 90%; max-width: 360px;
+        }
+        .toast {
+            padding: 12px 20px; border-radius: var(--radius-sm);
+            background: var(--bg-tertiary); border: 1px solid var(--glass-border-hover);
+            color: var(--text-main); font-size: 0.82rem; font-weight: 500;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            animation: toastIn 0.35s var(--transition-spring);
+            display: flex; align-items: center; gap: 8px;
+            backdrop-filter: blur(20px); pointer-events: auto;
+            max-width: 100%;
+        }
+        .toast.toast-out { animation: toastOut 0.25s ease-in forwards; }
+        @keyframes toastIn {
+            from { transform: translateY(-20px) scale(0.95); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        @keyframes toastOut {
+            from { transform: translateY(0) scale(1); opacity: 1; }
+            to { transform: translateY(-20px) scale(0.95); opacity: 0; }
+        }
+
+        /* ============================================================
+           FOOTER
+           ============================================================ */
+        .footer-credit {
+            text-align: center; padding: 30px 20px 15px;
+            font-size: 0.7rem; font-weight: 600;
+            color: var(--text-muted); letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .footer-credit span {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ============================================================
+           ANIMATIONS & UTILITIES
+           ============================================================ */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Ripple effect */
+        .ripple {
+            position: absolute; border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            transform: scale(0); animation: rippleAnim 0.6s ease-out;
+            pointer-events: none;
+        }
+        @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
+
+        /* ============================================================
+           RESPONSIVE - MOBILE FIRST
+           ============================================================ */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column; gap: 10px; padding: 12px 16px;
+            }
+            header.scrolled { padding: 8px 16px; gap: 8px; }
+            .logo-area { width: 100%; }
+            .search-container { width: 100%; max-width: 100%; }
+
+            .tab-nav-wrapper { padding: 0 16px; margin-top: 14px; }
+            .tab-nav { width: 100%; display: flex; }
+            .tab-btn { flex: 1; text-align: center; padding: 9px 12px; font-size: 0.85rem; }
+            .tab-slider { display: none; }
+            .tab-btn.active { background: var(--accent-gradient); color: white; border-radius: 11px; }
+
+            .main-container { padding: 12px 16px; }
+
+            .grid[data-layout="classic"] { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
+            .grid[data-layout="list"] .card { padding: 10px 14px; }
+            .grid[data-layout="app"] { grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 12px; }
+            .grid[data-layout="app"] .card-icon-wrap { width: 50px; height: 50px; border-radius: 14px; }
+            .grid[data-layout="app"] .card-title { font-size: 0.68rem; }
+            .grid[data-layout="minimal"] { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+            .grid[data-layout="boxy"] { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+
+            .retainer-dock {
+                padding: 6px 8px; width: auto; max-width: 96%;
+                gap: 2px; border-radius: 16px;
+            }
+            .dock-btn {
+                padding: 10px; border-radius: 12px;
+                width: 40px; height: 40px; justify-content: center;
+            }
+            .dock-btn span { display: none; }
+            .dock-btn::before { content: attr(data-icon); font-size: 1.2rem; }
+            .dock-divider { height: 18px; }
+
+            #qr-float { display: none !important; }
+
+            .fc-grid { grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 12px; }
+            .fc-card { min-height: 180px; padding: 16px 12px; }
+            .fc-card-logo { width: 48px; height: 48px; padding: 7px; }
+
+            .notepad-container {
+                max-width: 100%; height: 95vh; height: 95dvh;
+                border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            }
+
+            .modal { padding: 20px; max-width: 95%; border-radius: var(--radius-lg); }
+            .modal h3 { font-size: 1rem; }
+
+            .menu-popup {
+                min-width: 140px;
+            }
+
+            body { padding-bottom: calc(80px + var(--safe-bottom)); }
+        }
+
+        @media (max-width: 380px) {
+            .grid[data-layout="classic"] { grid-template-columns: 1fr; }
+            .fc-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .fc-card { min-height: 160px; }
+            .retainer-dock { gap: 1px; padding: 5px 6px; }
+            .dock-btn { width: 36px; height: 36px; padding: 8px; }
+        }
+
+        /* Large screens */
+        @media (min-width: 1200px) {
+            .grid[data-layout="classic"] { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+            .fc-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        }
+
+        /* Hover-capable devices only */
+        @media (hover: none) {
+            .card-icon-wrap::after { display: none; }
+            .card-icon-wrap:hover { transform: none; }
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== LOADING SCREEN ===== -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-logo">A</div>
+        <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+        <div class="loading-text">Loading</div>
+    </div>
+
+    <!-- ===== BACKGROUND LAYERS ===== -->
+    <div class="bg-layer">
+        <div class="mesh-gradient"></div>
+        <div class="grid-overlay"></div>
+    </div>
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- ===== FLOATING QR ===== -->
+    <div id="qr-float"><img id="qr-img" src="" alt="QR Code"></div>
+
+    <!-- ===== TOAST CONTAINER ===== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ===== HEADER ===== -->
+    <header id="mainHeader">
+        <div class="logo-area">
+            <div class="logo-icon">A</div>
+            <div class="logo-text">ANABRATA's Space</div>
+            <span id="syncStatus" style="font-size: 0.65rem; color: var(--text-muted); background: var(--glass-bg-strong); padding: 2px 8px; border-radius: 20px; display: none; align-items: center; gap: 4px;">
+                <span class="sync-dot" style="width: 6px; height: 6px; border-radius: 50%; background: var(--success);"></span>
+                <span class="sync-text">Synced</span>
+            </span>
+        </div>
+        <div class="search-container">
+            <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+            <input type="text" class="search-input" id="searchInput" placeholder="Search everything..." autocomplete="off">
+        </div>
+    </header>
+
+    <!-- ===== TAB NAVIGATION ===== -->
+    <div class="tab-nav-wrapper">
+        <div class="tab-nav" id="tabNav">
+            <div class="tab-slider" id="tabSlider"></div>
+            <button class="tab-btn active" data-tab="websites" onclick="switchTab('websites')">🌐 Websites</button>
+            <button class="tab-btn" data-tab="flashcards" onclick="switchTab('flashcards')">🃏 Flash Cards</button>
+        </div>
+    </div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-container">
+        <div class="tab-content active" id="tab-websites">
+            <main id="dashboard"></main>
+        </div>
+        <div class="tab-content" id="tab-flashcards">
+            <div id="flashcardsArea"></div>
+        </div>
+    </div>
+
+    <div class="footer-credit">Crafted with ❤️ by <span>ANABRATA</span></div>
+
+    <button class="secret-btn" onclick="openExportModal()" title="Save & Export">💾</button>
+
+    <!-- ===== DOCK ===== -->
+    <div class="retainer-dock" id="mainDock">
+        <button class="dock-btn" onclick="window.scrollTo({top:0, behavior:'smooth'})" data-icon="↑" title="Top"><span>Top</span></button>
+        <div class="dock-divider"></div>
+        <button class="dock-btn" id="layoutBtn" data-icon="⊞" title="Layout">
+            <span>Layout</span>
+            <div class="menu-popup" id="layoutMenu">
+                <div class="menu-item" onclick="setLayout('classic'); event.stopPropagation();">🗂️ Classic</div>
+                <div class="menu-item" onclick="setLayout('list'); event.stopPropagation();">☰ List</div>
+                <div class="menu-item" onclick="setLayout('app'); event.stopPropagation();">📱 App</div>
+                <div class="menu-item" onclick="setLayout('minimal'); event.stopPropagation();">➖ Minimal</div>
+                <div class="menu-item" onclick="setLayout('boxy'); event.stopPropagation();">🔳 Boxy</div>
+            </div>
+        </button>
+        <button class="dock-btn" id="themeBtn" data-icon="🎨" title="Theme">
+            <span>Theme</span>
+            <div class="menu-popup" id="themeMenu">
+                <div class="menu-item" onclick="setTheme('aurora'); event.stopPropagation();">🌌 Aurora</div>
+                <div class="menu-item" onclick="setTheme('ocean'); event.stopPropagation();">🌊 Ocean</div>
+                <div class="menu-item" onclick="setTheme('sunset'); event.stopPropagation();">🌅 Sunset</div>
+                <div class="menu-item" onclick="setTheme('neon'); event.stopPropagation();">⚡ Neon</div>
+                <div class="menu-item" onclick="setTheme('cyberpunk'); event.stopPropagation();">🤖 Cyberpunk</div>
+            </div>
+        </button>
+        <button class="dock-btn" onclick="toggleArrange()" id="arrangeBtn" data-icon="⇄" title="Arrange"><span>Arrange</span></button>
+        <button class="dock-btn" onclick="toggleDeleteMode()" id="deleteBtn" data-icon="−" title="Edit/Remove"><span>Edit</span></button>
+    </div>
+
+    <!-- ===== ADD BOOKMARK MODAL ===== -->
+    <div class="modal-overlay" id="addModal">
+        <div class="modal">
+            <h3>Add Bookmark</h3>
+            <p class="modal-subtitle">Add a new link to your collection</p>
+            <div class="modal-input-group">
+                <label>Name</label>
+                <input type="text" class="modal-input" id="bmName" placeholder="Website Name">
+            </div>
+            <div class="modal-input-group">
+                <label>URL</label>
+                <input type="text" class="modal-input" id="bmUrl" placeholder="https://example.com">
+            </div>
+            <div class="modal-input-group">
+                <label>Description</label>
+                <input type="text" class="modal-input" id="bmDesc" placeholder="Short description">
+            </div>
+            <div class="modal-btns">
+                <button class="btn-modal btn-cancel" onclick="closeModal('addModal')">Cancel</button>
+                <button class="btn-modal btn-primary" onclick="saveBookmark()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ADD FLASH CARD MODAL ===== -->
+    <div class="modal-overlay" id="addFcModal">
+        <div class="modal">
+            <h3>Create Flash Card</h3>
+            <p class="modal-subtitle">Give your card a name and an image</p>
+            <div class="modal-input-group">
+                <label>Image Link</label>
+                <input type="text" class="modal-input" id="fcImageUrl" placeholder="Paste any image URL or PostImg link"
+                    oninput="previewFcImage(this.value)">
+                <p class="modal-input-hint">
+                    Supports direct image links (.png, .jpg) and PostImg page links (postimg.cc/xxxxx)
+                </p>
+                <div class="modal-image-preview" id="fcImagePreview">
+                    <img id="fcPreviewImg" src="" alt="Preview"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+                        onload="this.style.display='block'; this.nextElementSibling.style.display='none';">
+                    <span class="preview-error" style="display:none;">Could not load image</span>
+                </div>
+            </div>
+            <div class="modal-input-group">
+                <label>Card Name</label>
+                <input type="text" class="modal-input" id="fcName" placeholder="My Notes">
+            </div>
+            <div class="modal-btns">
+                <button class="btn-modal btn-cancel" onclick="closeModal('addFcModal')">Cancel</button>
+                <button class="btn-modal btn-primary" onclick="saveFlashCard()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== EXPORT MODAL ===== -->
+    <div class="modal-overlay" id="exportModal">
+        <div class="modal" style="text-align: center;">
+            <h3>Save Dashboard</h3>
+            <p class="modal-subtitle">Download an HTML file with all your data</p>
+            <img id="page-qr" src="" width="130" height="130"
+                style="margin: 14px 0; border-radius: 12px; border: 3px solid var(--glass-border-hover);" alt="QR">
+            <div class="modal-btns" style="justify-content: center; flex-direction: column; gap: 10px;">
+                <div style="display: flex; gap: 8px; justify-content: center; width: 100%;">
+                    <button class="btn-modal btn-cancel" onclick="closeModal('exportModal')">Close</button>
+                    <button class="btn-modal btn-primary" onclick="downloadUpdatedHTML()">Download HTML</button>
+                </div>
+                <button class="btn-modal btn-primary" style="background: var(--success); width: 100%; font-weight: bold;" onclick="linkLocalFile()">🔗 Link Local File for Auto-Sync</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== NOTEPAD OVERLAY ===== -->
+    <div class="notepad-overlay" id="notepadOverlay">
+        <div class="notepad-container">
+            <div class="notepad-header">
+                <div class="notepad-header-left">
+                    <div class="notepad-header-logo" id="notepadLogo"><img src="" alt=""></div>
+                    <div class="notepad-header-title" id="notepadTitle">Untitled</div>
+                </div>
+                <div class="notepad-header-actions">
+                    <button class="notepad-action-btn" id="notepadEditBtn" onclick="toggleNotepadEdit()" title="Edit">✏️</button>
+                </div>
+            </div>
+            <div class="notepad-body notepad-lined" id="notepadBody"></div>
+            <div class="notepad-footer">
+                <div class="notepad-footer-info" id="notepadCharCount">0 characters</div>
+                <div class="notepad-footer-btns">
+                    <button class="notepad-close-btn" onclick="closeNotepad()">Close</button>
+                    <button class="notepad-save-btn" id="notepadSaveBtn" onclick="saveNotepadContent()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+    (function() {
+        'use strict';
+
+        // ============================================================
+        // LOCAL DIRECT SYNC STATE
+        // ============================================================
+        let localFileHandle = null;
+
+        // ============================================================
+        // LOADING SCREEN
+        // ============================================================
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loadingScreen').classList.add('hidden');
+            }, 1000);
+        });
+
+        // ============================================================
+        // PARTICLE SYSTEM - Optimized
+        // ============================================================
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouseX = -1000, mouseY = -1000;
+        let animFrameId = null;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+
+        let resizeTimer;
+        let lastWidth = window.innerWidth;
+        window.addEventListener('resize', () => {
+            if (window.innerWidth === lastWidth) return; // Prevent scrollbar/mobile-height resize ticks
+            lastWidth = window.innerWidth;
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                resizeCanvas();
+                initParticles();
+            }, 200);
+        });
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.8 + 0.4;
+                this.speedX = (Math.random() - 0.5) * 0.25;
+                this.speedY = (Math.random() - 0.5) * 0.25;
+                this.opacity = Math.random() * 0.35 + 0.05;
+                this.hue = Math.random() * 80 + 230;
+                this.life = 0;
+                this.maxLife = Math.random() * 600 + 300;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.life++;
+
+                this.opacity = (Math.sin(this.life * 0.02) * 0.1 + 0.2) * (1 - this.life / this.maxLife);
+
+                const dx = mouseX - this.x;
+                const dy = mouseY - this.y;
+                const dist = dx * dx + dy * dy;
+                if (dist < 14400) {
+                    const force = (14400 - dist) / 14400 * 0.008;
+                    this.x -= dx * force;
+                    this.y -= dy * force;
+                }
+
+                if (this.life >= this.maxLife || this.x < -10 || this.x > canvas.width + 10 || this.y < -10 || this.y > canvas.height + 10) {
+                    this.reset();
+                }
+            }
+            draw() {
+                if (this.opacity <= 0) return;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, 6.283);
+                ctx.fillStyle = `hsla(${this.hue}, 70%, 65%, ${this.opacity})`;
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            const area = canvas.width * canvas.height;
+            const isMobile = window.innerWidth <= 768;
+            const maxLimit = isMobile ? 15 : 60; // Lower density on mobile
+            const count = Math.min(maxLimit, Math.max(10, Math.floor(area / 20000)));
+            particles = [];
+            for (let i = 0; i < count; i++) particles.push(new Particle());
+        }
+        initParticles();
+
+        function drawConnections() {
+            if (window.innerWidth <= 768) return; // Skip heavy check on mobile to prevent lag
+            const maxDist = 120;
+            const maxDistSq = maxDist * maxDist;
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distSq = dx * dx + dy * dy;
+                    if (distSq < maxDistSq) {
+                        const alpha = 0.04 * (1 - distSq / maxDistSq);
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(108, 99, 255, ${alpha})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (const p of particles) { p.update(); p.draw(); }
+            drawConnections();
+            animFrameId = requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // Throttled mouse tracking
+        let mouseThrottle = false;
+        document.addEventListener('mousemove', e => {
+            if (mouseThrottle) return;
+            mouseThrottle = true;
+            mouseX = e.clientX; mouseY = e.clientY;
+            requestAnimationFrame(() => { mouseThrottle = false; });
+        });
+        document.addEventListener('mouseleave', () => { mouseX = -1000; mouseY = -1000; });
+
+        // Pause particles when tab hidden
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                cancelAnimationFrame(animFrameId);
+            } else {
+                animateParticles();
+            }
+        });
+
+        // ============================================================
+        // DATA
+        // ============================================================
+        const defaultData = [
+            {
+                id: "pdf",
+                category: "PDF Editors",
+                links: [
+                    { name: "PDF Watermark Remover", url: "https://lightpdf.com/remove-watermark", desc: "LightPDF" },
+                    { name: "Image to PDF", url: "https://www.freepdfconvert.com/", desc: "Free PDF Convert" },
+                    { name: "Merge PDF", url: "https://www.ilovepdf.com/merge_pdf", desc: "iLovePDF" },
+                    { name: "PDF to Excel", url: "https://www.ilovepdf.com/pdf_to_excel", desc: "Convert" },
+                    { name: "JPG to PDF", url: "https://www.ilovepdf.com/jpg_to_pdf", desc: "Convert" },
+                    { name: "Powerpoint to PDF", url: "https://www.ilovepdf.com/powerpoint_to_pdf", desc: "Convert" },
+                    { name: "OCR PDF", url: "https://www.ilovepdf.com/ocr-pdf", desc: "Scan" },
+                    { name: "PDF to JPG", url: "https://www.ilovepdf.com/pdf_to_jpg", desc: "Extract" },
+                    { name: "Organize PDF", url: "https://www.ilovepdf.com/organize-pdf", desc: "Sort" },
+                    { name: "Remove Pages", url: "https://www.ilovepdf.com/remove-pages", desc: "Delete" },
+                    { name: "PDF to Word", url: "https://www.ilovepdf.com/pdf_to_word", desc: "Convert" },
+                    { name: "Word to PDF", url: "https://www.ilovepdf.com/word_to_pdf", desc: "Convert" }
+                ]
+            },
+            { id: "img", category: "Image Editing", links: [
+                { name: "Image Background", url: "https://www.pixelbin.io/ai-tools/watermark-remover", desc: "PixelBin" },
+                { name: "Editing Prompt", url: "https://editingprompt.com/", desc: "Prompts" },
+                { name: "Post Images", url: "https://postimages.org/", desc: "Hosting" },
+                { name: "AI Photo Editor", url: "https://pixlr.com/express/?tool=adjust", desc: "Pixlr" },
+                { name: "Super Resolution", url: "https://deepai.org/machine-learning-model/torch-srgan", desc: "DeepAI" },
+                { name: "Watermark Remover", url: "https://lightpdf.com/image-watermark-remover", desc: "Clean" },
+                { name: "Clothes Editor", url: "https://fitroom.app/create", desc: "Fitroom" },
+                { name: "Background Remover", url: "https://www.photoroom.com/tools/background-remover", desc: "PhotoRoom" },
+                { name: "Face Swap", url: "https://remaker.ai/face-swap-free/", desc: "Remaker" },
+                { name: "Photoshop Online", url: "https://www.photopea.com/", desc: "Photopea" },
+                { name: "Merge Images", url: "https://pinetools.com/merge-images", desc: "PineTools" },
+                { name: "Image Compressor", url: "https://imageresizer.com/image-compressor", desc: "Resize" },
+                { name: "Circle Crop", url: "https://circlecropimage.com/", desc: "Crop" },
+                { name: "iLoveIMG", url: "https://www.iloveimg.com/", desc: "Suite" },
+                { name: "BG Remover", url: "https://www.iloveimg.com/remove-background", desc: "Remove BG" },
+                { name: "Online Compressor", url: "https://imagecompressor.com/", desc: "Compress" },
+                { name: "Resize for WhatsApp", url: "https://imresizer.com/resize-image-to-whatsapp-dp?content=hide", desc: "DP Resize" }
+            ]},
+            { id: "others", category: "Tools & Utilities", links: [
+                { name: "Figlet Generator", url: "https://doodlenerd.com/web-tool/figlet-generator", desc: "ASCII" },
+                { name: "VirusTotal", url: "https://www.virustotal.com/gui/home/upload", desc: "Scan" },
+                { name: "Hinglish Translator", url: "https://anythingtranslate.com/translators/hinglish-translator/", desc: "Translate" },
+                { name: "YouTube Tool", url: "https://tuberanker.com/", desc: "SEO" },
+                { name: "Chat v2.0", url: "https://chatv2.septapus.com/", desc: "Style Gen" },
+                { name: "Temp Mail So", url: "https://tempmail.so/", desc: "Email" },
+                { name: "HTML Viewer", url: "https://html.onlineviewer.net/", desc: "Code" },
+                { name: "Temp Mail O", url: "https://tempmailo.com/", desc: "Email" },
+                { name: "Software hack", url: "https://filecr.com/windows/office-pdf/", desc: "FileCR" },
+                { name: "ToffeeShare", url: "https://toffeeshare.com/en/", desc: "Share" },
+                { name: "Questions", url: "https://childquesz.netlify.app/", desc: "ChildQuesz" },
+                { name: "Bijoy Converter", url: "https://bsbk.portal.gov.bd/apps/bangla-converter/index.html", desc: "Unicode" },
+                { name: "JioCloud", url: "https://www.jioaicloud.com/home", desc: "Storage" },
+                { name: "Link Ink", url: "https://lnk.ink/dashboard", desc: "Shortener" },
+                { name: "QR Generator", url: "https://pewscorner.github.io/barcodes/qrcode_generator.html", desc: "QR Code" }
+            ]},
+            { id: "ai", category: "AI Tools", links: [
+                { name: "Venice Chat", url: "https://venice.ai/chat", desc: "Uncensored" },
+                { name: "LMArena", url: "https://lmarena.ai/?mode=side-by-side", desc: "Compare" },
+                { name: "Claude", url: "https://claude.ai/login?returnTo=%2F%3F", desc: "Anthropic" },
+                { name: "Perplexity", url: "https://www.perplexity.ai/", desc: "Search" },
+                { name: "Google Gemini", url: "https://gemini.google.com/app", desc: "Google" },
+                { name: "Qwen", url: "https://chat.qwen.ai/", desc: "Alibaba" },
+                { name: "DeepSeek", url: "https://chat.deepseek.com/", desc: "DeepSeek" },
+                { name: "Copilot", url: "https://copilot.microsoft.com/chats/umqpciKs3jhwoeUTXwon8", desc: "Microsoft" }
+            ]},
+            { id: "games", category: "Games", links: [
+                { name: "Aternos", url: "https://aternos.org/go/", desc: "Minecraft" },
+                { name: "House of Dead", url: "https://retroonline.net/Windows/The%20House%20of%20the%20Dead", desc: "Retro" }
+            ]},
+            { id: "video_dl", category: "Video Downloaders", links: [
+                { name: "SSYouTube", url: "https://ssyoutube.online/en2/", desc: "YouTube" },
+                { name: "Cobalt", url: "https://cobalt.tools/", desc: "Clean" },
+                { name: "YTMP3", url: "https://ytmp3.gg/", desc: "MP3" }
+            ]},
+            { id: "watch_movies", category: "Movies: Watch", links: [
+                { name: "Fmovies", url: "https://freemoviesin.com/home/", desc: "Stream" },
+                { name: "123Movies", url: "https://ww7.123moviesfree.net/", desc: "Stream" },
+                { name: "Soap2Day", url: "https://ww25.soap2day.day/", desc: "Stream" }
+            ]},
+            { id: "dl_movies", category: "Movies: Download", links: [
+                { name: "Cinemaluxe", url: "https://cinemalux.zip/", desc: "Download" },
+                { name: "9xflix", url: "https://9xflix.tube/m/", desc: "Download" },
+                { name: "MoviesVerse", url: "https://hdmovieverse.cloud/", desc: "Download" },
+                { name: "Vegamovies", url: "https://avegamovies.cfd/", desc: "Download" },
+                { name: "VegaMovies 2.0", url: "https://vegamovise.vip/", desc: "Proxy" },
+                { name: "FilmyFly", url: "https://prmovies4u.com/", desc: "Regional Movies" }
+            ]},
+            { id: "music", category: "Music & Audio", links: [
+                { name: "Adobe Enhance", url: "https://podcast.adobe.com/en/enhance#", desc: "Audio" },
+                { name: "Book Voice", url: "https://notebooklm.google.com/", desc: "Notebook" },
+                { name: "Suno", url: "https://suno.com/create", desc: "Music Gen" },
+                { name: "AI Voice", url: "https://aistudio.google.com/generate-speech", desc: "Speech" },
+                { name: "Lyricsify", url: "https://www.lyricsify.com/", desc: "Lyrics" },
+                { name: "Spotify", url: "https://open.spotify.com/", desc: "Music" },
+                { name: "Virtual Piano", url: "https://virtualpiano.net/", desc: "Play" },
+                { name: "Vocal Remover", url: "https://vocalremover.org/", desc: "Karaoke" },
+                { name: "Song Downloader", url: "https://ezconv.com/", desc: "EZConv" },
+                { name: "Ultimate VR", url: "https://x-minus.pro/ai", desc: "X-Minus" }
+            ]},
+            { id: "my_projects", category: "My Projects", links: [
+                { name: "Software Makerz", url: "https://softwaremakerz.netlify.app/", desc: "Portfolio" },
+                { name: "MilkTraker", url: "https://milktrakerz.netlify.app/", desc: "App" },
+                { name: "HandToTextz", url: "https://handtextz.netlify.app/", desc: "OCR" },
+                { name: "PDF Bookletz", url: "https://pdfbookletz.netlify.app/", desc: "Tools" },
+                { name: "PPT Maker", url: "https://pptmakerz.netlify.app/", desc: "Slides" },
+                { name: "Page Remover", url: "https://pdfpageremoverz.netlify.app/", desc: "PDF" },
+                { name: "Voice PDF", url: "https://voicepdfz.netlify.app/", desc: "Audio" },
+                { name: "Colour Picker", url: "https://pinkpiker.netlify.app/", desc: "Design" },
+                { name: "Images to PDF", url: "https://imageztopdfz.netlify.app/", desc: "Convert" },
+                { name: "QR Arranger", url: "https://qrana.netlify.app/", desc: "QR" },
+                { name: "Pagemix", url: "https://pagemix.netlify.app/", desc: "Tools" },
+                { name: "Photopy", url: "https://photocopyana.netlify.app/", desc: "Copy" },
+                { name: "FlipTimer V2", url: "https://fliptimerz.netlify.app/", desc: "Time" },
+                { name: "Drop", url: "https://app.netlify.com/drop", desc: "Deploy" },
+                { name: "Netlify File Maker", url: "https://netlifyanab.netlify.app/", desc: "Files" },
+                { name: "InfinityFree", url: "https://dash.infinityfree.com/accounts/if0_40401503", desc: "Host" },
+                { name: "Netlify File Maker V2", url: "https://netlifyanabv2.netlify.app/", desc: "Files V2" }
+            ]}
+        ];
+
+        // ============================================================
+        // STATE
+        // ============================================================
+        const buildTimestamp = "2026-07-02T12:00:00.000Z";
+        const defaultFlashCards = [];
+
+        // Check if server HTML has a newer build than our local storage
+        const localTimestamp = localStorage.getItem('gh_build_timestamp') || '';
+        if (buildTimestamp && localTimestamp !== buildTimestamp) {
+            localStorage.setItem('bmData_v19', JSON.stringify(defaultData));
+            localStorage.setItem('fcData_v19', JSON.stringify(defaultFlashCards));
+            localStorage.setItem('gh_build_timestamp', buildTimestamp);
+        }
+
+        let bookmarks = JSON.parse(localStorage.getItem('bmData_v19')) || defaultData;
+        let flashCards = JSON.parse(localStorage.getItem('fcData_v19')) || defaultFlashCards;
+        let currentLayout = localStorage.getItem('bmLayout_v19') || 'classic';
+        let currentTab = 'websites';
+        let isArrange = false;
+        let isDeleteMode = false;
+        let currentSection = null;
+        let dragSrcEl = null;
+        let currentNotepadFcId = null;
+        let notepadEditMode = false;
+
+        const dashboard = document.getElementById('dashboard');
+        const qrFloat = document.getElementById('qr-float');
+        const qrImg = document.getElementById('qr-img');
+        const flashcardsArea = document.getElementById('flashcardsArea');
+
+        // ============================================================
+        // IMAGE URL RESOLVER - Handles PostImg & Direct URLs
+        // ============================================================
+        function resolveImageUrl(inputUrl) {
+            if (!inputUrl) return inputUrl;
+            const url = inputUrl.trim();
+
+            const postimgPageMatch = url.match(/^https?:\/\/(?:www\.)?postimg\.cc\/([A-Za-z0-9]+)$/);
+            if (postimgPageMatch) {
+                return `https://i.postimg.cc/${postimgPageMatch[1]}/image.png`;
+            }
+
+            if (url.match(/^https?:\/\/i\.postimg\.cc\//)) {
+                return url;
+            }
+
+            return url;
+        }
+
+        // Preview handler for flash card modal
+        window.previewFcImage = function(val) {
+            const preview = document.getElementById('fcImagePreview');
+            const img = document.getElementById('fcPreviewImg');
+            if (!val.trim()) {
+                preview.classList.remove('visible');
+                return;
+            }
+            const resolved = resolveImageUrl(val);
+            img.src = resolved;
+            preview.classList.add('visible');
+        };
+
+        // ============================================================
+        // PATTERN GENERATOR (for flash card backgrounds)
+        // ============================================================
+        const palettes = [
+            ['#6c63ff', '#ff6b9d', '#4ecdc4'],
+            ['#f72585', '#7209b7', '#3a0ca3'],
+            ['#ff6b35', '#f7c948', '#45b7d1'],
+            ['#00b4d8', '#0077b6', '#023e8a'],
+            ['#e63946', '#457b9d', '#1d3557'],
+            ['#606c38', '#dda15e', '#bc6c25'],
+            ['#ff006e', '#8338ec', '#3a86ff'],
+            ['#f94144', '#f3722c', '#f9844a'],
+            ['#2ec4b6', '#e71d36', '#ff9f1c'],
+            ['#540d6e', '#ee4266', '#ffd23f'],
+            ['#264653', '#2a9d8f', '#e9c46a'],
+            ['#001219', '#005f73', '#0a9396'],
+            ['#7b2cbf', '#c77dff', '#e0aaff'],
+            ['#d00000', '#e85d04', '#faa307'],
+            ['#006d77', '#83c5be', '#edf6f9'],
+        ];
+
+        function generatePattern(seed) {
+            const pal = palettes[seed % palettes.length];
+            const type = seed % 10;
+            const W = 200, H = 260;
+            let s = `<rect width="${W}" height="${H}" fill="${pal[0]}"/>`;
+
+            switch (type) {
+                case 0: // Bubbles
+                    for (let i = 0; i < 15; i++) {
+                        const cx = (seed * 37 + i * 53) % W;
+                        const cy = (seed * 29 + i * 41) % H;
+                        const r = 8 + (i * 7 % 35);
+                        s += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${pal[(i+1)%3]}" opacity="${0.15 + (i%3)*0.1}"/>`;
+                    }
+                    break;
+                case 1: // Diagonal stripes
+                    for (let i = -H; i < W + H; i += 18) {
+                        s += `<line x1="${i}" y1="0" x2="${i+H}" y2="${H}" stroke="${pal[1]}" stroke-width="${2+(i%5)}" opacity="0.2"/>`;
+                    }
+                    break;
+                case 2: // Polka dots
+                    for (let x = 12; x < W; x += 22) {
+                        for (let y = 12; y < H; y += 22) {
+                            s += `<circle cx="${x}" cy="${y}" r="${2+(x+y+seed)%4}" fill="${pal[(x+y)%3===0?1:2]}" opacity="0.3"/>`;
+                        }
+                    }
+                    break;
+                case 3: // Waves
+                    for (let i = 0; i < 9; i++) {
+                        const y = 15 + i * 30;
+                        s += `<path d="M0,${y} Q${W/4},${y-18} ${W/2},${y} Q${W*3/4},${y+18} ${W},${y}" stroke="${pal[(i+1)%3]}" fill="none" stroke-width="2.5" opacity="0.25"/>`;
+                    }
+                    break;
+                case 4: // Triangles
+                    for (let i = 0; i < 12; i++) {
+                        const x = (seed*13+i*47)%W, y = (seed*17+i*31)%H, sz = 12+(i*11%28);
+                        s += `<polygon points="${x},${y-sz} ${x-sz},${y+sz} ${x+sz},${y+sz}" fill="${pal[(i+1)%3]}" opacity="0.2"/>`;
+                    }
+                    break;
+                case 5: // Rings
+                    for (let i = 1; i < 9; i++) {
+                        s += `<circle cx="${W/2}" cy="${H/2}" r="${i*22}" fill="none" stroke="${pal[i%3]}" stroke-width="1.5" opacity="0.25"/>`;
+                    }
+                    break;
+                case 6: // Rotated squares
+                    for (let i = 0; i < 10; i++) {
+                        const x=(seed*19+i*43)%(W-35), y=(seed*23+i*37)%(H-35), sz=15+(i*9%28), rot=(seed+i*17)%45;
+                        s += `<rect x="${x}" y="${y}" width="${sz}" height="${sz}" fill="${pal[(i+1)%3]}" opacity="0.2" transform="rotate(${rot} ${x+sz/2} ${y+sz/2})"/>`;
+                    }
+                    break;
+                case 7: // Crosshatch
+                    for (let i = 0; i < W+H; i += 14) {
+                        s += `<line x1="${i}" y1="0" x2="${i-H}" y2="${H}" stroke="${pal[1]}" stroke-width="1" opacity="0.15"/>`;
+                        s += `<line x1="${i-W}" y1="0" x2="${i}" y2="${H}" stroke="${pal[2]}" stroke-width="1" opacity="0.15"/>`;
+                    }
+                    break;
+                case 8: // Diamond mesh
+                    for (let x = 0; x < W; x += 30) {
+                        for (let y = 0; y < H; y += 30) {
+                            const off = (y/30)%2 === 0 ? 0 : 15;
+                            s += `<polygon points="${x+off},${y-10} ${x+off+10},${y} ${x+off},${y+10} ${x+off-10},${y}" fill="${pal[(x+y)%3]}" opacity="0.2"/>`;
+                        }
+                    }
+                    break;
+                case 9: // Starburst
+                    for (let i = 0; i < 12; i++) {
+                        const angle = (i * 30) * Math.PI / 180;
+                        const len = 80 + (seed + i * 7) % 60;
+                        s += `<line x1="${W/2}" y1="${H/2}" x2="${W/2+Math.cos(angle)*len}" y2="${H/2+Math.sin(angle)*len}" stroke="${pal[i%3]}" stroke-width="2" opacity="0.2"/>`;
+                    }
+                    break;
+            }
+
+            return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">${s}</svg>`)}`;
+        }
+
+        // ============================================================
+        // TAB SYSTEM - Fully Functional
+        // ============================================================
+        function updateTabSlider() {
+            const slider = document.getElementById('tabSlider');
+            const activeBtn = document.querySelector('.tab-btn.active');
+            if (!slider || !activeBtn || window.innerWidth <= 768) return;
+            slider.style.left = activeBtn.offsetLeft + 'px';
+            slider.style.width = activeBtn.offsetWidth + 'px';
+        }
+
+        window.switchTab = function(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+
+            document.querySelectorAll('.tab-content').forEach(c => {
+                c.classList.remove('active');
+                c.style.display = 'none';
+            });
+
+            const target = document.getElementById(`tab-${tab}`);
+            target.style.display = 'block';
+            void target.offsetWidth;
+            target.classList.add('active');
+
+            if (tab === 'flashcards') renderFlashCards();
+            if (tab === 'websites') render(document.getElementById('searchInput').value);
+
+            updateTabSlider();
+        };
+
+        requestAnimationFrame(() => { setTimeout(updateTabSlider, 100); });
+        window.addEventListener('resize', updateTabSlider);
+
+        // ============================================================
+        // ICON RESOLVER
+        // ============================================================
+        function getIcon(url) {
+            try {
+                return `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=128`;
+            } catch { return null; }
+        }
+
+        // ============================================================
+        // WEBSITE BOOKMARKS RENDER
+        // ============================================================
+        function render(filter = '') {
+            dashboard.innerHTML = '';
+            const lowerFilter = filter.toLowerCase();
+
+            bookmarks.forEach((group, index) => {
+                const matches = group.links.filter(l =>
+                    l.name.toLowerCase().includes(lowerFilter) ||
+                    l.desc.toLowerCase().includes(lowerFilter)
+                );
+
+                if (matches.length > 0 || !filter) {
+                    const section = document.createElement('div');
+                    section.className = 'section-group';
+                    section.style.animationDelay = `${index * 0.04}s`;
+
+                    section.innerHTML = `
+                        <div class="section-header">
+                            <div class="section-title">
+                                <div class="section-title-icon"></div>
+                                ${group.category}
+                                <span class="section-count">${matches.length}</span>
+                            </div>
+                            <button class="btn-add-section" onclick="openModal('${group.id}')" aria-label="Add bookmark to ${group.category}">+</button>
+                        </div>`;
+
+                    const grid = document.createElement('div');
+                    grid.className = 'grid';
+                    grid.dataset.layout = currentLayout;
+                    grid.dataset.group = group.id;
+
+                    matches.forEach((link, idx) => {
+                        const card = document.createElement(isArrange ? 'div' : 'a');
+                        card.className = 'card';
+                        card.dataset.url = link.url;
+
+                        if (!isArrange) {
+                            card.href = link.url;
+                            card.target = '_top';
+                        } else {
+                            card.draggable = true;
+                            card.dataset.idx = idx;
+                            card.addEventListener('dragstart', handleDragStart);
+                            card.addEventListener('dragover', handleDragOver);
+                            card.addEventListener('drop', handleDrop);
+                            card.addEventListener('dragend', handleDragEnd);
+                        }
+
+                        const iconUrl = getIcon(link.url);
+                        card.innerHTML = `
+                            <div class="delete-btn" onclick="deleteBookmark('${group.id}', ${idx}, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="${iconUrl}" class="card-icon" loading="lazy"
+                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">${link.name}</div>
+                                <div class="card-desc">${link.desc}</div>
+                            </div>`;
+                        grid.appendChild(card);
+
+                        if (window.innerWidth > 768 && !isArrange && !isDeleteMode) {
+                            const iconWrap = card.querySelector('.card-icon-wrap');
+                            iconWrap.addEventListener('mouseenter', () => {
+                                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(link.url)}`;
+                                qrFloat.style.opacity = '1';
+                            });
+                            iconWrap.addEventListener('mousemove', (e) => {
+                                qrFloat.style.transform = `translate(${e.clientX + 20}px, ${e.clientY + 20}px)`;
+                            });
+                            iconWrap.addEventListener('mouseleave', () => { qrFloat.style.opacity = '0'; });
+                        }
+                    });
+
+                    section.appendChild(grid);
+                    dashboard.appendChild(section);
+                }
+            });
+        }
+
+        // ============================================================
+        // FLASH CARDS RENDER
+        // ============================================================
+        function renderFlashCards() {
+            flashcardsArea.innerHTML = '';
+
+            if (flashCards.length === 0) {
+                flashcardsArea.innerHTML = `
+                    <div class="flashcards-empty">
+                        <div class="empty-icon-container">
+                            <div class="empty-icon">🃏</div>
+                            <div class="empty-icon-ring"></div>
+                        </div>
+                        <div class="empty-title">No Flash Cards Yet</div>
+                        <div class="empty-desc">Create your first flash card to start organizing your notes. Each card comes with its own personal notepad!</div>
+                        <button class="btn-modal btn-primary" onclick="openModal('addFcModal')" style="font-size:0.95rem; padding:13px 30px;">
+                            + Create First Card
+                        </button>
+                    </div>`;
+                return;
+            }
+
+            const grid = document.createElement('div');
+            grid.className = 'fc-grid';
+
+            const addCard = document.createElement('div');
+            addCard.className = 'fc-add-btn';
+            addCard.onclick = () => openModal('addFcModal');
+            addCard.innerHTML = `<div class="plus-icon">+</div><p>New Card</p>`;
+            grid.appendChild(addCard);
+
+            flashCards.forEach((fc, idx) => {
+                const card = document.createElement('div');
+                card.className = 'fc-card fc-card-animated';
+                card.style.animationDelay = `${idx * 0.06}s`;
+                card.onclick = (e) => {
+                    if (e.target.closest('.fc-card-delete')) return;
+                    openNotepad(fc.id);
+                };
+
+                const patternBg = generatePattern(fc.patternSeed || idx * 7 + 3);
+                const hasNote = fc.note && fc.note.trim().length > 0;
+                const resolvedImg = resolveImageUrl(fc.image);
+
+                card.innerHTML = `
+                    <div class="fc-card-bg" style="background-image: url('${patternBg}'); background-size: cover;"></div>
+                    <div class="fc-card-overlay"></div>
+                    <div class="fc-card-delete" onclick="deleteFlashCard(${idx}, event)">✕</div>
+                    ${hasNote ? '<div class="fc-card-note-indicator">📝</div>' : ''}
+                    <div class="fc-card-content">
+                        <div class="fc-card-logo">
+                            <img src="${resolvedImg}"
+                                crossorigin="anonymous"
+                                referrerpolicy="no-referrer"
+                                onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='block';"
+                                onload="this.style.display='block'; if(this.nextElementSibling) this.nextElementSibling.style.display='none';"
+                                alt="${fc.name}" loading="lazy">
+                            <span class="fc-card-logo-emoji" style="display:none;">🃏</span>
+                        </div>
+                        <div class="fc-card-name">${fc.name}</div>
+                    </div>`;
+                grid.appendChild(card);
+            });
+
+            flashcardsArea.appendChild(grid);
+        }
+
+        // ============================================================
+        // FLASH CARD CRUD
+        // ============================================================
+        window.saveFlashCard = function() {
+            const rawUrl = document.getElementById('fcImageUrl').value.trim();
+            const name = document.getElementById('fcName').value.trim();
+
+            if (!name) { showToast('⚠️ Please enter a card name'); return; }
+            if (!rawUrl) { showToast('⚠️ Please enter an image link'); return; }
+
+            const resolvedUrl = resolveImageUrl(rawUrl);
+
+            const newCard = {
+                id: 'fc_' + Date.now(),
+                name: name,
+                image: resolvedUrl,
+                imageOriginal: rawUrl,
+                note: '',
+                patternSeed: Math.floor(Math.random() * 1000),
+                createdAt: new Date().toISOString()
+            };
+
+            flashCards.push(newCard);
+            saveFlashCardData();
+            renderFlashCards();
+            closeModal('addFcModal');
+            document.getElementById('fcImageUrl').value = '';
+            document.getElementById('fcName').value = '';
+            document.getElementById('fcImagePreview').classList.remove('visible');
+            showToast('✨ Flash card created!');
+        };
+
+        window.deleteFlashCard = function(idx, e) {
+            e.stopPropagation();
+            if (confirm('Delete this flash card and its notes?')) {
+                flashCards.splice(idx, 1);
+                saveFlashCardData();
+                renderFlashCards();
+                showToast('🗑️ Flash card deleted');
+            }
+        };
+
+        function saveFlashCardData() {
+            localStorage.setItem('fcData_v19', JSON.stringify(flashCards));
+            triggerLocalSync(false);
+        }
+
+        // ============================================================
+        // NOTEPAD - Full System
+        // ============================================================
+        window.openNotepad = function(fcId) {
+            currentNotepadFcId = fcId;
+            const fc = flashCards.find(c => c.id === fcId);
+            if (!fc) return;
+
+            notepadEditMode = false;
+
+            const logoImg = document.getElementById('notepadLogo').querySelector('img');
+            logoImg.src = resolveImageUrl(fc.image);
+            logoImg.onerror = function() { this.parentElement.innerHTML = '🃏'; };
+            document.getElementById('notepadTitle').textContent = fc.name;
+
+            renderNotepadContent(fc);
+            updateEditBtnState();
+            document.getElementById('notepadOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        };
+
+        function renderNotepadContent(fc) {
+            const body = document.getElementById('notepadBody');
+            body.innerHTML = '';
+
+            if (notepadEditMode) {
+                const textarea = document.createElement('textarea');
+                textarea.className = 'notepad-textarea';
+                textarea.id = 'notepadTextarea';
+                textarea.placeholder = 'Start writing your notes here...';
+                textarea.value = fc.note || '';
+                textarea.addEventListener('input', () => updateCharCount(textarea.value));
+                body.appendChild(textarea);
+                setTimeout(() => textarea.focus(), 100);
+                updateCharCount(fc.note || '');
+                document.getElementById('notepadSaveBtn').style.display = '';
+            } else {
+                const display = document.createElement('div');
+                display.className = 'notepad-display';
+                if (fc.note && fc.note.trim()) {
+                    display.textContent = fc.note;
+                } else {
+                    display.textContent = 'No notes yet. Click the ✏️ pencil button to start writing...';
+                    display.classList.add('empty-note');
+                }
+                body.appendChild(display);
+                updateCharCount(fc.note || '');
+                document.getElementById('notepadSaveBtn').style.display = 'none';
+            }
+        }
+
+        window.toggleNotepadEdit = function() {
+            notepadEditMode = !notepadEditMode;
+            const fc = flashCards.find(c => c.id === currentNotepadFcId);
+            if (!fc) return;
+
+            if (!notepadEditMode) {
+                const textarea = document.getElementById('notepadTextarea');
+                if (textarea) { fc.note = textarea.value; saveFlashCardData(); }
+            }
+
+            renderNotepadContent(fc);
+            updateEditBtnState();
+        };
+
+        function updateEditBtnState() {
+            const btn = document.getElementById('notepadEditBtn');
+            btn.classList.toggle('active', notepadEditMode);
+            btn.title = notepadEditMode ? 'View Mode' : 'Edit';
+        }
+
+        window.saveNotepadContent = function() {
+            const fc = flashCards.find(c => c.id === currentNotepadFcId);
+            const textarea = document.getElementById('notepadTextarea');
+            if (!fc || !textarea) return;
+
+            fc.note = textarea.value;
+            saveFlashCardData();
+            showToast('💾 Notes saved!');
+
+            notepadEditMode = false;
+            renderNotepadContent(fc);
+            updateEditBtnState();
+        };
+
+        window.closeNotepad = function() {
+            if (notepadEditMode) {
+                const fc = flashCards.find(c => c.id === currentNotepadFcId);
+                const textarea = document.getElementById('notepadTextarea');
+                if (fc && textarea) { fc.note = textarea.value; saveFlashCardData(); }
+            }
+            document.getElementById('notepadOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+            currentNotepadFcId = null;
+            notepadEditMode = false;
+            if (currentTab === 'flashcards') renderFlashCards();
+        };
+
+        function updateCharCount(text) {
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            document.getElementById('notepadCharCount').textContent = `${text.length} chars · ${words} words`;
+        }
+
+        document.getElementById('notepadOverlay').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('notepadOverlay')) closeNotepad();
+        });
+
+        // ============================================================
+        // DRAG & DROP
+        // ============================================================
+        function handleDragStart(e) {
+            dragSrcEl = this;
+            e.dataTransfer.effectAllowed = 'move';
+            this.style.opacity = '0.4';
+        }
+        function handleDragOver(e) { e.preventDefault(); }
+        function handleDrop(e) {
+            e.stopPropagation();
+            if (dragSrcEl !== this) {
+                const groupID = this.parentElement.dataset.group;
+                if (dragSrcEl.parentElement.dataset.group === groupID) {
+                    const group = bookmarks.find(g => g.id === groupID);
+                    const srcIdx = parseInt(dragSrcEl.dataset.idx);
+                    const targetIdx = parseInt(this.dataset.idx);
+                    const item = group.links.splice(srcIdx, 1)[0];
+                    group.links.splice(targetIdx, 0, item);
+                    save(); render();
+                }
+            }
+        }
+        function handleDragEnd() { this.style.opacity = '1'; }
+
+        // ============================================================
+        // CONTROLS
+        // ============================================================
+        window.toggleArrange = function() {
+            isArrange = !isArrange;
+            isDeleteMode = false;
+            document.body.classList.remove('delete-mode');
+            document.getElementById('arrangeBtn').classList.toggle('active', isArrange);
+            document.getElementById('deleteBtn').classList.remove('active');
+            document.getElementById('deleteBtn').querySelector('span').innerText = 'Edit';
+            render(); if (currentTab === 'flashcards') renderFlashCards();
+        };
+
+        window.toggleDeleteMode = function() {
+            isDeleteMode = !isDeleteMode;
+            isArrange = false;
+            document.getElementById('arrangeBtn').classList.remove('active');
+            document.body.classList.toggle('delete-mode', isDeleteMode);
+            const btn = document.getElementById('deleteBtn');
+            btn.classList.toggle('active', isDeleteMode);
+            btn.querySelector('span').innerText = isDeleteMode ? 'Done' : 'Edit';
+            render(); if (currentTab === 'flashcards') renderFlashCards();
+        };
+
+        window.deleteBookmark = function(groupId, index, e) {
+            e.preventDefault(); e.stopPropagation();
+            if (confirm('Delete this bookmark?')) {
+                bookmarks.find(g => g.id === groupId).links.splice(index, 1);
+                save(); render();
+                showToast('🗑️ Bookmark removed');
+            }
+        };
+
+        function toggleMenu(menuId) {
+            const menu = document.getElementById(menuId);
+            const wasActive = menu.classList.contains('active');
+            document.querySelectorAll('.menu-popup').forEach(m => m.classList.remove('active'));
+            if (!wasActive) menu.classList.add('active');
+        }
+
+        window.setLayout = function(layout) {
+            currentLayout = layout;
+            localStorage.setItem('bmLayout_v19', layout);
+            render(); document.getElementById('layoutMenu').classList.remove('active');
+        };
+
+        window.setTheme = function(theme) {
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('bmTheme_v19', theme);
+            document.getElementById('themeMenu').classList.remove('active');
+        };
+
+        // ============================================================
+        // MODALS
+        // ============================================================
+        window.openModal = function(id) {
+            if (id === 'addFcModal') {
+                document.getElementById('addFcModal').classList.add('active');
+            } else if (id === 'exportModal') {
+                openExportModal();
+            } else {
+                currentSection = id;
+                document.getElementById('addModal').classList.add('active');
+            }
+        };
+
+        window.closeModal = function(id) {
+            document.getElementById(id).classList.remove('active');
+        };
+
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) overlay.classList.remove('active');
+            });
+        });
+
+        window.saveBookmark = function() {
+            const name = document.getElementById('bmName').value.trim();
+            const url = document.getElementById('bmUrl').value.trim();
+            const desc = document.getElementById('bmDesc').value.trim() || 'Link';
+            if (name && url) {
+                bookmarks.find(g => g.id === currentSection).links.push({ name, url, desc });
+                save(); render(); closeModal('addModal');
+                document.getElementById('bmName').value = '';
+                document.getElementById('bmUrl').value = '';
+                document.getElementById('bmDesc').value = '';
+                showToast('✅ Bookmark saved!');
+            } else {
+                showToast('⚠️ Name and URL required');
+            }
+        };
+
+        function save() {
+            localStorage.setItem('bmData_v19', JSON.stringify(bookmarks));
+            triggerLocalSync(false);
+        }
+
+        // ============================================================
+        // EXPORT & SERIALIZATION
+        // ============================================================
+        window.openExportModal = function() {
+            document.getElementById('page-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(window.location.href)}`;
+            document.getElementById('exportModal').classList.add('active');
+        };
+
+        let lastSerializedTimestamp = '';
+        function serializeHTML() {
+            let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+            
+            // Clean up state items to keep the source clean
+            html = html.replace(/class="modal-overlay active"/g, 'class="modal-overlay"');
+            html = html.replace(/class="notepad-overlay active"/g, 'class="notepad-overlay"');
+            html = html.replace(/class="menu-popup active"/g, 'class="menu-popup"');
+            html = html.replace(/id="mainHeader" class="scrolled"/g, 'id="mainHeader"');
+            html = html.replace(/class="dock-btn active"/g, 'class="dock-btn"');
+            html = html.replace(/class="delete-mode"/g, '');
+            html = html.replace(/<body class="delete-mode">/g, '<body>');
+            
+            // Inject dynamic databases into source defaults using lookaheads to support nested arrays
+            const regexBM = /const defaultData = \[[\s\S]*?\];(?=\s*\/\/\s*=+\s*\/\/\s*STATE)/;
+            html = html.replace(regexBM, `const defaultData = ${JSON.stringify(bookmarks, null, 4)};`);
+            
+            const regexFC = /const defaultFlashCards = \[[\s\S]*?\];(?=\s*let bookmarks =)/;
+            html = html.replace(regexFC, `const defaultFlashCards = ${JSON.stringify(flashCards, null, 4)};`);
+            
+            // Inject new build timestamp to trigger cache refresh on other devices
+            lastSerializedTimestamp = new Date().toISOString();
+            const regexTS = /const buildTimestamp = "([\s\S]*?)";/;
+            html = html.replace(regexTS, `const buildTimestamp = "${lastSerializedTimestamp}";`);
+            
+            return html;
+        }
+
+        window.downloadUpdatedHTML = function() {
+            closeModal('exportModal');
+            const html = serializeHTML();
+            const blob = new Blob([html], { type: 'text/html' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'my_dashboard.html';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(a.href);
+        };
+
+        // ============================================================
+        // LOCAL DIRECT AUTO-SYNC SYSTEM
+        // ============================================================
+        function updateSyncStatus(state, msg = '') {
+            const statusBadge = document.getElementById('syncStatus');
+            if (!statusBadge) return;
+
+            statusBadge.style.display = 'inline-flex';
+            const dot = statusBadge.querySelector('.sync-dot');
+            const text = statusBadge.querySelector('.sync-text');
+
+            if (state === 'syncing') {
+                dot.style.background = 'var(--warning)';
+                dot.style.boxShadow = '0 0 8px var(--warning)';
+                text.textContent = 'Saving...';
+            } else if (state === 'success') {
+                dot.style.background = 'var(--success)';
+                dot.style.boxShadow = '0 0 8px var(--success)';
+                text.textContent = msg || 'Saved Locally';
+                setTimeout(() => { statusBadge.style.display = 'none'; }, 2000);
+            } else if (state === 'error') {
+                dot.style.background = 'var(--delete-color)';
+                dot.style.boxShadow = '0 0 8px var(--delete-color)';
+                text.textContent = msg || 'Save Error';
+            }
+        }
+
+        window.triggerLocalSync = async function(showNotification = false) {
+            if (!localFileHandle) return; 
+
+            updateSyncStatus('syncing');
+            try {
+                const serializedHtml = serializeHTML();
+                const writable = await localFileHandle.createWritable();
+                await writable.write(serializedHtml);
+                await writable.close();
+
+                updateSyncStatus('success', 'Saved Locally');
+                if (showNotification) showToast('🚀 Local file updated successfully!');
+            } catch (err) {
+                console.error(err);
+                updateSyncStatus('error', err.message);
+                if (showNotification) showToast(`⚠️ Local save failed: ${err.message}`);
+                
+                if (err.name === 'NotAllowedError') {
+                    localFileHandle = null;
+                }
+            }
+        };
+
+        window.linkLocalFile = async function() {
+            try {
+                [localFileHandle] = await window.showOpenFilePicker({
+                    types: [{
+                        description: 'HTML Document',
+                        accept: { 'text/html': ['.html', '.htm'] }
+                    }],
+                    multiple: false
+                });
+                
+                closeModal('exportModal');
+                await triggerLocalSync(true);
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    showToast('⚠️ Could not link file: ' + err.message);
+                }
+            }
+        };
+
+        // ============================================================
+        // TOAST SYSTEM
+        // ============================================================
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('toast-out');
+                setTimeout(() => toast.remove(), 250);
+            }, 2200);
+        }
+
+        // ============================================================
+        // EVENTS
+        // ============================================================
+        document.getElementById('layoutBtn').addEventListener('click', (e) => {
+            e.stopPropagation(); toggleMenu('layoutMenu');
+        });
+        document.getElementById('themeBtn').addEventListener('click', (e) => {
+            e.stopPropagation(); toggleMenu('themeMenu');
+        });
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.dock-btn')) {
+                document.querySelectorAll('.menu-popup').forEach(m => m.classList.remove('active'));
+            }
+        });
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const v = e.target.value;
+            if (currentTab === 'websites') render(v);
+            if (currentTab === 'flashcards') {
+                const lv = v.toLowerCase();
+                document.querySelectorAll('.fc-card').forEach(card => {
+                    const name = card.querySelector('.fc-card-name');
+                    if (name) {
+                        const match = !v || name.textContent.toLowerCase().includes(lv);
+                        card.style.display = match ? '' : 'none';
+                    }
+                });
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+                if (document.getElementById('notepadOverlay').classList.contains('active')) closeNotepad();
+                document.querySelectorAll('.menu-popup.active').forEach(m => m.classList.remove('active'));
+            }
+        });
+
+        const mainHeader = document.getElementById('mainHeader');
+        let scrollTicking = false;
+        window.addEventListener('scroll', () => {
+            if (!scrollTicking) {
+                requestAnimationFrame(() => {
+                    mainHeader.classList.toggle('scrolled', window.scrollY > 40);
+                    scrollTicking = false;
+                });
+                scrollTicking = true;
+            }
+        });
+
+        document.querySelectorAll('.menu-popup').forEach(menu => {
+            menu.addEventListener('click', e => e.stopPropagation());
+        });
+
+        document.addEventListener('touchstart', (e) => {
+            if (!e.target.closest('.dock-btn') && !e.target.closest('.menu-popup')) {
+                document.querySelectorAll('.menu-popup.active').forEach(m => m.classList.remove('active'));
+            }
+        }, { passive: true });
+
+        const savedTheme = localStorage.getItem('bmTheme_v19') || 'aurora';
+        setTheme(savedTheme);
+        render();
+
+    })();
+    </script>
+</body>
+</html>
 
