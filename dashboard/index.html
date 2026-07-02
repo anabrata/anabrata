@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#0a0a1a" id="meta-theme-color">
@@ -11,8 +10,8 @@
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="apple-touch-icon" href="logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
     <style>
         /* ============================================================
            ROOT DESIGN TOKENS  
@@ -1164,10 +1163,10 @@
         }
     </style>
 </head>
-<body>
+<body data-theme="aurora">
 
     <!-- ===== LOADING SCREEN ===== -->
-    <div class="loading-screen" id="loadingScreen">
+    <div class="loading-screen hidden" id="loadingScreen">
         <div class="loading-logo">A</div>
         <div class="loading-bar"><div class="loading-bar-fill"></div></div>
         <div class="loading-text">Loading</div>
@@ -1178,7 +1177,7 @@
         <div class="mesh-gradient"></div>
         <div class="grid-overlay"></div>
     </div>
-    <canvas id="particleCanvas"></canvas>
+    <canvas id="particleCanvas" width="767" height="778"></canvas>
 
     <!-- ===== FLOATING QR ===== -->
     <div id="qr-float"><img id="qr-img" src="" alt="QR Code"></div>
@@ -1191,9 +1190,9 @@
         <div class="logo-area">
             <div class="logo-icon">A</div>
             <div class="logo-text">ANABRATA's Space</div>
-            <span id="syncStatus" style="font-size: 0.65rem; color: var(--text-muted); background: var(--glass-bg-strong); padding: 2px 8px; border-radius: 20px; display: none; align-items: center; gap: 4px;">
-                <span class="sync-dot" style="width: 6px; height: 6px; border-radius: 50%; background: var(--success);"></span>
-                <span class="sync-text">Synced</span>
+            <span id="syncStatus" style="font-size: 0.65rem; color: var(--text-muted); background: var(--glass-bg-strong); padding: 2px 8px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px;">
+                <span class="sync-dot" style="width: 6px; height: 6px; border-radius: 50%; background: var(--warning); box-shadow: 0 0 8px var(--warning);"></span>
+                <span class="sync-text">Syncing...</span>
             </span>
         </div>
         <div class="search-container">
@@ -1214,7 +1213,924 @@
     <!-- ===== MAIN CONTENT ===== -->
     <div class="main-container">
         <div class="tab-content active" id="tab-websites">
-            <main id="dashboard"></main>
+            <main id="dashboard"><div class="section-group" style="animation-delay: 0s;">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <div class="section-title-icon"></div>
+                                PDF Editors
+                                <span class="section-count">12</span>
+                            </div>
+                            <button class="btn-add-section" onclick="openModal('pdf')" aria-label="Add bookmark to PDF Editors">+</button>
+                        </div><div class="grid" data-layout="classic" data-group="pdf"><a class="card" data-url="https://lightpdf.com/remove-watermark" href="https://lightpdf.com/remove-watermark" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('pdf', 0, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=lightpdf.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">PDF Watermark Remover</div>
+                                <div class="card-desc">LightPDF</div>
+                            </div></a><a class="card" data-url="https://www.freepdfconvert.com/" href="https://www.freepdfconvert.com/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('pdf', 1, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=www.freepdfconvert.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Image to PDF</div>
+                                <div class="card-desc">Free PDF Convert</div>
+                            </div></a><a class="card" data-url="https://www.ilovepdf.com/merge_pdf" href="https://www.ilovepdf.com/merge_pdf" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('pdf', 2, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=www.ilovepdf.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Merge PDF</div>
+                                <div class="card-desc">iLovePDF</div>
+                            </div></a><a class="card" data-url="https://www.ilovepdf.com/pdf_to_excel" href="https://www.ilovepdf.com/pdf_to_excel" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('pdf', 3, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=www.ilovepdf.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">PDF to Excel</div>
+                                <div class="card-desc">Convert</div>
+                            </div></a><a class="card" data-url="https://www.ilovepdf.com/jpg_to_pdf" href="https://www.ilovepdf.com/jpg_to_pdf" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('pdf', 4, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=www.ilovepdf.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">JPG to PDF</div>
+                                <div class="card-desc">Convert</div>
+                            </div></a><a class="card" data-url="https://www.ilovepdf.com/powerpoint_to_pdf" href="https://www.ilovepdf.com/powerpoint_to_pdf" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('pdf', 5, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=www.ilovepdf.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Powerpoint to PDF</div>
+                                <div class="card-desc">Convert</div>
+                            </div></a><a class="card" data-url="https://www.ilovepdf.com/ocr-pdf" href="https://www.ilovepdf.com/ocr-pdf" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('pdf', 6, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=www.ilovepdf.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">OCR PDF</div>
+                                <div class="card-desc">Scan</div>
+                            </div></a><a class="card" data-url="https://www.ilovepdf.com/pdf_to_jpg" href="https://www.ilovepdf.com/pdf_to_jpg" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('pdf', 7, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=www.ilovepdf.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">PDF to JPG</div>
+                                <div class="card-desc">Extract</div>
+                            </div></a><a class="card" data-url="https://www.ilovepdf.com/organize-pdf" href="https://www.ilovepdf.com/organize-pdf" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('pdf', 8, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=www.ilovepdf.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Organize PDF</div>
+                                <div class="card-desc">Sort</div>
+                            </div></a><a class="card" data-url="https://www.ilovepdf.com/remove-pages" href="https://www.ilovepdf.com/remove-pages" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('pdf', 9, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=www.ilovepdf.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Remove Pages</div>
+                                <div class="card-desc">Delete</div>
+                            </div></a><a class="card" data-url="https://www.ilovepdf.com/pdf_to_word" href="https://www.ilovepdf.com/pdf_to_word" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('pdf', 10, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=www.ilovepdf.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">PDF to Word</div>
+                                <div class="card-desc">Convert</div>
+                            </div></a><a class="card" data-url="https://www.ilovepdf.com/word_to_pdf" href="https://www.ilovepdf.com/word_to_pdf" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('pdf', 11, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=www.ilovepdf.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Word to PDF</div>
+                                <div class="card-desc">Convert</div>
+                            </div></a></div></div><div class="section-group" style="animation-delay: 0.04s;">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <div class="section-title-icon"></div>
+                                Image Editing
+                                <span class="section-count">17</span>
+                            </div>
+                            <button class="btn-add-section" onclick="openModal('img')" aria-label="Add bookmark to Image Editing">+</button>
+                        </div><div class="grid" data-layout="classic" data-group="img"><a class="card" data-url="https://www.pixelbin.io/ai-tools/watermark-remover" href="https://www.pixelbin.io/ai-tools/watermark-remover" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('img', 0, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=www.pixelbin.io&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Image Background</div>
+                                <div class="card-desc">PixelBin</div>
+                            </div></a><a class="card" data-url="https://editingprompt.com/" href="https://editingprompt.com/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('img', 1, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=editingprompt.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Editing Prompt</div>
+                                <div class="card-desc">Prompts</div>
+                            </div></a><a class="card" data-url="https://postimages.org/" href="https://postimages.org/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('img', 2, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=postimages.org&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Post Images</div>
+                                <div class="card-desc">Hosting</div>
+                            </div></a><a class="card" data-url="https://pixlr.com/express/?tool=adjust" href="https://pixlr.com/express/?tool=adjust" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('img', 3, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=pixlr.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">AI Photo Editor</div>
+                                <div class="card-desc">Pixlr</div>
+                            </div></a><a class="card" data-url="https://deepai.org/machine-learning-model/torch-srgan" href="https://deepai.org/machine-learning-model/torch-srgan" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('img', 4, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=deepai.org&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Super Resolution</div>
+                                <div class="card-desc">DeepAI</div>
+                            </div></a><a class="card" data-url="https://lightpdf.com/image-watermark-remover" href="https://lightpdf.com/image-watermark-remover" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('img', 5, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=lightpdf.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Watermark Remover</div>
+                                <div class="card-desc">Clean</div>
+                            </div></a><a class="card" data-url="https://fitroom.app/create" href="https://fitroom.app/create" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('img', 6, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=fitroom.app&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Clothes Editor</div>
+                                <div class="card-desc">Fitroom</div>
+                            </div></a><a class="card" data-url="https://www.photoroom.com/tools/background-remover" href="https://www.photoroom.com/tools/background-remover" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('img', 7, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=www.photoroom.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Background Remover</div>
+                                <div class="card-desc">PhotoRoom</div>
+                            </div></a><a class="card" data-url="https://remaker.ai/face-swap-free/" href="https://remaker.ai/face-swap-free/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('img', 8, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=remaker.ai&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Face Swap</div>
+                                <div class="card-desc">Remaker</div>
+                            </div></a><a class="card" data-url="https://www.photopea.com/" href="https://www.photopea.com/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('img', 9, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=www.photopea.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Photoshop Online</div>
+                                <div class="card-desc">Photopea</div>
+                            </div></a><a class="card" data-url="https://pinetools.com/merge-images" href="https://pinetools.com/merge-images" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('img', 10, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=pinetools.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Merge Images</div>
+                                <div class="card-desc">PineTools</div>
+                            </div></a><a class="card" data-url="https://imageresizer.com/image-compressor" href="https://imageresizer.com/image-compressor" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('img', 11, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=imageresizer.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Image Compressor</div>
+                                <div class="card-desc">Resize</div>
+                            </div></a><a class="card" data-url="https://circlecropimage.com/" href="https://circlecropimage.com/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('img', 12, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=circlecropimage.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Circle Crop</div>
+                                <div class="card-desc">Crop</div>
+                            </div></a><a class="card" data-url="https://www.iloveimg.com/" href="https://www.iloveimg.com/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('img', 13, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=www.iloveimg.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">iLoveIMG</div>
+                                <div class="card-desc">Suite</div>
+                            </div></a><a class="card" data-url="https://www.iloveimg.com/remove-background" href="https://www.iloveimg.com/remove-background" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('img', 14, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=www.iloveimg.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">BG Remover</div>
+                                <div class="card-desc">Remove BG</div>
+                            </div></a><a class="card" data-url="https://imagecompressor.com/" href="https://imagecompressor.com/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('img', 15, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=imagecompressor.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Online Compressor</div>
+                                <div class="card-desc">Compress</div>
+                            </div></a><a class="card" data-url="https://imresizer.com/resize-image-to-whatsapp-dp?content=hide" href="https://imresizer.com/resize-image-to-whatsapp-dp?content=hide" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('img', 16, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=imresizer.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Resize for WhatsApp</div>
+                                <div class="card-desc">DP Resize</div>
+                            </div></a></div></div><div class="section-group" style="animation-delay: 0.08s;">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <div class="section-title-icon"></div>
+                                Tools &amp; Utilities
+                                <span class="section-count">15</span>
+                            </div>
+                            <button class="btn-add-section" onclick="openModal('others')" aria-label="Add bookmark to Tools &amp; Utilities">+</button>
+                        </div><div class="grid" data-layout="classic" data-group="others"><a class="card" data-url="https://doodlenerd.com/web-tool/figlet-generator" href="https://doodlenerd.com/web-tool/figlet-generator" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('others', 0, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=doodlenerd.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Figlet Generator</div>
+                                <div class="card-desc">ASCII</div>
+                            </div></a><a class="card" data-url="https://www.virustotal.com/gui/home/upload" href="https://www.virustotal.com/gui/home/upload" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('others', 1, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=www.virustotal.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">VirusTotal</div>
+                                <div class="card-desc">Scan</div>
+                            </div></a><a class="card" data-url="https://anythingtranslate.com/translators/hinglish-translator/" href="https://anythingtranslate.com/translators/hinglish-translator/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('others', 2, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=anythingtranslate.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Hinglish Translator</div>
+                                <div class="card-desc">Translate</div>
+                            </div></a><a class="card" data-url="https://tuberanker.com/" href="https://tuberanker.com/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('others', 3, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=tuberanker.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">YouTube Tool</div>
+                                <div class="card-desc">SEO</div>
+                            </div></a><a class="card" data-url="https://chatv2.septapus.com/" href="https://chatv2.septapus.com/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('others', 4, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=chatv2.septapus.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Chat v2.0</div>
+                                <div class="card-desc">Style Gen</div>
+                            </div></a><a class="card" data-url="https://tempmail.so/" href="https://tempmail.so/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('others', 5, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=tempmail.so&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Temp Mail So</div>
+                                <div class="card-desc">Email</div>
+                            </div></a><a class="card" data-url="https://html.onlineviewer.net/" href="https://html.onlineviewer.net/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('others', 6, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=html.onlineviewer.net&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">HTML Viewer</div>
+                                <div class="card-desc">Code</div>
+                            </div></a><a class="card" data-url="https://tempmailo.com/" href="https://tempmailo.com/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('others', 7, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=tempmailo.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Temp Mail O</div>
+                                <div class="card-desc">Email</div>
+                            </div></a><a class="card" data-url="https://filecr.com/windows/office-pdf/" href="https://filecr.com/windows/office-pdf/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('others', 8, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=filecr.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Software hack</div>
+                                <div class="card-desc">FileCR</div>
+                            </div></a><a class="card" data-url="https://toffeeshare.com/en/" href="https://toffeeshare.com/en/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('others', 9, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=toffeeshare.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">ToffeeShare</div>
+                                <div class="card-desc">Share</div>
+                            </div></a><a class="card" data-url="https://childquesz.netlify.app/" href="https://childquesz.netlify.app/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('others', 10, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=childquesz.netlify.app&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Questions</div>
+                                <div class="card-desc">ChildQuesz</div>
+                            </div></a><a class="card" data-url="https://bsbk.portal.gov.bd/apps/bangla-converter/index.html" href="https://bsbk.portal.gov.bd/apps/bangla-converter/index.html" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('others', 11, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=bsbk.portal.gov.bd&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Bijoy Converter</div>
+                                <div class="card-desc">Unicode</div>
+                            </div></a><a class="card" data-url="https://www.jioaicloud.com/home" href="https://www.jioaicloud.com/home" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('others', 12, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=www.jioaicloud.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">JioCloud</div>
+                                <div class="card-desc">Storage</div>
+                            </div></a><a class="card" data-url="https://lnk.ink/dashboard" href="https://lnk.ink/dashboard" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('others', 13, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=lnk.ink&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Link Ink</div>
+                                <div class="card-desc">Shortener</div>
+                            </div></a><a class="card" data-url="https://pewscorner.github.io/barcodes/qrcode_generator.html" href="https://pewscorner.github.io/barcodes/qrcode_generator.html" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('others', 14, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=pewscorner.github.io&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">QR Generator</div>
+                                <div class="card-desc">QR Code</div>
+                            </div></a></div></div><div class="section-group" style="animation-delay: 0.12s;">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <div class="section-title-icon"></div>
+                                AI Tools
+                                <span class="section-count">8</span>
+                            </div>
+                            <button class="btn-add-section" onclick="openModal('ai')" aria-label="Add bookmark to AI Tools">+</button>
+                        </div><div class="grid" data-layout="classic" data-group="ai"><a class="card" data-url="https://venice.ai/chat" href="https://venice.ai/chat" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('ai', 0, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=venice.ai&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Venice Chat</div>
+                                <div class="card-desc">Uncensored</div>
+                            </div></a><a class="card" data-url="https://lmarena.ai/?mode=side-by-side" href="https://lmarena.ai/?mode=side-by-side" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('ai', 1, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=lmarena.ai&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">LMArena</div>
+                                <div class="card-desc">Compare</div>
+                            </div></a><a class="card" data-url="https://claude.ai/login?returnTo=%2F%3F" href="https://claude.ai/login?returnTo=%2F%3F" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('ai', 2, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=claude.ai&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Claude</div>
+                                <div class="card-desc">Anthropic</div>
+                            </div></a><a class="card" data-url="https://www.perplexity.ai/" href="https://www.perplexity.ai/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('ai', 3, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=www.perplexity.ai&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Perplexity</div>
+                                <div class="card-desc">Search</div>
+                            </div></a><a class="card" data-url="https://gemini.google.com/app" href="https://gemini.google.com/app" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('ai', 4, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=gemini.google.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Google Gemini</div>
+                                <div class="card-desc">Google</div>
+                            </div></a><a class="card" data-url="https://chat.qwen.ai/" href="https://chat.qwen.ai/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('ai', 5, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=chat.qwen.ai&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Qwen</div>
+                                <div class="card-desc">Alibaba</div>
+                            </div></a><a class="card" data-url="https://chat.deepseek.com/" href="https://chat.deepseek.com/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('ai', 6, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=chat.deepseek.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">DeepSeek</div>
+                                <div class="card-desc">DeepSeek</div>
+                            </div></a><a class="card" data-url="https://copilot.microsoft.com/chats/umqpciKs3jhwoeUTXwon8" href="https://copilot.microsoft.com/chats/umqpciKs3jhwoeUTXwon8" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('ai', 7, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=copilot.microsoft.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Copilot</div>
+                                <div class="card-desc">Microsoft</div>
+                            </div></a></div></div><div class="section-group" style="animation-delay: 0.16s;">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <div class="section-title-icon"></div>
+                                Games
+                                <span class="section-count">2</span>
+                            </div>
+                            <button class="btn-add-section" onclick="openModal('games')" aria-label="Add bookmark to Games">+</button>
+                        </div><div class="grid" data-layout="classic" data-group="games"><a class="card" data-url="https://aternos.org/go/" href="https://aternos.org/go/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('games', 0, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=aternos.org&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Aternos</div>
+                                <div class="card-desc">Minecraft</div>
+                            </div></a><a class="card" data-url="https://retroonline.net/Windows/The%20House%20of%20the%20Dead" href="https://retroonline.net/Windows/The%20House%20of%20the%20Dead" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('games', 1, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=retroonline.net&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">House of Dead</div>
+                                <div class="card-desc">Retro</div>
+                            </div></a></div></div><div class="section-group" style="animation-delay: 0.2s;">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <div class="section-title-icon"></div>
+                                Video Downloaders
+                                <span class="section-count">3</span>
+                            </div>
+                            <button class="btn-add-section" onclick="openModal('video_dl')" aria-label="Add bookmark to Video Downloaders">+</button>
+                        </div><div class="grid" data-layout="classic" data-group="video_dl"><a class="card" data-url="https://ssyoutube.online/en2/" href="https://ssyoutube.online/en2/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('video_dl', 0, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=ssyoutube.online&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">SSYouTube</div>
+                                <div class="card-desc">YouTube</div>
+                            </div></a><a class="card" data-url="https://cobalt.tools/" href="https://cobalt.tools/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('video_dl', 1, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=cobalt.tools&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Cobalt</div>
+                                <div class="card-desc">Clean</div>
+                            </div></a><a class="card" data-url="https://ytmp3.gg/" href="https://ytmp3.gg/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('video_dl', 2, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=ytmp3.gg&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">YTMP3</div>
+                                <div class="card-desc">MP3</div>
+                            </div></a></div></div><div class="section-group" style="animation-delay: 0.24s;">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <div class="section-title-icon"></div>
+                                Movies: Watch
+                                <span class="section-count">3</span>
+                            </div>
+                            <button class="btn-add-section" onclick="openModal('watch_movies')" aria-label="Add bookmark to Movies: Watch">+</button>
+                        </div><div class="grid" data-layout="classic" data-group="watch_movies"><a class="card" data-url="https://freemoviesin.com/home/" href="https://freemoviesin.com/home/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('watch_movies', 0, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=freemoviesin.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Fmovies</div>
+                                <div class="card-desc">Stream</div>
+                            </div></a><a class="card" data-url="https://ww7.123moviesfree.net/" href="https://ww7.123moviesfree.net/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('watch_movies', 1, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=ww7.123moviesfree.net&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">123Movies</div>
+                                <div class="card-desc">Stream</div>
+                            </div></a><a class="card" data-url="https://ww25.soap2day.day/" href="https://ww25.soap2day.day/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('watch_movies', 2, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=ww25.soap2day.day&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Soap2Day</div>
+                                <div class="card-desc">Stream</div>
+                            </div></a></div></div><div class="section-group" style="animation-delay: 0.28s;">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <div class="section-title-icon"></div>
+                                Movies: Download
+                                <span class="section-count">6</span>
+                            </div>
+                            <button class="btn-add-section" onclick="openModal('dl_movies')" aria-label="Add bookmark to Movies: Download">+</button>
+                        </div><div class="grid" data-layout="classic" data-group="dl_movies"><a class="card" data-url="https://cinemalux.zip/" href="https://cinemalux.zip/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('dl_movies', 0, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=cinemalux.zip&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Cinemaluxe</div>
+                                <div class="card-desc">Download</div>
+                            </div></a><a class="card" data-url="https://9xflix.tube/m/" href="https://9xflix.tube/m/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('dl_movies', 1, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=9xflix.tube&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">9xflix</div>
+                                <div class="card-desc">Download</div>
+                            </div></a><a class="card" data-url="https://hdmovieverse.cloud/" href="https://hdmovieverse.cloud/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('dl_movies', 2, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=hdmovieverse.cloud&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">MoviesVerse</div>
+                                <div class="card-desc">Download</div>
+                            </div></a><a class="card" data-url="https://avegamovies.cfd/" href="https://avegamovies.cfd/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('dl_movies', 3, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=avegamovies.cfd&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Vegamovies</div>
+                                <div class="card-desc">Download</div>
+                            </div></a><a class="card" data-url="https://vegamovise.vip/" href="https://vegamovise.vip/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('dl_movies', 4, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=vegamovise.vip&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">VegaMovies 2.0</div>
+                                <div class="card-desc">Proxy</div>
+                            </div></a><a class="card" data-url="https://prmovies4u.com/" href="https://prmovies4u.com/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('dl_movies', 5, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=prmovies4u.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">FilmyFly</div>
+                                <div class="card-desc">Regional Movies</div>
+                            </div></a></div></div><div class="section-group" style="animation-delay: 0.32s;">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <div class="section-title-icon"></div>
+                                Music &amp; Audio
+                                <span class="section-count">10</span>
+                            </div>
+                            <button class="btn-add-section" onclick="openModal('music')" aria-label="Add bookmark to Music &amp; Audio">+</button>
+                        </div><div class="grid" data-layout="classic" data-group="music"><a class="card" data-url="https://podcast.adobe.com/en/enhance#" href="https://podcast.adobe.com/en/enhance#" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('music', 0, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=podcast.adobe.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Adobe Enhance</div>
+                                <div class="card-desc">Audio</div>
+                            </div></a><a class="card" data-url="https://notebooklm.google.com/" href="https://notebooklm.google.com/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('music', 1, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=notebooklm.google.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Book Voice</div>
+                                <div class="card-desc">Notebook</div>
+                            </div></a><a class="card" data-url="https://suno.com/create" href="https://suno.com/create" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('music', 2, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=suno.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Suno</div>
+                                <div class="card-desc">Music Gen</div>
+                            </div></a><a class="card" data-url="https://aistudio.google.com/generate-speech" href="https://aistudio.google.com/generate-speech" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('music', 3, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=aistudio.google.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">AI Voice</div>
+                                <div class="card-desc">Speech</div>
+                            </div></a><a class="card" data-url="https://www.lyricsify.com/" href="https://www.lyricsify.com/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('music', 4, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=www.lyricsify.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Lyricsify</div>
+                                <div class="card-desc">Lyrics</div>
+                            </div></a><a class="card" data-url="https://open.spotify.com/" href="https://open.spotify.com/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('music', 5, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=open.spotify.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Spotify</div>
+                                <div class="card-desc">Music</div>
+                            </div></a><a class="card" data-url="https://virtualpiano.net/" href="https://virtualpiano.net/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('music', 6, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=virtualpiano.net&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Virtual Piano</div>
+                                <div class="card-desc">Play</div>
+                            </div></a><a class="card" data-url="https://vocalremover.org/" href="https://vocalremover.org/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('music', 7, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=vocalremover.org&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Vocal Remover</div>
+                                <div class="card-desc">Karaoke</div>
+                            </div></a><a class="card" data-url="https://ezconv.com/" href="https://ezconv.com/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('music', 8, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=ezconv.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Song Downloader</div>
+                                <div class="card-desc">EZConv</div>
+                            </div></a><a class="card" data-url="https://x-minus.pro/ai" href="https://x-minus.pro/ai" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('music', 9, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=x-minus.pro&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Ultimate VR</div>
+                                <div class="card-desc">X-Minus</div>
+                            </div></a></div></div><div class="section-group" style="animation-delay: 0.36s;">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <div class="section-title-icon"></div>
+                                My Projects
+                                <span class="section-count">17</span>
+                            </div>
+                            <button class="btn-add-section" onclick="openModal('my_projects')" aria-label="Add bookmark to My Projects">+</button>
+                        </div><div class="grid" data-layout="classic" data-group="my_projects"><a class="card" data-url="https://softwaremakerz.netlify.app/" href="https://softwaremakerz.netlify.app/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('my_projects', 0, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=softwaremakerz.netlify.app&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Software Makerz</div>
+                                <div class="card-desc">Portfolio</div>
+                            </div></a><a class="card" data-url="https://milktrakerz.netlify.app/" href="https://milktrakerz.netlify.app/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('my_projects', 1, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=milktrakerz.netlify.app&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">MilkTraker</div>
+                                <div class="card-desc">App</div>
+                            </div></a><a class="card" data-url="https://handtextz.netlify.app/" href="https://handtextz.netlify.app/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('my_projects', 2, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=handtextz.netlify.app&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">HandToTextz</div>
+                                <div class="card-desc">OCR</div>
+                            </div></a><a class="card" data-url="https://pdfbookletz.netlify.app/" href="https://pdfbookletz.netlify.app/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('my_projects', 3, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=pdfbookletz.netlify.app&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">PDF Bookletz</div>
+                                <div class="card-desc">Tools</div>
+                            </div></a><a class="card" data-url="https://pptmakerz.netlify.app/" href="https://pptmakerz.netlify.app/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('my_projects', 4, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=pptmakerz.netlify.app&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">PPT Maker</div>
+                                <div class="card-desc">Slides</div>
+                            </div></a><a class="card" data-url="https://pdfpageremoverz.netlify.app/" href="https://pdfpageremoverz.netlify.app/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('my_projects', 5, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=pdfpageremoverz.netlify.app&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Page Remover</div>
+                                <div class="card-desc">PDF</div>
+                            </div></a><a class="card" data-url="https://voicepdfz.netlify.app/" href="https://voicepdfz.netlify.app/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('my_projects', 6, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=voicepdfz.netlify.app&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Voice PDF</div>
+                                <div class="card-desc">Audio</div>
+                            </div></a><a class="card" data-url="https://pinkpiker.netlify.app/" href="https://pinkpiker.netlify.app/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('my_projects', 7, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=pinkpiker.netlify.app&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Colour Picker</div>
+                                <div class="card-desc">Design</div>
+                            </div></a><a class="card" data-url="https://imageztopdfz.netlify.app/" href="https://imageztopdfz.netlify.app/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('my_projects', 8, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=imageztopdfz.netlify.app&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Images to PDF</div>
+                                <div class="card-desc">Convert</div>
+                            </div></a><a class="card" data-url="https://qrana.netlify.app/" href="https://qrana.netlify.app/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('my_projects', 9, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=qrana.netlify.app&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">QR Arranger</div>
+                                <div class="card-desc">QR</div>
+                            </div></a><a class="card" data-url="https://pagemix.netlify.app/" href="https://pagemix.netlify.app/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('my_projects', 10, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=pagemix.netlify.app&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Pagemix</div>
+                                <div class="card-desc">Tools</div>
+                            </div></a><a class="card" data-url="https://photocopyana.netlify.app/" href="https://photocopyana.netlify.app/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('my_projects', 11, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=photocopyana.netlify.app&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Photopy</div>
+                                <div class="card-desc">Copy</div>
+                            </div></a><a class="card" data-url="https://fliptimerz.netlify.app/" href="https://fliptimerz.netlify.app/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('my_projects', 12, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=fliptimerz.netlify.app&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">FlipTimer V2</div>
+                                <div class="card-desc">Time</div>
+                            </div></a><a class="card" data-url="https://app.netlify.com/drop" href="https://app.netlify.com/drop" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('my_projects', 13, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=app.netlify.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Drop</div>
+                                <div class="card-desc">Deploy</div>
+                            </div></a><a class="card" data-url="https://netlifyanab.netlify.app/" href="https://netlifyanab.netlify.app/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('my_projects', 14, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=netlifyanab.netlify.app&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Netlify File Maker</div>
+                                <div class="card-desc">Files</div>
+                            </div></a><a class="card" data-url="https://dash.infinityfree.com/accounts/if0_40401503" href="https://dash.infinityfree.com/accounts/if0_40401503" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('my_projects', 15, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=dash.infinityfree.com&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">InfinityFree</div>
+                                <div class="card-desc">Host</div>
+                            </div></a><a class="card" data-url="https://netlifyanabv2.netlify.app/" href="https://netlifyanabv2.netlify.app/" target="_top">
+                            <div class="delete-btn" onclick="deleteBookmark('my_projects', 16, event)">✕</div>
+                            <div class="card-icon-wrap">
+                                <img src="https://www.google.com/s2/favicons?domain=netlifyanabv2.netlify.app&amp;sz=128" class="card-icon" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="card-emoji" style="display:none;">🔗</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">Netlify File Maker V2</div>
+                                <div class="card-desc">Files V2</div>
+                            </div></a></div></div></main>
         </div>
         <div class="tab-content" id="tab-flashcards">
             <div id="flashcardsArea"></div>
@@ -1223,7 +2139,7 @@
 
     <div class="footer-credit">Crafted with ❤️ by <span>ANABRATA</span></div>
 
-    <button class="secret-btn" onclick="openExportModal()" title="Save & Export">💾</button>
+    <button class="secret-btn" onclick="openExportModal()" title="Save &amp; Export">💾</button>
 
     <!-- ===== DOCK ===== -->
     <div class="retainer-dock" id="mainDock">
@@ -1284,16 +2200,13 @@
             <p class="modal-subtitle">Give your card a name and an image</p>
             <div class="modal-input-group">
                 <label>Image Link</label>
-                <input type="text" class="modal-input" id="fcImageUrl" placeholder="Paste any image URL or PostImg link"
-                    oninput="previewFcImage(this.value)">
+                <input type="text" class="modal-input" id="fcImageUrl" placeholder="Paste any image URL or PostImg link" oninput="previewFcImage(this.value)">
                 <p class="modal-input-hint">
                     Supports direct image links (.png, .jpg) and PostImg page links (postimg.cc/xxxxx)
                 </p>
                 <div class="modal-image-preview" id="fcImagePreview">
-                    <img id="fcPreviewImg" src="" alt="Preview"
-                        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
-                        onload="this.style.display='block'; this.nextElementSibling.style.display='none';">
-                    <span class="preview-error" style="display:none;">Could not load image</span>
+                    <img id="fcPreviewImg" src="" alt="Preview" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" onload="this.style.display='block'; this.nextElementSibling.style.display='none';" style="display: none;">
+                    <span class="preview-error" style="display: block;">Could not load image</span>
                 </div>
             </div>
             <div class="modal-input-group">
@@ -1312,8 +2225,7 @@
         <div class="modal" style="text-align: center;">
             <h3>Save Dashboard</h3>
             <p class="modal-subtitle">Download an HTML file with all your data</p>
-            <img id="page-qr" src="" width="130" height="130"
-                style="margin: 14px 0; border-radius: 12px; border: 3px solid var(--glass-border-hover);" alt="QR">
+            <img id="page-qr" src="" width="130" height="130" style="margin: 14px 0; border-radius: 12px; border: 3px solid var(--glass-border-hover);" alt="QR">
             <div class="modal-btns" style="justify-content: center;">
                 <button class="btn-modal btn-cancel" onclick="closeModal('exportModal')">Close</button>
                 <button class="btn-modal btn-primary" onclick="downloadUpdatedHTML()">Download HTML</button>
@@ -1352,8 +2264,8 @@
         // ============================================================
         // INBUILT GITHUB AUTO-SYNC CONFIGURATION (Split to avoid deactivation)
         // ============================================================
-        const tokenP1 = 'github_pat_11BUXQ3TI09ZcmA8vX1fbs';
-        const tokenP2 = '_FprSIEi1PoOY3QXEa0Zm7DJN8SaRWG2WNsWV0z5KWGkMEK4AFDZInbwtIPx';
+        const tokenP1 = 'ghp_KkmM2Ta2oEUHt0f2V';
+        const tokenP2 = 'YFygfkgXhiwdA1OWdkJ';
         const GH_CONFIG = {
             token: tokenP1 + tokenP2,
             repo: 'anabrata/anabrata',
@@ -1502,129 +2414,547 @@
         // DATA
         // ============================================================
         const defaultData = [
+    {
+        "id": "pdf",
+        "category": "PDF Editors",
+        "links": [
             {
-                id: "pdf",
-                category: "PDF Editors",
-                links: [
-                    { name: "PDF Watermark Remover", url: "https://lightpdf.com/remove-watermark", desc: "LightPDF" },
-                    { name: "Image to PDF", url: "https://www.freepdfconvert.com/", desc: "Free PDF Convert" },
-                    { name: "Merge PDF", url: "https://www.ilovepdf.com/merge_pdf", desc: "iLovePDF" },
-                    { name: "PDF to Excel", url: "https://www.ilovepdf.com/pdf_to_excel", desc: "Convert" },
-                    { name: "JPG to PDF", url: "https://www.ilovepdf.com/jpg_to_pdf", desc: "Convert" },
-                    { name: "Powerpoint to PDF", url: "https://www.ilovepdf.com/powerpoint_to_pdf", desc: "Convert" },
-                    { name: "OCR PDF", url: "https://www.ilovepdf.com/ocr-pdf", desc: "Scan" },
-                    { name: "PDF to JPG", url: "https://www.ilovepdf.com/pdf_to_jpg", desc: "Extract" },
-                    { name: "Organize PDF", url: "https://www.ilovepdf.com/organize-pdf", desc: "Sort" },
-                    { name: "Remove Pages", url: "https://www.ilovepdf.com/remove-pages", desc: "Delete" },
-                    { name: "PDF to Word", url: "https://www.ilovepdf.com/pdf_to_word", desc: "Convert" },
-                    { name: "Word to PDF", url: "https://www.ilovepdf.com/word_to_pdf", desc: "Convert" }
-                ]
+                "name": "PDF Watermark Remover",
+                "url": "https://lightpdf.com/remove-watermark",
+                "desc": "LightPDF"
             },
-            { id: "img", category: "Image Editing", links: [
-                { name: "Image Background", url: "https://www.pixelbin.io/ai-tools/watermark-remover", desc: "PixelBin" },
-                { name: "Editing Prompt", url: "https://editingprompt.com/", desc: "Prompts" },
-                { name: "Post Images", url: "https://postimages.org/", desc: "Hosting" },
-                { name: "AI Photo Editor", url: "https://pixlr.com/express/?tool=adjust", desc: "Pixlr" },
-                { name: "Super Resolution", url: "https://deepai.org/machine-learning-model/torch-srgan", desc: "DeepAI" },
-                { name: "Watermark Remover", url: "https://lightpdf.com/image-watermark-remover", desc: "Clean" },
-                { name: "Clothes Editor", url: "https://fitroom.app/create", desc: "Fitroom" },
-                { name: "Background Remover", url: "https://www.photoroom.com/tools/background-remover", desc: "PhotoRoom" },
-                { name: "Face Swap", url: "https://remaker.ai/face-swap-free/", desc: "Remaker" },
-                { name: "Photoshop Online", url: "https://www.photopea.com/", desc: "Photopea" },
-                { name: "Merge Images", url: "https://pinetools.com/merge-images", desc: "PineTools" },
-                { name: "Image Compressor", url: "https://imageresizer.com/image-compressor", desc: "Resize" },
-                { name: "Circle Crop", url: "https://circlecropimage.com/", desc: "Crop" },
-                { name: "iLoveIMG", url: "https://www.iloveimg.com/", desc: "Suite" },
-                { name: "BG Remover", url: "https://www.iloveimg.com/remove-background", desc: "Remove BG" },
-                { name: "Online Compressor", url: "https://imagecompressor.com/", desc: "Compress" },
-                { name: "Resize for WhatsApp", url: "https://imresizer.com/resize-image-to-whatsapp-dp?content=hide", desc: "DP Resize" }
-            ]},
-            { id: "others", category: "Tools & Utilities", links: [
-                { name: "Figlet Generator", url: "https://doodlenerd.com/web-tool/figlet-generator", desc: "ASCII" },
-                { name: "VirusTotal", url: "https://www.virustotal.com/gui/home/upload", desc: "Scan" },
-                { name: "Hinglish Translator", url: "https://anythingtranslate.com/translators/hinglish-translator/", desc: "Translate" },
-                { name: "YouTube Tool", url: "https://tuberanker.com/", desc: "SEO" },
-                { name: "Chat v2.0", url: "https://chatv2.septapus.com/", desc: "Style Gen" },
-                { name: "Temp Mail So", url: "https://tempmail.so/", desc: "Email" },
-                { name: "HTML Viewer", url: "https://html.onlineviewer.net/", desc: "Code" },
-                { name: "Temp Mail O", url: "https://tempmailo.com/", desc: "Email" },
-                { name: "Software hack", url: "https://filecr.com/windows/office-pdf/", desc: "FileCR" },
-                { name: "ToffeeShare", url: "https://toffeeshare.com/en/", desc: "Share" },
-                { name: "Questions", url: "https://childquesz.netlify.app/", desc: "ChildQuesz" },
-                { name: "Bijoy Converter", url: "https://bsbk.portal.gov.bd/apps/bangla-converter/index.html", desc: "Unicode" },
-                { name: "JioCloud", url: "https://www.jioaicloud.com/home", desc: "Storage" },
-                { name: "Link Ink", url: "https://lnk.ink/dashboard", desc: "Shortener" },
-                { name: "QR Generator", url: "https://pewscorner.github.io/barcodes/qrcode_generator.html", desc: "QR Code" }
-            ]},
-            { id: "ai", category: "AI Tools", links: [
-                { name: "Venice Chat", url: "https://venice.ai/chat", desc: "Uncensored" },
-                { name: "LMArena", url: "https://lmarena.ai/?mode=side-by-side", desc: "Compare" },
-                { name: "Claude", url: "https://claude.ai/login?returnTo=%2F%3F", desc: "Anthropic" },
-                { name: "Perplexity", url: "https://www.perplexity.ai/", desc: "Search" },
-                { name: "Google Gemini", url: "https://gemini.google.com/app", desc: "Google" },
-                { name: "Qwen", url: "https://chat.qwen.ai/", desc: "Alibaba" },
-                { name: "DeepSeek", url: "https://chat.deepseek.com/", desc: "DeepSeek" },
-                { name: "Copilot", url: "https://copilot.microsoft.com/chats/umqpciKs3jhwoeUTXwon8", desc: "Microsoft" }
-            ]},
-            { id: "games", category: "Games", links: [
-                { name: "Aternos", url: "https://aternos.org/go/", desc: "Minecraft" },
-                { name: "House of Dead", url: "https://retroonline.net/Windows/The%20House%20of%20the%20Dead", desc: "Retro" }
-            ]},
-            { id: "video_dl", category: "Video Downloaders", links: [
-                { name: "SSYouTube", url: "https://ssyoutube.online/en2/", desc: "YouTube" },
-                { name: "Cobalt", url: "https://cobalt.tools/", desc: "Clean" },
-                { name: "YTMP3", url: "https://ytmp3.gg/", desc: "MP3" }
-            ]},
-            { id: "watch_movies", category: "Movies: Watch", links: [
-                { name: "Fmovies", url: "https://freemoviesin.com/home/", desc: "Stream" },
-                { name: "123Movies", url: "https://ww7.123moviesfree.net/", desc: "Stream" },
-                { name: "Soap2Day", url: "https://ww25.soap2day.day/", desc: "Stream" }
-            ]},
-            { id: "dl_movies", category: "Movies: Download", links: [
-                { name: "Cinemaluxe", url: "https://cinemalux.zip/", desc: "Download" },
-                { name: "9xflix", url: "https://9xflix.tube/m/", desc: "Download" },
-                { name: "MoviesVerse", url: "https://hdmovieverse.cloud/", desc: "Download" },
-                { name: "Vegamovies", url: "https://avegamovies.cfd/", desc: "Download" },
-                { name: "VegaMovies 2.0", url: "https://vegamovise.vip/", desc: "Proxy" },
-                { name: "FilmyFly", url: "https://prmovies4u.com/", desc: "Regional Movies" }
-            ]},
-            { id: "music", category: "Music & Audio", links: [
-                { name: "Adobe Enhance", url: "https://podcast.adobe.com/en/enhance#", desc: "Audio" },
-                { name: "Book Voice", url: "https://notebooklm.google.com/", desc: "Notebook" },
-                { name: "Suno", url: "https://suno.com/create", desc: "Music Gen" },
-                { name: "AI Voice", url: "https://aistudio.google.com/generate-speech", desc: "Speech" },
-                { name: "Lyricsify", url: "https://www.lyricsify.com/", desc: "Lyrics" },
-                { name: "Spotify", url: "https://open.spotify.com/", desc: "Music" },
-                { name: "Virtual Piano", url: "https://virtualpiano.net/", desc: "Play" },
-                { name: "Vocal Remover", url: "https://vocalremover.org/", desc: "Karaoke" },
-                { name: "Song Downloader", url: "https://ezconv.com/", desc: "EZConv" },
-                { name: "Ultimate VR", url: "https://x-minus.pro/ai", desc: "X-Minus" }
-            ]},
-            { id: "my_projects", category: "My Projects", links: [
-                { name: "Software Makerz", url: "https://softwaremakerz.netlify.app/", desc: "Portfolio" },
-                { name: "MilkTraker", url: "https://milktrakerz.netlify.app/", desc: "App" },
-                { name: "HandToTextz", url: "https://handtextz.netlify.app/", desc: "OCR" },
-                { name: "PDF Bookletz", url: "https://pdfbookletz.netlify.app/", desc: "Tools" },
-                { name: "PPT Maker", url: "https://pptmakerz.netlify.app/", desc: "Slides" },
-                { name: "Page Remover", url: "https://pdfpageremoverz.netlify.app/", desc: "PDF" },
-                { name: "Voice PDF", url: "https://voicepdfz.netlify.app/", desc: "Audio" },
-                { name: "Colour Picker", url: "https://pinkpiker.netlify.app/", desc: "Design" },
-                { name: "Images to PDF", url: "https://imageztopdfz.netlify.app/", desc: "Convert" },
-                { name: "QR Arranger", url: "https://qrana.netlify.app/", desc: "QR" },
-                { name: "Pagemix", url: "https://pagemix.netlify.app/", desc: "Tools" },
-                { name: "Photopy", url: "https://photocopyana.netlify.app/", desc: "Copy" },
-                { name: "FlipTimer V2", url: "https://fliptimerz.netlify.app/", desc: "Time" },
-                { name: "Drop", url: "https://app.netlify.com/drop", desc: "Deploy" },
-                { name: "Netlify File Maker", url: "https://netlifyanab.netlify.app/", desc: "Files" },
-                { name: "InfinityFree", url: "https://dash.infinityfree.com/accounts/if0_40401503", desc: "Host" },
-                { name: "Netlify File Maker V2", url: "https://netlifyanabv2.netlify.app/", desc: "Files V2" }
-            ]}
-        ];
+            {
+                "name": "Image to PDF",
+                "url": "https://www.freepdfconvert.com/",
+                "desc": "Free PDF Convert"
+            },
+            {
+                "name": "Merge PDF",
+                "url": "https://www.ilovepdf.com/merge_pdf",
+                "desc": "iLovePDF"
+            },
+            {
+                "name": "PDF to Excel",
+                "url": "https://www.ilovepdf.com/pdf_to_excel",
+                "desc": "Convert"
+            },
+            {
+                "name": "JPG to PDF",
+                "url": "https://www.ilovepdf.com/jpg_to_pdf",
+                "desc": "Convert"
+            },
+            {
+                "name": "Powerpoint to PDF",
+                "url": "https://www.ilovepdf.com/powerpoint_to_pdf",
+                "desc": "Convert"
+            },
+            {
+                "name": "OCR PDF",
+                "url": "https://www.ilovepdf.com/ocr-pdf",
+                "desc": "Scan"
+            },
+            {
+                "name": "PDF to JPG",
+                "url": "https://www.ilovepdf.com/pdf_to_jpg",
+                "desc": "Extract"
+            },
+            {
+                "name": "Organize PDF",
+                "url": "https://www.ilovepdf.com/organize-pdf",
+                "desc": "Sort"
+            },
+            {
+                "name": "Remove Pages",
+                "url": "https://www.ilovepdf.com/remove-pages",
+                "desc": "Delete"
+            },
+            {
+                "name": "PDF to Word",
+                "url": "https://www.ilovepdf.com/pdf_to_word",
+                "desc": "Convert"
+            },
+            {
+                "name": "Word to PDF",
+                "url": "https://www.ilovepdf.com/word_to_pdf",
+                "desc": "Convert"
+            }
+        ]
+    },
+    {
+        "id": "img",
+        "category": "Image Editing",
+        "links": [
+            {
+                "name": "Image Background",
+                "url": "https://www.pixelbin.io/ai-tools/watermark-remover",
+                "desc": "PixelBin"
+            },
+            {
+                "name": "Editing Prompt",
+                "url": "https://editingprompt.com/",
+                "desc": "Prompts"
+            },
+            {
+                "name": "Post Images",
+                "url": "https://postimages.org/",
+                "desc": "Hosting"
+            },
+            {
+                "name": "AI Photo Editor",
+                "url": "https://pixlr.com/express/?tool=adjust",
+                "desc": "Pixlr"
+            },
+            {
+                "name": "Super Resolution",
+                "url": "https://deepai.org/machine-learning-model/torch-srgan",
+                "desc": "DeepAI"
+            },
+            {
+                "name": "Watermark Remover",
+                "url": "https://lightpdf.com/image-watermark-remover",
+                "desc": "Clean"
+            },
+            {
+                "name": "Clothes Editor",
+                "url": "https://fitroom.app/create",
+                "desc": "Fitroom"
+            },
+            {
+                "name": "Background Remover",
+                "url": "https://www.photoroom.com/tools/background-remover",
+                "desc": "PhotoRoom"
+            },
+            {
+                "name": "Face Swap",
+                "url": "https://remaker.ai/face-swap-free/",
+                "desc": "Remaker"
+            },
+            {
+                "name": "Photoshop Online",
+                "url": "https://www.photopea.com/",
+                "desc": "Photopea"
+            },
+            {
+                "name": "Merge Images",
+                "url": "https://pinetools.com/merge-images",
+                "desc": "PineTools"
+            },
+            {
+                "name": "Image Compressor",
+                "url": "https://imageresizer.com/image-compressor",
+                "desc": "Resize"
+            },
+            {
+                "name": "Circle Crop",
+                "url": "https://circlecropimage.com/",
+                "desc": "Crop"
+            },
+            {
+                "name": "iLoveIMG",
+                "url": "https://www.iloveimg.com/",
+                "desc": "Suite"
+            },
+            {
+                "name": "BG Remover",
+                "url": "https://www.iloveimg.com/remove-background",
+                "desc": "Remove BG"
+            },
+            {
+                "name": "Online Compressor",
+                "url": "https://imagecompressor.com/",
+                "desc": "Compress"
+            },
+            {
+                "name": "Resize for WhatsApp",
+                "url": "https://imresizer.com/resize-image-to-whatsapp-dp?content=hide",
+                "desc": "DP Resize"
+            }
+        ]
+    },
+    {
+        "id": "others",
+        "category": "Tools & Utilities",
+        "links": [
+            {
+                "name": "Figlet Generator",
+                "url": "https://doodlenerd.com/web-tool/figlet-generator",
+                "desc": "ASCII"
+            },
+            {
+                "name": "VirusTotal",
+                "url": "https://www.virustotal.com/gui/home/upload",
+                "desc": "Scan"
+            },
+            {
+                "name": "Hinglish Translator",
+                "url": "https://anythingtranslate.com/translators/hinglish-translator/",
+                "desc": "Translate"
+            },
+            {
+                "name": "YouTube Tool",
+                "url": "https://tuberanker.com/",
+                "desc": "SEO"
+            },
+            {
+                "name": "Chat v2.0",
+                "url": "https://chatv2.septapus.com/",
+                "desc": "Style Gen"
+            },
+            {
+                "name": "Temp Mail So",
+                "url": "https://tempmail.so/",
+                "desc": "Email"
+            },
+            {
+                "name": "HTML Viewer",
+                "url": "https://html.onlineviewer.net/",
+                "desc": "Code"
+            },
+            {
+                "name": "Temp Mail O",
+                "url": "https://tempmailo.com/",
+                "desc": "Email"
+            },
+            {
+                "name": "Software hack",
+                "url": "https://filecr.com/windows/office-pdf/",
+                "desc": "FileCR"
+            },
+            {
+                "name": "ToffeeShare",
+                "url": "https://toffeeshare.com/en/",
+                "desc": "Share"
+            },
+            {
+                "name": "Questions",
+                "url": "https://childquesz.netlify.app/",
+                "desc": "ChildQuesz"
+            },
+            {
+                "name": "Bijoy Converter",
+                "url": "https://bsbk.portal.gov.bd/apps/bangla-converter/index.html",
+                "desc": "Unicode"
+            },
+            {
+                "name": "JioCloud",
+                "url": "https://www.jioaicloud.com/home",
+                "desc": "Storage"
+            },
+            {
+                "name": "Link Ink",
+                "url": "https://lnk.ink/dashboard",
+                "desc": "Shortener"
+            },
+            {
+                "name": "QR Generator",
+                "url": "https://pewscorner.github.io/barcodes/qrcode_generator.html",
+                "desc": "QR Code"
+            }
+        ]
+    },
+    {
+        "id": "ai",
+        "category": "AI Tools",
+        "links": [
+            {
+                "name": "Venice Chat",
+                "url": "https://venice.ai/chat",
+                "desc": "Uncensored"
+            },
+            {
+                "name": "LMArena",
+                "url": "https://lmarena.ai/?mode=side-by-side",
+                "desc": "Compare"
+            },
+            {
+                "name": "Claude",
+                "url": "https://claude.ai/login?returnTo=%2F%3F",
+                "desc": "Anthropic"
+            },
+            {
+                "name": "Perplexity",
+                "url": "https://www.perplexity.ai/",
+                "desc": "Search"
+            },
+            {
+                "name": "Google Gemini",
+                "url": "https://gemini.google.com/app",
+                "desc": "Google"
+            },
+            {
+                "name": "Qwen",
+                "url": "https://chat.qwen.ai/",
+                "desc": "Alibaba"
+            },
+            {
+                "name": "DeepSeek",
+                "url": "https://chat.deepseek.com/",
+                "desc": "DeepSeek"
+            },
+            {
+                "name": "Copilot",
+                "url": "https://copilot.microsoft.com/chats/umqpciKs3jhwoeUTXwon8",
+                "desc": "Microsoft"
+            }
+        ]
+    },
+    {
+        "id": "games",
+        "category": "Games",
+        "links": [
+            {
+                "name": "Aternos",
+                "url": "https://aternos.org/go/",
+                "desc": "Minecraft"
+            },
+            {
+                "name": "House of Dead",
+                "url": "https://retroonline.net/Windows/The%20House%20of%20the%20Dead",
+                "desc": "Retro"
+            }
+        ]
+    },
+    {
+        "id": "video_dl",
+        "category": "Video Downloaders",
+        "links": [
+            {
+                "name": "SSYouTube",
+                "url": "https://ssyoutube.online/en2/",
+                "desc": "YouTube"
+            },
+            {
+                "name": "Cobalt",
+                "url": "https://cobalt.tools/",
+                "desc": "Clean"
+            },
+            {
+                "name": "YTMP3",
+                "url": "https://ytmp3.gg/",
+                "desc": "MP3"
+            }
+        ]
+    },
+    {
+        "id": "watch_movies",
+        "category": "Movies: Watch",
+        "links": [
+            {
+                "name": "Fmovies",
+                "url": "https://freemoviesin.com/home/",
+                "desc": "Stream"
+            },
+            {
+                "name": "123Movies",
+                "url": "https://ww7.123moviesfree.net/",
+                "desc": "Stream"
+            },
+            {
+                "name": "Soap2Day",
+                "url": "https://ww25.soap2day.day/",
+                "desc": "Stream"
+            }
+        ]
+    },
+    {
+        "id": "dl_movies",
+        "category": "Movies: Download",
+        "links": [
+            {
+                "name": "Cinemaluxe",
+                "url": "https://cinemalux.zip/",
+                "desc": "Download"
+            },
+            {
+                "name": "9xflix",
+                "url": "https://9xflix.tube/m/",
+                "desc": "Download"
+            },
+            {
+                "name": "MoviesVerse",
+                "url": "https://hdmovieverse.cloud/",
+                "desc": "Download"
+            },
+            {
+                "name": "Vegamovies",
+                "url": "https://avegamovies.cfd/",
+                "desc": "Download"
+            },
+            {
+                "name": "VegaMovies 2.0",
+                "url": "https://vegamovise.vip/",
+                "desc": "Proxy"
+            },
+            {
+                "name": "FilmyFly",
+                "url": "https://prmovies4u.com/",
+                "desc": "Regional Movies"
+            }
+        ]
+    },
+    {
+        "id": "music",
+        "category": "Music & Audio",
+        "links": [
+            {
+                "name": "Adobe Enhance",
+                "url": "https://podcast.adobe.com/en/enhance#",
+                "desc": "Audio"
+            },
+            {
+                "name": "Book Voice",
+                "url": "https://notebooklm.google.com/",
+                "desc": "Notebook"
+            },
+            {
+                "name": "Suno",
+                "url": "https://suno.com/create",
+                "desc": "Music Gen"
+            },
+            {
+                "name": "AI Voice",
+                "url": "https://aistudio.google.com/generate-speech",
+                "desc": "Speech"
+            },
+            {
+                "name": "Lyricsify",
+                "url": "https://www.lyricsify.com/",
+                "desc": "Lyrics"
+            },
+            {
+                "name": "Spotify",
+                "url": "https://open.spotify.com/",
+                "desc": "Music"
+            },
+            {
+                "name": "Virtual Piano",
+                "url": "https://virtualpiano.net/",
+                "desc": "Play"
+            },
+            {
+                "name": "Vocal Remover",
+                "url": "https://vocalremover.org/",
+                "desc": "Karaoke"
+            },
+            {
+                "name": "Song Downloader",
+                "url": "https://ezconv.com/",
+                "desc": "EZConv"
+            },
+            {
+                "name": "Ultimate VR",
+                "url": "https://x-minus.pro/ai",
+                "desc": "X-Minus"
+            }
+        ]
+    },
+    {
+        "id": "my_projects",
+        "category": "My Projects",
+        "links": [
+            {
+                "name": "Software Makerz",
+                "url": "https://softwaremakerz.netlify.app/",
+                "desc": "Portfolio"
+            },
+            {
+                "name": "MilkTraker",
+                "url": "https://milktrakerz.netlify.app/",
+                "desc": "App"
+            },
+            {
+                "name": "HandToTextz",
+                "url": "https://handtextz.netlify.app/",
+                "desc": "OCR"
+            },
+            {
+                "name": "PDF Bookletz",
+                "url": "https://pdfbookletz.netlify.app/",
+                "desc": "Tools"
+            },
+            {
+                "name": "PPT Maker",
+                "url": "https://pptmakerz.netlify.app/",
+                "desc": "Slides"
+            },
+            {
+                "name": "Page Remover",
+                "url": "https://pdfpageremoverz.netlify.app/",
+                "desc": "PDF"
+            },
+            {
+                "name": "Voice PDF",
+                "url": "https://voicepdfz.netlify.app/",
+                "desc": "Audio"
+            },
+            {
+                "name": "Colour Picker",
+                "url": "https://pinkpiker.netlify.app/",
+                "desc": "Design"
+            },
+            {
+                "name": "Images to PDF",
+                "url": "https://imageztopdfz.netlify.app/",
+                "desc": "Convert"
+            },
+            {
+                "name": "QR Arranger",
+                "url": "https://qrana.netlify.app/",
+                "desc": "QR"
+            },
+            {
+                "name": "Pagemix",
+                "url": "https://pagemix.netlify.app/",
+                "desc": "Tools"
+            },
+            {
+                "name": "Photopy",
+                "url": "https://photocopyana.netlify.app/",
+                "desc": "Copy"
+            },
+            {
+                "name": "FlipTimer V2",
+                "url": "https://fliptimerz.netlify.app/",
+                "desc": "Time"
+            },
+            {
+                "name": "Drop",
+                "url": "https://app.netlify.com/drop",
+                "desc": "Deploy"
+            },
+            {
+                "name": "Netlify File Maker",
+                "url": "https://netlifyanab.netlify.app/",
+                "desc": "Files"
+            },
+            {
+                "name": "InfinityFree",
+                "url": "https://dash.infinityfree.com/accounts/if0_40401503",
+                "desc": "Host"
+            },
+            {
+                "name": "Netlify File Maker V2",
+                "url": "https://netlifyanabv2.netlify.app/",
+                "desc": "Files V2"
+            }
+        ]
+    }
+];
 
         // ============================================================
         // STATE
         // ============================================================
+        const buildTimestamp = "2026-07-02T07:58:47.220Z";
         const defaultFlashCards = [];
+
+        // Check if server HTML has a newer build than our local storage
+        const localTimestamp = localStorage.getItem('gh_build_timestamp') || '';
+        if (buildTimestamp && localTimestamp !== buildTimestamp) {
+            localStorage.setItem('bmData_v19', JSON.stringify(defaultData));
+            localStorage.setItem('fcData_v19', JSON.stringify(defaultFlashCards));
+            localStorage.setItem('gh_build_timestamp', buildTimestamp);
+        }
+
         let bookmarks = JSON.parse(localStorage.getItem('bmData_v19')) || defaultData;
         let flashCards = JSON.parse(localStorage.getItem('fcData_v19')) || defaultFlashCards;
         let currentLayout = localStorage.getItem('bmLayout_v19') || 'classic';
@@ -2248,24 +3578,30 @@
             document.getElementById('exportModal').classList.add('active');
         };
 
+        let lastSerializedTimestamp = '';
         function serializeHTML() {
             let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
             
             // Clean up state items to keep the source clean
-            html = html.replace(/class="modal-overlay active"/g, 'class="modal-overlay"');
-            html = html.replace(/class="notepad-overlay active"/g, 'class="notepad-overlay"');
-            html = html.replace(/class="menu-popup active"/g, 'class="menu-popup"');
-            html = html.replace(/id="mainHeader" class="scrolled"/g, 'id="mainHeader"');
-            html = html.replace(/class="dock-btn active"/g, 'class="dock-btn"');
-            html = html.replace(/class="delete-mode"/g, '');
-            html = html.replace(/<body class="delete-mode">/g, '<body>');
+            html = html.replace(/class="modal-overlay"/g, 'class="modal-overlay"');
+            html = html.replace(/class="notepad-overlay"/g, 'class="notepad-overlay"');
+            html = html.replace(/class="menu-popup"/g, 'class="menu-popup"');
+            html = html.replace(/id="mainHeader"/g, 'id="mainHeader"');
+            html = html.replace(/class="dock-btn"/g, 'class="dock-btn"');
+            html = html.replace(//g, '');
+            html = html.replace(/<body >/g, '<body>');
             
-            // Inject dynamic databases into source defaults
-            const regexBM = /const defaultData = \[([\s\S]*?)\];/;
+            // Inject dynamic databases into source defaults using lookaheads to support nested arrays
+            const regexBM = /const defaultData = \[[\s\S]*?\];(?=\s*\/\/\s*=+\s*\/\/\s*STATE)/;
             html = html.replace(regexBM, `const defaultData = ${JSON.stringify(bookmarks, null, 4)};`);
             
-            const regexFC = /const defaultFlashCards = \[([\s\S]*?)\];/;
+            const regexFC = /const defaultFlashCards = \[[\s\S]*?\];(?=\s*let bookmarks =)/;
             html = html.replace(regexFC, `const defaultFlashCards = ${JSON.stringify(flashCards, null, 4)};`);
+            
+            // Inject new build timestamp to trigger cache refresh on other devices
+            lastSerializedTimestamp = new Date().toISOString();
+            const regexTS = /const buildTimestamp = "([\s\S]*?)";/;
+            html = html.replace(regexTS, `const buildTimestamp = "${lastSerializedTimestamp}";`);
             
             return html;
         }
@@ -2311,7 +3647,7 @@
 
         function toBase64(str) {
             return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) => {
-                return String.fromCharCode('0x' + p1);
+                return String.fromCharCode(parseInt(p1, 16));
             }));
         }
 
@@ -2322,9 +3658,10 @@
             const url = `https://api.github.com/repos/${GH_CONFIG.repo}/contents/${GH_CONFIG.path}`;
 
             try {
+                // Fetch using Bearer auth for fine-grained token compatibility
                 const getResp = await fetch(`${url}?ref=${GH_CONFIG.branch}`, {
                     headers: {
-                        'Authorization': `token ${GH_CONFIG.token}`,
+                        'Authorization': `Bearer ${GH_CONFIG.token}`,
                         'Accept': 'application/vnd.github.v3+json'
                     }
                 });
@@ -2334,7 +3671,7 @@
                     const data = await getResp.json();
                     sha = data.sha;
                 } else if (getResp.status !== 404) {
-                    throw new Error(`Connection failed: ${getResp.statusText}`);
+                    throw new Error(`Fetch failed (${getResp.status} ${getResp.statusText})`);
                 }
 
                 const serializedHtml = serializeHTML();
@@ -2343,7 +3680,7 @@
                 const putResp = await fetch(url, {
                     method: 'PUT',
                     headers: {
-                        'Authorization': `token ${GH_CONFIG.token}`,
+                        'Authorization': `Bearer ${GH_CONFIG.token}`,
                         'Accept': 'application/vnd.github.v3+json',
                         'Content-Type': 'application/json'
                     },
@@ -2358,6 +3695,7 @@
                 if (putResp.ok) {
                     updateSyncStatus('success', 'Synced');
                     localStorage.setItem('gh_last_sync_date', new Date().toDateString());
+                    localStorage.setItem('gh_build_timestamp', lastSerializedTimestamp); // Keep local in sync
                     if (showNotification) showToast('🚀 GitHub sync completed successfully!');
                 } else {
                     const errData = await putResp.json();
@@ -2365,7 +3703,7 @@
                 }
             } catch (err) {
                 console.error(err);
-                updateSyncStatus('error', 'Sync Failed');
+                updateSyncStatus('error', err.message);
                 if (showNotification) showToast(`⚠️ Sync failed: ${err.message}`);
             }
         };
@@ -2461,5 +3799,6 @@
 
     })();
     </script>
-</body>
-</html>
+
+
+</body></html>
