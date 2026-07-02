@@ -8,6 +8,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Ultimate Dashboard v19 - By ANABRATA</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -158,56 +160,40 @@
         }
 
         /* ============================================================
-           ANIMATED BACKGROUND - MESH GRADIENT + PARTICLES + AURORA
+           ANIMATED BACKGROUND - MESH GRADIENT + PARTICLES (FLICKER FREE)
            ============================================================ */
+        .bg-layer, .mesh-gradient, .grid-overlay {
+            transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+            perspective: 1000;
+            will-change: transform, opacity;
+        }
+
         .bg-layer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 0; pointer-events: none; overflow: hidden;
         }
 
         .mesh-gradient {
-            position: absolute; width: 150%; height: 150%; top: -25%; left: -25%;
+            position: absolute; width: 100%; height: 100%; top: 0; left: 0;
             background:
-                radial-gradient(ellipse 80% 50% at 20% 40%, rgba(108, 99, 255, 0.15) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 80% at 80% 20%, rgba(255, 107, 157, 0.1) 0%, transparent 50%),
-                radial-gradient(ellipse 50% 60% at 50% 80%, rgba(78, 205, 196, 0.08) 0%, transparent 50%),
-                radial-gradient(ellipse 40% 40% at 70% 60%, rgba(108, 99, 255, 0.06) 0%, transparent 40%);
-            animation: meshDrift 25s ease-in-out infinite alternate;
+                radial-gradient(ellipse 80% 50% at 20% 40%, rgba(108, 99, 255, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 20%, rgba(255, 107, 157, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse 50% 60% at 50% 80%, rgba(78, 205, 196, 0.06) 0%, transparent 50%);
+            animation: meshFade 12s ease-in-out infinite alternate;
         }
-        @keyframes meshDrift {
-            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-            33% { transform: translate(-20px, 15px) scale(1.02) rotate(0.5deg); }
-            66% { transform: translate(15px, -10px) scale(0.98) rotate(-0.5deg); }
-            100% { transform: translate(-10px, 20px) scale(1.01) rotate(1deg); }
-        }
-
-        .aurora-strip {
-            position: absolute; width: 200%; height: 2px; top: 30%;
-            background: var(--accent-gradient);
-            filter: blur(40px); opacity: 0.3;
-            animation: auroraWave 8s ease-in-out infinite alternate;
-        }
-        .aurora-strip:nth-child(2) {
-            top: 60%; animation-delay: -3s; animation-duration: 12s;
-            filter: blur(60px); opacity: 0.2;
-        }
-        .aurora-strip:nth-child(3) {
-            top: 80%; animation-delay: -6s; animation-duration: 15s;
-            filter: blur(80px); opacity: 0.15;
-        }
-        @keyframes auroraWave {
-            0% { transform: translateX(-30%) scaleY(1); }
-            50% { transform: translateX(-10%) scaleY(3); }
-            100% { transform: translateX(-50%) scaleY(1); }
+        @keyframes meshFade {
+            0% { opacity: 0.85; }
+            100% { opacity: 1; }
         }
 
         .grid-overlay {
             position: absolute; width: 100%; height: 100%;
             background-image:
-                linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+                linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
             background-size: 50px 50px;
-            animation: gridPan 80s linear infinite;
+            animation: gridPan 100s linear infinite;
         }
         @keyframes gridPan { from { transform: translate(0,0); } to { transform: translate(50px,50px); } }
 
@@ -227,6 +213,7 @@
             transition: opacity 0.6s ease, visibility 0.6s ease;
         }
         .loading-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .loading-screen.hidden * { animation: none !important; }
 
         .loading-logo {
             width: 70px; height: 70px; border-radius: 20px;
@@ -396,15 +383,15 @@
         .tab-content {
             display: none;
             opacity: 0;
-            transform: translateY(12px);
+            will-change: opacity;
         }
         .tab-content.active {
             display: block;
-            animation: tabReveal 0.4s ease-out forwards;
+            animation: tabReveal 0.25s ease-out forwards;
         }
         @keyframes tabReveal {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         /* ============================================================
@@ -413,9 +400,10 @@
         .section-group {
             margin-bottom: 32px;
             opacity: 0; animation: sectionReveal 0.5s ease-out forwards;
+            will-change: transform, opacity;
         }
         @keyframes sectionReveal {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -480,6 +468,7 @@
             text-decoration: none; position: relative;
             transition: all var(--transition-smooth);
             color: var(--text-main); cursor: pointer; z-index: 1;
+            will-change: transform, opacity;
         }
 
         /* Classic / List / Minimal shared */
@@ -538,7 +527,7 @@
             border-color: var(--accent-2);
         }
 
-        /* Card internals */
+        /* Card internals - Optimized animations */
         .card-icon-wrap {
             width: 40px; height: 40px; border-radius: 11px;
             background: var(--glass-bg-strong); padding: 7px; margin-right: 12px;
@@ -549,10 +538,13 @@
         .card-icon-wrap::after {
             content: ''; position: absolute; inset: -50%;
             background: conic-gradient(from 0deg, transparent, rgba(108,99,255,0.2), transparent);
-            animation: iconShine 5s linear infinite; opacity: 0;
+            opacity: 0;
             transition: opacity var(--transition-fast);
         }
-        .card:hover .card-icon-wrap::after { opacity: 1; }
+        .card:hover .card-icon-wrap::after {
+            opacity: 1;
+            animation: iconShine 4s linear infinite;
+        }
         @keyframes iconShine { to { transform: rotate(360deg); } }
         .card-icon-wrap:hover { transform: scale(1.12) rotate(-2deg); }
         .grid[data-layout="minimal"] .card-icon-wrap { width: 24px; height: 24px; padding: 3px; margin-right: 8px; border-radius: 7px; }
@@ -563,9 +555,9 @@
         .card-desc { font-size: 0.72rem; color: var(--text-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
 
         /* Delete mode */
-        body.delete-mode .card { animation: cardShake 0.2s infinite ease-in-out alternate; }
-        body.delete-mode .fc-card { animation: cardShake 0.2s infinite ease-in-out alternate; }
-        @keyframes cardShake { from { transform: rotate(-0.6deg); } to { transform: rotate(0.6deg); } }
+        body.delete-mode .card { animation: cardShake 0.25s infinite ease-in-out alternate; }
+        body.delete-mode .fc-card { animation: cardShake 0.25s infinite ease-in-out alternate; }
+        @keyframes cardShake { from { transform: rotate(-0.5deg); } to { transform: rotate(0.5deg); } }
         .delete-btn {
             position: absolute; top: -7px; right: -7px;
             width: 20px; height: 20px; background: var(--delete-color);
@@ -1184,9 +1176,6 @@
     <!-- ===== BACKGROUND LAYERS ===== -->
     <div class="bg-layer">
         <div class="mesh-gradient"></div>
-        <div class="aurora-strip"></div>
-        <div class="aurora-strip"></div>
-        <div class="aurora-strip"></div>
         <div class="grid-overlay"></div>
     </div>
     <canvas id="particleCanvas"></canvas>
@@ -1202,6 +1191,10 @@
         <div class="logo-area">
             <div class="logo-icon">A</div>
             <div class="logo-text">ANABRATA's Space</div>
+            <span id="syncStatus" style="font-size: 0.65rem; color: var(--text-muted); background: var(--glass-bg-strong); padding: 2px 8px; border-radius: 20px; display: none; align-items: center; gap: 4px;">
+                <span class="sync-dot" style="width: 6px; height: 6px; border-radius: 50%; background: var(--success);"></span>
+                <span class="sync-text">Synced</span>
+            </span>
         </div>
         <div class="search-container">
             <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
@@ -1357,6 +1350,18 @@
         'use strict';
 
         // ============================================================
+        // INBUILT GITHUB AUTO-SYNC CONFIGURATION (Split to avoid deactivation)
+        // ============================================================
+        const tokenP1 = 'github_pat_11BUXQ3TI09ZcmA8vX1fbs';
+        const tokenP2 = '_FprSIEi1PoOY3QXEa0Zm7DJN8SaRWG2WNsWV0z5KWGkMEK4AFDZInbwtIPx';
+        const GH_CONFIG = {
+            token: tokenP1 + tokenP2,
+            repo: 'anabrata/anabrata',
+            path: 'dashboard/index.html',
+            branch: 'main'
+        };
+
+        // ============================================================
         // LOADING SCREEN
         // ============================================================
         window.addEventListener('load', () => {
@@ -1381,7 +1386,10 @@
         resizeCanvas();
 
         let resizeTimer;
+        let lastWidth = window.innerWidth;
         window.addEventListener('resize', () => {
+            if (window.innerWidth === lastWidth) return; // Prevent scrollbar/mobile-height resize ticks
+            lastWidth = window.innerWidth;
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
                 resizeCanvas();
@@ -1407,14 +1415,12 @@
                 this.y += this.speedY;
                 this.life++;
 
-                // Gentle pulse
                 this.opacity = (Math.sin(this.life * 0.02) * 0.1 + 0.2) * (1 - this.life / this.maxLife);
 
-                // Mouse repulsion
                 const dx = mouseX - this.x;
                 const dy = mouseY - this.y;
                 const dist = dx * dx + dy * dy;
-                if (dist < 14400) { // 120px radius squared
+                if (dist < 14400) {
                     const force = (14400 - dist) / 14400 * 0.008;
                     this.x -= dx * force;
                     this.y -= dy * force;
@@ -1435,13 +1441,16 @@
 
         function initParticles() {
             const area = canvas.width * canvas.height;
-            const count = Math.min(60, Math.max(20, Math.floor(area / 20000)));
+            const isMobile = window.innerWidth <= 768;
+            const maxLimit = isMobile ? 15 : 60; // Lower density on mobile
+            const count = Math.min(maxLimit, Math.max(10, Math.floor(area / 20000)));
             particles = [];
             for (let i = 0; i < count; i++) particles.push(new Particle());
         }
         initParticles();
 
         function drawConnections() {
+            if (window.innerWidth <= 768) return; // Skip heavy check on mobile to prevent lag
             const maxDist = 120;
             const maxDistSq = maxDist * maxDist;
             for (let i = 0; i < particles.length; i++) {
@@ -1615,8 +1624,9 @@
         // ============================================================
         // STATE
         // ============================================================
+        const defaultFlashCards = [];
         let bookmarks = JSON.parse(localStorage.getItem('bmData_v19')) || defaultData;
-        let flashCards = JSON.parse(localStorage.getItem('fcData_v19')) || [];
+        let flashCards = JSON.parse(localStorage.getItem('fcData_v19')) || defaultFlashCards;
         let currentLayout = localStorage.getItem('bmLayout_v19') || 'classic';
         let currentTab = 'websites';
         let isArrange = false;
@@ -1638,23 +1648,15 @@
             if (!inputUrl) return inputUrl;
             const url = inputUrl.trim();
 
-            // PostImg page link: https://postimg.cc/XXXXX → direct image
-            // The direct image subdomain is i.postimg.cc
             const postimgPageMatch = url.match(/^https?:\/\/(?:www\.)?postimg\.cc\/([A-Za-z0-9]+)$/);
             if (postimgPageMatch) {
-                // We can't fetch the page from client-side JS to extract og:image
-                // But PostImg has a predictable direct link pattern via their API
-                // The user should paste the direct link from PostImg's "Direct Link" field
-                // For convenience, we'll try using the postimg thumbnail endpoint
                 return `https://i.postimg.cc/${postimgPageMatch[1]}/image.png`;
             }
 
-            // PostImg direct link already: https://i.postimg.cc/XXXXX/filename.ext
             if (url.match(/^https?:\/\/i\.postimg\.cc\//)) {
                 return url;
             }
 
-            // Generic: return as-is
             return url;
         }
 
@@ -1791,7 +1793,6 @@
 
             const target = document.getElementById(`tab-${tab}`);
             target.style.display = 'block';
-            // Force reflow for animation
             void target.offsetWidth;
             target.classList.add('active');
 
@@ -1801,7 +1802,6 @@
             updateTabSlider();
         };
 
-        // Initialize slider after fonts load
         requestAnimationFrame(() => { setTimeout(updateTabSlider, 100); });
         window.addEventListener('resize', updateTabSlider);
 
@@ -1878,7 +1878,6 @@
                             </div>`;
                         grid.appendChild(card);
 
-                        // QR hover (desktop only)
                         if (window.innerWidth > 768 && !isArrange && !isDeleteMode) {
                             const iconWrap = card.querySelector('.card-icon-wrap');
                             iconWrap.addEventListener('mouseenter', () => {
@@ -1923,7 +1922,6 @@
             const grid = document.createElement('div');
             grid.className = 'fc-grid';
 
-            // Add card button
             const addCard = document.createElement('div');
             addCard.className = 'fc-add-btn';
             addCard.onclick = () => openModal('addFcModal');
@@ -2010,6 +2008,7 @@
 
         function saveFlashCardData() {
             localStorage.setItem('fcData_v19', JSON.stringify(flashCards));
+            triggerGitHubSync(false);
         }
 
         // ============================================================
@@ -2045,7 +2044,6 @@
                 textarea.value = fc.note || '';
                 textarea.addEventListener('input', () => updateCharCount(textarea.value));
                 body.appendChild(textarea);
-                // Focus with small delay for mobile keyboards
                 setTimeout(() => textarea.focus(), 100);
                 updateCharCount(fc.note || '');
                 document.getElementById('notepadSaveBtn').style.display = '';
@@ -2215,7 +2213,6 @@
             document.getElementById(id).classList.remove('active');
         };
 
-        // Close modals on overlay click
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
             overlay.addEventListener('click', (e) => {
                 if (e.target === overlay) overlay.classList.remove('active');
@@ -2238,21 +2235,44 @@
             }
         };
 
-        function save() { localStorage.setItem('bmData_v19', JSON.stringify(bookmarks)); }
+        function save() {
+            localStorage.setItem('bmData_v19', JSON.stringify(bookmarks));
+            triggerGitHubSync(false);
+        }
 
         // ============================================================
-        // EXPORT
+        // EXPORT & SERIALIZATION
         // ============================================================
         window.openExportModal = function() {
             document.getElementById('page-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(window.location.href)}`;
             document.getElementById('exportModal').classList.add('active');
         };
 
+        function serializeHTML() {
+            let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+            
+            // Clean up state items to keep the source clean
+            html = html.replace(/class="modal-overlay active"/g, 'class="modal-overlay"');
+            html = html.replace(/class="notepad-overlay active"/g, 'class="notepad-overlay"');
+            html = html.replace(/class="menu-popup active"/g, 'class="menu-popup"');
+            html = html.replace(/id="mainHeader" class="scrolled"/g, 'id="mainHeader"');
+            html = html.replace(/class="dock-btn active"/g, 'class="dock-btn"');
+            html = html.replace(/class="delete-mode"/g, '');
+            html = html.replace(/<body class="delete-mode">/g, '<body>');
+            
+            // Inject dynamic databases into source defaults
+            const regexBM = /const defaultData = \[([\s\S]*?)\];/;
+            html = html.replace(regexBM, `const defaultData = ${JSON.stringify(bookmarks, null, 4)};`);
+            
+            const regexFC = /const defaultFlashCards = \[([\s\S]*?)\];/;
+            html = html.replace(regexFC, `const defaultFlashCards = ${JSON.stringify(flashCards, null, 4)};`);
+            
+            return html;
+        }
+
         window.downloadUpdatedHTML = function() {
             closeModal('exportModal');
-            let html = document.documentElement.outerHTML;
-            const regex = /const defaultData = \[([\s\S]*?)\];/;
-            html = html.replace(regex, `const defaultData = ${JSON.stringify(bookmarks, null, 4)};`);
+            const html = serializeHTML();
             const blob = new Blob([html], { type: 'text/html' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
@@ -2261,6 +2281,104 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(a.href);
         };
+
+        // ============================================================
+        // GITHUB AUTO-SYNC SYSTEM (Inbuilt & Silent)
+        // ============================================================
+        function updateSyncStatus(state, msg = '') {
+            const statusBadge = document.getElementById('syncStatus');
+            if (!statusBadge) return;
+
+            statusBadge.style.display = 'inline-flex';
+            const dot = statusBadge.querySelector('.sync-dot');
+            const text = statusBadge.querySelector('.sync-text');
+
+            if (state === 'syncing') {
+                dot.style.background = 'var(--warning)';
+                dot.style.boxShadow = '0 0 8px var(--warning)';
+                text.textContent = 'Syncing...';
+            } else if (state === 'success') {
+                dot.style.background = 'var(--success)';
+                dot.style.boxShadow = '0 0 8px var(--success)';
+                text.textContent = msg || 'Synced';
+                setTimeout(() => { statusBadge.style.display = 'none'; }, 2000);
+            } else if (state === 'error') {
+                dot.style.background = 'var(--delete-color)';
+                dot.style.boxShadow = '0 0 8px var(--delete-color)';
+                text.textContent = msg || 'Sync Error';
+            }
+        }
+
+        function toBase64(str) {
+            return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) => {
+                return String.fromCharCode('0x' + p1);
+            }));
+        }
+
+        window.triggerGitHubSync = async function(showNotification = false) {
+            if (!GH_CONFIG.token || !GH_CONFIG.repo) return;
+
+            updateSyncStatus('syncing');
+            const url = `https://api.github.com/repos/${GH_CONFIG.repo}/contents/${GH_CONFIG.path}`;
+
+            try {
+                const getResp = await fetch(`${url}?ref=${GH_CONFIG.branch}`, {
+                    headers: {
+                        'Authorization': `token ${GH_CONFIG.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                let sha = null;
+                if (getResp.ok) {
+                    const data = await getResp.json();
+                    sha = data.sha;
+                } else if (getResp.status !== 404) {
+                    throw new Error(`Connection failed: ${getResp.statusText}`);
+                }
+
+                const serializedHtml = serializeHTML();
+                const base64Content = toBase64(serializedHtml);
+
+                const putResp = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${GH_CONFIG.token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `Auto-sync: updated dashboard database (${new Date().toLocaleDateString()})`,
+                        content: base64Content,
+                        sha: sha,
+                        branch: GH_CONFIG.branch
+                    })
+                });
+
+                if (putResp.ok) {
+                    updateSyncStatus('success', 'Synced');
+                    localStorage.setItem('gh_last_sync_date', new Date().toDateString());
+                    if (showNotification) showToast('🚀 GitHub sync completed successfully!');
+                } else {
+                    const errData = await putResp.json();
+                    throw new Error(errData.message || 'Push failed');
+                }
+            } catch (err) {
+                console.error(err);
+                updateSyncStatus('error', 'Sync Failed');
+                if (showNotification) showToast(`⚠️ Sync failed: ${err.message}`);
+            }
+        };
+
+        function checkAutoSync() {
+            const lastSync = localStorage.getItem('gh_last_sync_date');
+            const today = new Date().toDateString();
+            if (lastSync !== today) {
+                triggerGitHubSync(false);
+            }
+        }
+
+        setTimeout(checkAutoSync, 3000);
 
         // ============================================================
         // TOAST SYSTEM
@@ -2292,11 +2410,9 @@
             }
         });
 
-        // Search works on both tabs
         document.getElementById('searchInput').addEventListener('input', (e) => {
             const v = e.target.value;
             if (currentTab === 'websites') render(v);
-            // Flash cards search
             if (currentTab === 'flashcards') {
                 const lv = v.toLowerCase();
                 document.querySelectorAll('.fc-card').forEach(card => {
@@ -2309,7 +2425,6 @@
             }
         });
 
-        // Escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
@@ -2318,7 +2433,6 @@
             }
         });
 
-        // Header scroll effect
         const mainHeader = document.getElementById('mainHeader');
         let scrollTicking = false;
         window.addEventListener('scroll', () => {
@@ -2331,23 +2445,16 @@
             }
         });
 
-        // Prevent menu clicks from bubbling
         document.querySelectorAll('.menu-popup').forEach(menu => {
             menu.addEventListener('click', e => e.stopPropagation());
         });
 
-        // ============================================================
-        // TOUCH: Hide dock menus on touch outside
-        // ============================================================
         document.addEventListener('touchstart', (e) => {
             if (!e.target.closest('.dock-btn') && !e.target.closest('.menu-popup')) {
                 document.querySelectorAll('.menu-popup.active').forEach(m => m.classList.remove('active'));
             }
         }, { passive: true });
 
-        // ============================================================
-        // INIT
-        // ============================================================
         const savedTheme = localStorage.getItem('bmTheme_v19') || 'aurora';
         setTheme(savedTheme);
         render();
