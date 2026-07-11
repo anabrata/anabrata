@@ -408,6 +408,7 @@ let farmerDB = [];
 let aadharIndex = {};
 let verifiedCount = 0;
 let recentSearches = [];
+let lastSearchedValue = '';
 
 // ===== PARTICLES =====
 (function() {
@@ -486,6 +487,14 @@ aadharInput.addEventListener('input', function() {
         f += v[i];
     }
     this.value = f;
+
+    // Clear old result instantly when input changes
+    if (v !== lastSearchedValue) {
+        const rs = document.getElementById('resultSection');
+        rs.classList.remove('show');
+        rs.innerHTML = '';
+    }
+
     this.classList.remove('valid', 'invalid');
     if (v.length >= 4) {
         const m = findMatches(v);
@@ -539,6 +548,7 @@ function searchAadhar() {
         aadharInput.classList.add('invalid'); aadharInput.focus(); return;
     }
     btn.classList.add('loading'); btn.disabled = true;
+    lastSearchedValue = raw;
     setTimeout(() => {
         btn.classList.remove('loading'); btn.disabled = false;
         const matches = findMatches(raw);
@@ -562,6 +572,16 @@ function formatAadhar(raw) {
     return raw;
 }
 
+// Mask sensitive data: show only last 4 characters
+function maskValue(val) {
+    if (!val) return '';
+    val = String(val).trim();
+    if (val.length <= 4) return val;
+    const last4 = val.slice(-4);
+    const masked = '●'.repeat(val.length - 4);
+    return masked + last4;
+}
+
 function field(label, value, cls, fw) {
     if (!value || value === 'undefined' || value === '—') return '';
     return `<div class="result-field${fw?' full-width':''}"><div class="field-label">${label}</div><div class="field-value${cls?' '+cls:''}">${value}</div></div>`;
@@ -577,11 +597,11 @@ function showResult(f) {
     h += field('Father / Husband Name', f.father, '', true);
     h += field('Village', f.village, '', false);
     h += field('Gender', f.gender, '', false);
-    h += field('KB ID No', f.kb, '', false);
-    h += field('EPIC No', f.epic, '', false);
-    h += field('Mobile No', f.mobile, '', false);
+    h += field('KB ID No', maskValue(f.kb), '', false);
+    h += field('EPIC No', maskValue(f.epic), '', false);
+    h += field('Mobile No', maskValue(f.mobile), '', false);
     h += field('Bank Name', f.bank, '', false);
-    h += field('Account No', f.account, '', true);
+    h += field('Account No', maskValue(f.account), '', true);
 
     s.innerHTML = `<div class="result-card"><div class="result-header"><div class="result-icon success-icon">✅</div><div class="result-header-text"><h3>Verification Successful</h3><p>Record found in Belta Village database</p></div></div><div class="result-body"><div class="result-grid">${h}</div></div></div>`;
     s.classList.remove('show'); void s.offsetWidth; s.classList.add('show');
