@@ -4,18 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Belta Portal — Farmer Verification System</title>
-    <meta name="description" content="Belta Portal: Verify farmer Aadhar details from Palla Gram Panchayat, Belta Village. Official verification system.">
+    <meta name="description" content="Belta Portal: Verify farmer Aadhaar details from Palla Gram Panchayat, Belta Village. Official verification system.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* ===== CSS RESET & VARIABLES ===== */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
         :root {
             --bg-primary: #0a0e1a;
             --bg-secondary: #111827;
-            --bg-card: rgba(17, 24, 39, 0.6);
             --glass: rgba(255, 255, 255, 0.04);
             --glass-border: rgba(255, 255, 255, 0.08);
             --accent-1: #6366f1;
@@ -38,934 +35,320 @@
             --radius-lg: 24px;
             --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
-
         html { scroll-behavior: smooth; }
-
         body {
             font-family: 'Inter', sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
-            position: relative;
         }
 
         /* ===== ANIMATED BACKGROUND ===== */
-        .bg-animation {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 0;
-            overflow: hidden;
-            pointer-events: none;
-        }
-
-        .bg-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.15;
-            animation: orbFloat 20s ease-in-out infinite;
-        }
-
-        .bg-orb:nth-child(1) {
-            width: 600px; height: 600px;
-            background: var(--accent-1);
-            top: -200px; left: -200px;
-            animation-duration: 25s;
-        }
-        .bg-orb:nth-child(2) {
-            width: 500px; height: 500px;
-            background: var(--accent-2);
-            top: 50%; right: -150px;
-            animation-duration: 30s;
-            animation-delay: -5s;
-        }
-        .bg-orb:nth-child(3) {
-            width: 400px; height: 400px;
-            background: #0ea5e9;
-            bottom: -100px; left: 30%;
-            animation-duration: 22s;
-            animation-delay: -10s;
-        }
-        .bg-orb:nth-child(4) {
-            width: 300px; height: 300px;
-            background: #10b981;
-            top: 30%; left: 50%;
-            animation-duration: 28s;
-            animation-delay: -15s;
-        }
-
+        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
+        .bg-orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15; animation: orbFloat 20s ease-in-out infinite; }
+        .bg-orb:nth-child(1) { width: 600px; height: 600px; background: var(--accent-1); top: -200px; left: -200px; animation-duration: 25s; }
+        .bg-orb:nth-child(2) { width: 500px; height: 500px; background: var(--accent-2); top: 50%; right: -150px; animation-duration: 30s; animation-delay: -5s; }
+        .bg-orb:nth-child(3) { width: 400px; height: 400px; background: #0ea5e9; bottom: -100px; left: 30%; animation-duration: 22s; animation-delay: -10s; }
+        .bg-orb:nth-child(4) { width: 300px; height: 300px; background: #10b981; top: 30%; left: 50%; animation-duration: 28s; animation-delay: -15s; }
         @keyframes orbFloat {
             0%, 100% { transform: translate(0, 0) scale(1); }
             25% { transform: translate(50px, -80px) scale(1.1); }
             50% { transform: translate(-30px, 60px) scale(0.9); }
             75% { transform: translate(70px, 30px) scale(1.05); }
         }
-
-        /* Grid overlay */
         .bg-grid {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-image: 
-                linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
-            background-size: 60px 60px;
-            z-index: 0;
-            pointer-events: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(99,102,241,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.03) 1px, transparent 1px);
+            background-size: 60px 60px; z-index: 0; pointer-events: none;
         }
 
         /* ===== PARTICLES ===== */
-        .particles {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .particle {
-            position: absolute;
-            width: 3px; height: 3px;
-            background: var(--accent-3);
-            border-radius: 50%;
-            opacity: 0;
-            animation: particleFloat 8s ease-in-out infinite;
-        }
-
+        .particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .particle { position: absolute; width: 3px; height: 3px; background: var(--accent-3); border-radius: 50%; opacity: 0; animation: particleFloat 8s ease-in-out infinite; }
         @keyframes particleFloat {
             0% { opacity: 0; transform: translateY(100vh) scale(0); }
-            10% { opacity: 0.6; }
-            90% { opacity: 0.6; }
+            10% { opacity: 0.6; } 90% { opacity: 0.6; }
             100% { opacity: 0; transform: translateY(-100px) scale(1); }
         }
 
-        /* ===== MAIN CONTAINER ===== */
-        .container {
-            position: relative;
-            z-index: 1;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+        .container { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 20px; }
 
-        /* ===== HEADER / NAVBAR ===== */
+        /* ===== NAVBAR ===== */
         .navbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 28px;
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius);
-            margin-bottom: 40px;
-            animation: slideDown 0.8s ease-out;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 28px; background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); border-radius: var(--radius);
+            margin-bottom: 24px; animation: slideDown 0.8s ease-out;
         }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        .logo { display: flex; align-items: center; gap: 12px; }
         .logo-icon {
-            width: 44px; height: 44px;
-            background: var(--gradient-1);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            font-weight: 800;
-            color: white;
-            font-family: 'Outfit', sans-serif;
-            box-shadow: 0 0 20px var(--accent-glow);
-            animation: logoPulse 3s ease-in-out infinite;
+            width: 44px; height: 44px; background: var(--gradient-1); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; font-weight: 800; color: white; font-family: 'Outfit', sans-serif;
+            box-shadow: 0 0 20px var(--accent-glow); animation: logoPulse 3s ease-in-out infinite;
         }
-
         @keyframes logoPulse {
             0%, 100% { box-shadow: 0 0 20px var(--accent-glow); }
             50% { box-shadow: 0 0 35px var(--accent-glow), 0 0 60px rgba(99,102,241,0.15); }
         }
-
         .logo-text {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 800;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -0.5px;
+            font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 800;
+            background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
-
         .nav-badge {
-            padding: 6px 14px;
-            background: rgba(16, 185, 129, 0.12);
-            border: 1px solid rgba(16, 185, 129, 0.25);
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--success);
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            animation: badgePulse 2s ease-in-out infinite;
+            padding: 6px 14px; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.25);
+            border-radius: 20px; font-size: 0.75rem; font-weight: 600; color: var(--success);
+            letter-spacing: 0.5px; text-transform: uppercase; animation: badgePulse 2s ease-in-out infinite;
         }
+        @keyframes badgePulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
 
-        @keyframes badgePulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        /* ===== HERO SECTION ===== */
-        .hero {
-            text-align: center;
-            padding: 40px 20px 50px;
-            animation: fadeUp 1s ease-out 0.3s both;
-        }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(40px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
+        /* ===== HERO ===== */
+        .hero { text-align: center; padding: 16px 20px 24px; animation: fadeUp 1s ease-out 0.3s both; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
         .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 18px;
-            background: rgba(99, 102, 241, 0.1);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            border-radius: 30px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: var(--accent-3);
-            margin-bottom: 24px;
+            display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px;
+            background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2);
+            border-radius: 30px; font-size: 0.8rem; font-weight: 500; color: var(--accent-3); margin-bottom: 18px;
         }
+        .hero-badge .dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; animation: dotBlink 1.5s ease-in-out infinite; }
+        @keyframes dotBlink { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } }
+        .hero h1 { font-family: 'Outfit', sans-serif; font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 900; line-height: 1.1; margin-bottom: 12px; letter-spacing: -1px; }
+        .hero h1 .gradient-text { background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .hero p { font-size: 1rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 24px; line-height: 1.7; }
 
-        .hero-badge .dot {
-            width: 8px; height: 8px;
-            background: var(--success);
-            border-radius: 50%;
-            animation: dotBlink 1.5s ease-in-out infinite;
-        }
+        /* ===== STATS ===== */
+        .stats-bar { display: flex; justify-content: center; gap: 40px; margin-bottom: 20px; animation: fadeUp 1s ease-out 0.5s both; flex-wrap: wrap; }
+        .stat-item { text-align: center; }
+        .stat-number { font-family: 'Outfit', sans-serif; font-size: 2rem; font-weight: 800; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .stat-label { font-size: 0.78rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
 
-        @keyframes dotBlink {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.8); }
-        }
-
-        .hero h1 {
-            font-family: 'Outfit', sans-serif;
-            font-size: clamp(2.2rem, 5vw, 3.5rem);
-            font-weight: 900;
-            line-height: 1.1;
-            margin-bottom: 16px;
-            letter-spacing: -1px;
-        }
-
-        .hero h1 .gradient-text {
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero p {
-            font-size: 1.05rem;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto 40px;
-            line-height: 1.7;
-        }
-
-        /* ===== STATS BAR ===== */
-        .stats-bar {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-bottom: 50px;
-            animation: fadeUp 1s ease-out 0.5s both;
-            flex-wrap: wrap;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-family: 'Outfit', sans-serif;
-            font-size: 2rem;
-            font-weight: 800;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .stat-label {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 4px;
-        }
-
-        /* ===== SEARCH SECTION ===== */
-        .search-section {
-            max-width: 700px;
-            margin: 0 auto 50px;
-            animation: fadeUp 1s ease-out 0.6s both;
-        }
-
+        /* ===== SEARCH ===== */
+        .search-section { max-width: 700px; margin: 0 auto 36px; animation: fadeUp 1s ease-out 0.6s both; }
         .search-card {
-            background: var(--glass);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-lg);
-            padding: 36px;
-            position: relative;
-            overflow: hidden;
-            transition: border-color 0.4s ease, box-shadow 0.4s ease;
+            background: var(--glass); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border); border-radius: var(--radius-lg);
+            padding: 36px; position: relative; overflow: hidden; transition: border-color 0.4s ease;
         }
-
-        .search-card:hover {
-            border-color: rgba(99, 102, 241, 0.2);
-        }
-
-        .search-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 2px;
-            background: var(--gradient-1);
-            opacity: 0.6;
-        }
-
+        .search-card:hover { border-color: rgba(99,102,241,0.2); }
+        .search-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: var(--gradient-1); opacity: 0.6; }
         .search-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 16px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 600;
+            color: var(--text-secondary); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px;
         }
-
-        .search-label svg {
-            width: 18px; height: 18px;
-            color: var(--accent-3);
-        }
-
-        .search-input-wrapper {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
+        .search-label svg { width: 18px; height: 18px; color: var(--accent-3); }
+        .search-input-wrapper { position: relative; margin-bottom: 16px; }
         .search-input {
-            width: 100%;
-            padding: 18px 24px;
-            padding-right: 60px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 2px solid rgba(255, 255, 255, 0.06);
-            border-radius: var(--radius);
-            color: var(--text-primary);
-            font-size: 1.2rem;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 600;
-            letter-spacing: 3px;
-            outline: none;
-            transition: all 0.3s ease;
+            width: 100%; padding: 18px 24px; padding-right: 60px;
+            background: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.06);
+            border-radius: var(--radius); color: var(--text-primary);
+            font-size: 1.2rem; font-family: 'Outfit', sans-serif; font-weight: 600;
+            letter-spacing: 3px; outline: none; transition: all 0.3s ease;
         }
-
-        .search-input::placeholder {
-            color: var(--text-muted);
-            font-weight: 400;
-            letter-spacing: 1px;
-            font-size: 1rem;
-        }
-
-        .search-input:focus {
-            border-color: var(--accent-1);
-            box-shadow: 0 0 0 4px var(--accent-glow), 0 0 30px rgba(99,102,241,0.1);
-        }
-
-        .search-input.valid {
-            border-color: var(--success);
-            box-shadow: 0 0 0 4px var(--success-glow);
-        }
-
-        .search-input.invalid {
-            border-color: var(--error);
-            box-shadow: 0 0 0 4px var(--error-glow);
-        }
-
-        .input-icon {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 24px; height: 24px;
-            color: var(--text-muted);
-            transition: color 0.3s ease;
-        }
-
-        .aadhar-format-hint {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
+        .search-input::placeholder { color: var(--text-muted); font-weight: 400; letter-spacing: 1px; font-size: 1rem; }
+        .search-input:focus { border-color: var(--accent-1); box-shadow: 0 0 0 4px var(--accent-glow), 0 0 30px rgba(99,102,241,0.1); }
+        .search-input.valid { border-color: var(--success); box-shadow: 0 0 0 4px var(--success-glow); }
+        .search-input.invalid { border-color: var(--error); box-shadow: 0 0 0 4px var(--error-glow); }
+        .input-icon { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; color: var(--text-muted); }
+        .aadhar-format-hint { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 18px; display: flex; align-items: center; gap: 6px; }
         .search-btn {
-            width: 100%;
-            padding: 16px;
-            background: var(--gradient-1);
-            border: none;
-            border-radius: var(--radius);
-            color: white;
-            font-family: 'Outfit', sans-serif;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            letter-spacing: 0.5px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            width: 100%; padding: 16px; background: var(--gradient-1); border: none; border-radius: var(--radius);
+            color: white; font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 700;
+            cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;
         }
-
-        .search-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px var(--accent-glow);
-        }
-
-        .search-btn:active {
-            transform: translateY(0);
-        }
-
-        .search-btn::after {
-            content: '';
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 0; height: 0;
-            background: rgba(255,255,255,0.2);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s ease, height 0.6s ease;
-        }
-
-        .search-btn:active::after {
-            width: 400px; height: 400px;
-        }
-
-        .search-btn .btn-content {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .search-btn .spinner {
-            display: none;
-            width: 20px; height: 20px;
-            border: 2.5px solid rgba(255,255,255,0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
+        .search-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px var(--accent-glow); }
+        .search-btn:active { transform: translateY(0); }
+        .search-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .search-btn .btn-content { display: flex; align-items: center; justify-content: center; gap: 10px; position: relative; z-index: 1; }
+        .search-btn .spinner { display: none; width: 20px; height: 20px; border: 2.5px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
         .search-btn.loading .spinner { display: block; }
         .search-btn.loading .btn-text { display: none; }
-
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ===== RESULT SECTION ===== */
-        .result-section {
-            max-width: 700px;
-            margin: 0 auto 60px;
-            display: none;
+        /* ===== LOADING OVERLAY ===== */
+        .loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-primary); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
         }
-
-        .result-section.show {
-            display: block;
-            animation: resultSlide 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        .loading-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .loading-logo {
+            width: 72px; height: 72px; background: var(--gradient-1); border-radius: 18px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 32px; font-weight: 900; color: white; font-family: 'Outfit', sans-serif;
+            box-shadow: 0 0 40px var(--accent-glow); margin-bottom: 24px;
+            animation: loadingPulse 1.5s ease-in-out infinite;
         }
-
-        @keyframes resultSlide {
-            from { opacity: 0; transform: translateY(30px) scale(0.97); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+        @keyframes loadingPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 40px var(--accent-glow); }
+            50% { transform: scale(1.08); box-shadow: 0 0 60px var(--accent-glow), 0 0 100px rgba(99,102,241,0.15); }
         }
+        .loading-text { font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; }
+        .loading-sub { font-size: 0.82rem; color: var(--text-muted); }
+        .loading-bar { width: 200px; height: 3px; background: rgba(255,255,255,0.06); border-radius: 3px; margin-top: 20px; overflow: hidden; }
+        .loading-bar-fill { height: 100%; width: 0%; background: var(--gradient-1); border-radius: 3px; animation: loadBar 2s ease-in-out forwards; }
+        @keyframes loadBar { 0% { width: 0%; } 60% { width: 70%; } 100% { width: 100%; } }
 
-        /* SUCCESS CARD */
+        /* ===== RESULT ===== */
+        .result-section { max-width: 700px; margin: 0 auto 50px; display: none; }
+        .result-section.show { display: block; animation: resultSlide 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+        @keyframes resultSlide { from { opacity: 0; transform: translateY(30px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
         .result-card {
-            background: var(--glass);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            box-shadow: 0 0 40px rgba(16, 185, 129, 0.08);
+            background: var(--glass); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(16,185,129,0.2); border-radius: var(--radius-lg);
+            overflow: hidden; box-shadow: 0 0 40px rgba(16,185,129,0.08);
         }
-
-        .result-card.error-card {
-            border-color: rgba(239, 68, 68, 0.2);
-            box-shadow: 0 0 40px rgba(239, 68, 68, 0.08);
-        }
-
+        .result-card.error-card { border-color: rgba(239,68,68,0.2); box-shadow: 0 0 40px rgba(239,68,68,0.08); }
         .result-header {
-            padding: 24px 32px;
-            background: rgba(16, 185, 129, 0.06);
-            border-bottom: 1px solid rgba(16, 185, 129, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 14px;
+            padding: 24px 32px; background: rgba(16,185,129,0.06);
+            border-bottom: 1px solid rgba(16,185,129,0.1); display: flex; align-items: center; gap: 14px;
         }
-
-        .result-card.error-card .result-header {
-            background: rgba(239, 68, 68, 0.06);
-            border-bottom-color: rgba(239, 68, 68, 0.1);
-        }
-
-        .result-icon {
-            width: 48px; height: 48px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-        }
-
-        .result-icon.success-icon {
-            background: rgba(16, 185, 129, 0.15);
-        }
-
-        .result-icon.error-icon {
-            background: rgba(239, 68, 68, 0.15);
-        }
-
-        .result-header-text h3 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.15rem;
-            font-weight: 700;
-        }
-
-        .result-header-text p {
-            font-size: 0.82rem;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        .result-body {
-            padding: 28px 32px;
-        }
-
-        .result-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
+        .result-card.error-card .result-header { background: rgba(239,68,68,0.06); border-bottom-color: rgba(239,68,68,0.1); }
+        .result-icon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+        .result-icon.success-icon { background: rgba(16,185,129,0.15); }
+        .result-icon.error-icon { background: rgba(239,68,68,0.15); }
+        .result-header-text h3 { font-family: 'Outfit', sans-serif; font-size: 1.15rem; font-weight: 700; }
+        .result-header-text p { font-size: 0.82rem; color: var(--text-muted); margin-top: 2px; }
+        .result-body { padding: 28px 32px; }
+        .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .result-field {
-            padding: 16px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: var(--radius-sm);
-            border: 1px solid rgba(255,255,255,0.04);
-            transition: all 0.3s ease;
+            padding: 16px; background: rgba(0,0,0,0.2); border-radius: var(--radius-sm);
+            border: 1px solid rgba(255,255,255,0.04); transition: all 0.3s ease;
         }
+        .result-field:hover { border-color: rgba(99,102,241,0.15); background: rgba(0,0,0,0.3); }
+        .result-field.full-width { grid-column: 1 / -1; }
+        .field-label { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 6px; }
+        .field-value { font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-primary); word-break: break-all; }
+        .field-value.highlight { color: var(--accent-3); }
+        .field-value.aadhar-display { letter-spacing: 4px; font-size: 1.2rem; color: var(--success); }
+        .field-value.name-display { font-size: 1.25rem; color: #a78bfa; }
+        .error-body { padding: 40px 32px; text-align: center; }
+        .error-emoji { font-size: 3rem; margin-bottom: 16px; animation: shake 0.5s ease-in-out; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-6px); } 80% { transform: translateX(6px); } }
+        .error-body h4 { font-family: 'Outfit', sans-serif; font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+        .error-body p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; }
 
-        .result-field:hover {
-            border-color: rgba(99, 102, 241, 0.15);
-            background: rgba(0, 0, 0, 0.3);
+        /* ===== RECENT ===== */
+        .recent-section { max-width: 700px; margin: 0 auto 50px; display: none; }
+        .recent-section.show { display: block; animation: fadeUp 0.5s ease-out; }
+        .recent-title { font-family: 'Outfit', sans-serif; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+        .recent-list { display: flex; flex-wrap: wrap; gap: 10px; }
+        .recent-chip {
+            padding: 8px 16px; background: var(--glass); border: 1px solid var(--glass-border);
+            border-radius: 30px; font-size: 0.82rem; font-weight: 500; color: var(--text-secondary);
+            cursor: pointer; transition: all 0.3s ease; font-family: 'Outfit', sans-serif; letter-spacing: 1px;
         }
-
-        .result-field.full-width {
-            grid-column: 1 / -1;
-        }
-
-        .field-label {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            margin-bottom: 6px;
-        }
-
-        .field-value {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.05rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            word-break: break-all;
-        }
-
-        .field-value.highlight {
-            color: var(--accent-3);
-        }
-
-        .field-value.aadhar-display {
-            letter-spacing: 4px;
-            font-size: 1.2rem;
-            color: var(--success);
-        }
-
-        /* Error body */
-        .error-body {
-            padding: 40px 32px;
-            text-align: center;
-        }
-
-        .error-emoji {
-            font-size: 3rem;
-            margin-bottom: 16px;
-            animation: shake 0.5s ease-in-out;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-8px); }
-            40% { transform: translateX(8px); }
-            60% { transform: translateX(-6px); }
-            80% { transform: translateX(6px); }
-        }
-
-        .error-body h4 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .error-body p {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            line-height: 1.6;
-        }
+        .recent-chip:hover { background: rgba(99,102,241,0.1); border-color: rgba(99,102,241,0.3); color: var(--accent-3); }
 
         /* ===== INFO CARDS ===== */
-        .info-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 60px;
-            animation: fadeUp 1s ease-out 0.8s both;
-        }
-
+        .info-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 60px; animation: fadeUp 1s ease-out 0.8s both; }
         .info-card {
-            background: var(--glass);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius);
-            padding: 28px;
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
+            background: var(--glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border); border-radius: var(--radius);
+            padding: 28px; transition: all 0.4s ease; position: relative; overflow: hidden;
         }
-
-        .info-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            border-radius: 3px 3px 0 0;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
+        .info-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 3px 3px 0 0; opacity: 0; transition: opacity 0.4s ease; }
         .info-card:nth-child(1)::before { background: var(--gradient-1); }
         .info-card:nth-child(2)::before { background: var(--gradient-2); }
         .info-card:nth-child(3)::before { background: var(--gradient-3); }
-
-        .info-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(99, 102, 241, 0.15);
-            box-shadow: var(--shadow-lg);
-        }
-
+        .info-card:hover { transform: translateY(-4px); border-color: rgba(99,102,241,0.15); box-shadow: var(--shadow-lg); }
         .info-card:hover::before { opacity: 1; }
-
-        .info-card-icon {
-            width: 48px; height: 48px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            margin-bottom: 18px;
-        }
-
-        .info-card:nth-child(1) .info-card-icon { background: rgba(99, 102, 241, 0.12); }
-        .info-card:nth-child(2) .info-card-icon { background: rgba(14, 165, 233, 0.12); }
-        .info-card:nth-child(3) .info-card-icon { background: rgba(16, 185, 129, 0.12); }
-
-        .info-card h3 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.05rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .info-card p {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            line-height: 1.6;
-        }
-
-        /* ===== RECENT SEARCHES ===== */
-        .recent-section {
-            max-width: 700px;
-            margin: 0 auto 60px;
-            display: none;
-        }
-
-        .recent-section.show { display: block; animation: fadeUp 0.5s ease-out; }
-
-        .recent-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .recent-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .recent-chip {
-            padding: 8px 16px;
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 30px;
-            font-size: 0.82rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Outfit', sans-serif;
-            letter-spacing: 1px;
-        }
-
-        .recent-chip:hover {
-            background: rgba(99, 102, 241, 0.1);
-            border-color: rgba(99, 102, 241, 0.3);
-            color: var(--accent-3);
-        }
+        .info-card-icon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 18px; }
+        .info-card:nth-child(1) .info-card-icon { background: rgba(99,102,241,0.12); }
+        .info-card:nth-child(2) .info-card-icon { background: rgba(14,165,233,0.12); }
+        .info-card:nth-child(3) .info-card-icon { background: rgba(16,185,129,0.12); }
+        .info-card h3 { font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; }
+        .info-card p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
 
         /* ===== FOOTER ===== */
-        .footer {
-            text-align: center;
-            padding: 30px 20px;
-            border-top: 1px solid var(--glass-border);
-            animation: fadeUp 1s ease-out 1s both;
-        }
-
-        .footer p {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        .footer .footer-brand {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 700;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+        .footer { text-align: center; padding: 30px 20px; border-top: 1px solid var(--glass-border); animation: fadeUp 1s ease-out 1s both; }
+        .footer p { font-size: 0.8rem; color: var(--text-muted); }
+        .footer .footer-brand { font-family: 'Outfit', sans-serif; font-weight: 700; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            .container { padding: 12px; }
-            .navbar { padding: 12px 18px; margin-bottom: 24px; }
+            .container { padding: 10px; }
+            .navbar { padding: 12px 16px; margin-bottom: 10px; }
             .logo-text { font-size: 1.2rem; }
-            .nav-badge { display: none; }
-            .hero { padding: 24px 12px 30px; }
-            .hero p { font-size: 0.92rem; }
-            .stats-bar { gap: 24px; }
-            .stat-number { font-size: 1.5rem; }
-            .search-card { padding: 24px; }
-            .search-input { font-size: 1rem; padding: 16px 20px; padding-right: 50px; letter-spacing: 2px; }
-            .result-body { padding: 20px; }
-            .result-header { padding: 18px 20px; }
-            .result-grid { grid-template-columns: 1fr; gap: 14px; }
+            .hero { padding: 10px 12px 14px; }
+            .hero h1 { font-size: 1.8rem; margin-bottom: 8px; }
+            .hero p { font-size: 0.88rem; margin-bottom: 14px; }
+            .hero-badge { margin-bottom: 12px; font-size: 0.72rem; padding: 6px 14px; }
+            .stats-bar { gap: 18px; margin-bottom: 14px; }
+            .stat-number { font-size: 1.4rem; }
+            .stat-label { font-size: 0.68rem; }
+            .search-section { margin-bottom: 24px; }
+            .search-card { padding: 20px; }
+            .search-input { font-size: 1rem; padding: 16px 18px; padding-right: 50px; letter-spacing: 2px; }
+            .search-label { font-size: 0.78rem; margin-bottom: 12px; }
+            .aadhar-format-hint { font-size: 0.72rem; margin-bottom: 14px; }
+            .result-body { padding: 18px; }
+            .result-header { padding: 16px 18px; }
+            .result-grid { grid-template-columns: 1fr; gap: 12px; }
             .info-section { grid-template-columns: 1fr; }
         }
-
         @media (max-width: 480px) {
-            .hero h1 { font-size: 1.8rem; }
-            .stats-bar { gap: 16px; }
-            .stat-number { font-size: 1.3rem; }
-            .stat-label { font-size: 0.68rem; }
+            .hero h1 { font-size: 1.55rem; }
+            .stats-bar { gap: 14px; }
+            .stat-number { font-size: 1.2rem; }
         }
 
-        /* ===== TYPING CURSOR ===== */
-        .typing-cursor {
-            display: inline-block;
-            width: 2px;
-            height: 1.1em;
-            background: var(--accent-3);
-            margin-left: 2px;
-            animation: blink 1s step-end infinite;
-            vertical-align: text-bottom;
-        }
-
-        @keyframes blink {
-            50% { opacity: 0; }
-        }
-
-        /* ===== SCROLL REVEAL ===== */
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        .reveal.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* ===== TOOLTIP ===== */
-        .tooltip-container {
-            position: relative;
-        }
-
-        .tooltip {
-            position: absolute;
-            bottom: calc(100% + 8px);
-            left: 50%;
-            transform: translateX(-50%) scale(0.95);
-            padding: 8px 14px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.25s ease;
-            z-index: 100;
-        }
-
-        .tooltip-container:hover .tooltip {
-            opacity: 1;
-            transform: translateX(-50%) scale(1);
-        }
-
-        /* Copy animation */
-        .copied-flash {
-            animation: flashGreen 0.5s ease;
-        }
-
-        @keyframes flashGreen {
-            0% { background: rgba(16, 185, 129, 0.2); }
-            100% { background: transparent; }
-        }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
     </style>
 </head>
 <body>
 
-    <!-- Animated Background -->
-    <div class="bg-animation">
-        <div class="bg-orb"></div>
-        <div class="bg-orb"></div>
-        <div class="bg-orb"></div>
-        <div class="bg-orb"></div>
+    <!-- Loading Screen -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-logo">B</div>
+        <div class="loading-text">Belta Portal</div>
+        <div class="loading-sub">Loading farmer records...</div>
+        <div class="loading-bar"><div class="loading-bar-fill"></div></div>
     </div>
-    <div class="bg-grid"></div>
 
-    <!-- Particles -->
+    <div class="bg-animation"><div class="bg-orb"></div><div class="bg-orb"></div><div class="bg-orb"></div><div class="bg-orb"></div></div>
+    <div class="bg-grid"></div>
     <div class="particles" id="particles"></div>
 
     <div class="container">
 
         <!-- Navbar -->
-        <nav class="navbar" id="navbar">
+        <nav class="navbar">
             <div class="logo">
                 <div class="logo-icon">B</div>
                 <span class="logo-text">Belta Portal</span>
             </div>
-            <div class="nav-badge">● System Online</div>
+            <div class="nav-badge" id="statusBadge">● System Online</div>
         </nav>
 
-        <!-- Hero Section -->
-        <section class="hero" id="hero">
-            <div class="hero-badge">
-                <span class="dot"></span>
-                Palla Gram Panchayat — Belta Village
-            </div>
-            <h1>
-                <span class="gradient-text">Belta Portal</span><br>
-                Farmer Verification
-            </h1>
+        <!-- Hero -->
+        <section class="hero">
+            <div class="hero-badge"><span class="dot"></span> Palla Gram Panchayat — Belta Village</div>
+            <h1><span class="gradient-text">Belta Portal</span><br>Farmer Verification</h1>
             <p>Enter an Aadhaar number to instantly retrieve farmer registration details from the official Belta Village database. Fast, secure, and reliable.</p>
         </section>
 
         <!-- Stats -->
-        <div class="stats-bar" id="stats">
-            <div class="stat-item">
-                <div class="stat-number" id="totalRecords">308</div>
-                <div class="stat-label">Total Records</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">1</div>
-                <div class="stat-label">Gram Panchayat</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">1</div>
-                <div class="stat-label">Village</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" id="verifiedCount">0</div>
-                <div class="stat-label">Verified Today</div>
-            </div>
+        <div class="stats-bar">
+            <div class="stat-item"><div class="stat-number" id="totalRecords">0</div><div class="stat-label">Total Records</div></div>
+            <div class="stat-item"><div class="stat-number" id="gpCount">1</div><div class="stat-label">Gram Panchayat</div></div>
+            <div class="stat-item"><div class="stat-number" id="villageCount">1</div><div class="stat-label">Village</div></div>
+            <div class="stat-item"><div class="stat-number" id="verifiedCount">0</div><div class="stat-label">Verified Today</div></div>
         </div>
 
-        <!-- Search Section -->
-        <section class="search-section" id="searchSection">
+        <!-- Search -->
+        <section class="search-section">
             <div class="search-card">
                 <label class="search-label" for="aadharInput">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
                     Aadhaar Card Number
                 </label>
                 <div class="search-input-wrapper">
-                    <input 
-                        type="text" 
-                        id="aadharInput" 
-                        class="search-input" 
-                        placeholder="Enter 12-digit Aadhaar number"
-                        maxlength="14"
-                        autocomplete="off"
-                        inputmode="numeric"
-                    >
-                    <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                    </svg>
+                    <input type="text" id="aadharInput" class="search-input" placeholder="Enter 12-digit Aadhaar number" maxlength="14" autocomplete="off" inputmode="numeric">
+                    <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 </div>
                 <div class="aadhar-format-hint">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
@@ -980,7 +363,7 @@
             </div>
         </section>
 
-        <!-- Recent Searches -->
+        <!-- Recent -->
         <div class="recent-section" id="recentSection">
             <div class="recent-title">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -989,359 +372,46 @@
             <div class="recent-list" id="recentList"></div>
         </div>
 
-        <!-- Result Section -->
+        <!-- Result -->
         <section class="result-section" id="resultSection"></section>
 
         <!-- Info Cards -->
-        <section class="info-section reveal" id="infoCards">
+        <section class="info-section reveal">
             <div class="info-card">
                 <div class="info-card-icon">🔐</div>
                 <h3>Secure Verification</h3>
-                <p>All searches are processed locally. No data is transmitted to external servers. Your privacy is our priority.</p>
+                <p>All searches are processed securely. Your privacy is our priority with encrypted data handling.</p>
             </div>
             <div class="info-card">
                 <div class="info-card-icon">⚡</div>
                 <h3>Instant Results</h3>
-                <p>Get farmer details in milliseconds. The entire database is indexed for lightning-fast lookups by Aadhaar number.</p>
+                <p>Get farmer details in milliseconds. The database is indexed for lightning-fast lookups by Aadhaar number.</p>
             </div>
             <div class="info-card">
                 <div class="info-card-icon">📋</div>
                 <h3>Complete Records</h3>
-                <p>View serial number, farmer name, father's name, KB ID, EPIC number, and more — all from a single search.</p>
+                <p>View serial number, farmer name, father's name, KB ID, EPIC, gender, mobile, bank &amp; account details.</p>
             </div>
         </section>
 
-        <!-- Footer -->
         <footer class="footer">
             <p>© 2026 <span class="footer-brand">Belta Portal</span> — Palla Gram Panchayat, Belta Village. All rights reserved.</p>
         </footer>
-
     </div>
 
 <script>
-// ===== FARMER DATABASE =====
-const farmerDB = [
-{sl:1,gp:"PALLA",village:"BELTA",kb:"617274864035",epic:"WB/13/085/249788",aadhar:"688031857386",name:"ABDUL CHATTAR MONDAL",father:"DIDAR BAKS"},
-{sl:2,gp:"PALLA",village:"BELTA",kb:"428072453285",epic:"NRC1383017",aadhar:"460407774356",name:"ABDUL KALAM MONDAL",father:"HALIM"},
-{sl:3,gp:"PALLA",village:"BELTA",kb:"630807016133",epic:"NRC2126258",aadhar:"498474496463",name:"ABHIJIT KUMAR GHOSH",father:"ASWINI"},
-{sl:4,gp:"PALLA",village:"BELTA",kb:"111529111063",epic:"WB/13/085/255332",aadhar:"339773818372",name:"ABUBAKKAR MONDAL",father:"MUJIBAR"},
-{sl:5,gp:"PALLA",village:"BELTA",kb:"132280994348",epic:"NRC1902097",aadhar:"591500918626",name:"ABUTAHER MANDAL",father:"SAHADAT"},
-{sl:6,gp:"PALLA",village:"BELTA",kb:"518608425374",epic:"NRC0843284",aadhar:"786656430921",name:"ACHINTA GHOSH",father:"ASHOK"},
-{sl:7,gp:"PALLA",village:"BELTA",kb:"314882877970",epic:"WB/13/085/249467",aadhar:"572270660444",name:"ADHIR DAS",father:"ANIL"},
-{sl:8,gp:"PALLA",village:"BELTA",kb:"109969638782",epic:"WB/13/085/255655",aadhar:"890597924001",name:"AHEDA BIBI",father:"NUISLAM"},
-{sl:9,gp:"PALLA",village:"BELTA",kb:"605470925473",epic:"WB/13/085/249664",aadhar:"414431749732",name:"AIJUL PIR",father:"KEETA BALI"},
-{sl:10,gp:"PALLA",village:"BELTA",kb:"418852182820",epic:"HCL2786499",aadhar:"617037939094",name:"AJAY BISWAS",father:"AHAMBHU"},
-{sl:11,gp:"PALLA",village:"BELTA",kb:"407229313980",epic:"HCL3185204",aadhar:"564437773867",name:"AJAY KUMAR CHOWDHURY",father:"RABINDRA CHAUDHURY"},
-{sl:12,gp:"PALLA",village:"BELTA",kb:"20004945038",epic:"NRC1023167",aadhar:"623705143579",name:"AJGAR ALI MONDAL",father:"NAFAR"},
-{sl:13,gp:"PALLA",village:"BELTA",kb:"817721401814",epic:"WB/13/085/249571",aadhar:"935332703745",name:"AJOY DAS",father:"ANIL"},
-{sl:14,gp:"PALLA",village:"BELTA",kb:"37087687423",epic:"WB/12/080/561412",aadhar:"295725199694",name:"AKBAR BISWAS",father:"PONCHUHOSEN"},
-{sl:15,gp:"PALLA",village:"BELTA",kb:"721434979343",epic:"NRC1382878",aadhar:"818532684789",name:"ALIYA BIBI",father:"MUJIBAR"},
-{sl:16,gp:"PALLA",village:"BELTA",kb:"839208712723",epic:"WB/13/085/255461",aadhar:"896528533641",name:"ALOK KABIRAJ",father:"RABINDRA NATH KABIRAJ"},
-{sl:17,gp:"PALLA",village:"BELTA",kb:"9930681561",epic:"HCL1577535",aadhar:"859380738875",name:"ALOMOTI LASKAR",father:"PARIMAL"},
-{sl:18,gp:"PALLA",village:"BELTA",kb:"610874963820",epic:"WB/13/085/255682",aadhar:"482648727148",name:"ALTAB MANDAL",father:"KHODABOX MONDAL"},
-{sl:19,gp:"PALLA",village:"BELTA",kb:"616520591234",epic:"WB/13/085/258239",aadhar:"614748579940",name:"AMAL DEBNATH",father:"ASHWINI DEBNATH"},
-{sl:20,gp:"PALLA",village:"BELTA",kb:"442134285750",epic:"GQL3226776",aadhar:"678671661345",name:"AMBIA MONDAL",father:"ABDUI RASID MANDAL"},
-{sl:21,gp:"PALLA",village:"BELTA",kb:"614090457860",epic:"NRC1901925",aadhar:"451493878649",name:"AMIR MONDAL",father:"OSMAN MONDAL"},
-{sl:22,gp:"PALLA",village:"BELTA",kb:"503329082740",epic:"HCL1577667",aadhar:"327385427953",name:"AMIT BISWAS",father:"RAMPADA"},
-{sl:23,gp:"PALLA",village:"BELTA",kb:"501518530360",epic:"NRC1263276",aadhar:"338099620238",name:"AMIT KUMAR DAS",father:"AMAL"},
-{sl:24,gp:"PALLA",village:"BELTA",kb:"508012078718",epic:"HCL3573656",aadhar:"708635530807",name:"AMIT KUMAR MANDAL",father:"RABINDRANATH MONDAL"},
-{sl:25,gp:"PALLA",village:"BELTA",kb:"141678116334",epic:"HCL2787935",aadhar:"808480218738",name:"AMIT LASKAR",father:"ANIL"},
-{sl:26,gp:"PALLA",village:"BELTA",kb:"706167917383",epic:"WB/13/085/252370",aadhar:"255682895137",name:"AMIYA BALA",father:"UPENDRA NATH"},
-{sl:27,gp:"PALLA",village:"BELTA",kb:"106260774477",epic:"HCL3184751",aadhar:"230824548558",name:"ANANDA DAS",father:"HARADHAN"},
-{sl:28,gp:"PALLA",village:"BELTA",kb:"503295331628",epic:"HCL3402146",aadhar:"729347985192",name:"ANANDA DAS",father:"NITYANANDA"},
-{sl:29,gp:"PALLA",village:"BELTA",kb:"334712930757",epic:"WB/13/085/252253",aadhar:"529847710390",name:"ANANTA BISWAS",father:"NITAI"},
-{sl:30,gp:"PALLA",village:"BELTA",kb:"26595047091",epic:"WB/13/085/255730",aadhar:"342179113723",name:"ANGUR BALA SADHUKHA",father:"KENARAM"},
-{sl:31,gp:"PALLA",village:"BELTA",kb:"822688224030",epic:"HCL1579325",aadhar:"654287646476",name:"ANIT KUMAR GHOSH",father:"ASWINI"},
-{sl:32,gp:"PALLA",village:"BELTA",kb:"721802486600",epic:"HCL3166097",aadhar:"458312544701",name:"ANITA BAIN",father:"TUSHAR KANTI BAIN"},
-{sl:33,gp:"PALLA",village:"BELTA",kb:"712880881110",epic:"HCL1570340",aadhar:"896449556043",name:"ANJALI DAS",father:"ANIL"},
-{sl:34,gp:"PALLA",village:"BELTA",kb:"323876115815",epic:"HCL1578467",aadhar:"387664494430",name:"ANUKUL SARKAR",father:"MOTILAL SARKAR"},
-{sl:35,gp:"PALLA",village:"BELTA",kb:"235590028917",epic:"HCL2400539",aadhar:"417048564226",name:"ANUPAM KABIRAJ",father:"RABINDRA NATH KABIRAJ"},
-{sl:36,gp:"PALLA",village:"BELTA",kb:"400108743494",epic:"HCL3186046",aadhar:"402241893365",name:"APARESH LASKAR",father:"ANIL"},
-{sl:37,gp:"PALLA",village:"BELTA",kb:"306592121470",epic:"NRC2371664",aadhar:"270213797082",name:"ARAJIT PAUL",father:"ARUN"},
-{sl:38,gp:"PALLA",village:"BELTA",kb:"16827301496",epic:"WB/12/080/534716",aadhar:"544803110496",name:"ARCHANA LASKAR",father:"ANIMESH LASKAR"},
-{sl:39,gp:"PALLA",village:"BELTA",kb:"707106933810",epic:"NRC1263185",aadhar:"818323944719",name:"ARINDAM PODDER",father:"ANANDA PODDER"},
-{sl:40,gp:"PALLA",village:"BELTA",kb:"314475171420",epic:"NRC2040137",aadhar:"492381191842",name:"ARJUN BISWAS",father:"MAHENDRA"},
-{sl:41,gp:"PALLA",village:"BELTA",kb:"417382861916",epic:"HCL3821311",aadhar:"634683632130",name:"ASADA KHATUN MANDAL",father:"MUJIBAR"},
-{sl:42,gp:"PALLA",village:"BELTA",kb:"808575552403",epic:"WB/13/085/252143",aadhar:"872713221540",name:"ASHALATA RAY",father:"RABIN"},
-{sl:43,gp:"PALLA",village:"BELTA",kb:"132208122266",epic:"NRC1130251",aadhar:"518564607259",name:"ASHIS BALA",father:"MANTU BALA"},
-{sl:44,gp:"PALLA",village:"BELTA",kb:"112756491323",epic:"WB/13/085/252020",aadhar:"268655352359",name:"ASHIS DAS",father:"BAIDYANATH DAS"},
-{sl:45,gp:"PALLA",village:"BELTA",kb:"407429278720",epic:"WB/13/085/255798",aadhar:"435883026665",name:"ASHOK GHOSH",father:"SATIS"},
-{sl:46,gp:"PALLA",village:"BELTA",kb:"833179531112",epic:"WKM1469014",aadhar:"575855246314",name:"ASHOK HALDETR",father:"ATUL"},
-{sl:47,gp:"PALLA",village:"BELTA",kb:"720867486340",epic:"ZSG2192177",aadhar:"780725944943",name:"ASHOK PANDAY",father:"GOUR"},
-{sl:48,gp:"PALLA",village:"BELTA",kb:"829252412162",epic:"NRC1671627",aadhar:"770258107562",name:"ASHWINEE BAIN",father:"ARJUN KUMAR BAIN"},
-{sl:49,gp:"PALLA",village:"BELTA",kb:"102972831011",epic:"WB/13/085/255740",aadhar:"483020006109",name:"ASIMA PAUL",father:"RAMPADA"},
-{sl:50,gp:"PALLA",village:"BELTA",kb:"833360517722",epic:"NRC0155440",aadhar:"247402099359",name:"ASISH SHIKDAR",father:"SUNITI"},
-{sl:51,gp:"PALLA",village:"BELTA",kb:"720171118410",epic:"HCL3574027",aadhar:"980281227793",name:"ASURA BIBI",father:"MIJANUR"},
-{sl:52,gp:"PALLA",village:"BELTA",kb:"339911406921",epic:"NRC0927632",aadhar:"759750017546",name:"BABU NEOGI",father:"MRITYUNJAY"},
-{sl:53,gp:"PALLA",village:"BELTA",kb:"611437293447",epic:"UEC1048966",aadhar:"687895715753",name:"BARNALI BISWAS MONDAL",father:"DEB DULAL MONDAL"},
-{sl:54,gp:"PALLA",village:"BELTA",kb:"722133714488",epic:"WB/13/085/252587",aadhar:"693617918513",name:"BARUN HAZRA",father:"MAHADEB"},
-{sl:55,gp:"PALLA",village:"BELTA",kb:"411423592770",epic:"NRC1130186",aadhar:"890470885463",name:"BARUN PAUL",father:"BIDHAN PAUL"},
-{sl:56,gp:"PALLA",village:"BELTA",kb:"128847909796",epic:"NRC0842773",aadhar:"333804063875",name:"BASHAK ROY",father:"BICHARAN"},
-{sl:57,gp:"PALLA",village:"BELTA",kb:"433195065860",epic:"HCL3183886",aadhar:"232991011295",name:"BENODENI BALA",father:"HARENDRANATH"},
-{sl:58,gp:"PALLA",village:"BELTA",kb:"513501837073",epic:"NRC1382670",aadhar:"854490815676",name:"BHABANI CHOWDHURY SADHUKHAN",father:"YADU SADHUKHAN"},
-{sl:59,gp:"PALLA",village:"BELTA",kb:"110020995755",epic:"NCR0843243",aadhar:"472732754381",name:"BHABANI DAS",father:"TITUL DAS"},
-{sl:60,gp:"PALLA",village:"BELTA",kb:"518360922414",epic:"WB/13/085/228290",aadhar:"799989538464",name:"BHABANI MAJUMDAR",father:"KALIPADA"},
-{sl:61,gp:"PALLA",village:"BELTA",kb:"607025040425",epic:"HCL0399154",aadhar:"262525720960",name:"BHAKTI HAZRA",father:"DILIP"},
-{sl:62,gp:"PALLA",village:"BELTA",kb:"714592453748",epic:"HCL3573839",aadhar:"269826355466",name:"BHARATI SAMADDAR",father:"ROMESH"},
-{sl:63,gp:"PALLA",village:"BELTA",kb:"734973215880",epic:"HCL1587252",aadhar:"488783212992",name:"BIDYUT KUMAR MONDAL",father:"BIMAL KRISHNA"},
-{sl:64,gp:"PALLA",village:"BELTA",kb:"106683451710",epic:"HCL3566353",aadhar:"316042556296",name:"BIKAS SARKAR",father:"BIRENDRANATH"},
-{sl:65,gp:"PALLA",village:"BELTA",kb:"12532357103",epic:"NRC0842799",aadhar:"373919577417",name:"BIKASH BISWAS",father:"BIMAL BISWAS"},
-{sl:66,gp:"PALLA",village:"BELTA",kb:"428843094590",epic:"WB/13/085/255629",aadhar:"395721918390",name:"BIMAL BISWAS",father:"UPENDRA"},
-{sl:67,gp:"PALLA",village:"BELTA",kb:"138615047626",epic:"NRC2148096",aadhar:"970788006844",name:"BIMAL CHINTAPATRA",father:"SARAT"},
-{sl:68,gp:"PALLA",village:"BELTA",kb:"707462339724",epic:"HCL3700804",aadhar:"643271357808",name:"BISWAJIT GHOSH",father:"ANIL GHOSH"},
-{sl:69,gp:"PALLA",village:"BELTA",kb:"603473001387",epic:"NRC1130798",aadhar:"975233383759",name:"BISWAJIT NEOGI",father:"MRITYUNJOY"},
-{sl:70,gp:"PALLA",village:"BELTA",kb:"104227890706",epic:"WB/13/085/255487",aadhar:"400388134225",name:"BRAJEN CHINTAPATRA",father:"BINAD BIHARI CHINTAPATRA"},
-{sl:71,gp:"PALLA",village:"BELTA",kb:"301220034842",epic:"WB/20/138/168238",aadhar:"648143580937",name:"CHANDANA MONDAL ROY",father:"BHIBHUTI"},
-{sl:72,gp:"PALLA",village:"BELTA",kb:"739878114626",epic:"WB/13/085/228450",aadhar:"489517216151",name:"CHAPALA BISWAS",father:"AKHIL"},
-{sl:73,gp:"PALLA",village:"BELTA",kb:"326733765572",epic:"WB/13/085/252463",aadhar:"876357455265",name:"CHAPALA BISWAS",father:"LATE GOURANGA"},
-{sl:74,gp:"PALLA",village:"BELTA",kb:"311837466076",epic:"NRC1130244",aadhar:"657558476793",name:"DEBASISH BALA",father:"MANTU"},
-{sl:75,gp:"PALLA",village:"BELTA",kb:"410789009588",epic:"NRC1959057",aadhar:"670248145805",name:"DEBJYOTI BISWAS",father:"SANJAY"},
-{sl:76,gp:"PALLA",village:"BELTA",kb:"532140493590",epic:"HCL3732625",aadhar:"523521207736",name:"DEBRAJ DAS",father:"SANTOSH"},
-{sl:77,gp:"PALLA",village:"BELTA",kb:"315313512493",epic:"WB/13/085/255370",aadhar:"994612757798",name:"DESHBANDHU SIKDAR",father:"GONESH CHANDRA SIKDAR"},
-{sl:78,gp:"PALLA",village:"BELTA",kb:"519719906140",epic:"WB/13/085/252063",aadhar:"833389066545",name:"DILIP DAS",father:"DEBENDRA DAS"},
-{sl:79,gp:"PALLA",village:"BELTA",kb:"212425762560",epic:"HCL0393397",aadhar:"816079034940",name:"DIPAK DAS",father:"AMAR"},
-{sl:80,gp:"PALLA",village:"BELTA",kb:"306440854940",epic:"HCL1579580",aadhar:"499562068766",name:"DIPAK DAS",father:"DULAL"},
-{sl:81,gp:"PALLA",village:"BELTA",kb:"831183388066",epic:"HCL3566551",aadhar:"915636626426",name:"DIPAK SARKAR",father:"NAGENDRANATH SARKAR"},
-{sl:82,gp:"PALLA",village:"BELTA",kb:"611674601710",epic:"NRC0842807",aadhar:"837113880987",name:"DIPANKAR BISWAS",father:"MANINDRANATH"},
-{sl:83,gp:"PALLA",village:"BELTA",kb:"617891614780",epic:"HCL1575356",aadhar:"905512923139",name:"DIPANKAR DAS",father:"SANTOSH"},
-{sl:84,gp:"PALLA",village:"BELTA",kb:"223661315246",epic:"HCL3186434",aadhar:"872546656242",name:"DIPANKAR DAS",father:"DULAL"},
-{sl:85,gp:"PALLA",village:"BELTA",kb:"237232122970",epic:"HCL3185287",aadhar:"553624254586",name:"DIPANKAR PAUL",father:"RAMPADA"},
-{sl:86,gp:"PALLA",village:"BELTA",kb:"233292987717",epic:"HCL3184843",aadhar:"826586239797",name:"DIPANKAR ROY",father:"SANKAR ROR"},
-{sl:87,gp:"PALLA",village:"BELTA",kb:"822313841053",epic:"WB/13/085/255669",aadhar:"222696273896",name:"DULAL DAS",father:"SHRINATH"},
-{sl:88,gp:"PALLA",village:"BELTA",kb:"339926825446",epic:"HCL3186442",aadhar:"955605280021",name:"EYANUR MONDAL",father:"UMBAR ALI"},
-{sl:89,gp:"PALLA",village:"BELTA",kb:"434759551811",epic:"NRC1476902",aadhar:"458088858748",name:"FIROJ MONDAL",father:"ARFIL"},
-{sl:90,gp:"PALLA",village:"BELTA",kb:"324409186061",epic:"HCL3732880",aadhar:"576186636743",name:"GAFFAR ALI MONDAL",father:"MOKTAR ALI"},
-{sl:91,gp:"PALLA",village:"BELTA",kb:"14517589336",epic:"HCL3821394",aadhar:"609158976891",name:"GAFFAR ALI MONDAL",father:"BABURALI"},
-{sl:92,gp:"PALLA",village:"BELTA",kb:"738013905983",epic:"WB/13/085/252243",aadhar:"885610021770",name:"GANESH BISWAS",father:"MAHANANDA"},
-{sl:93,gp:"PALLA",village:"BELTA",kb:"638884829915",epic:"HCL3567088",aadhar:"980185422405",name:"GEETA MONDAL",father:"NIRMAL"},
-{sl:94,gp:"PALLA",village:"BELTA",kb:"324043069562",epic:"WB/13/085/255389",aadhar:"672277187755",name:"GOBINDA GHOSH",father:"KUNJA GHOSH"},
-{sl:95,gp:"PALLA",village:"BELTA",kb:"414110302183",epic:"WB/13/085/255271",aadhar:"654170641554",name:"GOBINDA MONDAL",father:"GOBINDA MONDAL"},
-{sl:96,gp:"PALLA",village:"BELTA",kb:"320578883450",epic:"WB/13/085/255524",aadhar:"482064323350",name:"GOBINDA PAUL",father:"GENENDRA PAUL"},
-{sl:97,gp:"PALLA",village:"BELTA",kb:"713548841716",epic:"WB/13/085/255224",aadhar:"922282794746",name:"GOPAL HAJRA",father:"PASHURAM HAJRA"},
-{sl:98,gp:"PALLA",village:"BELTA",kb:"524664551836",epic:"NRC1601806",aadhar:"889847077623",name:"GOURAB KIRTANIA",father:"NIRMAL"},
-{sl:99,gp:"PALLA",village:"BELTA",kb:"215476529850",epic:"NRC0928085",aadhar:"532007804189",name:"HABIBUR MONDAL",father:"SAMSER"},
-{sl:100,gp:"PALLA",village:"BELTA",kb:"656031155",epic:"HCL3185782",aadhar:"770228060027",name:"HAFIJUL MONDAL",father:"FAKIR CHAND"},
-{sl:101,gp:"PALLA",village:"BELTA",kb:"203043757284",epic:"WB/13/085/255188",aadhar:"806188226872",name:"HALEMA BIBI",father:"RAVIOLI"},
-{sl:102,gp:"PALLA",village:"BELTA",kb:"429180338716",epic:"WB/13/085/255256",aadhar:"852625475470",name:"HARAN GHOSH",father:"ANANTA DAS"},
-{sl:103,gp:"PALLA",village:"BELTA",kb:"738430851620",epic:"HCL0393389",aadhar:"656188514172",name:"HARIDASI DAS",father:"AMAR DAS"},
-{sl:104,gp:"PALLA",village:"BELTA",kb:"634538746910",epic:"GQL3110855",aadhar:"794906078539",name:"HASANA MISTRI",father:"SUSANTA"},
-{sl:105,gp:"PALLA",village:"BELTA",kb:"140059998431",epic:"WB/13/085/252514",aadhar:"277422374071",name:"HIMANGSHU BALA",father:"HARENDRA"},
-{sl:106,gp:"PALLA",village:"BELTA",kb:"236148567920",epic:"WB/13/085/255757",aadhar:"390223542756",name:"HUJURALI MONDAL",father:"NABICHADDI MANDAL"},
-{sl:107,gp:"PALLA",village:"BELTA",kb:"824352560350",epic:"NCR1022987",aadhar:"393882759544",name:"IDRISH MANDAL",father:"OSMAN MANDAL"},
-{sl:108,gp:"PALLA",village:"BELTA",kb:"101940234296",epic:"HCL3730405",aadhar:"759683005267",name:"IMADUL MONDAL",father:"GOLAM"},
-{sl:109,gp:"PALLA",village:"BELTA",kb:"137597659292",epic:"NRC1023134",aadhar:"235362216754",name:"ISRAFIL MONDAL",father:"ELAHIBOX"},
-{sl:110,gp:"PALLA",village:"BELTA",kb:"627337837745",epic:"WB/13/085/231362",aadhar:"424286855495",name:"JAGADESH KARMAKAR",father:"SURENDRA"},
-{sl:111,gp:"PALLA",village:"BELTA",kb:"413899780816",epic:"NRC0842666",aadhar:"295091327225",name:"JAHANARA KHATOON DHABAK",father:"AMINUR"},
-{sl:112,gp:"PALLA",village:"BELTA",kb:"523215723150",epic:"NRC1382977",aadhar:"872943347402",name:"JAHANGIR MONDAL",father:"DAUD"},
-{sl:113,gp:"PALLA",village:"BELTA",kb:"119753803205",epic:"WB/13/085/255659",aadhar:"808422618222",name:"JALALUDDIN MONDAL",father:"ASABBARI"},
-{sl:114,gp:"PALLA",village:"BELTA",kb:"300689187440",epic:"NRC0927806",aadhar:"800962513044",name:"JAMAL UDDIN MONDAL",father:"ASAB BARI"},
-{sl:115,gp:"PALLA",village:"BELTA",kb:"438296229921",epic:"NRC1862507",aadhar:"307349121095",name:"JASIMUDDIN MONDAL",father:"JAMSHED"},
-{sl:116,gp:"PALLA",village:"BELTA",kb:"533174458358",epic:"NRC0982892",aadhar:"936656480053",name:"JAYANTI DAS SARDAR",father:"NABAKUMAR"},
-{sl:117,gp:"PALLA",village:"BELTA",kb:"125295512904",epic:"WB/13/085/255117",aadhar:"783995470527",name:"JAYANTI GHOSH",father:"SHYAMAL"},
-{sl:118,gp:"PALLA",village:"BELTA",kb:"435710265570",epic:"NRC1130103",aadhar:"525139539538",name:"JAYDEB DAS",father:"ANUKUL DAS"},
-{sl:119,gp:"PALLA",village:"BELTA",kb:"405085830662",epic:"WB/13/085/255056",aadhar:"295992772624",name:"JHARNA BISWAS",father:"KRISNA BISWAS"},
-{sl:120,gp:"PALLA",village:"BELTA",kb:"137805959650",epic:"HCL1581875",aadhar:"559505672607",name:"JIBAN SARKAR",father:"NAGENDRANATH"},
-{sl:121,gp:"PALLA",village:"BELTA",kb:"403644014190",epic:"HCL3046026",aadhar:"534490274709",name:"JISHU BISWAS",father:"RASIK"},
-{sl:122,gp:"PALLA",village:"BELTA",kb:"612688999050",epic:"WB/13/085/255812",aadhar:"903047772546",name:"JOYANTI CHOWDHURY",father:"SUVASH"},
-{sl:123,gp:"PALLA",village:"BELTA",kb:"630188231070",epic:"WB/13/085/252447",aadhar:"790367735201",name:"JOYDEB BISWAS",father:"DHANANJOY"},
-{sl:124,gp:"PALLA",village:"BELTA",kb:"720580541084",epic:"WB/13/086/297360",aadhar:"832737191667",name:"KABITA RANI DAS",father:"DILIP KUMAR DAS"},
-{sl:125,gp:"PALLA",village:"BELTA",kb:"21922216070",epic:"WB/13/085/231122",aadhar:"650133017276",name:"KAJALI GAIN",father:"GIRISH"},
-{sl:126,gp:"PALLA",village:"BELTA",kb:"617369124171",epic:"HCL3574399",aadhar:"330583659082",name:"KAKALI HAQUE MANDAL",father:"JAYNUDDIN"},
-{sl:127,gp:"PALLA",village:"BELTA",kb:"241800275216",epic:"NRC0150532",aadhar:"914192247014",name:"KAKALI PAL",father:"ARUN"},
-{sl:128,gp:"PALLA",village:"BELTA",kb:"700693027486",epic:"HCL1579754",aadhar:"280629454823",name:"KALIDAS BISWAS",father:"CHITTARANHAN"},
-{sl:129,gp:"PALLA",village:"BELTA",kb:"106983958466",epic:"WB/13/085/252135",aadhar:"481872931496",name:"KALYAN BISWAS",father:"MAHENDRANATH"},
-{sl:130,gp:"PALLA",village:"BELTA",kb:"529105799258",epic:"WB/13/085/258133",aadhar:"708852868105",name:"KANAI LAL SARKAR",father:"KRISHNAMOHAN"},
-{sl:131,gp:"PALLA",village:"BELTA",kb:"12607971275",epic:"WB/13/085/255610",aadhar:"703335791202",name:"KANAN BALA BISWAS",father:"RAMPADA"},
-{sl:132,gp:"PALLA",village:"BELTA",kb:"804339784262",epic:"WB/13/085/252582",aadhar:"543371401521",name:"KANCHAN BASU",father:"JIBANANDA"},
-{sl:133,gp:"PALLA",village:"BELTA",kb:"702988404608",epic:"WB/13/085/249865",aadhar:"963634990806",name:"KAOCHHAR ALI SARDAR",father:"RABIOL"},
-{sl:134,gp:"PALLA",village:"BELTA",kb:"18547965987",epic:"NRC2124345",aadhar:"948309935896",name:"KARNAJIT BISWAS",father:"RAMPADA"},
-{sl:135,gp:"PALLA",village:"BELTA",kb:"610537564633",epic:"WB/13/085/258262",aadhar:"266804333887",name:"KARTIK ROY",father:"MAKHAN LAL ROY"},
-{sl:136,gp:"PALLA",village:"BELTA",kb:"226693376285",epic:"WB/13/085/252527",aadhar:"578778590633",name:"KAWSHALYA BISWAS",father:"MAHEN BISWAS"},
-{sl:137,gp:"PALLA",village:"BELTA",kb:"30660325091",epic:"HCL3185568",aadhar:"346858238890",name:"KHATIB MONDAL",father:"MUKHTAR MONDAL"},
-{sl:138,gp:"PALLA",village:"BELTA",kb:"522493886541",epic:"NRC1504257",aadhar:"981817434653",name:"KOUSHIK DAS",father:"ASHIS DAS"},
-{sl:139,gp:"PALLA",village:"BELTA",kb:"40180828352",epic:"HCL2786689",aadhar:"927520659056",name:"KOUSIK BISWAS",father:"HARIDAS"},
-{sl:140,gp:"PALLA",village:"BELTA",kb:"431997744776",epic:"HCL1577477",aadhar:"352238902910",name:"KRISHNA BASU",father:"SUKDEB"},
-{sl:141,gp:"PALLA",village:"BELTA",kb:"128834922488",epic:"WB/13/085/249264",aadhar:"524104589591",name:"KRISHNAPADA DAS",father:"SANTIRAM"},
-{sl:142,gp:"PALLA",village:"BELTA",kb:"541873792360",epic:"HCL1577048",aadhar:"298618662376",name:"KRISHNENDU DAS",father:"DULAL"},
-{sl:143,gp:"PALLA",village:"BELTA",kb:"16876904102",epic:"HCL3574985",aadhar:"966279938210",name:"KUDDUS ALI MONDAL",father:"TAHURA"},
-{sl:144,gp:"PALLA",village:"BELTA",kb:"524266837283",epic:"HCL3730082",aadhar:"991870454165",name:"KUTUBUDDIN MONDAL",father:"MUJIBAR"},
-{sl:145,gp:"PALLA",village:"BELTA",kb:"703962464150",epic:"HCL3573045",aadhar:"706198437220",name:"LALTU DAS",father:"SUNIL"},
-{sl:146,gp:"PALLA",village:"BELTA",kb:"426064883233",epic:"HCL3045937",aadhar:"655256133465",name:"LALU BISWAS",father:"CHITTA RANJAN"},
-{sl:147,gp:"PALLA",village:"BELTA",kb:"5199147275",epic:"HCL3574761",aadhar:"655361495902",name:"LITUN BISWAS",father:"PRABIR"},
-{sl:148,gp:"PALLA",village:"BELTA",kb:"437778029822",epic:"WB/13/085/255296",aadhar:"910727402601",name:"LUTFAR MONDAL",father:"JAFAR ALI"},
-{sl:149,gp:"PALLA",village:"BELTA",kb:"241298568116",epic:"HCL1578939",aadhar:"782888357303",name:"MADAN GAIN",father:"DINABANDHU GAIN"},
-{sl:150,gp:"PALLA",village:"BELTA",kb:"529304251697",epic:"WB/13/085/255230",aadhar:"838713379026",name:"MALATI BISWAS",father:"ADHIR"},
-{sl:151,gp:"PALLA",village:"BELTA",kb:"318559559416",epic:"WB/13/085/252037",aadhar:"410969207633",name:"MALATI DAS",father:"GOBINDA DAS"},
-{sl:152,gp:"PALLA",village:"BELTA",kb:"828583934018",epic:"HCL3045747",aadhar:"402406692200",name:"MALAY BISWAS",father:"MANORANJAN BISWSS"},
-{sl:153,gp:"PALLA",village:"BELTA",kb:"827484724680",epic:"WB/13/085/255530",aadhar:"519427399538",name:"MALINA BISWAS",father:"SUNIL KUMAR BISWAS"},
-{sl:154,gp:"PALLA",village:"BELTA",kb:"821023516043",epic:"WB/13/085/252194",aadhar:"574327182975",name:"MALINA DAS",father:"—"},
-{sl:155,gp:"PALLA",village:"BELTA",kb:"123017129416",epic:"HCL3439049",aadhar:"472158963117",name:"MAMBE MONDAL",father:"DUKHI"},
-{sl:156,gp:"PALLA",village:"BELTA",kb:"341475768098",epic:"NRC1863596",aadhar:"771297897608",name:"MAMONI DAS",father:"AMALENDU DAS"},
-{sl:157,gp:"PALLA",village:"BELTA",kb:"510819455811",epic:"NRC2080448",aadhar:"302460227344",name:"MANDAR MONDAL",father:"NIRAPAD"},
-{sl:158,gp:"PALLA",village:"BELTA",kb:"34468654358",epic:"WB/13/085/252203",aadhar:"595138558539",name:"MANINDRANATH BISWAS",father:"MUKUNDA"},
-{sl:159,gp:"PALLA",village:"BELTA",kb:"839948668901",epic:"NRC1022102",aadhar:"243468507657",name:"MANOTOSH BISWAS",father:"MANOHAR"},
-{sl:160,gp:"PALLA",village:"BELTA",kb:"414586489513",epic:"NRC0843060",aadhar:"808199207425",name:"MAYA PAUL",father:"BIDHAN"},
-{sl:161,gp:"PALLA",village:"BELTA",kb:"117885736355",epic:"NRC0928093",aadhar:"553405809851",name:"MAYENA KHATUN",father:"MATIYAR"},
-{sl:162,gp:"PALLA",village:"BELTA",kb:"409993321857",epic:"WB/13/085/255572",aadhar:"791705638681",name:"MAYNUDDIN MONDAL",father:"MADAR"},
-{sl:163,gp:"PALLA",village:"BELTA",kb:"718875492026",epic:"WB/13/085/249523",aadhar:"747714570809",name:"MD ROMJAN ALI DHABOK",father:"BILAT ALI DHABAK"},
-{sl:164,gp:"PALLA",village:"BELTA",kb:"821986076640",epic:"WB/13/085/249218",aadhar:"450613105750",name:"MILAN DAS",father:"TARAPADA"},
-{sl:165,gp:"PALLA",village:"BELTA",kb:"630674597580",epic:"HCL2785822",aadhar:"850341696309",name:"MINARUL MONDAL",father:"ARAFIL MONDAL"},
-{sl:166,gp:"PALLA",village:"BELTA",kb:"240568996592",epic:"HCL3187632",aadhar:"703580362057",name:"MINTU DAS",father:"ASHOK"},
-{sl:167,gp:"PALLA",village:"BELTA",kb:"16774018784",epic:"WB/13/085/255091",aadhar:"482853913797",name:"MISS.VARATI BISWAS",father:"DHIRENDRA BISWAS"},
-{sl:168,gp:"PALLA",village:"BELTA",kb:"235198647553",epic:"HCL0391706",aadhar:"332801854306",name:"MITHU BIBI",father:"ARAFIL"},
-{sl:169,gp:"PALLA",village:"BELTA",kb:"640015158872",epic:"NRC1129436",aadhar:"721338331747",name:"MOFIJUL MANDAL",father:"SUKUR ALI"},
-{sl:170,gp:"PALLA",village:"BELTA",kb:"415382017290",epic:"NRC1130814",aadhar:"346469579646",name:"MOHSIN MANDAL",father:"JAMAT"},
-{sl:171,gp:"PALLA",village:"BELTA",kb:"737864506586",epic:"NRC0843482",aadhar:"650905690844",name:"MORIOM MONDAL",father:"ROHID"},
-{sl:172,gp:"PALLA",village:"BELTA",kb:"510104047733",epic:"WB/13/085/255449",aadhar:"353765799800",name:"MOYNARA MONDAL",father:"ABDUL CHATTAR"},
-{sl:173,gp:"PALLA",village:"BELTA",kb:"30678703150",epic:"HCL2786960",aadhar:"587056903425",name:"MR HAMIDUL MONDAL",father:"NAOSER MONDAL"},
-{sl:174,gp:"PALLA",village:"BELTA",kb:"622916401453",epic:"HCL1575182",aadhar:"284941417847",name:"MR.BIJAY SHIKDAR",father:"AMULYA SHIKDAR"},
-{sl:175,gp:"PALLA",village:"BELTA",kb:"824149171560",epic:"HCL3185311",aadhar:"496922147160",name:"MR.CHAPIUL BISWAS",father:"NURBAKS BISWAS"},
-{sl:176,gp:"PALLA",village:"BELTA",kb:"533122457416",epic:"WB/13/085/252458",aadhar:"809527045262",name:"MR.SANTASIL SARKAR",father:"NITYNANDA SARKAR"},
-{sl:177,gp:"PALLA",village:"BELTA",kb:"436270927606",epic:"WB/13/085/252164",aadhar:"552994139871",name:"MR.SUDIP SARKAR",father:"SANTASHIL SARKAR"},
-{sl:178,gp:"PALLA",village:"BELTA",kb:"232983487170",epic:"HCL2401818",aadhar:"468372818157",name:"MRITYUNJAY GHARAMI",father:"—"},
-{sl:179,gp:"PALLA",village:"BELTA",kb:"12706600994",epic:"WB/13/085/252584",aadhar:"821685286558",name:"MS MIRA RANI LASKAR",father:"PARAN LASKAR"},
-{sl:180,gp:"PALLA",village:"BELTA",kb:"305357948700",epic:"HCL3182565",aadhar:"599735764509",name:"MUJAFFAR MISTRI",father:"AIJUL"},
-{sl:181,gp:"PALLA",village:"BELTA",kb:"814544107917",epic:"NRC1902295",aadhar:"469151926249",name:"NAGENDRA NATH BISWAS",father:"DINOBANDHU BISWAS"},
-{sl:182,gp:"PALLA",village:"BELTA",kb:"709810057685",epic:"NRC1959469",aadhar:"243253375050",name:"NAIM MONDAL",father:"LATE ISLAM ALI"},
-{sl:183,gp:"PALLA",village:"BELTA",kb:"611498830270",epic:"WB/13/085/258056",aadhar:"996588391490",name:"NANDA BISWAS",father:"KALI DAS"},
-{sl:184,gp:"PALLA",village:"BELTA",kb:"142469332076",epic:"WB/13/085/252572",aadhar:"797893115070",name:"NANI ROY",father:"BALAHARI"},
-{sl:185,gp:"PALLA",village:"BELTA",kb:"342518665857",epic:"HCL3183472",aadhar:"557699973241",name:"NANTU DAS",father:"TARAPADA"},
-{sl:186,gp:"PALLA",village:"BELTA",kb:"735835245720",epic:"WB/13/085/255720",aadhar:"479701034832",name:"NASIMA BIBI",father:"RAJJAK"},
-{sl:187,gp:"PALLA",village:"BELTA",kb:"131243288691",epic:"NRC1570647",aadhar:"505372851132",name:"NEPAL CHANDRA PAUL",father:"BINOD BEHARI PAUL"},
-{sl:188,gp:"PALLA",village:"BELTA",kb:"619823573774",epic:"WB/13/085/255712",aadhar:"256277068630",name:"NIMAI SADHUKHAN",father:"HAJARI SADHUKHA"},
-{sl:189,gp:"PALLA",village:"BELTA",kb:"807912784022",epic:"WB/13/085/228137",aadhar:"991675889212",name:"NITYANANDA BISWAS",father:"RAMPADA"},
-{sl:190,gp:"PALLA",village:"BELTA",kb:"421450581077",epic:"NRC1902303",aadhar:"222638975942",name:"OHAB BARI MONDAL",father:"ICHOKBARI MANDAL"},
-{sl:191,gp:"PALLA",village:"BELTA",kb:"211052688591",epic:"XDY1183177",aadhar:"322558427024",name:"PAMPA BISWAS",father:"LATE SUDHANSHU"},
-{sl:192,gp:"PALLA",village:"BELTA",kb:"822788964386",epic:"NRC0890962",aadhar:"941553908269",name:"PAPPU MAJUMDER",father:"UDAYSHANKAR"},
-{sl:193,gp:"PALLA",village:"BELTA",kb:"439223389145",epic:"NRC1097138",aadhar:"716114344815",name:"PARIMAL KANTI BISWAS",father:"HARAN CHANDRA BISWAS"},
-{sl:194,gp:"PALLA",village:"BELTA",kb:"631691300880",epic:"NRC1602820",aadhar:"236003009920",name:"PARUL MONDAL",father:"RAFIKUL MONDAL"},
-{sl:195,gp:"PALLA",village:"BELTA",kb:"423248120621",epic:"WB/13/085/249861",aadhar:"567502062751",name:"PRANAB KUMAR DAS",father:"JAMINI RANJAN DAS"},
-{sl:196,gp:"PALLA",village:"BELTA",kb:"642471368940",epic:"HCL3438827",aadhar:"737521310924",name:"PRASENJIT DAS",father:"DILIP"},
-{sl:197,gp:"PALLA",village:"BELTA",kb:"323760134386",epic:"WB/13/085/255649",aadhar:"638375730493",name:"PRASHANTA GHOSH",father:"HAZARI GHOSH"},
-{sl:198,gp:"PALLA",village:"BELTA",kb:"413375010476",epic:"HCL3574183",aadhar:"515581030446",name:"PRITIKANA CHOWDHURY",father:"SAMAR"},
-{sl:199,gp:"PALLA",village:"BELTA",kb:"517015682460",epic:"NRC2034601",aadhar:"691031317823",name:"PRITOM GAIN",father:"BHAJAN"},
-{sl:200,gp:"PALLA",village:"BELTA",kb:"625944309350",epic:"NRC1901941",aadhar:"274712597893",name:"RABIOL MANDAL",father:"SUKIR ALI MONDAL"},
-{sl:201,gp:"PALLA",village:"BELTA",kb:"415492594513",epic:"WB/13/085/255037",aadhar:"787845586854",name:"RABIOL MANDAL",father:"DINMOHAMMAD MANDAL"},
-{sl:202,gp:"PALLA",village:"BELTA",kb:"626613385553",epic:"WB/13/085/255656",aadhar:"467886049660",name:"RABIUL MONDAL",father:"JAYNAL MONDAL"},
-{sl:203,gp:"PALLA",village:"BELTA",kb:"812271646246",epic:"NRC1021716",aadhar:"833132444681",name:"RABIYAL BISWAS",father:"JABEDA BIBI"},
-{sl:204,gp:"PALLA",village:"BELTA",kb:"841288888617",epic:"HCL3820511",aadhar:"397409817993",name:"RAFIK MONDAL",father:"ABDULLA"},
-{sl:205,gp:"PALLA",village:"BELTA",kb:"416244175133",epic:"NRC1022870",aadhar:"838721728503",name:"RAHIM MONDAL",father:"MAHAMMAD"},
-{sl:206,gp:"PALLA",village:"BELTA",kb:"513773258691",epic:"WB/13/085/255554",aadhar:"347181256308",name:"RAHIMA MONDAL",father:"MATIYAR"},
-{sl:207,gp:"PALLA",village:"BELTA",kb:"4025717481",epic:"WB/13/085/255336",aadhar:"714626898168",name:"RAJJAK MONDAL",father:"HAJARAT"},
-{sl:208,gp:"PALLA",village:"BELTA",kb:"519503780384",epic:"NRC0927988",aadhar:"559816248704",name:"RAKHI BISWAS DAS",father:"JAYDEB"},
-{sl:209,gp:"PALLA",village:"BELTA",kb:"625290092708",epic:"DKJ3492634",aadhar:"410230545439",name:"RAKHI DAS",father:"ANANDA"},
-{sl:210,gp:"PALLA",village:"BELTA",kb:"829680656126",epic:"NRC1382076",aadhar:"454194455840",name:"RAMA RANI BALA KHAN",father:"BINAY BALA"},
-{sl:211,gp:"PALLA",village:"BELTA",kb:"715941301298",epic:"NRC2329431",aadhar:"673002756145",name:"RANI BALA",father:"AMIYA"},
-{sl:212,gp:"PALLA",village:"BELTA",kb:"308224877816",epic:"HCL2785301",aadhar:"947104876589",name:"RATAN KUMAR DAS",father:"AMULYA DAS"},
-{sl:213,gp:"PALLA",village:"BELTA",kb:"327182428513",epic:"HCL3574233",aadhar:"918019027051",name:"REHENA MONDAL",father:"ISRAFLL"},
-{sl:214,gp:"PALLA",village:"BELTA",kb:"419859984818",epic:"WB/13/085/255749",aadhar:"546163813244",name:"REKHA BISWAS",father:"BIKASH"},
-{sl:215,gp:"PALLA",village:"BELTA",kb:"108270786308",epic:"WB/13/085/255110",aadhar:"903599753893",name:"REKHA BISWAS",father:"PRABIR"},
-{sl:216,gp:"PALLA",village:"BELTA",kb:"801221492897",epic:"HCL0392670",aadhar:"871802535398",name:"REKHA RANI GHOSH",father:"GOUR CHANDRA"},
-{sl:217,gp:"PALLA",village:"BELTA",kb:"423615865500",epic:"WB/13/085/252112",aadhar:"400335633947",name:"RENUKA BISWAS",father:"HARSHIT BISWAS"},
-{sl:218,gp:"PALLA",village:"BELTA",kb:"209070624395",epic:"HCL3821378",aadhar:"827338229264",name:"RIJAUL MONDAL",father:"ABDUL"},
-{sl:219,gp:"PALLA",village:"BELTA",kb:"436481097493",epic:"NRC0843409",aadhar:"223912820975",name:"RINKU GUHA NEOGI BISWAS",father:"SUNIL"},
-{sl:220,gp:"PALLA",village:"BELTA",kb:"42193925053",epic:"HCL2786051",aadhar:"266729491139",name:"RITA GHOSH",father:"BIJAN"},
-{sl:221,gp:"PALLA",village:"BELTA",kb:"326188525481",epic:"WB/13/085/249489",aadhar:"642303392991",name:"ROBIAL HASSEN MONDAL",father:"FAKIR CHAND"},
-{sl:222,gp:"PALLA",village:"BELTA",kb:"629398380990",epic:"HCL1575729",aadhar:"580709021128",name:"ROKEYA BIBI",father:"GOLAM"},
-{sl:223,gp:"PALLA",village:"BELTA",kb:"309875893974",epic:"HCL3186350",aadhar:"727159910332",name:"RULAMIN MONDAL",father:"BACHHATULLA"},
-{sl:224,gp:"PALLA",village:"BELTA",kb:"521772974920",epic:"NRC1902345",aadhar:"733636806007",name:"RUPBAN BIBI",father:"MAJID"},
-{sl:225,gp:"PALLA",village:"BELTA",kb:"106873429540",epic:"WKM1442920",aadhar:"234595363093",name:"SABANA KHATUN BISWAS",father:"JASIMUDDIN"},
-{sl:226,gp:"PALLA",village:"BELTA",kb:"617364507086",epic:"UEC0879130",aadhar:"778648812916",name:"SABINA KHATUN",father:"MUSARAF"},
-{sl:227,gp:"PALLA",village:"BELTA",kb:"501693348610",epic:"NRC1504877",aadhar:"335108376039",name:"SABINA MONDAL",father:"JAMAL"},
-{sl:228,gp:"PALLA",village:"BELTA",kb:"739286784810",epic:"NLW2571412",aadhar:"548691670905",name:"SABITA MISTRI",father:"PRAFULLA"},
-{sl:229,gp:"PALLA",village:"BELTA",kb:"128586400560",epic:"NRC1863570",aadhar:"231644634289",name:"SABUJ BISWAS",father:"KHUDIRAM"},
-{sl:230,gp:"PALLA",village:"BELTA",kb:"835113564431",epic:"HCL3185840",aadhar:"872487670082",name:"SADHAN GAIN",father:"KHAGENDRA NATH"},
-{sl:231,gp:"PALLA",village:"BELTA",kb:"512596063666",epic:"HCL3820602",aadhar:"889470196737",name:"SAHAJAN MONDAL",father:"AIJUL HAQ"},
-{sl:232,gp:"PALLA",village:"BELTA",kb:"142099470983",epic:"NRC0153734",aadhar:"779768338601",name:"SAHAJAN MONDAL",father:"RAMJAN MANDAL"},
-{sl:233,gp:"PALLA",village:"BELTA",kb:"18181335660",epic:"HCL3184892",aadhar:"963251958410",name:"SAHAJAN MONDAL",father:"SUKURALI"},
-{sl:234,gp:"PALLA",village:"BELTA",kb:"714019372100",epic:"HCL2785996",aadhar:"399762349380",name:"SAHANAJ BIBI",father:"ISLAM ALI MONDAL"},
-{sl:235,gp:"PALLA",village:"BELTA",kb:"1600800236",epic:"WB/13/085/225628",aadhar:"524868220329",name:"SAHEB ALI MONDAL",father:"DUUPLISATA"},
-{sl:236,gp:"PALLA",village:"BELTA",kb:"739604677750",epic:"NRC2128700",aadhar:"531720818219",name:"SAHIN MALLICK",father:"SUKUR ALI"},
-{sl:237,gp:"PALLA",village:"BELTA",kb:"15676062927",epic:"WB/13/085/258185",aadhar:"536176526694",name:"SAILEN BISWAS",father:"NILRATAN"},
-{sl:238,gp:"PALLA",village:"BELTA",kb:"829920501983",epic:"HCL1578962",aadhar:"970012480731",name:"SAILEN HAZRA",father:"DWIJABAR"},
-{sl:239,gp:"PALLA",village:"BELTA",kb:"520081527848",epic:"HCL1590405",aadhar:"452102508431",name:"SAMAR DEBNATH",father:"ASHWINI DEBNATH"},
-{sl:240,gp:"PALLA",village:"BELTA",kb:"541199736017",epic:"WB/13/085/255562",aadhar:"593156095169",name:"SANDHA SADUKHA",father:"NIMAI SADUKHA"},
-{sl:241,gp:"PALLA",village:"BELTA",kb:"11089468496",epic:"WB/13/085/252039",aadhar:"814728402292",name:"SANDHYA DAS",father:"DILIP"},
-{sl:242,gp:"PALLA",village:"BELTA",kb:"111572683355",epic:"NRC1090356",aadhar:"803100484119",name:"SANJAY TIKADER",father:"SUBARNA TIKADER"},
-{sl:243,gp:"PALLA",village:"BELTA",kb:"837738735353",epic:"HCL3438751",aadhar:"408218451146",name:"SANJIB SARKAR",father:"ANUKUL"},
-{sl:244,gp:"PALLA",village:"BELTA",kb:"23318310695",epic:"WB/13/085/255770",aadhar:"261280662704",name:"SARAMA GHOSH",father:"ASWANI"},
-{sl:245,gp:"PALLA",village:"BELTA",kb:"704179499307",epic:"HCL3436151",aadhar:"579546788209",name:"SHANKAR BACHAR",father:"BANAMALI BACHAR"},
-{sl:246,gp:"PALLA",village:"BELTA",kb:"728907338834",epic:"HCL1576453",aadhar:"780484348992",name:"SHANTI BISWAS",father:"BALARAM BIWSAS"},
-{sl:247,gp:"PALLA",village:"BELTA",kb:"730800177920",epic:"NRC1959451",aadhar:"754180192492",name:"SHASWATA ROY CHOUDHURY",father:"SATYAJIT"},
-{sl:248,gp:"PALLA",village:"BELTA",kb:"714308690754",epic:"HCL3438679",aadhar:"564415586852",name:"SHEFALIPODDAR",father:"NITYANANDA"},
-{sl:249,gp:"PALLA",village:"BELTA",kb:"736035877250",epic:"WB/13/085/255284",aadhar:"341584901719",name:"SHIKHA SADHUKHA",father:"NITAI SADHUKHA"},
-{sl:250,gp:"PALLA",village:"BELTA",kb:"16067813716",epic:"MTK2387611",aadhar:"290439429345",name:"SHIPRA BISWAS ROY",father:"SUSHANTA"},
-{sl:251,gp:"PALLA",village:"BELTA",kb:"434974036870",epic:"NRC1504661",aadhar:"336437638646",name:"SHOVAN GHOSH",father:"DILIP KUMAR GHOSH"},
-{sl:252,gp:"PALLA",village:"BELTA",kb:"337168051604",epic:"NRC1896638",aadhar:"732905023605",name:"SHYAMAL SARKAR",father:"MOTILAL SARKAR"},
-{sl:253,gp:"PALLA",village:"BELTA",kb:"721303995204",epic:"BVD2193670",aadhar:"560244993067",name:"SHYAMALI BHOWMICK",father:"KALIPADA"},
-{sl:254,gp:"PALLA",village:"BELTA",kb:"740313306223",epic:"HCL0394676",aadhar:"776247154836",name:"SOMA BISWAS",father:"AMAL"},
-{sl:255,gp:"PALLA",village:"BELTA",kb:"327656688286",epic:"NRC1704634",aadhar:"948855140674",name:"SOMA MITRA",father:"MANIK MITRA"},
-{sl:256,gp:"PALLA",village:"BELTA",kb:"541099538356",epic:"NRC0843433",aadhar:"364503335187",name:"SOMEN BISWAS",father:"SARAJ"},
-{sl:257,gp:"PALLA",village:"BELTA",kb:"138290166032",epic:"NRC1862705",aadhar:"534333103092",name:"SONALI BIBI",father:"SAWKAT"},
-{sl:258,gp:"PALLA",village:"BELTA",kb:"535402342843",epic:"NRC0144469",aadhar:"415019866432",name:"SUBAL CHINTAPATRA",father:"ANANTA"},
-{sl:259,gp:"PALLA",village:"BELTA",kb:"608558138023",epic:"WB/13/085/252279",aadhar:"208456569782",name:"SUBASH DAS",father:"DEBENDRA NATH DAS"},
-{sl:260,gp:"PALLA",village:"BELTA",kb:"331425831060",epic:"WB/13/085/252561",aadhar:"532172080773",name:"SUBASH MONDAL",father:"SUMANTA"},
-{sl:261,gp:"PALLA",village:"BELTA",kb:"16853162487",epic:"WB/13/085/255658",aadhar:"776730299486",name:"SUBHAS CHANDRA BISWAS",father:"BIRENDRA"},
-{sl:262,gp:"PALLA",village:"BELTA",kb:"307477706710",epic:"WB/13/085/255050",aadhar:"280015168027",name:"SUBRATA PAUL",father:"JENENDRA PAUL"},
-{sl:263,gp:"PALLA",village:"BELTA",kb:"233847384332",epic:"NRC1381227",aadhar:"406984317244",name:"SUBUDDIN DHABAK",father:"KUDDUSH"},
-{sl:264,gp:"PALLA",village:"BELTA",kb:"612206807140",epic:"HCL1583954",aadhar:"987060965031",name:"SUDEB SARKAR",father:"PROFULLA"},
-{sl:265,gp:"PALLA",village:"BELTA",kb:"602384109840",epic:"HCL1577501",aadhar:"481749218161",name:"SUDHANGSHU CHAUDHURI",father:"PRAMATHA"},
-{sl:266,gp:"PALLA",village:"BELTA",kb:"515897147075",epic:"WB/13/085/255259",aadhar:"687039292672",name:"SUDIP LASKAR",father:"ARUP"},
-{sl:267,gp:"PALLA",village:"BELTA",kb:"707311439270",epic:"HCL3730462",aadhar:"453858710557",name:"SUDIP ROY CHOWDHURY",father:"SWAPAN"},
-{sl:268,gp:"PALLA",village:"BELTA",kb:"732671588498",epic:"NRC0144840",aadhar:"972450456911",name:"SUJATA BISWAS",father:"RANJIT BISWAS"},
-{sl:269,gp:"PALLA",village:"BELTA",kb:"417501390940",epic:"WB/13/085/255558",aadhar:"917006638728",name:"SUJIT BHOWMIK",father:"BHUBAN"},
-{sl:270,gp:"PALLA",village:"BELTA",kb:"414294668273",epic:"NRC1263284",aadhar:"416797670976",name:"SUKDEB BISWAS",father:"KHUDIRAM"},
-{sl:271,gp:"PALLA",village:"BELTA",kb:"521746924967",epic:"NRC1130657",aadhar:"284139764523",name:"SUKHEN PAUL",father:"GANESH"},
-{sl:272,gp:"PALLA",village:"BELTA",kb:"23380145930",epic:"NRC1130608",aadhar:"944608141458",name:"SUKLA BISWAS",father:"TAPAN BISWAS"},
-{sl:273,gp:"PALLA",village:"BELTA",kb:"418636802986",epic:"LLQ0082339",aadhar:"310656515820",name:"SUKLA DAS",father:"CHANDAN DAS"},
-{sl:274,gp:"PALLA",village:"BELTA",kb:"808967223660",epic:"HCL0390682",aadhar:"806912547189",name:"SUKUMAR ROY",father:"ADITYA PRASAD ROY"},
-{sl:275,gp:"PALLA",village:"BELTA",kb:"713977081400",epic:"NRC1382555",aadhar:"986933591118",name:"SUKUR ALI MONDAL",father:"NAFAR ALI"},
-{sl:276,gp:"PALLA",village:"BELTA",kb:"142310502250",epic:"NRC1263979",aadhar:"231643481546",name:"SUMAN GHOSH",father:"DILIP"},
-{sl:277,gp:"PALLA",village:"BELTA",kb:"535383193412",epic:"NRC0144477",aadhar:"303182703497",name:"SUMITRACHINTAPATRA",father:"SUBAL"},
-{sl:278,gp:"PALLA",village:"BELTA",kb:"537665774781",epic:"WB/13/085/255124",aadhar:"672726801136",name:"SUNIL BISWAS",father:"DHIRENDRA"},
-{sl:279,gp:"PALLA",village:"BELTA",kb:"226867360508",epic:"WB/13/085/252588",aadhar:"499172071880",name:"SUNIL KUMAR LASKAR",father:"JITENDRA"},
-{sl:280,gp:"PALLA",village:"BELTA",kb:"428759888120",epic:"HCL2409266",aadhar:"793520357768",name:"SUPRIYA SHIKDAR",father:"SUBHASH"},
-{sl:281,gp:"PALLA",village:"BELTA",kb:"820279677480",epic:"WB/13/085/252486",aadhar:"414636260504",name:"SURYA MONDAL",father:"SUMANTA"},
-{sl:282,gp:"PALLA",village:"BELTA",kb:"709381513103",epic:"HCL3183662",aadhar:"517346853496",name:"SUSAMA DAS",father:"AMAL"},
-{sl:283,gp:"PALLA",village:"BELTA",kb:"326484919061",epic:"WB/13/085/252258",aadhar:"877300039565",name:"SUSANTA BALA",father:"HARASHIT BALA"},
-{sl:284,gp:"PALLA",village:"BELTA",kb:"39792816373",epic:"HCL1579606",aadhar:"275984559318",name:"SUSHANTA MISTRI",father:"RAJEN"},
-{sl:285,gp:"PALLA",village:"BELTA",kb:"717847823603",epic:"HCL1576990",aadhar:"941123176773",name:"SUTAPA DAS",father:"SUBRATA"},
-{sl:286,gp:"PALLA",village:"BELTA",kb:"111990241040",epic:"NRC2176469",aadhar:"507020556372",name:"SUVASHIS DAS",father:"ASHIS"},
-{sl:287,gp:"PALLA",village:"BELTA",kb:"524955853134",epic:"WB/13/085/252081",aadhar:"514807551694",name:"SWAPAN BISWAS",father:"ANIL"},
-{sl:288,gp:"PALLA",village:"BELTA",kb:"419733457647",epic:"HCL2405496",aadhar:"464172616962",name:"SWAPAN BISWAS",father:"SANATAN"},
-{sl:289,gp:"PALLA",village:"BELTA",kb:"107167071656",epic:"HCL1579762",aadhar:"386906478075",name:"SWAPAN SIKDAR",father:"SUDHIR"},
-{sl:290,gp:"PALLA",village:"BELTA",kb:"20496563405",epic:"HCL2407229",aadhar:"875991095203",name:"TAPAN BALA",father:"PANCHANAN"},
-{sl:291,gp:"PALLA",village:"BELTA",kb:"212839840606",epic:"WB/13/085/234129",aadhar:"476300085340",name:"TAPAN DEYSARKAR",father:"SUDHIR"},
-{sl:292,gp:"PALLA",village:"BELTA",kb:"422664269440",epic:"WB/13/085/252565",aadhar:"320419604502",name:"TAPAN KUMAR MONDAL",father:"MANINDRA"},
-{sl:293,gp:"PALLA",village:"BELTA",kb:"618553293128",epic:"HCL1578392",aadhar:"330321249054",name:"TAPAN MONDAL",father:"SUMANTA"},
-{sl:294,gp:"PALLA",village:"BELTA",kb:"242359068761",epic:"HCL1579127",aadhar:"619390831503",name:"TAPAS CHINTAPATRA",father:"TRINATH CHINTAPATRA"},
-{sl:295,gp:"PALLA",village:"BELTA",kb:"238109180757",epic:"HCL3184454",aadhar:"540123733230",name:"TAPAS ROY",father:"KALIDAS"},
-{sl:296,gp:"PALLA",village:"BELTA",kb:"725755946633",epic:"WB/13/085/252409",aadhar:"254824848312",name:"TARAK BISWAS",father:"GOBINDA BISWAS"},
-{sl:297,gp:"PALLA",village:"BELTA",kb:"416268310650",epic:"NEY1507441",aadhar:"641546459044",name:"TASLIMA MONDAL",father:"ALAMAT"},
-{sl:298,gp:"PALLA",village:"BELTA",kb:"211701447921",epic:"WB/13/085/255218",aadhar:"898447005965",name:"TOFAJJEL MONDAL",father:"FAKIRCHAND"},
-{sl:299,gp:"PALLA",village:"BELTA",kb:"626736970766",epic:"NRC1862861",aadhar:"526862315401",name:"TUHIN MALLICK",father:"SUKURALI"},
-{sl:300,gp:"PALLA",village:"BELTA",kb:"506071421600",epic:"NRC0927996",aadhar:"722553331458",name:"TUMPA BISWAS",father:"PRADIP"},
-{sl:301,gp:"PALLA",village:"BELTA",kb:"331211763866",epic:"HCL1576495",aadhar:"518681942847",name:"TUMPA MONDAL",father:"SADHAN MONDAL"},
-{sl:302,gp:"PALLA",village:"BELTA",kb:"637878014720",epic:"HCL3185816",aadhar:"339979723008",name:"TUNI MALLIK",father:"SUKUR ALI MALLIK"},
-{sl:303,gp:"PALLA",village:"BELTA",kb:"613723130075",epic:"HCL1570860",aadhar:"259587052039",name:"UJJALA DAS",father:"SANKAR"},
-{sl:304,gp:"PALLA",village:"BELTA",kb:"214239161558",epic:"WB/13/085/255800",aadhar:"862591563647",name:"UMESH BISWAS",father:"KISORL BISWAS"},
-{sl:305,gp:"PALLA",village:"BELTA",kb:"614696548808",epic:"HCL0387597",aadhar:"959766126536",name:"USHA BISWAS",father:"ANUKUL"},
-{sl:306,gp:"PALLA",village:"BELTA",kb:"537535997477",epic:"NRC0931360",aadhar:"353362332091",name:"UTPAL BISWAS",father:"AKHIL"},
-{sl:307,gp:"PALLA",village:"BELTA",kb:"119154665983",epic:"WB/13/085/240141",aadhar:"651774542156",name:"UTTAM KARMAKAR",father:"NIMAI"},
-{sl:308,gp:"PALLA",village:"BELTA",kb:"7587263306",epic:"HCL2784403",aadhar:"235731178570",name:"UTTAM PAL",father:"SATYA RANJAN"}
-];
-
-// Build Aadhar index for O(1) lookup
-const aadharIndex = {};
-farmerDB.forEach(f => { aadharIndex[f.aadhar] = f; });
+// ===== CONFIG =====
+const DATA_URL = 'https://script.google.com/macros/s/AKfycbwixbkIUVdMQApQjRcOKwvqYTPran-VKtcSUv9n5KBawxei6B3cTyfmZmzj0g3O-O_n/exec';
 
 // ===== STATE =====
+let farmerDB = [];
+let aadharIndex = {};
 let verifiedCount = 0;
 let recentSearches = [];
 
 // ===== PARTICLES =====
-function createParticles() {
-    const container = document.getElementById('particles');
+(function() {
+    const c = document.getElementById('particles');
     for (let i = 0; i < 30; i++) {
         const p = document.createElement('div');
         p.className = 'particle';
@@ -1349,211 +419,211 @@ function createParticles() {
         p.style.animationDelay = Math.random() * 8 + 's';
         p.style.animationDuration = (6 + Math.random() * 6) + 's';
         p.style.width = p.style.height = (2 + Math.random() * 3) + 'px';
-        container.appendChild(p);
+        c.appendChild(p);
     }
+})();
+
+// ===== LOAD DATA ON START =====
+window.addEventListener('DOMContentLoaded', () => {
+    // Load cached data instantly
+    const cached = localStorage.getItem('belta_data');
+    if (cached) {
+        try {
+            const parsed = JSON.parse(cached);
+            if (parsed && parsed.length) loadData(parsed);
+        } catch(e) {}
+    }
+    // Fetch fresh data
+    fetchData();
+});
+
+function fetchData() {
+    fetch(DATA_URL)
+        .then(r => { if (!r.ok) throw new Error('Network error'); return r.json(); })
+        .then(json => {
+            if (json.success && json.data && json.data.length) {
+                localStorage.setItem('belta_data', JSON.stringify(json.data));
+                loadData(json.data);
+            }
+            hideLoading();
+        })
+        .catch(() => {
+            // If fetch fails but we have cached data, still work
+            hideLoading();
+        });
 }
-createParticles();
 
-// ===== AADHAR FORMATTING =====
-const aadharInput = document.getElementById('aadharInput');
-
-aadharInput.addEventListener('input', function(e) {
-    let value = this.value.replace(/\D/g, '');
-    if (value.length > 12) value = value.substring(0, 12);
-    
-    // Format as XXXX XXXX XXXX
-    let formatted = '';
-    for (let i = 0; i < value.length; i++) {
-        if (i > 0 && i % 4 === 0) formatted += ' ';
-        formatted += value[i];
-    }
-    this.value = formatted;
-
-    // Live validation styling
-    const raw = value;
-    this.classList.remove('valid', 'invalid');
-    if (raw.length === 12) {
-        this.classList.add(aadharIndex[raw] ? 'valid' : 'invalid');
-    }
-});
-
-aadharInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') searchAadhar();
-});
-
-// ===== SEARCH =====
-function searchAadhar() {
-    const raw = aadharInput.value.replace(/\D/g, '');
-    const btn = document.getElementById('searchBtn');
-    const resultSection = document.getElementById('resultSection');
-
-    if (raw.length !== 12) {
-        showError('Invalid Format', 'Please enter a valid 12-digit Aadhaar number to proceed with verification.');
-        aadharInput.classList.add('invalid');
-        aadharInput.focus();
-        return;
-    }
-
-    // Loading animation
-    btn.classList.add('loading');
-    btn.disabled = true;
-
-    setTimeout(() => {
-        btn.classList.remove('loading');
-        btn.disabled = false;
-
-        const farmer = aadharIndex[raw];
-
-        if (farmer) {
-            showResult(farmer);
-            verifiedCount++;
-            document.getElementById('verifiedCount').textContent = verifiedCount;
-            addRecentSearch(raw, farmer.name);
-        } else {
-            showError('Record Not Found', `No farmer record found for Aadhaar number ${formatAadhar(raw)}. This number may not be registered in the Belta Village database.`);
+function loadData(data) {
+    farmerDB = data;
+    aadharIndex = {};
+    farmerDB.forEach(f => {
+        if (f.aadhar) {
+            const clean = f.aadhar.replace(/\D/g, '');
+            if (clean) aadharIndex[clean] = f;
         }
+    });
+    const gps = new Set(farmerDB.map(f => (f.gp||'').toUpperCase()).filter(Boolean));
+    const villages = new Set(farmerDB.map(f => (f.village||'').toUpperCase()).filter(Boolean));
+    animateCount(document.getElementById('totalRecords'), farmerDB.length, 1500);
+    document.getElementById('gpCount').textContent = gps.size || 1;
+    document.getElementById('villageCount').textContent = villages.size || 1;
+}
+
+function hideLoading() {
+    setTimeout(() => {
+        document.getElementById('loadingOverlay').classList.add('hidden');
     }, 800);
 }
 
-function formatAadhar(raw) {
-    return raw.replace(/(\d{4})(\d{4})(\d{4})/, '$1 $2 $3');
+// ===== INPUT FORMATTING =====
+const aadharInput = document.getElementById('aadharInput');
+aadharInput.addEventListener('input', function() {
+    let v = this.value.replace(/\D/g, '');
+    if (v.length > 12) v = v.substring(0, 12);
+    let f = '';
+    for (let i = 0; i < v.length; i++) {
+        if (i > 0 && i % 4 === 0) f += ' ';
+        f += v[i];
+    }
+    this.value = f;
+    this.classList.remove('valid', 'invalid');
+    if (v.length >= 4) {
+        const m = findMatches(v);
+        if (m.length > 0) this.classList.add('valid');
+        else if (v.length === 12) this.classList.add('invalid');
+    }
+});
+aadharInput.addEventListener('keydown', e => { if (e.key === 'Enter') searchAadhar(); });
+
+// ===== SMART SEARCH =====
+function findMatches(query) {
+    const clean = query.replace(/\D/g, '');
+    if (!clean) return [];
+    // Exact match
+    if (aadharIndex[clean]) return [aadharIndex[clean]];
+    // Contains match
+    let matches = [];
+    for (const key in aadharIndex) {
+        if (key.includes(clean) || clean.includes(key)) {
+            matches.push(aadharIndex[key]);
+        }
+    }
+    if (matches.length) return matches.slice(0, 10);
+    // Fuzzy match (70%+ digit match)
+    if (clean.length >= 6) {
+        let best = [], bestScore = 0;
+        for (const key in aadharIndex) {
+            let score = 0;
+            const len = Math.min(clean.length, key.length);
+            for (let i = 0; i < len; i++) { if (clean[i] === key[i]) score++; }
+            if (score > bestScore && score >= Math.floor(len * 0.7)) {
+                bestScore = score; best = [aadharIndex[key]];
+            } else if (score === bestScore && score >= Math.floor(len * 0.7)) {
+                best.push(aadharIndex[key]);
+            }
+        }
+        return best.slice(0, 5);
+    }
+    return [];
 }
 
-function showResult(farmer) {
-    const section = document.getElementById('resultSection');
-    section.innerHTML = `
-        <div class="result-card">
-            <div class="result-header">
-                <div class="result-icon success-icon">✅</div>
-                <div class="result-header-text">
-                    <h3>Verification Successful</h3>
-                    <p>Record found in Belta Village database</p>
-                </div>
-            </div>
-            <div class="result-body">
-                <div class="result-grid">
-                    <div class="result-field">
-                        <div class="field-label">Sl. No</div>
-                        <div class="field-value highlight">#${farmer.sl}</div>
-                    </div>
-                    <div class="result-field">
-                        <div class="field-label">Gram Panchayat</div>
-                        <div class="field-value">${farmer.gp}</div>
-                    </div>
-                    <div class="result-field full-width">
-                        <div class="field-label">Aadhaar Number</div>
-                        <div class="field-value aadhar-display">${formatAadhar(farmer.aadhar)}</div>
-                    </div>
-                    <div class="result-field full-width">
-                        <div class="field-label">Farmer Name</div>
-                        <div class="field-value" style="font-size:1.25rem; color: #a78bfa;">${farmer.name}</div>
-                    </div>
-                    <div class="result-field full-width">
-                        <div class="field-label">Father / Husband Name</div>
-                        <div class="field-value">${farmer.father}</div>
-                    </div>
-                    <div class="result-field">
-                        <div class="field-label">Village</div>
-                        <div class="field-value">${farmer.village}</div>
-                    </div>
-                    <div class="result-field">
-                        <div class="field-label">KB ID No</div>
-                        <div class="field-value" style="font-size:0.88rem; word-break:break-all;">${farmer.kb}</div>
-                    </div>
-                    <div class="result-field full-width">
-                        <div class="field-label">EPIC No</div>
-                        <div class="field-value">${farmer.epic}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    section.classList.remove('show');
-    void section.offsetWidth; // force reflow
-    section.classList.add('show');
-    section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+function searchAadhar() {
+    const raw = aadharInput.value.replace(/\D/g, '');
+    const btn = document.getElementById('searchBtn');
+    if (farmerDB.length === 0) {
+        showError('Loading', 'Data is still loading. Please wait a moment and try again.');
+        return;
+    }
+    if (raw.length < 4) {
+        showError('Too Short', 'Please enter at least 4 digits of the Aadhaar number to search.');
+        aadharInput.classList.add('invalid'); aadharInput.focus(); return;
+    }
+    btn.classList.add('loading'); btn.disabled = true;
+    setTimeout(() => {
+        btn.classList.remove('loading'); btn.disabled = false;
+        const matches = findMatches(raw);
+        if (matches.length === 1) {
+            showResult(matches[0]);
+            verifiedCount++;
+            document.getElementById('verifiedCount').textContent = verifiedCount;
+            addRecentSearch(matches[0].aadhar, matches[0].name);
+        } else if (matches.length > 1) {
+            showMultipleResults(matches);
+        } else {
+            showError('Record Not Found', `No farmer record matched "${formatAadhar(raw)}". This Aadhaar may not be registered in the Belta Village database.`);
+        }
+    }, 600);
+}
+
+// ===== DISPLAY =====
+function formatAadhar(raw) {
+    raw = (raw||'').replace(/\D/g, '');
+    if (raw.length === 12) return raw.replace(/(\d{4})(\d{4})(\d{4})/, '$1 $2 $3');
+    return raw;
+}
+
+function field(label, value, cls, fw) {
+    if (!value || value === 'undefined' || value === '—') return '';
+    return `<div class="result-field${fw?' full-width':''}"><div class="field-label">${label}</div><div class="field-value${cls?' '+cls:''}">${value}</div></div>`;
+}
+
+function showResult(f) {
+    const s = document.getElementById('resultSection');
+    let h = '';
+    h += field('Sl. No', f.sl ? '#'+f.sl : '', 'highlight', false);
+    h += field('Gram Panchayat', f.gp, '', false);
+    h += field('Aadhaar Number', formatAadhar(f.aadhar), 'aadhar-display', true);
+    h += field('Farmer Name', f.name, 'name-display', true);
+    h += field('Father / Husband Name', f.father, '', true);
+    h += field('Village', f.village, '', false);
+    h += field('Gender', f.gender, '', false);
+    h += field('KB ID No', f.kb, '', false);
+    h += field('EPIC No', f.epic, '', false);
+    h += field('Mobile No', f.mobile, '', false);
+    h += field('Bank Name', f.bank, '', false);
+    h += field('Account No', f.account, '', true);
+
+    s.innerHTML = `<div class="result-card"><div class="result-header"><div class="result-icon success-icon">✅</div><div class="result-header-text"><h3>Verification Successful</h3><p>Record found in Belta Village database</p></div></div><div class="result-body"><div class="result-grid">${h}</div></div></div>`;
+    s.classList.remove('show'); void s.offsetWidth; s.classList.add('show');
+    s.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function showMultipleResults(matches) {
+    const s = document.getElementById('resultSection');
+    let cards = matches.map(f => `<div style="padding:16px;background:rgba(0,0,0,0.2);border-radius:12px;border:1px solid rgba(255,255,255,0.06);cursor:pointer;transition:all 0.3s ease" onmouseover="this.style.borderColor='rgba(99,102,241,0.3)';this.style.background='rgba(0,0,0,0.35)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.06)';this.style.background='rgba(0,0,0,0.2)'" onclick="selectMatch('${f.aadhar}')"><div style="font-family:'Outfit';font-weight:700;color:#a78bfa;font-size:1.05rem">${f.name||'—'}</div><div style="font-size:0.82rem;color:var(--text-muted);margin-top:4px">Aadhaar: ${formatAadhar(f.aadhar)}${f.father?' · F/H: '+f.father:''}</div></div>`).join('');
+    s.innerHTML = `<div class="result-card" style="border-color:rgba(245,158,11,0.2);box-shadow:0 0 40px rgba(245,158,11,0.08)"><div class="result-header" style="background:rgba(245,158,11,0.06);border-bottom-color:rgba(245,158,11,0.1)"><div class="result-icon" style="background:rgba(245,158,11,0.15)">🔎</div><div class="result-header-text"><h3>Multiple Matches Found</h3><p>${matches.length} records matched. Tap one to view full details.</p></div></div><div class="result-body"><div style="display:grid;gap:12px">${cards}</div></div></div>`;
+    s.classList.remove('show'); void s.offsetWidth; s.classList.add('show');
+    s.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function selectMatch(aadhar) {
+    const f = aadharIndex[(aadhar||'').replace(/\D/g,'')];
+    if (f) { showResult(f); verifiedCount++; document.getElementById('verifiedCount').textContent = verifiedCount; addRecentSearch(f.aadhar, f.name); }
 }
 
 function showError(title, message) {
-    const section = document.getElementById('resultSection');
-    section.innerHTML = `
-        <div class="result-card error-card">
-            <div class="result-header">
-                <div class="result-icon error-icon">❌</div>
-                <div class="result-header-text">
-                    <h3>${title}</h3>
-                    <p>Verification failed</p>
-                </div>
-            </div>
-            <div class="error-body">
-                <div class="error-emoji">🔍</div>
-                <h4>No Match Found</h4>
-                <p>${message}</p>
-            </div>
-        </div>
-    `;
-    section.classList.remove('show');
-    void section.offsetWidth;
-    section.classList.add('show');
-    section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const s = document.getElementById('resultSection');
+    s.innerHTML = `<div class="result-card error-card"><div class="result-header"><div class="result-icon error-icon">❌</div><div class="result-header-text"><h3>${title}</h3><p>Verification failed</p></div></div><div class="error-body"><div class="error-emoji">🔍</div><h4>No Match Found</h4><p>${message}</p></div></div>`;
+    s.classList.remove('show'); void s.offsetWidth; s.classList.add('show');
+    s.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
-// ===== RECENT SEARCHES =====
-function addRecentSearch(aadhar, name) {
-    // Avoid duplicates
-    recentSearches = recentSearches.filter(r => r.aadhar !== aadhar);
-    recentSearches.unshift({ aadhar, name });
-    if (recentSearches.length > 6) recentSearches.pop();
-    renderRecent();
-}
-
-function renderRecent() {
-    const section = document.getElementById('recentSection');
-    const list = document.getElementById('recentList');
-    if (recentSearches.length === 0) { section.classList.remove('show'); return; }
-    
-    section.classList.add('show');
-    list.innerHTML = recentSearches.map(r => 
-        `<div class="recent-chip" onclick="quickSearch('${r.aadhar}')" title="${r.name}">${formatAadhar(r.aadhar)}</div>`
-    ).join('');
-}
-
-function quickSearch(aadhar) {
-    aadharInput.value = formatAadhar(aadhar);
-    aadharInput.classList.remove('valid', 'invalid');
-    aadharInput.classList.add('valid');
-    searchAadhar();
-}
+// ===== RECENT =====
+function addRecentSearch(a, n) { recentSearches = recentSearches.filter(r => r.aadhar !== a); recentSearches.unshift({aadhar:a,name:n}); if (recentSearches.length > 6) recentSearches.pop(); renderRecent(); }
+function renderRecent() { const s=document.getElementById('recentSection'),l=document.getElementById('recentList'); if (!recentSearches.length){s.classList.remove('show');return;} s.classList.add('show'); l.innerHTML=recentSearches.map(r=>`<div class="recent-chip" onclick="quickSearch('${r.aadhar}')" title="${r.name}">${formatAadhar(r.aadhar)}</div>`).join(''); }
+function quickSearch(a) { aadharInput.value=formatAadhar(a); aadharInput.classList.remove('valid','invalid'); aadharInput.classList.add('valid'); searchAadhar(); }
 
 // ===== SCROLL REVEAL =====
-const revealElements = document.querySelectorAll('.reveal');
-const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
-    });
-}, { threshold: 0.15 });
+const ro = new IntersectionObserver(es => { es.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }); }, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
 
-revealElements.forEach(el => revealObserver.observe(el));
-
-// ===== COUNT-UP ANIMATION =====
-function animateCount(el, target, duration = 1500) {
-    let start = 0;
-    const step = (timestamp) => {
-        if (!start) start = timestamp;
-        const progress = Math.min((timestamp - start) / duration, 1);
-        const ease = 1 - Math.pow(1 - progress, 3);
-        el.textContent = Math.floor(ease * target);
-        if (progress < 1) requestAnimationFrame(step);
-    };
+// ===== COUNTER =====
+function animateCount(el, target, dur) {
+    if (!target) { el.textContent = '0'; return; }
+    let s = 0;
+    const step = t => { if (!s) s = t; const p = Math.min((t-s)/dur,1); el.textContent = Math.floor((1-Math.pow(1-p,3))*target); if (p<1) requestAnimationFrame(step); };
     requestAnimationFrame(step);
 }
-
-// Animate the total records count on load
-setTimeout(() => {
-    animateCount(document.getElementById('totalRecords'), 308, 2000);
-}, 800);
 </script>
 </body>
 </html>
