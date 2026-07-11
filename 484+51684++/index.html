@@ -488,79 +488,50 @@ aadharInput.addEventListener('input', function() {
     }
     this.value = f;
 
-    // Clear old result instantly when input changes
-    if (v !== lastSearchedValue) {
-        const rs = document.getElementById('resultSection');
-        rs.classList.remove('show');
-        rs.innerHTML = '';
-    }
-
+    // ALWAYS clear old result on ANY input change
+    const rs = document.getElementById('resultSection');
+    rs.classList.remove('show');
+    rs.innerHTML = '';
     this.classList.remove('valid', 'invalid');
-    if (v.length >= 4) {
-        const m = findMatches(v);
-        if (m.length > 0) this.classList.add('valid');
-        else if (v.length === 12) this.classList.add('invalid');
-    }
 });
 aadharInput.addEventListener('keydown', e => { if (e.key === 'Enter') searchAadhar(); });
 
-// ===== SMART SEARCH =====
-function findMatches(query) {
-    const clean = query.replace(/\D/g, '');
-    if (!clean) return [];
-    // Exact match
-    if (aadharIndex[clean]) return [aadharIndex[clean]];
-    // Contains match
-    let matches = [];
-    for (const key in aadharIndex) {
-        if (key.includes(clean) || clean.includes(key)) {
-            matches.push(aadharIndex[key]);
-        }
-    }
-    if (matches.length) return matches.slice(0, 10);
-    // Fuzzy match (70%+ digit match)
-    if (clean.length >= 6) {
-        let best = [], bestScore = 0;
-        for (const key in aadharIndex) {
-            let score = 0;
-            const len = Math.min(clean.length, key.length);
-            for (let i = 0; i < len; i++) { if (clean[i] === key[i]) score++; }
-            if (score > bestScore && score >= Math.floor(len * 0.7)) {
-                bestScore = score; best = [aadharIndex[key]];
-            } else if (score === bestScore && score >= Math.floor(len * 0.7)) {
-                best.push(aadharIndex[key]);
-            }
-        }
-        return best.slice(0, 5);
-    }
-    return [];
-}
-
+// ===== EXACT MATCH SEARCH (button click only) =====
 function searchAadhar() {
     const raw = aadharInput.value.replace(/\D/g, '');
     const btn = document.getElementById('searchBtn');
+
+    // Clear any previous result first
+    const rs = document.getElementById('resultSection');
+    rs.classList.remove('show');
+    rs.innerHTML = '';
+    aadharInput.classList.remove('valid', 'invalid');
+
     if (farmerDB.length === 0) {
         showError('Loading', 'Data is still loading. Please wait a moment and try again.');
         return;
     }
-    if (raw.length < 4) {
-        showError('Too Short', 'Please enter at least 4 digits of the Aadhaar number to search.');
+    if (raw.length !== 12) {
+        showError('Invalid Format', 'Please enter a complete 12-digit Aadhaar number.');
         aadharInput.classList.add('invalid'); aadharInput.focus(); return;
     }
+
     btn.classList.add('loading'); btn.disabled = true;
-    lastSearchedValue = raw;
     setTimeout(() => {
         btn.classList.remove('loading'); btn.disabled = false;
-        const matches = findMatches(raw);
-        if (matches.length === 1) {
-            showResult(matches[0]);
+
+        // EXACT match only — no fuzzy, no partial, no approximate
+        const farmer = aadharIndex[raw];
+
+        if (farmer) {
+            aadharInput.classList.add('valid');
+            showResult(farmer);
             verifiedCount++;
             document.getElementById('verifiedCount').textContent = verifiedCount;
-            addRecentSearch(matches[0].aadhar, matches[0].name);
-        } else if (matches.length > 1) {
-            showMultipleResults(matches);
+            addRecentSearch(farmer.aadhar, farmer.name);
         } else {
-            showError('Record Not Found', `No farmer record matched "${formatAadhar(raw)}". This Aadhaar may not be registered in the Belta Village database.`);
+            aadharInput.classList.add('invalid');
+            showError('Record Not Found', `No farmer record found for Aadhaar number ${formatAadhar(raw)}. This number is not registered in the Belta Village database.`);
         }
     }, 600);
 }
