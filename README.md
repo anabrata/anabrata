@@ -5,8 +5,19 @@
 ## 🌐 Socials:
 [![YouTube](https://img.shields.io/badge/YouTube-%23FF0000.svg?logo=YouTube&logoColor=white)](https://youtube.com/@@glitches_in_science) [![email](https://img.shields.io/badge/Email-D14836?logo=gmail&logoColor=white)](mailto:anabratabis@gmail.com) 
 
-# 💻 Tech Stack:
-![Firebase](https://img.shields.io/badge/firebase-a08021?style=for-the-badge&logo=firebase&logoColor=ffcd34) ![Adobe](https://img.shields.io/badge/adobe-%23FF0000.svg?style=for-the-badge&logo=adobe&logoColor=white) ![Adobe After Effects](https://img.shields.io/badge/Adobe%20After%20Effects-9999FF.svg?style=for-the-badge&logo=Adobe%20After%20Effects&logoColor=white) ![Adobe Acrobat Reader](https://img.shields.io/badge/Adobe%20Acrobat%20Reader-EC1C24.svg?style=for-the-badge&logo=Adobe%20Acrobat%20Reader&logoColor=white)
+## 💻 Tech Stack
+
+**Front-End:**  
+![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white) ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
+
+**Mobile Development:**  
+![Android Studio](https://img.shields.io/badge/Android%20Studio-3DDC84.svg?style=for-the-badge&logo=android-studio&logoColor=white) ![APK Compilation](https://img.shields.io/badge/APK_Compilation-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)
+
+**Backend API:**  
+![Google Apps Script](https://img.shields.io/badge/Google_Apps_Script-4285F4.svg?style=for-the-badge&logo=google&logoColor=white) ![Google Sheets API](https://img.shields.io/badge/Google_Sheets_API-34A853.svg?style=for-the-badge&logo=googlesheets&logoColor=white)
+
+**Creative Tools:**  
+![AI Video Generation](https://img.shields.io/badge/AI_Video_Generation-412991.svg?style=for-the-badge&logo=openai&logoColor=white) ![Subtitle Synchronization](https://img.shields.io/badge/Subtitle_Synchronization-FF0000.svg?style=for-the-badge&logo=youtubestudio&logoColor=white)
 # 📊 GitHub Stats:
 ![](https://github-readme-stats.shion.dev/api?username=anabrata&theme=midnight-purple&hide_border=false&include_all_commits=false&count_private=false)<br/>
 ![](https://streak-stats.demolab.com/?user=anabrata&theme=midnight-purple&hide_border=false)<br/>
