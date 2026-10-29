@@ -86,8 +86,8 @@ html:not([data-theme="dark"]) {
   --c-shadow-card: 0 4px 18px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
   --c-shadow-hover: 0 12px 28px -4px rgba(15, 23, 42, 0.12);
 
-  /* Proximity Widget Veil */
-  --c-veil-bg: rgba(255, 255, 255, 0.75);
+  /* Proximity Widget Veil (Sweet, subtle background blur - never totally hard blur) */
+  --c-veil-bg: rgba(255, 255, 255, 0.28);
 }
 
 /* --------------------------------------------------------------------------
@@ -136,8 +136,8 @@ html.dark {
   --c-shadow-card: 0 8px 24px -2px rgba(0, 0, 0, 0.6), 0 2px 8px -1px rgba(0, 0, 0, 0.4);
   --c-shadow-hover: 0 16px 36px -4px rgba(0, 0, 0, 0.8);
 
-  /* Proximity Widget Veil */
-  --c-veil-bg: rgba(7, 11, 20, 0.85);
+  /* Proximity Widget Veil (Sweet, subtle background blur - never totally hard blur) */
+  --c-veil-bg: rgba(7, 11, 20, 0.42);
 }
 
 /* --------------------------------------------------------------------------

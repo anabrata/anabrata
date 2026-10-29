@@ -43,25 +43,25 @@
        01. EXECUTIVE NAVIGATION BAR
        ================================================================ -->
   <header class="site-header sticky top-0 z-40 backdrop-blur-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-[1540px] w-full mx-auto px-4 sm:px-6 lg:px-10 xl:px-14">
       <div class="flex items-center justify-between h-18">
         
         <!-- Clean Executive Monogram "AB" (Avatar image removed from site, tab only) -->
-        <a href="#hero" class="flex items-center gap-2.5 min-w-0 group shrink">
+        <a href="#hero" class="flex items-center gap-2.5 sm:gap-3 shrink-0 group">
           <div class="brand-monogram w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-outfit font-extrabold text-sm sm:text-base tracking-tight shadow-sm group-hover:scale-105 transition-transform shrink-0">
             AB
           </div>
-          <div class="min-w-0">
-            <div class="flex items-center gap-1.5">
-              <span class="font-outfit font-bold text-sm sm:text-base text-headline tracking-tight truncate">Anabrata Biswas</span>
+          <div class="flex flex-col shrink-0">
+            <div class="flex items-center gap-1.5 whitespace-nowrap">
+              <span class="font-outfit font-bold text-sm sm:text-base text-headline tracking-tight">Anabrata Biswas</span>
               <span class="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 rounded font-bold badge-student hidden sm:inline-block">Ana</span>
             </div>
-            <p class="text-[11px] sm:text-xs text-secondary font-medium truncate">Class 12th Bio • NEET Aspirant</p>
+            <p class="text-[11px] sm:text-xs text-secondary font-medium whitespace-nowrap">Class 12th Bio • NEET Aspirant</p>
           </div>
         </a>
 
         <!-- Desktop Navigation Links -->
-        <nav class="hidden md:flex items-center gap-1">
+        <nav class="hidden lg:flex items-center gap-1 shrink-0">
           <a href="#dashboard" class="nav-link">Dashboard</a>
           <a href="#academics" class="nav-link">Academics & Goals</a>
           <a href="#passions" class="nav-link">Interests</a>
@@ -73,7 +73,7 @@
         <div class="flex items-center gap-2 sm:gap-3 shrink-0">
           
           <!-- Direct Location Pill (Direct to https://maps.app.goo.gl/tvgFF9HiQKRyVHHu5) -->
-          <a href="https://maps.app.goo.gl/tvgFF9HiQKRyVHHu5" target="_blank" rel="noopener noreferrer" class="badge-pill-location hidden lg:inline-flex">
+          <a href="https://maps.app.goo.gl/tvgFF9HiQKRyVHHu5" target="_blank" rel="noopener noreferrer" class="badge-pill-location hidden xl:inline-flex">
             <i class="fa-solid fa-location-dot text-red-500 text-xs"></i>
             <span>Belta, Bongaon</span>
           </a>
@@ -96,7 +96,7 @@
           </a>
 
           <!-- Mobile Hamburger -->
-          <button id="mobileMenuBtn" aria-label="Toggle Navigation Menu" class="theme-toggle-btn md:hidden w-9 h-9 rounded-lg flex items-center justify-center">
+          <button id="mobileMenuBtn" aria-label="Toggle Navigation Menu" class="theme-toggle-btn lg:hidden w-9 h-9 rounded-lg flex items-center justify-center">
             <i class="fa-solid fa-bars text-sm" id="menuIcon"></i>
           </button>
 
@@ -106,7 +106,7 @@
     </div>
 
     <!-- Mobile Drawer -->
-    <div id="mobileMenu" class="hidden md:hidden px-4 py-4 site-header border-t section-divider shadow-lg">
+    <div id="mobileMenu" class="hidden lg:hidden px-4 py-4 site-header border-t section-divider shadow-lg">
       <div class="flex flex-col gap-2">
         <a href="#dashboard" class="mobile-link">Dashboard Overview</a>
         <a href="#academics" class="mobile-link">Academics & NEET Pathway</a>
@@ -140,7 +140,7 @@
          02. HERO DASHBOARD SECTION (Re-triggerable Scroll Animation)
          ================================================================ -->
     <section id="hero" class="pt-10 pb-16 lg:pt-14 lg:pb-20 border-b section-divider">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-[1540px] w-full mx-auto px-4 sm:px-6 lg:px-10 xl:px-14">
         
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
           
@@ -166,12 +166,12 @@
             </p>
 
             <!-- Body Paragraph with Deep Charcoal High Contrast -->
-            <p class="text-body text-base leading-relaxed max-w-2xl mb-8 font-normal scroll-reveal reveal-fade-up stagger-3">
+            <p class="text-body text-base leading-relaxed max-w-3xl lg:max-w-none mb-8 font-normal scroll-reveal reveal-fade-up stagger-3">
               Welcome to my official personal portfolio. I am 17 years old, based in Bongaon, West Bengal. I am preparing intensely for the NEET examination to pursue MBBS, driven by an enduring passion for biological sciences, human physiology, and healthcare service — complemented by creative interests in Artificial Intelligence, photography, and video editing.
             </p>
 
             <!-- Key Quick Metrics Dashboard Bar -->
-            <div class="dashboard-metrics-box grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 mb-8 max-w-2xl scroll-reveal reveal-zoom-in stagger-4">
+            <div class="dashboard-metrics-box grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 mb-8 max-w-3xl lg:max-w-none scroll-reveal reveal-zoom-in stagger-4">
               <div class="border-r metrics-divider pr-3">
                 <span class="metrics-label">Age</span>
                 <span class="font-outfit metrics-value">17 Years</span>
@@ -294,7 +294,7 @@
          03. ACADEMIC & CAREER PATHWAY DASHBOARD (Re-triggerable: 3D Flip)
          ================================================================ -->
     <section id="academics" class="py-16 border-b section-divider">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-[1540px] w-full mx-auto px-4 sm:px-6 lg:px-10 xl:px-14">
         
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-6 border-b section-divider scroll-reveal reveal-fade-up">
           <div>
@@ -380,7 +380,7 @@
          04. INTERESTS & HOBBIES DASHBOARD (Re-triggerable: Wave Cascade)
          ================================================================ -->
     <section id="passions" class="py-16 border-b section-divider">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-[1540px] w-full mx-auto px-4 sm:px-6 lg:px-10 xl:px-14">
         
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-6 border-b section-divider scroll-reveal reveal-fade-up">
           <div>
@@ -502,7 +502,7 @@
          05. VERIFIED LOCATION & GOOGLE MAPS SECTION (Re-triggerable: Spatial Slide)
          ================================================================ -->
     <section id="location" class="py-16 border-b section-divider">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-[1540px] w-full mx-auto px-4 sm:px-6 lg:px-10 xl:px-14">
         
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-6 border-b section-divider scroll-reveal reveal-fade-up">
           <div>
@@ -617,7 +617,7 @@
          06. DIRECT CONTACT DASHBOARD (Re-triggerable: Squeeze & Unfold)
          ================================================================ -->
     <section id="contact" class="py-16">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-[1540px] w-full mx-auto px-4 sm:px-6 lg:px-10 xl:px-14">
         
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-6 border-b section-divider scroll-reveal reveal-fade-up">
           <div>
@@ -793,114 +793,59 @@
 
   </div>
 
-  <!-- Mobile Quick Contact Bottom Sheet (< 1024px) -->
-  <div id="mobileContactSheet" class="mobile-contact-sheet lg:hidden">
-    <div class="max-w-md mx-auto dashboard-card rounded-t-3xl p-6 shadow-2xl border-t border-x section-divider">
-      
-      <!-- Drag Bar & Header -->
-      <div class="flex items-center justify-between mb-4 pb-3 border-b section-divider">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center text-sm font-bold">
-            <i class="fa-solid fa-paper-plane"></i>
-          </div>
-          <div>
-            <h3 class="font-outfit font-bold text-base text-headline">Quick Connect</h3>
-            <p class="text-[11px] text-secondary font-medium">Reach out directly or explore channels</p>
-          </div>
-        </div>
-        <button id="closeMobileSheet" class="theme-toggle-btn w-8 h-8 rounded-full flex items-center justify-center text-xs cursor-pointer" aria-label="Close sheet">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
+  <!-- Mobile Radial Arc Speed-Dial Menu (< 1024px) -->
+  <div id="mobileRadialMenu" class="mobile-radial-menu lg:hidden" aria-label="Mobile Contact Arc">
+    
+    <!-- Central Channel Indicator Hub (Center of quadrant: zero overlapping with any icon) -->
+    <div class="mobile-radial-hub" id="mobileRadialHub">
+      <span class="hub-pill" id="mobileHubPill">Quick Connect</span>
+    </div>
 
-      <!-- Quick Contact Grid (6 Touch-Friendly Channels) -->
-      <div class="grid grid-cols-2 gap-2.5 mb-2">
-        
-        <!-- 1. WhatsApp (Active) -->
-        <a href="https://wa.me/919679010859?text=Hi%20Anabrata!%20Connecting%20from%20your%20website" 
-           class="flex items-center gap-2.5 p-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 transition-colors"
-           onclick="window.handleSocialClick('whatsapp', event)">
-          <div class="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-sm shadow-sm shrink-0">
-            <i class="fa-brands fa-whatsapp"></i>
-          </div>
-          <div class="min-w-0">
-            <div class="font-outfit font-bold text-xs text-headline truncate">WhatsApp</div>
-            <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">Direct Chat</div>
-          </div>
-        </a>
+    <!-- 1. YouTube (Status: 0 -> Animated Notice) -->
+    <div class="mobile-radial-node" style="--rx: 0px; --ry: -168px; --rdelay: 0.00s;" data-name="YouTube • Coming Soon">
+      <a href="no-info.html?platform=youtube" class="mobile-radial-icon youtube" title="YouTube" onclick="window.handleSocialClick('youtube', event)">
+        <i class="fa-brands fa-youtube"></i>
+      </a>
+    </div>
 
-        <!-- 2. Instagram (Active) -->
-        <a href="https://www.instagram.com/abheroism?srtk=MndnNzF6a2oyb3pu" 
-           class="flex items-center gap-2.5 p-2.5 rounded-xl bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/20 transition-colors"
-           onclick="window.handleSocialClick('instagram', event)">
-          <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 via-pink-500 to-purple-600 text-white flex items-center justify-center text-sm shadow-sm shrink-0">
-            <i class="fa-brands fa-instagram"></i>
-          </div>
-          <div class="min-w-0">
-            <div class="font-outfit font-bold text-xs text-headline truncate">Instagram</div>
-            <div class="text-[10px] text-pink-600 dark:text-pink-400 font-semibold">@abheroism</div>
-          </div>
-        </a>
+    <!-- 2. Facebook (Status: 0 -> Animated Notice) -->
+    <div class="mobile-radial-node" style="--rx: -52px; --ry: -160px; --rdelay: 0.03s;" data-name="Facebook • Coming Soon">
+      <a href="no-info.html?platform=facebook" class="mobile-radial-icon facebook" title="Facebook" onclick="window.handleSocialClick('facebook', event)">
+        <i class="fa-brands fa-facebook-f"></i>
+      </a>
+    </div>
 
-        <!-- 3. Google Maps (Active) -->
-        <a href="https://maps.app.goo.gl/tvgFF9HiQKRyVHHu5" 
-           class="flex items-center gap-2.5 p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-colors"
-           onclick="window.handleSocialClick('maps', event)">
-          <div class="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center text-sm shadow-sm shrink-0">
-            <i class="fa-solid fa-location-dot"></i>
-          </div>
-          <div class="min-w-0">
-            <div class="font-outfit font-bold text-xs text-headline truncate">Google Maps</div>
-            <div class="text-[10px] text-red-600 dark:text-red-400 font-semibold">Belta, Bongaon</div>
-          </div>
-        </a>
+    <!-- 3. Instagram (Status: 1 -> Direct Profile) -->
+    <div class="mobile-radial-node" style="--rx: -99px; --ry: -136px; --rdelay: 0.06s;" data-name="Instagram • @abheroism">
+      <a href="https://www.instagram.com/abheroism?srtk=MndnNzF6a2oyb3pu" class="mobile-radial-icon instagram" title="Instagram" onclick="window.handleSocialClick('instagram', event)">
+        <i class="fa-brands fa-instagram"></i>
+      </a>
+    </div>
 
-        <!-- 4. Email / Gmail (Active) -->
-        <a href="mailto:anabratabis@gmail.com" 
-           class="flex items-center gap-2.5 p-2.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 transition-colors"
-           onclick="window.handleEmailClick(event)">
-          <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm shadow-sm shrink-0">
-            <i class="fa-solid fa-envelope"></i>
-          </div>
-          <div class="min-w-0">
-            <div class="font-outfit font-bold text-xs text-headline truncate">Gmail</div>
-            <div class="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">Open App</div>
-          </div>
-        </a>
+    <!-- 4. WhatsApp (Status: 1 -> Direct WhatsApp Chat) -->
+    <div class="mobile-radial-node" style="--rx: -136px; --ry: -99px; --rdelay: 0.09s;" data-name="WhatsApp • Direct Chat">
+      <a href="https://wa.me/919679010859?text=Hi%20Anabrata!%20Connecting%20from%20your%20website" class="mobile-radial-icon whatsapp" title="WhatsApp" onclick="window.handleSocialClick('whatsapp', event)">
+        <i class="fa-brands fa-whatsapp"></i>
+      </a>
+    </div>
 
-        <!-- 5. Facebook (Status: 0 -> Animated Notice) -->
-        <a href="no-info.html?platform=facebook" 
-           class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-500/10 hover:bg-slate-500/20 border border-slate-500/20 transition-colors"
-           onclick="window.handleSocialClick('facebook', event)">
-          <div class="w-8 h-8 rounded-full bg-blue-700 text-white flex items-center justify-center text-sm shadow-sm shrink-0">
-            <i class="fa-brands fa-facebook-f"></i>
-          </div>
-          <div class="min-w-0">
-            <div class="font-outfit font-bold text-xs text-headline truncate">Facebook</div>
-            <div class="text-[10px] text-secondary font-medium">Coming Soon</div>
-          </div>
-        </a>
+    <!-- 5. Google Maps (Status: 1 -> Direct Google Maps Location) -->
+    <div class="mobile-radial-node" style="--rx: -160px; --ry: -52px; --rdelay: 0.12s;" data-name="Maps • Belta, Bongaon">
+      <a href="https://maps.app.goo.gl/tvgFF9HiQKRyVHHu5" class="mobile-radial-icon maps" title="Google Maps" onclick="window.handleSocialClick('maps', event)">
+        <i class="fa-solid fa-location-dot"></i>
+      </a>
+    </div>
 
-        <!-- 6. YouTube (Status: 0 -> Animated Notice) -->
-        <a href="no-info.html?platform=youtube" 
-           class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-500/10 hover:bg-slate-500/20 border border-slate-500/20 transition-colors"
-           onclick="window.handleSocialClick('youtube', event)">
-          <div class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-sm shadow-sm shrink-0">
-            <i class="fa-brands fa-youtube"></i>
-          </div>
-          <div class="min-w-0">
-            <div class="font-outfit font-bold text-xs text-headline truncate">YouTube</div>
-            <div class="text-[10px] text-secondary font-medium">Coming Soon</div>
-          </div>
-        </a>
-
-      </div>
-
+    <!-- 6. Gmail (Status: 1 -> Direct Email App/Compose) -->
+    <div class="mobile-radial-node" style="--rx: -168px; --ry: 0px; --rdelay: 0.15s;" data-name="Gmail • Open App">
+      <a href="mailto:anabratabis@gmail.com" class="mobile-radial-icon call" title="Email" onclick="window.handleEmailClick(event)">
+        <i class="fa-solid fa-envelope"></i>
+      </a>
     </div>
   </div>
 
-  <!-- Mobile Floating Quick Contact Button (< 1024px) -->
-  <button id="mobileSocialTrigger" aria-label="Toggle Quick Contact" class="theme-toggle-btn fixed bottom-5 right-5 z-[1001] w-12 h-12 rounded-full flex items-center justify-center shadow-xl lg:hidden cursor-pointer hover:scale-105 active:scale-95 transition-transform">
+  <!-- Mobile Floating Quick Contact Trigger Button (< 1024px) -->
+  <button id="mobileSocialTrigger" aria-label="Toggle Quick Contact" class="theme-toggle-btn fixed bottom-5 right-5 z-[1005] w-12 h-12 rounded-full flex items-center justify-center shadow-xl lg:hidden cursor-pointer hover:scale-105 active:scale-95 transition-transform">
     <i class="fa-solid fa-comments text-base text-blue-600 dark:text-blue-400" id="mobileTriggerIcon"></i>
   </button>
 
@@ -909,7 +854,7 @@
        08. FOOTER
        ================================================================ -->
   <footer class="site-header py-10 text-xs text-secondary">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="max-w-[1540px] w-full mx-auto px-4 sm:px-6 lg:px-10 xl:px-14 flex flex-col sm:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-2">
         <span class="font-outfit font-bold text-headline">Anabrata Biswas</span>
         <span>•</span>
