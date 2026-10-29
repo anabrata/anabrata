@@ -1,0 +1,306 @@
+/* ==========================================================================
+   LAYOUT.CSS — Exact Component Styling & High-Contrast Typography
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   01. HEADER & NAVIGATION
+   -------------------------------------------------------------------------- */
+.site-header {
+  background-color: var(--c-header-bg) !important;
+  border-bottom: 1px solid var(--c-border) !important;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+.brand-monogram {
+  background-color: var(--c-btn-primary-bg) !important;
+  color: var(--c-btn-primary-text) !important;
+  transition: all 0.2s ease;
+}
+
+.nav-link {
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  color: var(--c-text-secondary) !important;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+  color: var(--c-text-headline) !important;
+  background-color: var(--c-hover-bg) !important;
+}
+
+.mobile-link {
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  color: var(--c-text-secondary) !important;
+  transition: all 0.2s ease;
+}
+
+.mobile-link:hover {
+  color: var(--c-text-headline) !important;
+  background-color: var(--c-hover-bg) !important;
+}
+
+.theme-toggle-btn {
+  background-color: var(--c-subtle-bg) !important;
+  border: 1px solid var(--c-border) !important;
+  color: var(--c-text-headline) !important;
+  transition: all 0.2s ease;
+}
+
+.theme-toggle-btn:hover {
+  background-color: var(--c-hover-bg) !important;
+}
+
+/* --------------------------------------------------------------------------
+   02. TYPOGRAPHY CLASSES (Maximum Contrast in Both Themes)
+   -------------------------------------------------------------------------- */
+.text-headline {
+  color: var(--c-text-headline) !important;
+}
+
+.text-subtitle {
+  color: var(--c-text-subtitle) !important;
+}
+
+.text-body {
+  color: var(--c-text-body) !important;
+}
+
+.text-secondary {
+  color: var(--c-text-secondary) !important;
+}
+
+.text-muted {
+  color: var(--c-text-muted) !important;
+}
+
+/* --------------------------------------------------------------------------
+   03. STATUS BADGES
+   -------------------------------------------------------------------------- */
+.badge-student {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  background-color: var(--c-badge-student-bg) !important;
+  border: 1px solid var(--c-badge-student-border) !important;
+  color: var(--c-badge-student-text) !important;
+}
+
+.badge-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  background-color: var(--c-badge-verified-bg) !important;
+  border: 1px solid var(--c-badge-verified-border) !important;
+  color: var(--c-badge-verified-text) !important;
+}
+
+.badge-pill-location {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  background-color: var(--c-subtle-bg) !important;
+  border: 1px solid var(--c-border) !important;
+  color: var(--c-text-headline) !important;
+  transition: all 0.2s ease;
+}
+
+@media (min-width: 1024px) {
+  .badge-pill-location {
+    display: inline-flex;
+  }
+}
+
+.badge-pill-location:hover {
+  border-color: #EF4444 !important;
+}
+
+.badge-pill-clock {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-family: monospace;
+  font-weight: 700;
+  background-color: var(--c-subtle-bg) !important;
+  border: 1px solid var(--c-border) !important;
+  color: var(--c-text-headline) !important;
+}
+
+@media (min-width: 640px) {
+  .badge-pill-clock {
+    display: inline-flex;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   04. DASHBOARD CARDS & METRICS BOX
+   -------------------------------------------------------------------------- */
+.dashboard-card {
+  background-color: var(--c-card-bg) !important;
+  border: 1px solid var(--c-border) !important;
+  border-radius: 16px;
+  box-shadow: var(--c-shadow-card);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.2s ease;
+}
+
+.dashboard-card:hover {
+  border-color: var(--c-border-strong) !important;
+  box-shadow: var(--c-shadow-hover);
+}
+
+.dashboard-metrics-box {
+  background-color: var(--c-subtle-bg) !important;
+  border: 1px solid var(--c-border) !important;
+  border-radius: 14px;
+}
+
+.metrics-divider {
+  border-color: var(--c-border) !important;
+}
+
+.metrics-label {
+  color: var(--c-text-muted) !important;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: block;
+}
+
+.metrics-value {
+  color: var(--c-text-headline) !important;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+/* --------------------------------------------------------------------------
+   05. STUDIO PORTRAIT FRAME
+   -------------------------------------------------------------------------- */
+.studio-frame {
+  background-color: var(--c-subtle-bg) !important;
+  border: 1px solid var(--c-border) !important;
+  border-radius: 22px;
+  box-shadow: var(--c-shadow-card);
+}
+
+.studio-canvas {
+  background-color: var(--c-card-bg) !important;
+  border: 1px solid var(--c-border) !important;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.studio-dock {
+  background-color: var(--c-card-bg) !important;
+  border: 1px solid var(--c-border) !important;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* --------------------------------------------------------------------------
+   06. BUTTONS
+   -------------------------------------------------------------------------- */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 22px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  background-color: var(--c-btn-primary-bg) !important;
+  color: var(--c-btn-primary-text) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--c-btn-primary-hover) !important;
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  background-color: var(--c-btn-outline-bg) !important;
+  border: 1px solid var(--c-btn-outline-border) !important;
+  color: var(--c-btn-outline-text) !important;
+  transition: all 0.2s ease;
+}
+
+.btn-outline:hover {
+  background-color: var(--c-btn-outline-hover) !important;
+  transform: translateY(-1px);
+}
+
+.btn-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  background-color: #16A34A !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25);
+  transition: all 0.2s ease;
+}
+
+.header-whatsapp {
+  display: none !important;
+}
+
+@media (min-width: 640px) {
+  .header-whatsapp {
+    display: inline-flex !important;
+  }
+}
+
+.btn-whatsapp:hover {
+  background-color: #15803D !important;
+  transform: translateY(-1px);
+}
+
+/* Sections Divider */
+.section-divider {
+  border-color: var(--c-border) !important;
+}

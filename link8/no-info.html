@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Anabrata Biswas</title>
+  <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+  <link rel="apple-touch-icon" href="assets/logo.jpg">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <script src="js/config.js"></script>
+
+  <style>
+    /* Animated floating pulse ring */
+    .pulse-ring {
+      position: absolute;
+      inset: -14px;
+      border-radius: 50%;
+      border: 2px dashed rgba(59, 130, 246, 0.4);
+      animation: rotateRing 14s linear infinite;
+    }
+    @keyframes rotateRing {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .bounce-subtle {
+      animation: bounceSubtle 3s ease-in-out infinite alternate;
+    }
+    @keyframes bounceSubtle {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-6px); }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 antialiased">
+
+  <div class="max-w-md w-full dashboard-card p-8 sm:p-10 text-center relative overflow-hidden bounce-subtle">
+    
+    <!-- Animated Center Icon Container -->
+    <div class="relative w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+      <div class="pulse-ring" id="pulseRing"></div>
+      <div class="w-20 h-20 rounded-full flex items-center justify-center text-3xl shadow-lg relative z-10 transition-transform duration-300 hover:scale-105" id="platformIconBg">
+        <i class="fa-brands fa-facebook-f text-white" id="platformIcon"></i>
+      </div>
+    </div>
+
+    <!-- Dynamic Headlines -->
+    <h1 class="font-outfit text-2xl sm:text-3xl font-extrabold text-headline tracking-tight mb-3" id="noticeTitle">
+      Information Coming Soon
+    </h1>
+
+    <p class="text-body text-sm leading-relaxed mb-6 font-normal" id="noticeDescription">
+      Anabrata Biswas has not linked this channel yet. Please reach out directly through WhatsApp or Instagram.
+    </p>
+
+    <!-- Alternative Active Channels -->
+    <div class="p-4 rounded-xl dashboard-metrics-box text-left mb-6 space-y-2.5">
+      <span class="metrics-label">Connect Directly with Anabrata:</span>
+      
+      <a href="https://wa.me/919679010859?text=Hi%20Anabrata!%20Connecting%20from%20your%20website" class="flex items-center justify-between p-2.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold text-xs transition-colors">
+        <span class="flex items-center gap-2">
+          <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp (+91 9679010859)
+        </span>
+        <span>Chat →</span>
+      </a>
+
+      <a href="https://www.instagram.com/abheroism?srtk=MndnNzF6a2oyb3pu" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between p-2.5 rounded-lg bg-pink-500/10 hover:bg-pink-500/20 text-pink-600 dark:text-pink-400 font-bold text-xs transition-colors">
+        <span class="flex items-center gap-2">
+          <i class="fa-brands fa-instagram text-sm"></i> Instagram (@abheroism)
+        </span>
+        <span>Visit →</span>
+      </a>
+
+      <a href="mailto:anabratabis@gmail.com" onclick="window.handleEmailClick(event)" class="flex items-center justify-between p-2.5 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-bold text-xs transition-colors">
+        <span class="flex items-center gap-2">
+          <i class="fa-solid fa-envelope text-sm"></i> Gmail (anabratabis@gmail.com)
+        </span>
+        <span>Write →</span>
+      </a>
+    </div>
+
+    <!-- Return to Portfolio Button -->
+    <a href="index.html" class="btn-primary w-full py-3 text-sm">
+      <i class="fa-solid fa-arrow-left text-xs"></i>
+      <span>Return to Portfolio</span>
+    </a>
+
+  </div>
+
+  <!-- Dynamic Script for Page -->
+  <script>
+    (function () {
+      // Synchronize theme with localStorage
+      const savedTheme = localStorage.getItem('ab_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+
+      // Parse platform from URL query parameter
+      const params = new URLSearchParams(window.location.search);
+      const platform = (params.get('platform') || 'facebook').toLowerCase();
+
+      const iconBg = document.getElementById('platformIconBg');
+      const icon = document.getElementById('platformIcon');
+      const title = document.getElementById('noticeTitle');
+      const desc = document.getElementById('noticeDescription');
+
+      if (platform === 'facebook') {
+        iconBg.style.background = 'radial-gradient(circle at 30% 30%, #3b82f6, #1d4ed8)';
+        icon.className = 'fa-brands fa-facebook-f text-white';
+        title.textContent = 'Facebook Coming Soon';
+        desc.innerHTML = 'Anabrata Biswas has not linked his official <strong>Facebook profile</strong> yet. Feel free to connect directly through WhatsApp or Instagram.';
+      } else if (platform === 'youtube') {
+        iconBg.style.background = 'radial-gradient(circle at 30% 30%, #ff4d4d, #dc2626)';
+        icon.className = 'fa-brands fa-youtube text-white';
+        title.textContent = 'YouTube Coming Soon';
+        desc.innerHTML = 'Anabrata Biswas has not linked his official <strong>YouTube channel</strong> yet. Feel free to connect directly through WhatsApp or Instagram.';
+      } else {
+        iconBg.style.background = 'radial-gradient(circle at 30% 30%, #64748b, #334155)';
+        icon.className = 'fa-solid fa-link-slash text-white';
+        title.textContent = 'Channel Coming Soon';
+        desc.innerHTML = 'This channel is currently not active yet. Please feel free to reach out via WhatsApp, Instagram, or Gmail below.';
+      }
+    })();
+  </script>
+</body>
+</html>

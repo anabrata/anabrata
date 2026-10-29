@@ -1,9 +1,937 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="refresh" content="0; URL='https://cdn.discordapp.com/attachments/1399755805565128859/1399756427089809498/DocScanner_8_Jun_2025_7-51_am.jpg?ex=688a2842&is=6888d6c2&hm=06f106dfec20ea6e02bd8464e5bab7ab74c57cfdf12f9321cc9e4b45ef70a041&'" />
-  </head>
-  <body>
-    <p>If you are not redirected, <a href="https://cdn.discordapp.com/attachments/1399755805565128859/1399756427089809498/DocScanner_8_Jun_2025_7-51_am.jpg?ex=688a2842&is=6888d6c2&hm=06f106dfec20ea6e02bd8464e5bab7ab74c57cfdf12f9321cc9e4b45ef70a041&">click here</a>.</p>
-  </body>
+<html lang="en" class="scroll-smooth" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Anabrata Biswas</title>
+  
+  <!-- Browser Tab Favicon (Only used in the browser tab, removed from main website) -->
+  <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+  <link rel="apple-touch-icon" href="assets/logo.jpg">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Anabrata Biswas">
+  <meta property="og:description" content="NEET Aspirant, Class 12th Bio at The Crescent School, and Creative Tech Explorer from Belta, Bongaon.">
+  <meta property="og:type" content="website">
+
+  <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <!-- High-Contrast Modular Stylesheets -->
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/widget.css">
+  <link rel="stylesheet" href="css/layout.css">
+
+  <!-- Social Link Status & Redirection Config (0 or 1 Toggle) -->
+  <script src="js/config.js"></script>
+</head>
+<body>
+
+  <!-- Focus Veil for Proximity Contact Widget -->
+  <div class="focus-veil" id="focusVeil"></div>
+
+  <!-- ================================================================
+       01. EXECUTIVE NAVIGATION BAR
+       ================================================================ -->
+  <header class="site-header sticky top-0 z-40 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-18">
+        
+        <!-- Clean Executive Monogram "AB" (Avatar image removed from site, tab only) -->
+        <a href="#hero" class="flex items-center gap-2.5 min-w-0 group shrink">
+          <div class="brand-monogram w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-outfit font-extrabold text-sm sm:text-base tracking-tight shadow-sm group-hover:scale-105 transition-transform shrink-0">
+            AB
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5">
+              <span class="font-outfit font-bold text-sm sm:text-base text-headline tracking-tight truncate">Anabrata Biswas</span>
+              <span class="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 rounded font-bold badge-student hidden sm:inline-block">Ana</span>
+            </div>
+            <p class="text-[11px] sm:text-xs text-secondary font-medium truncate">Class 12th Bio • NEET Aspirant</p>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <nav class="hidden md:flex items-center gap-1">
+          <a href="#dashboard" class="nav-link">Dashboard</a>
+          <a href="#academics" class="nav-link">Academics & Goals</a>
+          <a href="#passions" class="nav-link">Interests</a>
+          <a href="#location" class="nav-link">Location</a>
+          <a href="#contact" class="nav-link">Contact</a>
+        </nav>
+
+        <!-- Right Utilities: Location Pill + Time + Theme Switcher -->
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+          
+          <!-- Direct Location Pill (Direct to https://maps.app.goo.gl/tvgFF9HiQKRyVHHu5) -->
+          <a href="https://maps.app.goo.gl/tvgFF9HiQKRyVHHu5" target="_blank" rel="noopener noreferrer" class="badge-pill-location hidden lg:inline-flex">
+            <i class="fa-solid fa-location-dot text-red-500 text-xs"></i>
+            <span>Belta, Bongaon</span>
+          </a>
+
+          <!-- Live Bongaon IST Clock -->
+          <div class="badge-pill-clock hidden sm:flex">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 badge-pulse"></span>
+            <span id="liveClock">--:--</span>
+          </div>
+
+          <!-- Light / Dark Mode Toggle Button -->
+          <button id="themeToggle" aria-label="Toggle theme mode" class="theme-toggle-btn w-9 h-9 rounded-lg flex items-center justify-center cursor-pointer">
+            <i class="fa-regular fa-moon text-sm" id="themeIcon"></i>
+          </button>
+
+          <!-- WhatsApp Primary Action (Hidden on mobile < 640px, visible on sm and up) -->
+          <a href="https://wa.me/919679010859?text=Hi%20Anabrata!%20Connecting%20from%20your%20website" target="_blank" rel="noopener noreferrer" class="btn-whatsapp header-whatsapp" onclick="window.handleSocialClick('whatsapp', event)">
+            <i class="fa-brands fa-whatsapp text-sm"></i>
+            <span>WhatsApp</span>
+          </a>
+
+          <!-- Mobile Hamburger -->
+          <button id="mobileMenuBtn" aria-label="Toggle Navigation Menu" class="theme-toggle-btn md:hidden w-9 h-9 rounded-lg flex items-center justify-center">
+            <i class="fa-solid fa-bars text-sm" id="menuIcon"></i>
+          </button>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div id="mobileMenu" class="hidden md:hidden px-4 py-4 site-header border-t section-divider shadow-lg">
+      <div class="flex flex-col gap-2">
+        <a href="#dashboard" class="mobile-link">Dashboard Overview</a>
+        <a href="#academics" class="mobile-link">Academics & NEET Pathway</a>
+        <a href="#passions" class="mobile-link">Passions & Interests</a>
+        <a href="#location" class="mobile-link">Location & Google Maps</a>
+        <a href="#contact" class="mobile-link">Contact Information</a>
+        
+        <!-- Mobile Drawer Utilities -->
+        <div class="pt-3 mt-1 border-t section-divider flex items-center justify-between text-xs font-semibold">
+          <span class="flex items-center gap-1.5 text-secondary">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 badge-pulse"></span>
+            IST: <span id="liveClockMobile" class="font-mono text-headline">--:--</span>
+          </span>
+          <a href="https://maps.app.goo.gl/tvgFF9HiQKRyVHHu5" target="_blank" rel="noopener noreferrer" onclick="window.handleSocialClick('maps', event)" class="text-secondary hover:text-red-500">
+            <i class="fa-solid fa-location-dot text-red-500"></i> Belta, Bongaon
+          </a>
+        </div>
+
+        <a href="https://wa.me/919679010859?text=Hi%20Anabrata!%20Connecting%20from%20your%20website" target="_blank" rel="noopener noreferrer" class="btn-whatsapp w-full justify-center mt-1" onclick="window.handleSocialClick('whatsapp', event)">
+          <i class="fa-brands fa-whatsapp text-base"></i>
+          <span>Chat on WhatsApp</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+
+  <main id="dashboard" class="min-h-screen">
+    
+    <!-- ================================================================
+         02. HERO DASHBOARD SECTION (Re-triggerable Scroll Animation)
+         ================================================================ -->
+    <section id="hero" class="pt-10 pb-16 lg:pt-14 lg:pb-20 border-b section-divider">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+          
+          <!-- Left Column: Executive Identity & Metrics -->
+          <div class="lg:col-span-7 flex flex-col justify-center">
+            
+            <!-- Verified Status Badge -->
+            <div class="badge-student w-fit mb-6 scroll-reveal reveal-fade-up">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span>Student & Medical Aspirant</span>
+              <span class="opacity-50">|</span>
+              <span class="font-medium">The Crescent School</span>
+            </div>
+
+            <!-- Crisp Main Headline -->
+            <h1 class="font-outfit text-4xl sm:text-5xl lg:text-6xl font-extrabold text-headline tracking-tight leading-[1.12] mb-3 scroll-reveal reveal-fade-up stagger-1">
+              Anabrata Biswas
+            </h1>
+
+            <!-- High-Contrast Subtitle -->
+            <p class="font-outfit text-lg sm:text-xl font-bold text-subtitle mb-6 tracking-tight scroll-reveal reveal-fade-up stagger-2">
+              Class 12th Biology Student • Dedicated NEET Aspirant • Future Doctor
+            </p>
+
+            <!-- Body Paragraph with Deep Charcoal High Contrast -->
+            <p class="text-body text-base leading-relaxed max-w-2xl mb-8 font-normal scroll-reveal reveal-fade-up stagger-3">
+              Welcome to my official personal portfolio. I am 17 years old, based in Bongaon, West Bengal. I am preparing intensely for the NEET examination to pursue MBBS, driven by an enduring passion for biological sciences, human physiology, and healthcare service — complemented by creative interests in Artificial Intelligence, photography, and video editing.
+            </p>
+
+            <!-- Key Quick Metrics Dashboard Bar -->
+            <div class="dashboard-metrics-box grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 mb-8 max-w-2xl scroll-reveal reveal-zoom-in stagger-4">
+              <div class="border-r metrics-divider pr-3">
+                <span class="metrics-label">Age</span>
+                <span class="font-outfit metrics-value">17 Years</span>
+              </div>
+              <div class="border-r metrics-divider px-3">
+                <span class="metrics-label">Class & Stream</span>
+                <span class="font-outfit metrics-value">12th (Bio)</span>
+              </div>
+              <div class="border-r metrics-divider px-3">
+                <span class="metrics-label">Target</span>
+                <span class="font-outfit metrics-value">NEET / Doctor</span>
+              </div>
+              <div class="pl-3">
+                <span class="metrics-label">Pin Code</span>
+                <span class="font-outfit metrics-value">743701</span>
+              </div>
+            </div>
+
+            <!-- Action CTAs -->
+            <div class="flex flex-wrap items-center gap-3 scroll-reveal reveal-fade-up stagger-5">
+              <a href="https://wa.me/919679010859?text=Hi%20Anabrata!%20Connecting%20from%20your%20website" target="_blank" rel="noopener noreferrer" class="btn-primary" onclick="window.handleSocialClick('whatsapp', event)">
+                <i class="fa-brands fa-whatsapp text-emerald-400 text-base"></i>
+                <span>Chat on WhatsApp</span>
+              </a>
+
+              <a href="https://maps.app.goo.gl/tvgFF9HiQKRyVHHu5" target="_blank" rel="noopener noreferrer" class="btn-outline" onclick="window.handleSocialClick('maps', event)">
+                <i class="fa-solid fa-map-location-dot text-red-500 text-sm"></i>
+                <span>View My Location</span>
+              </a>
+
+              <a href="mailto:anabratabis@gmail.com" onclick="window.handleEmailClick(event)" class="btn-outline">
+                <i class="fa-solid fa-envelope text-blue-600"></i>
+                <span>Open Gmail</span>
+              </a>
+            </div>
+
+          </div>
+
+          <!-- Right Column: Studio Card with Portrait & Corner Seal -->
+          <div class="lg:col-span-5 flex justify-center">
+            
+            <div class="studio-frame relative w-full max-w-md p-4 sm:p-5 scroll-reveal reveal-slide-right">
+              
+              <!-- Frame Top Header -->
+              <div class="flex items-center justify-between pb-3 mb-3 border-b section-divider">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+                  <span class="text-xs font-mono font-bold text-muted ml-2">PORTRAIT // STUDIO</span>
+                </div>
+                <span class="badge-verified">Verified</span>
+              </div>
+
+              <!-- Main Frame Canvas -->
+              <div class="studio-canvas pt-8">
+                
+                <!-- Rotating Corner Seal (Neatly placed in top corner - completely clear of face) -->
+                <div class="absolute top-4 right-4 z-20 pointer-events-none" title="Anabrata Biswas Seal">
+                  <div class="relative w-24 h-24 flex items-center justify-center">
+                    <svg class="w-full h-full animate-rotate-seal" viewBox="0 0 120 120">
+                      <defs>
+                        <path id="sealPath" d="M 60, 60 m -44, 0 a 44,44 0 1,1 88,0 a 44,44 0 1,1 -88,0" />
+                      </defs>
+                      <text class="seal-svg-text">
+                        <textPath href="#sealPath" startOffset="0%">
+                          ✦ ANABRATA BISWAS ✦ NEET ASPIRANT ✦
+                        </textPath>
+                      </text>
+                    </svg>
+                    <div class="seal-center-badge absolute inset-0 m-auto w-8 h-8 rounded-full flex items-center justify-center">
+                      <i class="fa-solid fa-stethoscope text-[10px]"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Verified Location Pill in Frame Top-Left -->
+                <div class="absolute top-4 left-4 z-20">
+                  <a href="https://maps.app.goo.gl/tvgFF9HiQKRyVHHu5" target="_blank" rel="noopener noreferrer" onclick="window.handleSocialClick('maps', event)" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold theme-toggle-btn shadow-sm hover:text-red-500 transition-colors">
+                    <i class="fa-solid fa-location-dot text-red-500 text-xs"></i>
+                    <span>Belta, Gopalnagar</span>
+                  </a>
+                </div>
+
+                <!-- Cutout Portrait -->
+                <div class="relative z-10 w-full flex justify-center">
+                  <img 
+                    src="assets/anabrata.png" 
+                    alt="Anabrata Biswas" 
+                    id="heroImage"
+                    class="max-h-[420px] w-auto object-contain transition-transform duration-300"
+                    loading="eager"
+                  >
+                </div>
+
+                <!-- Bottom Dock Overlay Card -->
+                <div class="studio-dock absolute bottom-3 inset-x-3 z-20 p-3 flex items-center justify-between">
+                  <div>
+                    <h3 class="text-xs font-bold text-headline leading-tight">Anabrata Biswas (Ana)</h3>
+                    <p class="text-xs text-secondary font-medium">Class 12 Bio • Crescent School</p>
+                  </div>
+                  <span class="text-xs font-bold px-2.5 py-1 rounded-md theme-toggle-btn">
+                    Bongaon 743701
+                  </span>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ================================================================
+         03. ACADEMIC & CAREER PATHWAY DASHBOARD (Re-triggerable: 3D Flip)
+         ================================================================ -->
+    <section id="academics" class="py-16 border-b section-divider">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-6 border-b section-divider scroll-reveal reveal-fade-up">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-muted">Academic Foundation</span>
+            <h2 class="font-outfit text-2xl sm:text-3xl font-extrabold text-headline mt-1">
+              Education & Medical Ambition
+            </h2>
+          </div>
+          <p class="text-xs sm:text-sm text-secondary font-medium mt-2 md:mt-0 max-w-md">
+            Dedicated academic roadmap structured towards qualifying NEET and entering Medical College.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          <!-- Card 1: School (Tilt from Left) -->
+          <div class="dashboard-card p-6 flex flex-col justify-between scroll-reveal reveal-tilt-left stagger-1">
+            <div>
+              <div class="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center text-base mb-4 font-bold border border-blue-500/20">
+                <i class="fa-solid fa-school"></i>
+              </div>
+              <span class="text-xs font-bold uppercase tracking-wider text-muted">Institution</span>
+              <h3 class="font-outfit text-lg font-bold text-headline mt-1 mb-2">
+                The Crescent School
+              </h3>
+              <p class="text-xs sm:text-sm text-body leading-relaxed font-normal">
+                Currently enrolled in Class 12th with Biology Specialization. In-depth study of Botany, Zoology, Human Anatomy, Physics, and Chemistry.
+              </p>
+            </div>
+            <div class="pt-4 mt-6 border-t section-divider flex items-center justify-between text-xs font-bold text-secondary">
+              <span>Stream: Biology</span>
+              <span class="text-headline font-extrabold">Class 12</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Ambition (Zoom Focus Center) -->
+          <div class="dashboard-card p-6 flex flex-col justify-between scroll-reveal reveal-zoom-in stagger-2">
+            <div>
+              <div class="w-10 h-10 rounded-lg bg-red-500/10 text-red-600 flex items-center justify-center text-base mb-4 font-bold border border-red-500/20">
+                <i class="fa-solid fa-user-doctor"></i>
+              </div>
+              <span class="text-xs font-bold uppercase tracking-wider text-red-500">Primary Ambition</span>
+              <h3 class="font-outfit text-lg font-bold text-headline mt-1 mb-2">
+                To Become a Doctor
+              </h3>
+              <p class="text-xs sm:text-sm text-body leading-relaxed font-normal">
+                Targeted preparation for the NEET examination. Driven by the calling to heal, diagnose, and provide compassionate healthcare service to people.
+              </p>
+            </div>
+            <div class="pt-4 mt-6 border-t section-divider flex items-center justify-between text-xs font-bold text-secondary">
+              <span>Target Exam</span>
+              <span class="text-red-500 font-extrabold">NEET Medical</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Philosophy (Tilt from Right) -->
+          <div class="dashboard-card p-6 flex flex-col justify-between scroll-reveal reveal-tilt-right stagger-3">
+            <div>
+              <div class="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-600 flex items-center justify-center text-base mb-4 font-bold border border-amber-500/20">
+                <i class="fa-solid fa-quote-left"></i>
+              </div>
+              <span class="text-xs font-bold uppercase tracking-wider text-amber-500">Personal Philosophy</span>
+              <h3 class="font-outfit text-lg font-bold text-headline mt-1 mb-2">
+                "Because I Am Unique"
+              </h3>
+              <p class="text-xs sm:text-sm text-body leading-relaxed italic font-normal">
+                "What makes me unique? Because I am unique." Believing in originality, personal authenticity, and an insatiable drive to know new things every single day.
+              </p>
+            </div>
+            <div class="pt-4 mt-6 border-t section-divider flex items-center justify-between text-xs font-bold text-secondary">
+              <span>Mindset</span>
+              <span class="text-headline font-extrabold">Continuous Learning</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ================================================================
+         04. INTERESTS & HOBBIES DASHBOARD (Re-triggerable: Wave Cascade)
+         ================================================================ -->
+    <section id="passions" class="py-16 border-b section-divider">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-6 border-b section-divider scroll-reveal reveal-fade-up">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-muted">Curiosity & Craft</span>
+            <h2 class="font-outfit text-2xl sm:text-3xl font-extrabold text-headline mt-1">
+              Interests & Creative Pursuits
+            </h2>
+          </div>
+          <p class="text-xs sm:text-sm text-secondary font-medium mt-2 md:mt-0 max-w-md">
+            Hobby: "To know new things" — exploring science, cutting-edge technology, and visual media.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          
+          <!-- 1. Biology -->
+          <div class="dashboard-card p-5 hover-lift scroll-reveal reveal-fade-up stagger-1">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-sm font-bold border border-emerald-500/20">
+                <i class="fa-solid fa-dna text-base"></i>
+              </div>
+              <div>
+                <h3 class="font-outfit font-bold text-sm text-headline">Biology</h3>
+                <span class="text-xs font-semibold text-emerald-600">Life Sciences</span>
+              </div>
+            </div>
+            <p class="text-xs text-body leading-relaxed font-normal">
+              Living systems, cell biology, genetics, and the marvels of human physiological mechanisms.
+            </p>
+          </div>
+
+          <!-- 2. AI -->
+          <div class="dashboard-card p-5 hover-lift scroll-reveal reveal-fade-up stagger-2">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-lg bg-purple-500/10 text-purple-600 flex items-center justify-center text-sm font-bold border border-purple-500/20">
+                <i class="fa-solid fa-brain text-base"></i>
+              </div>
+              <div>
+                <h3 class="font-outfit font-bold text-sm text-headline">Artificial Intelligence</h3>
+                <span class="text-xs font-semibold text-purple-600">Modern Tech</span>
+              </div>
+            </div>
+            <p class="text-xs text-body leading-relaxed font-normal">
+              Fascinated by neural networks, AI tools, and how artificial intelligence shapes the future.
+            </p>
+          </div>
+
+          <!-- 3. Photography -->
+          <div class="dashboard-card p-5 hover-lift scroll-reveal reveal-fade-up stagger-3">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center text-sm font-bold border border-blue-500/20">
+                <i class="fa-solid fa-camera text-base"></i>
+              </div>
+              <div>
+                <h3 class="font-outfit font-bold text-sm text-headline">Photography</h3>
+                <span class="text-xs font-semibold text-blue-600">Visual Art</span>
+              </div>
+            </div>
+            <p class="text-xs text-body leading-relaxed font-normal">
+              Capturing candid portraits, architectural geometry, natural lighting, and framing moments.
+            </p>
+          </div>
+
+          <!-- 4. Editor -->
+          <div class="dashboard-card p-5 hover-lift scroll-reveal reveal-fade-up stagger-4">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-lg bg-orange-500/10 text-orange-600 flex items-center justify-center text-sm font-bold border border-orange-500/20">
+                <i class="fa-solid fa-sliders text-base"></i>
+              </div>
+              <div>
+                <h3 class="font-outfit font-bold text-sm text-headline">Video & Photo Editor</h3>
+                <span class="text-xs font-semibold text-orange-600">Post-Production</span>
+              </div>
+            </div>
+            <p class="text-xs text-body leading-relaxed font-normal">
+              Crafting visual rhythm, color grading, audio synchronization, and editing creative content.
+            </p>
+          </div>
+
+          <!-- 5. Songs -->
+          <div class="dashboard-card p-5 hover-lift scroll-reveal reveal-fade-up stagger-5">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-lg bg-rose-500/10 text-rose-600 flex items-center justify-center text-sm font-bold border border-rose-500/20">
+                <i class="fa-solid fa-music text-base"></i>
+              </div>
+              <div>
+                <h3 class="font-outfit font-bold text-sm text-headline">Songs & Music</h3>
+                <span class="text-xs font-semibold text-rose-600">Focus & Flow</span>
+              </div>
+            </div>
+            <p class="text-xs text-body leading-relaxed font-normal">
+              Music is the fuel for long study hours and creative flow. Love exploring melodies across genres.
+            </p>
+          </div>
+
+          <!-- 6. Movies -->
+          <div class="dashboard-card p-5 hover-lift scroll-reveal reveal-fade-up stagger-6">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-lg bg-teal-500/10 text-teal-600 flex items-center justify-center text-sm font-bold border border-teal-500/20">
+                <i class="fa-solid fa-film text-base"></i>
+              </div>
+              <div>
+                <h3 class="font-outfit font-bold text-sm text-headline">Cinema & Movies</h3>
+                <span class="text-xs font-semibold text-teal-600">Storytelling</span>
+              </div>
+            </div>
+            <p class="text-xs text-body leading-relaxed font-normal">
+              Appreciating compelling screenplay writing, directorial vision, world-building, and character arcs.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ================================================================
+         05. VERIFIED LOCATION & GOOGLE MAPS SECTION (Re-triggerable: Spatial Slide)
+         ================================================================ -->
+    <section id="location" class="py-16 border-b section-divider">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-6 border-b section-divider scroll-reveal reveal-fade-up">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-muted">Geographic Location</span>
+            <h2 class="font-outfit text-2xl sm:text-3xl font-extrabold text-headline mt-1">
+              Location & Google Maps
+            </h2>
+          </div>
+          <p class="text-xs sm:text-sm text-secondary font-medium mt-2 md:mt-0 max-w-md">
+            Residential address with direct Google Maps redirection and live interactive map.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          
+          <!-- Location Details Card (Slide In from Left) -->
+          <div class="lg:col-span-5 dashboard-card p-6 scroll-reveal reveal-slide-left">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-12 h-12 rounded-xl bg-red-500/10 text-red-600 flex items-center justify-center text-xl border border-red-500/20">
+                <i class="fa-solid fa-map-pin"></i>
+              </div>
+              <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-muted">Verified Address</span>
+                <h3 class="font-outfit text-lg font-bold text-headline">Belta, Gopalnagar</h3>
+              </div>
+            </div>
+
+            <!-- Address Breakdown -->
+            <div class="space-y-3 py-4 border-y section-divider text-xs font-medium">
+              <div class="flex justify-between">
+                <span class="text-secondary">Locality:</span>
+                <span class="font-bold text-headline">Belta</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-secondary">Police Station / Block:</span>
+                <span class="font-bold text-headline">Gopalnagar</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-secondary">Sub-division / Town:</span>
+                <span class="font-bold text-headline">Bongaon</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-secondary">District:</span>
+                <span class="font-bold text-headline">North 24 Parganas</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-secondary">State:</span>
+                <span class="font-bold text-headline">West Bengal, India</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-secondary">PIN Code:</span>
+                <span class="font-mono font-bold text-headline theme-toggle-btn px-2 py-0.5 rounded">743701</span>
+              </div>
+            </div>
+
+            <!-- Action Link Button (Direct to https://maps.app.goo.gl/tvgFF9HiQKRyVHHu5) -->
+            <div class="mt-6">
+              <a 
+                href="https://maps.app.goo.gl/tvgFF9HiQKRyVHHu5" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                onclick="window.handleSocialClick('maps', event)"
+                class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-sm transition-colors"
+              >
+                <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                <span>Open in Google Maps App / Web</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Interactive Google Maps Frame (Slide In from Right) -->
+          <div class="lg:col-span-7 dashboard-card overflow-hidden scroll-reveal reveal-slide-right relative">
+            <div class="p-3 border-b section-divider flex items-center justify-between text-xs text-secondary font-semibold gap-2">
+              <a href="https://maps.app.goo.gl/tvgFF9HiQKRyVHHu5" target="_blank" rel="noopener noreferrer" onclick="window.handleSocialClick('maps', event)" class="flex items-center gap-1.5 text-red-600 dark:text-red-400 font-bold hover:underline transition-colors truncate">
+                <i class="fa-solid fa-location-dot text-red-500 shrink-0"></i> 
+                <span class="truncate">Google Maps (maps.app.goo.gl/tvgFF9HiQKRyVHHu5)</span>
+              </a>
+              <span class="font-mono shrink-0">743701 • West Bengal</span>
+            </div>
+            <div class="relative">
+              <iframe 
+                src="https://maps.google.com/maps?q=Belta,%20Gopalnagar,%20Bongaon,%20West%20Bengal%20743701&t=&z=14&ie=UTF8&iwloc=&output=embed" 
+                width="100%" 
+                height="320" 
+                style="border:0;" 
+                allowfullscreen="" 
+                loading="lazy" 
+                referrerpolicy="no-referrer-when-downgrade"
+                title="Google Maps Location: Belta, Gopalnagar, Bongaon"
+              ></iframe>
+              <!-- Direct Floating Action Pill to open the exact shared Google Maps URL -->
+              <a 
+                href="https://maps.app.goo.gl/tvgFF9HiQKRyVHHu5" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                onclick="window.handleSocialClick('maps', event)"
+                class="absolute bottom-4 right-4 z-10 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-lg transition-transform hover:scale-105 active:scale-95"
+              >
+                <i class="fa-solid fa-map-location-dot"></i>
+                <span>Open Exact Location</span>
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ================================================================
+         06. DIRECT CONTACT DASHBOARD (Re-triggerable: Squeeze & Unfold)
+         ================================================================ -->
+    <section id="contact" class="py-16">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-6 border-b section-divider scroll-reveal reveal-fade-up">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-muted">Communication</span>
+            <h2 class="font-outfit text-2xl sm:text-3xl font-extrabold text-headline mt-1">
+              Contact Information
+            </h2>
+          </div>
+          <p class="text-xs sm:text-sm text-secondary font-medium mt-2 md:mt-0 max-w-md">
+            Preferred contact: WhatsApp (+91 9679010859). Direct email: anabratabis@gmail.com
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+          
+          <!-- Email Box -->
+          <div class="dashboard-card p-6 flex flex-col justify-between scroll-reveal reveal-slide-left stagger-1">
+            <div>
+              <div class="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center text-lg mb-4 border border-blue-500/20">
+                <i class="fa-solid fa-envelope"></i>
+              </div>
+              <span class="text-xs font-bold uppercase tracking-wider text-muted">Public Email</span>
+              <p class="font-outfit text-lg font-bold text-headline mt-1">
+                anabratabis@gmail.com
+              </p>
+              <p class="text-xs text-secondary mt-1 font-medium">Opens directly in Gmail on PC, or Mail app on Mobile.</p>
+            </div>
+            <div class="flex items-center gap-3 mt-6">
+              <a href="mailto:anabratabis@gmail.com" class="btn-primary text-xs py-2 px-4" onclick="window.handleEmailClick(event)">
+                <i class="fa-solid fa-paper-plane mr-1"></i> Open Gmail
+              </a>
+              <button id="copyEmailBtn" class="btn-outline text-xs py-2 px-4 cursor-pointer">
+                <i class="fa-regular fa-copy mr-1"></i> Copy Address
+              </button>
+            </div>
+          </div>
+
+          <!-- WhatsApp Box -->
+          <div class="dashboard-card p-6 flex flex-col justify-between scroll-reveal reveal-slide-right stagger-2">
+            <div>
+              <div class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-lg mb-4 border border-emerald-500/20">
+                <i class="fa-brands fa-whatsapp text-xl"></i>
+              </div>
+              <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Preferred Channel</span>
+              <p class="font-outfit text-lg font-bold text-headline mt-1">
+                WhatsApp: +91 9679010859
+              </p>
+              <p class="text-xs text-secondary mt-1 font-medium">Direct connection to WhatsApp application on Mobile and PC.</p>
+            </div>
+            <div class="mt-6">
+              <a href="https://wa.me/919679010859?text=Hi%20Anabrata!%20Connecting%20from%20your%20website" target="_blank" rel="noopener noreferrer" class="btn-whatsapp" onclick="window.handleSocialClick('whatsapp', event)">
+                <i class="fa-brands fa-whatsapp text-sm"></i>
+                <span>Open WhatsApp Chat</span>
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Social Media Buttons (Includes Direct Email Option) -->
+        <div class="dashboard-card p-6 text-center scroll-reveal reveal-unfold stagger-3">
+          <p class="text-xs font-bold uppercase tracking-wider text-secondary mb-4">
+            Connect Across Social Platforms & Direct Channels
+          </p>
+          <div class="flex flex-wrap justify-center gap-3">
+            
+            <!-- Facebook (Status: 0 -> Opens animated no-info.html) -->
+            <a href="no-info.html?platform=facebook" class="btn-outline text-xs py-2 px-4 flex items-center gap-2" onclick="window.handleSocialClick('facebook', event)">
+              <i class="fa-brands fa-facebook-f text-blue-600"></i> Facebook
+            </a>
+
+            <!-- Instagram (Status: 1 -> Opens actual Instagram App / Web) -->
+            <a href="https://www.instagram.com/abheroism?srtk=MndnNzF6a2oyb3pu" target="_blank" rel="noopener noreferrer" class="btn-outline text-xs py-2 px-4 flex items-center gap-2" onclick="window.handleSocialClick('instagram', event)">
+              <i class="fa-brands fa-instagram text-pink-600"></i> Instagram
+            </a>
+
+            <!-- YouTube (Status: 0 -> Opens animated no-info.html) -->
+            <a href="no-info.html?platform=youtube" class="btn-outline text-xs py-2 px-4 flex items-center gap-2" onclick="window.handleSocialClick('youtube', event)">
+              <i class="fa-brands fa-youtube text-red-600"></i> YouTube
+            </a>
+
+            <!-- Google Maps (Status: 1 -> Opens Maps App / Web) -->
+            <a href="https://maps.app.goo.gl/tvgFF9HiQKRyVHHu5" target="_blank" rel="noopener noreferrer" class="btn-outline text-xs py-2 px-4 flex items-center gap-2" onclick="window.handleSocialClick('maps', event)">
+              <i class="fa-solid fa-location-dot text-red-500"></i> Google Maps
+            </a>
+
+            <!-- Direct Email (Status: 1 -> Opens Gmail directly) -->
+            <a href="mailto:anabratabis@gmail.com" class="btn-outline text-xs py-2 px-4 flex items-center gap-2" onclick="window.handleEmailClick(event)">
+              <i class="fa-solid fa-envelope text-blue-600"></i> anabratabis@gmail.com
+            </a>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- ================================================================
+       07. PROXIMITY CIRCULAR CONTACT COLUMN WIDGET
+       Controlled via window.handleSocialClick (0 = Inactive Notice, 1 = Direct App)
+       ================================================================ -->
+  <div class="social-widget" id="socialWidget" aria-label="Interactive Contact Column">
+
+    <span class="column-track"></span>
+
+    <!-- 1. Facebook (Status: 0 -> Animated Notice) -->
+    <div class="social-item"
+         style="--cx:0px; --cy:-130px; --ax:-67px; --ay:-183px; --delay:0.00s"
+         data-label="Facebook">
+      <a href="no-info.html?platform=facebook" class="social-icon facebook" title="Facebook" onclick="window.handleSocialClick('facebook', event)">
+        <i class="fa-brands fa-facebook-f"></i>
+      </a>
+      <span class="widget-tooltip">Facebook</span>
+    </div>
+
+    <!-- 2. Instagram (Status: 1 -> Direct to https://www.instagram.com/abheroism) -->
+    <div class="social-item"
+         style="--cx:0px; --cy:-78px; --ax:-145px; --ay:-130px; --delay:0.04s"
+         data-label="Instagram">
+      <a href="https://www.instagram.com/abheroism?srtk=MndnNzF6a2oyb3pu" class="social-icon instagram" title="Instagram (@abheroism)" target="_blank" rel="noopener noreferrer" onclick="window.handleSocialClick('instagram', event)">
+        <i class="fa-brands fa-instagram"></i>
+      </a>
+      <span class="widget-tooltip">Instagram</span>
+    </div>
+
+    <!-- 3. YouTube (Status: 0 -> Animated Notice) -->
+    <div class="social-item"
+         style="--cx:0px; --cy:-26px; --ax:-189px; --ay:-47px; --delay:0.08s"
+         data-label="YouTube">
+      <a href="no-info.html?platform=youtube" class="social-icon youtube" title="YouTube" onclick="window.handleSocialClick('youtube', event)">
+        <i class="fa-brands fa-youtube"></i>
+      </a>
+      <span class="widget-tooltip">YouTube</span>
+    </div>
+
+    <!-- 4. WhatsApp (Status: 1 -> Direct to https://wa.me/919679010859) -->
+    <div class="social-item"
+         style="--cx:0px; --cy:26px; --ax:-189px; --ay:47px; --delay:0.12s"
+         data-label="WhatsApp">
+      <a href="https://wa.me/919679010859?text=Hi%20Anabrata!%20Connecting%20from%20your%20website" class="social-icon whatsapp" title="WhatsApp (+91 9679010859)" target="_blank" rel="noopener noreferrer" onclick="window.handleSocialClick('whatsapp', event)">
+        <i class="fa-brands fa-whatsapp"></i>
+      </a>
+      <span class="widget-tooltip">WhatsApp</span>
+    </div>
+
+    <!-- 5. Google Maps Location (Status: 1 -> Direct to https://maps.app.goo.gl/tvgFF9HiQKRyVHHu5) -->
+    <div class="social-item"
+         style="--cx:0px; --cy:78px; --ax:-145px; --ay:130px; --delay:0.16s"
+         data-label="Location">
+      <a href="https://maps.app.goo.gl/tvgFF9HiQKRyVHHu5" 
+         class="social-icon maps" 
+         title="Google Maps Location" 
+         target="_blank" 
+         rel="noopener noreferrer"
+         onclick="window.handleSocialClick('maps', event)">
+        <i class="fa-solid fa-location-dot"></i>
+      </a>
+      <span class="widget-tooltip">Belta, Bongaon</span>
+    </div>
+
+    <!-- 6. Direct Email (Status: 1 -> Direct to Gmail) -->
+    <div class="social-item"
+         style="--cx:0px; --cy:130px; --ax:-67px; --ay:183px; --delay:0.20s"
+         data-label="Email">
+      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=anabratabis@gmail.com" class="social-icon call" title="Email anabratabis@gmail.com" target="_blank" onclick="window.handleEmailClick(event)">
+        <i class="fa-solid fa-envelope"></i>
+      </a>
+      <span class="widget-tooltip">Open Gmail</span>
+    </div>
+
+  </div>
+
+  <!-- Mobile Quick Contact Bottom Sheet (< 1024px) -->
+  <div id="mobileContactSheet" class="mobile-contact-sheet lg:hidden">
+    <div class="max-w-md mx-auto dashboard-card rounded-t-3xl p-6 shadow-2xl border-t border-x section-divider">
+      
+      <!-- Drag Bar & Header -->
+      <div class="flex items-center justify-between mb-4 pb-3 border-b section-divider">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center text-sm font-bold">
+            <i class="fa-solid fa-paper-plane"></i>
+          </div>
+          <div>
+            <h3 class="font-outfit font-bold text-base text-headline">Quick Connect</h3>
+            <p class="text-[11px] text-secondary font-medium">Reach out directly or explore channels</p>
+          </div>
+        </div>
+        <button id="closeMobileSheet" class="theme-toggle-btn w-8 h-8 rounded-full flex items-center justify-center text-xs cursor-pointer" aria-label="Close sheet">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Quick Contact Grid (6 Touch-Friendly Channels) -->
+      <div class="grid grid-cols-2 gap-2.5 mb-2">
+        
+        <!-- 1. WhatsApp (Active) -->
+        <a href="https://wa.me/919679010859?text=Hi%20Anabrata!%20Connecting%20from%20your%20website" 
+           class="flex items-center gap-2.5 p-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 transition-colors"
+           onclick="window.handleSocialClick('whatsapp', event)">
+          <div class="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-sm shadow-sm shrink-0">
+            <i class="fa-brands fa-whatsapp"></i>
+          </div>
+          <div class="min-w-0">
+            <div class="font-outfit font-bold text-xs text-headline truncate">WhatsApp</div>
+            <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">Direct Chat</div>
+          </div>
+        </a>
+
+        <!-- 2. Instagram (Active) -->
+        <a href="https://www.instagram.com/abheroism?srtk=MndnNzF6a2oyb3pu" 
+           class="flex items-center gap-2.5 p-2.5 rounded-xl bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/20 transition-colors"
+           onclick="window.handleSocialClick('instagram', event)">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 via-pink-500 to-purple-600 text-white flex items-center justify-center text-sm shadow-sm shrink-0">
+            <i class="fa-brands fa-instagram"></i>
+          </div>
+          <div class="min-w-0">
+            <div class="font-outfit font-bold text-xs text-headline truncate">Instagram</div>
+            <div class="text-[10px] text-pink-600 dark:text-pink-400 font-semibold">@abheroism</div>
+          </div>
+        </a>
+
+        <!-- 3. Google Maps (Active) -->
+        <a href="https://maps.app.goo.gl/tvgFF9HiQKRyVHHu5" 
+           class="flex items-center gap-2.5 p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-colors"
+           onclick="window.handleSocialClick('maps', event)">
+          <div class="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center text-sm shadow-sm shrink-0">
+            <i class="fa-solid fa-location-dot"></i>
+          </div>
+          <div class="min-w-0">
+            <div class="font-outfit font-bold text-xs text-headline truncate">Google Maps</div>
+            <div class="text-[10px] text-red-600 dark:text-red-400 font-semibold">Belta, Bongaon</div>
+          </div>
+        </a>
+
+        <!-- 4. Email / Gmail (Active) -->
+        <a href="mailto:anabratabis@gmail.com" 
+           class="flex items-center gap-2.5 p-2.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 transition-colors"
+           onclick="window.handleEmailClick(event)">
+          <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm shadow-sm shrink-0">
+            <i class="fa-solid fa-envelope"></i>
+          </div>
+          <div class="min-w-0">
+            <div class="font-outfit font-bold text-xs text-headline truncate">Gmail</div>
+            <div class="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">Open App</div>
+          </div>
+        </a>
+
+        <!-- 5. Facebook (Status: 0 -> Animated Notice) -->
+        <a href="no-info.html?platform=facebook" 
+           class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-500/10 hover:bg-slate-500/20 border border-slate-500/20 transition-colors"
+           onclick="window.handleSocialClick('facebook', event)">
+          <div class="w-8 h-8 rounded-full bg-blue-700 text-white flex items-center justify-center text-sm shadow-sm shrink-0">
+            <i class="fa-brands fa-facebook-f"></i>
+          </div>
+          <div class="min-w-0">
+            <div class="font-outfit font-bold text-xs text-headline truncate">Facebook</div>
+            <div class="text-[10px] text-secondary font-medium">Coming Soon</div>
+          </div>
+        </a>
+
+        <!-- 6. YouTube (Status: 0 -> Animated Notice) -->
+        <a href="no-info.html?platform=youtube" 
+           class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-500/10 hover:bg-slate-500/20 border border-slate-500/20 transition-colors"
+           onclick="window.handleSocialClick('youtube', event)">
+          <div class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-sm shadow-sm shrink-0">
+            <i class="fa-brands fa-youtube"></i>
+          </div>
+          <div class="min-w-0">
+            <div class="font-outfit font-bold text-xs text-headline truncate">YouTube</div>
+            <div class="text-[10px] text-secondary font-medium">Coming Soon</div>
+          </div>
+        </a>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Mobile Floating Quick Contact Button (< 1024px) -->
+  <button id="mobileSocialTrigger" aria-label="Toggle Quick Contact" class="theme-toggle-btn fixed bottom-5 right-5 z-[1001] w-12 h-12 rounded-full flex items-center justify-center shadow-xl lg:hidden cursor-pointer hover:scale-105 active:scale-95 transition-transform">
+    <i class="fa-solid fa-comments text-base text-blue-600 dark:text-blue-400" id="mobileTriggerIcon"></i>
+  </button>
+
+
+  <!-- ================================================================
+       08. FOOTER
+       ================================================================ -->
+  <footer class="site-header py-10 text-xs text-secondary">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="font-outfit font-bold text-headline">Anabrata Biswas</span>
+        <span>•</span>
+        <span>Belta, Gopalnagar, Bongaon, West Bengal 743701</span>
+      </div>
+      <div>
+        &copy; <span id="currentYear"></span> • All Rights Reserved
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification for email copy -->
+  <div id="toastNotification" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[1001] px-4 py-2.5 rounded-lg bg-slate-900 text-white text-xs font-semibold shadow-xl flex items-center gap-2 opacity-0 pointer-events-none transition-opacity duration-200">
+    <i class="fa-solid fa-check text-emerald-400"></i>
+    <span id="toastMessage">Email copied: anabratabis@gmail.com</span>
+  </div>
+
+  <!-- Modular Scripts -->
+  <script src="js/theme.js"></script>
+  <script src="js/clock.js"></script>
+  <script src="js/scroll.js"></script>
+  <script src="js/widget.js"></script>
+  <script src="js/main.js"></script>
+</body>
 </html>

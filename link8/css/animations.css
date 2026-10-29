@@ -1,0 +1,191 @@
+/* ==========================================================================
+   ANIMATIONS.CSS — Cinematic Scroll Reveal Animations, Parallax & Effects
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   01. ROTATING CORNER SEAL (Located neatly in frame corner - away from face)
+   -------------------------------------------------------------------------- */
+.animate-rotate-seal {
+  animation: rotateSeal 22s linear infinite;
+  transform-origin: center center;
+}
+
+@keyframes rotateSeal {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.seal-svg-text {
+  font-family: 'Outfit', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  fill: var(--c-text-headline) !important;
+}
+
+.seal-center-badge {
+  background-color: var(--c-subtle-bg) !important;
+  border: 1px solid var(--c-border) !important;
+  color: var(--c-text-headline) !important;
+}
+
+/* --------------------------------------------------------------------------
+   02. COMPREHENSIVE SCROLL REVEAL ANIMATIONS (Re-triggerable on scroll up/down)
+   -------------------------------------------------------------------------- */
+
+/* Base state for all scroll-reveal elements */
+.scroll-reveal {
+  opacity: 0;
+  will-change: transform, opacity, filter;
+  transition:
+    opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 1. Reveal: Fade Up with Depth Lift */
+.reveal-fade-up {
+  transform: translateY(40px);
+  filter: blur(6px);
+}
+.reveal-fade-up.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* 2. Reveal: 3D Left Perspective Tilt */
+.reveal-tilt-left {
+  transform: perspective(1000px) rotateY(16deg) translateY(35px) scale(0.95);
+  filter: blur(5px);
+}
+.reveal-tilt-left.is-revealed {
+  opacity: 1;
+  transform: perspective(1000px) rotateY(0deg) translateY(0) scale(1);
+  filter: blur(0);
+}
+
+/* 3. Reveal: 3D Right Perspective Tilt */
+.reveal-tilt-right {
+  transform: perspective(1000px) rotateY(-16deg) translateY(35px) scale(0.95);
+  filter: blur(5px);
+}
+.reveal-tilt-right.is-revealed {
+  opacity: 1;
+  transform: perspective(1000px) rotateY(0deg) translateY(0) scale(1);
+  filter: blur(0);
+}
+
+/* 4. Reveal: Zoom In & Sharp Focus */
+.reveal-zoom-in {
+  transform: scale(0.90) translateY(30px);
+  filter: blur(6px);
+}
+.reveal-zoom-in.is-revealed {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  filter: blur(0);
+}
+
+/* 5. Reveal: Cinematic Slide In from Left */
+.reveal-slide-left {
+  transform: translateX(-50px);
+  filter: blur(5px);
+}
+.reveal-slide-left.is-revealed {
+  opacity: 1;
+  transform: translateX(0);
+  filter: blur(0);
+}
+
+/* 6. Reveal: Cinematic Slide In from Right */
+.reveal-slide-right {
+  transform: translateX(50px);
+  filter: blur(5px);
+}
+.reveal-slide-right.is-revealed {
+  opacity: 1;
+  transform: translateX(0);
+  filter: blur(0);
+}
+
+/* 7. Reveal: Architectural Unfold from Center */
+.reveal-unfold {
+  transform: scaleY(0.92) translateY(30px);
+  transform-origin: bottom center;
+  filter: blur(4px);
+}
+.reveal-unfold.is-revealed {
+  opacity: 1;
+  transform: scaleY(1) translateY(0);
+  filter: blur(0);
+}
+
+/* Staggered Delay Utilities */
+.stagger-1 { transition-delay: 0.06s; }
+.stagger-2 { transition-delay: 0.12s; }
+.stagger-3 { transition-delay: 0.18s; }
+.stagger-4 { transition-delay: 0.24s; }
+.stagger-5 { transition-delay: 0.30s; }
+.stagger-6 { transition-delay: 0.36s; }
+
+/* --------------------------------------------------------------------------
+   03. MICRO HOVER LIFTS & PULSES
+   -------------------------------------------------------------------------- */
+.hover-lift {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: var(--c-shadow-hover);
+}
+
+.badge-pulse {
+  animation: pulseDot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.15);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   04. MOBILE SCREEN OVERFLOW PREVENTION (< 768px)
+   Replaces horizontal slide transforms with vertical lifts so animations
+   never push content past the mobile screen edges.
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .reveal-slide-left,
+  .reveal-slide-right {
+    transform: translateY(28px) !important;
+    filter: blur(4px) !important;
+  }
+  .reveal-slide-left.is-revealed,
+  .reveal-slide-right.is-revealed {
+    transform: translateY(0) !important;
+    filter: blur(0) !important;
+  }
+
+  .reveal-tilt-left,
+  .reveal-tilt-right {
+    transform: translateY(28px) scale(0.98) !important;
+    filter: blur(4px) !important;
+  }
+  .reveal-tilt-left.is-revealed,
+  .reveal-tilt-right.is-revealed {
+    transform: translateY(0) scale(1) !important;
+    filter: blur(0) !important;
+  }
+}
